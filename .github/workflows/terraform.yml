@@ -1,0 +1,161 @@
+name: Terraform
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: ap-northeast-1
+  TF_IN_AUTOMATION: true
+  TF_INPUT: 0
+
+jobs:
+  plan:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.27.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build lambda package
+        run: |
+          pnpm --filter api exec tsc --outDir ../../infra/terraform/app/build --rootDir src
+          cd infra/terraform/app
+          zip -j build/lambda.zip build/index.js
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform init
+        run: terraform init
+        working-directory: infra/terraform/app
+
+      - name: Terraform workspace
+        run: terraform workspace select dev || terraform workspace new dev
+        working-directory: infra/terraform/app
+
+      - name: Terraform plan
+        run: terraform plan -var-file=../env/dev.tfvars
+        working-directory: infra/terraform/app
+
+  apply:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: wardrobe-dev-terraform
+      cancel-in-progress: false
+
+    outputs:
+      web_bucket_name: ${{ steps.tf-outputs.outputs.web_bucket_name }}
+      web_distribution_id: ${{ steps.tf-outputs.outputs.web_distribution_id }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.27.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build lambda package
+        run: |
+          pnpm --filter api exec tsc --outDir ../../infra/terraform/app/build --rootDir src
+          cd infra/terraform/app
+          zip -j build/lambda.zip build/index.js
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform init
+        run: terraform init
+        working-directory: infra/terraform/app
+
+      - name: Terraform workspace
+        run: terraform workspace select dev || terraform workspace new dev
+        working-directory: infra/terraform/app
+
+      - name: Terraform apply
+        run: terraform apply -auto-approve -var-file=../env/dev.tfvars
+        working-directory: infra/terraform/app
+
+      - name: Export Terraform outputs
+        id: tf-outputs
+        run: |
+          echo "web_bucket_name=$(terraform output -raw web_bucket_name)" >> "$GITHUB_OUTPUT"
+          echo "web_distribution_id=$(terraform output -raw web_cdn_distribution_id)" >> "$GITHUB_OUTPUT"
+        working-directory: infra/terraform/app
+
+  deploy_web:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    needs: apply
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.27.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build web
+        run: pnpm --filter web build
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Sync to S3
+        run: aws s3 sync apps/web/out s3://${{ needs.apply.outputs.web_bucket_name }}
+
+      - name: Invalidate CloudFront cache
+        run: aws cloudfront create-invalidation --distribution-id ${{ needs.apply.outputs.web_distribution_id }} --paths "/*"
