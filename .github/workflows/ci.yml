@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - main
+      - master
 
 permissions:
   contents: read
@@ -27,11 +28,20 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Lint
+        run: pnpm -r --if-present run lint
+
       - name: Typecheck api
         run: pnpm --filter api exec tsc --noEmit
 
       - name: Typecheck web
         run: pnpm --filter web exec tsc --noEmit
+
+      - name: Test
+        run: pnpm --filter api exec node --test
+
+      - name: Build api
+        run: pnpm --filter api exec tsc --outDir build --rootDir src
 
       - name: Build web
         run: pnpm --filter web build
