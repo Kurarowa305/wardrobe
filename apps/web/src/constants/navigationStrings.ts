@@ -2,6 +2,7 @@ export const NAVIGATION_STRINGS = {
   back: "戻る",
   aria: {
     mainTab: "メインタブ",
+    headerAction: "その他の操作",
   },
   tabs: {
     home: "ホーム",

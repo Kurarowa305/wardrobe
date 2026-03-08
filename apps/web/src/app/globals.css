@@ -60,6 +60,57 @@ a {
   font-weight: 700;
 }
 
+
+.app-header-side:last-child {
+  justify-content: flex-end;
+}
+
+.nav-header-action-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--text-main);
+  font-size: 20px;
+  line-height: 1;
+}
+
+
+.nav-header-action-wrap {
+  position: relative;
+}
+
+.nav-header-action-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  margin: 0;
+  padding: 6px;
+  min-width: 120px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  list-style: none;
+  display: grid;
+  gap: 4px;
+}
+
+.nav-header-action-menu-item {
+  display: block;
+  padding: 8px 10px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 13px;
+}
+
+.nav-header-action-menu-item:hover {
+  background: var(--primary-soft);
+}
+
 .nav-back-button {
   display: inline-flex;
   align-items: center;
