@@ -1,5 +1,6 @@
 import { StubScreen } from "@/components/app/layout/StubScreen";
 import { DEMO_IDS, ROUTES } from "@/constants/routes";
+import { TEMPLATE_STRINGS } from "@/features/template/strings";
 
 type TemplateListPageProps = {
   params: Promise<{ wardrobeId: string }>;
@@ -10,13 +11,12 @@ export default async function TemplateListPage({ params }: TemplateListPageProps
 
   return (
     <StubScreen
-      title="テンプレート"
+      title={TEMPLATE_STRINGS.list.title}
       tabKey="templates"
       wardrobeId={wardrobeId}
-      description="テンプレート一覧（タブ）。戻るは表示しません。"
       links={[
-        { label: "＋ テンプレートを追加", href: ROUTES.templateNew(wardrobeId) },
-        { label: "テンプレート詳細へ", href: ROUTES.templateDetail(wardrobeId, DEMO_IDS.template) },
+        { label: TEMPLATE_STRINGS.list.actions.add, href: ROUTES.templateNew(wardrobeId) },
+        { label: TEMPLATE_STRINGS.detail.title, href: ROUTES.templateDetail(wardrobeId, DEMO_IDS.template) },
       ]}
     />
   );

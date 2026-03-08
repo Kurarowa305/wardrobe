@@ -11,7 +11,7 @@ export type ScreenLink = {
 
 type StubScreenProps = {
   title: string;
-  description: string;
+  description?: string;
   backHref?: string;
   tabKey?: TabKey;
   wardrobeId?: string;
@@ -31,7 +31,7 @@ export function StubScreen({
   return (
     <AppLayout title={title} backHref={backHref} tabKey={tabKey} wardrobeId={wardrobeId}>
       <section className="stub-panel">
-        <p className="stub-description">{description}</p>
+        {description ? <p className="stub-description">{description}</p> : null}
         {note ? <p className="stub-note">{note}</p> : null}
         {links.length > 0 ? (
           <ul className="stub-link-list">

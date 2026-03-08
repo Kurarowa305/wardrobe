@@ -127,7 +127,7 @@ check("RT-03", "legacy top-level routes do not exist", () => {
   };
 });
 
-check("RT-05", "all stack routes under wardrobeId exist", () => {
+check("RT-04", "all stack routes under wardrobeId exist", () => {
   const missing = STACK_PAGES.filter((file) => !exists(file));
   return {
     ok: missing.length === 0,
@@ -135,7 +135,7 @@ check("RT-05", "all stack routes under wardrobeId exist", () => {
   };
 });
 
-check("RT-06", "all 15 screens are defined", () => {
+check("RT-05", "all 15 screens are defined", () => {
   const pages = findPageFiles().filter((file) => file !== ROOT_PAGE);
   const missing = expected15Screens.filter((file) => !pages.includes(file));
   const extra = pages.filter((file) => !expected15Screens.includes(file));
@@ -146,7 +146,7 @@ check("RT-06", "all 15 screens are defined", () => {
   };
 });
 
-check("RT-07", "TabBar rendering is limited to tab screens", () => {
+check("RT-06", "TabBar rendering is limited to tab screens", () => {
   const appLayoutOk = includes(
     "src/components/app/layout/AppLayout.tsx",
     "{tabKey && wardrobeId ? <TabBar activeTab={tabKey} wardrobeId={wardrobeId} /> : null}",
@@ -162,7 +162,7 @@ check("RT-07", "TabBar rendering is limited to tab screens", () => {
   };
 });
 
-check("RT-08", "tab transitions keep wardrobeId", () => {
+check("RT-07", "tab transitions keep wardrobeId", () => {
   const ok = containsAll("src/components/app/navigation/TabBar.tsx", [
     "ROUTES.home(wardrobeId)",
     "ROUTES.histories(wardrobeId)",
@@ -175,7 +175,7 @@ check("RT-08", "tab transitions keep wardrobeId", () => {
   };
 });
 
-check("RT-09", "tab pages have no back button", () => {
+check("RT-08", "tab pages have no back button", () => {
   const invalid = TAB_PAGES.filter((file) => includes(file, "backHref="));
   return {
     ok: invalid.length === 0,
@@ -183,7 +183,7 @@ check("RT-09", "tab pages have no back button", () => {
   };
 });
 
-check("RT-10", "stack/detail pages have back button", () => {
+check("RT-09", "stack/detail pages have back button", () => {
   const backFiles = [
     ...STACK_PAGES.filter((file) => !file.endsWith("/histories/[historyId]/page.tsx")),
     HISTORY_CLIENT,
@@ -195,7 +195,7 @@ check("RT-10", "stack/detail pages have back button", () => {
   };
 });
 
-check("RT-11", "record method back route is wardrobe home", () => {
+check("RT-10", "record method back route is wardrobe home", () => {
   const ok = includes(
     "src/app/wardrobes/[wardrobeId]/(stack)/record/page.tsx",
     "backHref={ROUTES.home(wardrobeId)}",
@@ -203,7 +203,7 @@ check("RT-11", "record method back route is wardrobe home", () => {
   return { ok, detail: "record/page.tsx must back to ROUTES.home(wardrobeId)" };
 });
 
-check("RT-12", "record detail pages back to record method", () => {
+check("RT-11", "record detail pages back to record method", () => {
   const files = [
     "src/app/wardrobes/[wardrobeId]/(stack)/record/template/page.tsx",
     "src/app/wardrobes/[wardrobeId]/(stack)/record/combination/page.tsx",
@@ -215,7 +215,7 @@ check("RT-12", "record detail pages back to record method", () => {
   };
 });
 
-check("RT-13", "template create/detail/edit back routes follow spec", () => {
+check("RT-12", "template create/detail/edit back routes follow spec", () => {
   const checks = [
     includes(
       "src/app/wardrobes/[wardrobeId]/(stack)/templates/new/page.tsx",
@@ -236,7 +236,7 @@ check("RT-13", "template create/detail/edit back routes follow spec", () => {
   };
 });
 
-check("RT-14", "clothing create/detail/edit back routes follow spec", () => {
+check("RT-13", "clothing create/detail/edit back routes follow spec", () => {
   const checks = [
     includes(
       "src/app/wardrobes/[wardrobeId]/(stack)/clothings/new/page.tsx",
@@ -257,17 +257,17 @@ check("RT-14", "clothing create/detail/edit back routes follow spec", () => {
   };
 });
 
-check("RT-15", "history detail from=home returns to home", () => {
+check("RT-14", "history detail from=home returns to home", () => {
   const ok = includes(HISTORY_CLIENT, 'from === "home" ? ROUTES.home(wardrobeId)');
   return { ok, detail: "HistoryDetailClient must branch to home when from=home" };
 });
 
-check("RT-16", "history detail from=histories returns to histories", () => {
+check("RT-15", "history detail from=histories returns to histories", () => {
   const ok = includes(HISTORY_CLIENT, "ROUTES.histories(wardrobeId)");
   return { ok, detail: "HistoryDetailClient must route to histories when from!=home" };
 });
 
-check("RT-17", "history detail uses histories as fallback for invalid from", () => {
+check("RT-16", "history detail uses histories as fallback for invalid from", () => {
   const ok = includes(
     HISTORY_CLIENT,
     'return from === "home" ? ROUTES.home(wardrobeId) : ROUTES.histories(wardrobeId);',
@@ -278,7 +278,7 @@ check("RT-17", "history detail uses histories as fallback for invalid from", () 
   };
 });
 
-check("RT-18", "history detail uses histories when from is omitted", () => {
+check("RT-17", "history detail uses histories when from is omitted", () => {
   const ok = includes(HISTORY_CLIENT, "searchParams.get(\"from\")");
   return {
     ok,
@@ -286,7 +286,7 @@ check("RT-18", "history detail uses histories when from is omitted", () => {
   };
 });
 
-check("RT-19", "history tab has no direct link to home tab", () => {
+check("RT-18", "history tab has no direct link to home tab", () => {
   const ok = noIncludes(
     "src/app/wardrobes/[wardrobeId]/(tabs)/histories/page.tsx",
     "ホームタブへ",
@@ -297,7 +297,7 @@ check("RT-19", "history tab has no direct link to home tab", () => {
   };
 });
 
-check("RT-20", "all in-wardrobe route calls use wardrobeId as first argument", () => {
+check("RT-19", "all in-wardrobe route calls use wardrobeId as first argument", () => {
   const files = collectFiles(path.join(appRoot, "wardrobes", "[wardrobeId]"))
     .filter((file) => file.endsWith(".tsx"))
     .map((file) => path.relative(webRoot, file).replaceAll(path.sep, "/"));
@@ -319,7 +319,7 @@ check("RT-20", "all in-wardrobe route calls use wardrobeId as first argument", (
   };
 });
 
-check("RT-21", "create page links to demo wardrobe home", () => {
+check("RT-20", "create page links to demo wardrobe home", () => {
   const ok = includes(CREATE_PAGE, "ROUTES.home(DEMO_IDS.wardrobe)");
   return {
     ok,

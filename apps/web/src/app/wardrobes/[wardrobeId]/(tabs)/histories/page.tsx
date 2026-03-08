@@ -1,5 +1,6 @@
 import { StubScreen } from "@/components/app/layout/StubScreen";
 import { DEMO_IDS, ROUTES } from "@/constants/routes";
+import { HISTORY_STRINGS } from "@/features/history/strings";
 
 type HistoryListPageProps = {
   params: Promise<{ wardrobeId: string }>;
@@ -10,12 +11,11 @@ export default async function HistoryListPage({ params }: HistoryListPageProps) 
 
   return (
     <StubScreen
-      title="履歴"
+      title={HISTORY_STRINGS.list.title}
       tabKey="histories"
       wardrobeId={wardrobeId}
-      description="履歴一覧（タブ）。戻るは表示しません。"
       links={[
-        { label: "履歴詳細へ", href: ROUTES.historyDetail(wardrobeId, DEMO_IDS.history, "histories") },
+        { label: HISTORY_STRINGS.detail.title, href: ROUTES.historyDetail(wardrobeId, DEMO_IDS.history, "histories") },
       ]}
     />
   );

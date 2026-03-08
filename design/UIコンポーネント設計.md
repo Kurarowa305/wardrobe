@@ -29,6 +29,12 @@
 * 文言は `constants/commonStrings.ts` と `features/*/strings.ts` に集約
 * components は文言をベタ書きしない（propsで受け取る）
 
+### 2.4 ルーティング文脈
+
+* ワードローブ作成画面を除く画面は `wardrobeId` 文脈で描画する
+* `app/` のページは `params.wardrobeId` を取得して、features/components に渡す
+* `TabBar` は `wardrobeId` を用いて同一ワードローブ内のタブ遷移URLを生成する
+
 ---
 
 ## 3. ディレクトリ構成
@@ -104,7 +110,8 @@ src/components/
 #### AppLayout
 
 **責務**：画面外枠（Header / Content / TabBar）を統合。タブバー表示を制御。
-**主要props**：`header`, `children`, `tabBar?`
+**主要props**：`title`, `children`, `backHref?`, `tabKey?`, `wardrobeId?`
+**補足**：`tabKey` と `wardrobeId` が揃う場合のみ TabBar を表示する
 
 #### Screen
 
@@ -133,7 +140,8 @@ src/components/
 #### TabBar / TabBarItem
 
 **責務**：4タブのUI。選択状態と遷移通知。
-**主要props（TabBar）**：`active`, `onChange`
+**主要props（TabBar）**：`activeTab`, `wardrobeId`
+**補足**：`wardrobeId` を使って `home/histories/templates/clothings` のURLを生成する
 
 #### OverflowMenu（︙）
 

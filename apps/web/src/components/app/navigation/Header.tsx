@@ -1,3 +1,5 @@
+import { NAVIGATION_STRINGS } from "@/constants/navigationStrings";
+
 import { BackButton } from "./BackButton";
 
 type HeaderProps = {
@@ -8,7 +10,9 @@ type HeaderProps = {
 export function Header({ title, backHref }: HeaderProps) {
   return (
     <header className="app-header">
-      <div className="app-header-side">{backHref ? <BackButton href={backHref} /> : null}</div>
+      <div className="app-header-side">
+        {backHref ? <BackButton href={backHref} label={NAVIGATION_STRINGS.back} /> : null}
+      </div>
       <h1 className="app-header-title">{title}</h1>
       <div className="app-header-side" aria-hidden="true" />
     </header>

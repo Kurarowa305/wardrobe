@@ -1,5 +1,6 @@
 import { StubScreen } from "@/components/app/layout/StubScreen";
 import { DEMO_IDS, ROUTES } from "@/constants/routes";
+import { CLOTHING_STRINGS } from "@/features/clothing/strings";
 
 type ClothingEditPageProps = {
   params: Promise<{ wardrobeId: string; clothingId: string }>;
@@ -14,11 +15,9 @@ export default async function ClothingEditPage({ params }: ClothingEditPageProps
 
   return (
     <StubScreen
-      title="服の編集"
+      title={CLOTHING_STRINGS.edit.title}
       backHref={ROUTES.clothingDetail(wardrobeId, clothingId)}
-      description="服編集（スタック）。"
-      note={`clothingId: ${clothingId}`}
-      links={[{ label: "保存して詳細へ", href: ROUTES.clothingDetail(wardrobeId, clothingId) }]}
+      links={[{ label: CLOTHING_STRINGS.edit.actions.submit, href: ROUTES.clothingDetail(wardrobeId, clothingId) }]}
     />
   );
 }

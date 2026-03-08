@@ -1,5 +1,7 @@
 import { StubScreen } from "@/components/app/layout/StubScreen";
+import { COMMON_STRINGS } from "@/constants/commonStrings";
 import { DEMO_IDS, ROUTES } from "@/constants/routes";
+import { TEMPLATE_STRINGS } from "@/features/template/strings";
 
 type TemplateDetailPageProps = {
   params: Promise<{ wardrobeId: string; templateId: string }>;
@@ -14,13 +16,11 @@ export default async function TemplateDetailPage({ params }: TemplateDetailPageP
 
   return (
     <StubScreen
-      title="テンプレートの詳細"
+      title={TEMPLATE_STRINGS.detail.title}
       backHref={ROUTES.templates(wardrobeId)}
-      description="テンプレート詳細（スタック）。"
-      note={`templateId: ${templateId}`}
       links={[
-        { label: "編集へ", href: ROUTES.templateEdit(wardrobeId, templateId) },
-        { label: "削除して一覧へ", href: ROUTES.templates(wardrobeId) },
+        { label: COMMON_STRINGS.actions.edit, href: ROUTES.templateEdit(wardrobeId, templateId) },
+        { label: COMMON_STRINGS.actions.delete, href: ROUTES.templates(wardrobeId) },
       ]}
     />
   );

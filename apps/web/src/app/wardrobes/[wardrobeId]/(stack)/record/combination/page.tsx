@@ -1,5 +1,6 @@
 import { StubScreen } from "@/components/app/layout/StubScreen";
 import { ROUTES } from "@/constants/routes";
+import { RECORD_STRINGS } from "@/features/record/strings";
 
 type RecordByCombinationPageProps = {
   params: Promise<{ wardrobeId: string }>;
@@ -10,10 +11,9 @@ export default async function RecordByCombinationPage({ params }: RecordByCombin
 
   return (
     <StubScreen
-      title="服の組み合わせで記録"
+      title={RECORD_STRINGS.byCombination.title}
       backHref={ROUTES.recordMethod(wardrobeId)}
-      description="記録（服の組み合わせで記録）画面。"
-      links={[{ label: "記録完了してホームへ", href: ROUTES.home(wardrobeId) }]}
+      links={[{ label: RECORD_STRINGS.byCombination.actions.submit, href: ROUTES.home(wardrobeId) }]}
     />
   );
 }

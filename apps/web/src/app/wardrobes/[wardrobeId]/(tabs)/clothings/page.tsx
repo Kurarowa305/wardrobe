@@ -1,5 +1,6 @@
 import { StubScreen } from "@/components/app/layout/StubScreen";
 import { DEMO_IDS, ROUTES } from "@/constants/routes";
+import { CLOTHING_STRINGS } from "@/features/clothing/strings";
 
 type ClothingListPageProps = {
   params: Promise<{ wardrobeId: string }>;
@@ -10,13 +11,12 @@ export default async function ClothingListPage({ params }: ClothingListPageProps
 
   return (
     <StubScreen
-      title="服"
+      title={CLOTHING_STRINGS.list.title}
       tabKey="clothings"
       wardrobeId={wardrobeId}
-      description="服一覧（タブ）。戻るは表示しません。"
       links={[
-        { label: "＋ 服を追加", href: ROUTES.clothingNew(wardrobeId) },
-        { label: "服詳細へ", href: ROUTES.clothingDetail(wardrobeId, DEMO_IDS.clothing) },
+        { label: CLOTHING_STRINGS.list.actions.add, href: ROUTES.clothingNew(wardrobeId) },
+        { label: CLOTHING_STRINGS.detail.title, href: ROUTES.clothingDetail(wardrobeId, DEMO_IDS.clothing) },
       ]}
     />
   );

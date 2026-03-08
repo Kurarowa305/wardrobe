@@ -1,3 +1,4 @@
+import { NAVIGATION_STRINGS } from "@/constants/navigationStrings";
 import Link from "next/link";
 
 import { ROUTES, type TabKey } from "@/constants/routes";
@@ -8,10 +9,10 @@ type TabBarProps = {
 };
 
 const TAB_ITEMS: Array<{ key: TabKey; label: string }> = [
-  { key: "home", label: "ホーム" },
-  { key: "histories", label: "履歴" },
-  { key: "templates", label: "テンプレ" },
-  { key: "clothings", label: "服" },
+  { key: "home", label: NAVIGATION_STRINGS.tabs.home },
+  { key: "histories", label: NAVIGATION_STRINGS.tabs.histories },
+  { key: "templates", label: NAVIGATION_STRINGS.tabs.templates },
+  { key: "clothings", label: NAVIGATION_STRINGS.tabs.clothings },
 ];
 
 function resolveTabHref(wardrobeId: string, key: TabKey) {
@@ -23,7 +24,7 @@ function resolveTabHref(wardrobeId: string, key: TabKey) {
 
 export function TabBar({ activeTab, wardrobeId }: TabBarProps) {
   return (
-    <nav className="tab-bar" aria-label="メインタブ">
+    <nav className="tab-bar" aria-label={NAVIGATION_STRINGS.aria.mainTab}>
       {TAB_ITEMS.map((item) => (
         <Link
           key={item.key}

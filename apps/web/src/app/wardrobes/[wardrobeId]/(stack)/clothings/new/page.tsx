@@ -1,5 +1,6 @@
 import { StubScreen } from "@/components/app/layout/StubScreen";
 import { ROUTES } from "@/constants/routes";
+import { CLOTHING_STRINGS } from "@/features/clothing/strings";
 
 type ClothingCreatePageProps = {
   params: Promise<{ wardrobeId: string }>;
@@ -10,10 +11,9 @@ export default async function ClothingCreatePage({ params }: ClothingCreatePageP
 
   return (
     <StubScreen
-      title="服の追加"
+      title={CLOTHING_STRINGS.create.title}
       backHref={ROUTES.clothings(wardrobeId)}
-      description="服追加（スタック）。"
-      links={[{ label: "追加完了して一覧へ", href: ROUTES.clothings(wardrobeId) }]}
+      links={[{ label: CLOTHING_STRINGS.create.actions.submit, href: ROUTES.clothings(wardrobeId) }]}
     />
   );
 }

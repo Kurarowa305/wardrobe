@@ -1,6 +1,7 @@
 "use client";
 
 import { StubScreen } from "@/components/app/layout/StubScreen";
+import { HISTORY_STRINGS } from "@/features/history/strings";
 import { ROUTES } from "@/constants/routes";
 import { useSearchParams } from "next/navigation";
 
@@ -19,11 +20,9 @@ export default function HistoryDetailClient({ wardrobeId, historyId }: HistoryDe
 
   return (
     <StubScreen
-      title="履歴詳細"
+      title={HISTORY_STRINGS.detail.title}
       backHref={backHref}
-      description="履歴詳細（スタック）。遷移元に応じて戻り先を分岐します。"
-      note={`historyId: ${historyId}`}
-      links={[{ label: "削除完了（戻る）", href: backHref }]}
+      links={[{ label: HISTORY_STRINGS.detail.menu.delete, href: backHref }]}
     />
   );
 }
