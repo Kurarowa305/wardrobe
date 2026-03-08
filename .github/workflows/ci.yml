@@ -43,6 +43,9 @@ jobs:
       - name: Typecheck web
         run: pnpm --filter web exec tsc --noEmit
 
+      - name: Routing spec test
+        run: pnpm --filter web test:routing
+
       - name: Build web
         run: |
           if [ -d apps/web/app ] || [ -d apps/web/pages ]; then
