@@ -29,10 +29,10 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Lint
-        run: pnpm -r run lint --if-present
+        run: pnpm -r --if-present run lint
 
       - name: Test
-        run: pnpm -r run test --if-present
+        run: pnpm -r --if-present run test
 
       - name: Typecheck api
         run: pnpm --filter api exec tsc --noEmit
