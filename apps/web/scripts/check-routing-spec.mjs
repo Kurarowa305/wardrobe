@@ -6,6 +6,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const webRoot = path.resolve(__dirname, "..");
 const appRoot = path.join(webRoot, "src", "app");
+const screenRoot = path.join(webRoot, "src", "components", "app", "screens");
 
 const failures = [];
 let checkCount = 0;
@@ -30,7 +31,29 @@ const STACK_PAGES = [
   "src/app/wardrobes/[wardrobeId]/(stack)/clothings/[clothingId]/edit/page.tsx",
 ];
 
-const HISTORY_CLIENT = "src/app/wardrobes/[wardrobeId]/(stack)/histories/[historyId]/HistoryDetailClient.tsx";
+const TAB_SCREENS = [
+  "src/components/app/screens/HomeTabScreen.tsx",
+  "src/components/app/screens/HistoriesTabScreen.tsx",
+  "src/components/app/screens/TemplatesTabScreen.tsx",
+  "src/components/app/screens/ClothingsTabScreen.tsx",
+];
+
+const STACK_SCREENS = [
+  "src/components/app/screens/RecordMethodScreen.tsx",
+  "src/components/app/screens/RecordByTemplateScreen.tsx",
+  "src/components/app/screens/RecordByCombinationScreen.tsx",
+  "src/components/app/screens/TemplateCreateScreen.tsx",
+  "src/components/app/screens/TemplateDetailScreen.tsx",
+  "src/components/app/screens/TemplateEditScreen.tsx",
+  "src/components/app/screens/ClothingCreateScreen.tsx",
+  "src/components/app/screens/ClothingDetailScreen.tsx",
+  "src/components/app/screens/ClothingEditScreen.tsx",
+  "src/components/app/screens/HistoryDetailScreen.tsx",
+];
+
+const CREATE_SCREEN = "src/components/app/screens/WardrobeCreateScreen.tsx";
+const HISTORY_DETAIL_SCREEN = "src/components/app/screens/HistoryDetailScreen.tsx";
+const HISTORY_ROUTING = "src/features/history/routing.ts";
 const CREATE_PAGE = "src/app/wardrobes/new/page.tsx";
 const ROOT_PAGE = "src/app/page.tsx";
 
@@ -151,14 +174,14 @@ check("RT-06", "TabBar rendering is limited to tab screens", () => {
     "src/components/app/layout/AppLayout.tsx",
     "{tabKey && wardrobeId ? <TabBar activeTab={tabKey} wardrobeId={wardrobeId} /> : null}",
   );
-  const tabPagesOk = TAB_PAGES.every(
-    (file) => includes(file, "tabKey=") && includes(file, "wardrobeId={wardrobeId}"),
+  const tabScreensOk = TAB_SCREENS.every(
+    (file) => includes(file, "tabKey:") && includes(file, "wardrobeId"),
   );
-  const stackPagesOk = STACK_PAGES.every((file) => noIncludes(file, "tabKey="));
+  const stackScreensOk = STACK_SCREENS.every((file) => noIncludes(file, "tabKey:"));
   return {
-    ok: appLayoutOk && tabPagesOk && stackPagesOk,
+    ok: appLayoutOk && tabScreensOk && stackScreensOk,
     detail:
-      "AppLayout tab condition or tab/stack page props do not match expected tab-only behavior",
+      "AppLayout tab condition or tab/stack screen props do not match expected tab-only behavior",
   };
 });
 
@@ -176,110 +199,109 @@ check("RT-07", "tab transitions keep wardrobeId", () => {
 });
 
 check("RT-08", "tab pages have no back button", () => {
-  const invalid = TAB_PAGES.filter((file) => includes(file, "backHref="));
+  const invalid = TAB_SCREENS.filter((file) => includes(file, "backHref"));
   return {
     ok: invalid.length === 0,
-    detail: `tab pages unexpectedly include backHref: ${invalid.join(", ") || "(none)"}`,
+    detail: `tab screens unexpectedly include backHref: ${invalid.join(", ") || "(none)"}`,
   };
 });
 
 check("RT-09", "stack/detail pages have back button", () => {
-  const backFiles = [
-    ...STACK_PAGES.filter((file) => !file.endsWith("/histories/[historyId]/page.tsx")),
-    HISTORY_CLIENT,
-  ];
-  const missing = backFiles.filter((file) => !includes(file, "backHref="));
+  const missing = STACK_SCREENS.filter((file) => !includes(file, "backHref"));
   return {
     ok: missing.length === 0,
-    detail: `stack files missing backHref: ${missing.join(", ") || "(none)"}`,
+    detail: `stack screens missing backHref: ${missing.join(", ") || "(none)"}`,
   };
 });
 
 check("RT-10", "record method back route is wardrobe home", () => {
   const ok = includes(
-    "src/app/wardrobes/[wardrobeId]/(stack)/record/page.tsx",
-    "backHref={ROUTES.home(wardrobeId)}",
+    "src/components/app/screens/RecordMethodScreen.tsx",
+    "backHref: ROUTES.home(wardrobeId),",
   );
-  return { ok, detail: "record/page.tsx must back to ROUTES.home(wardrobeId)" };
+  return { ok, detail: "RecordMethodScreen must back to ROUTES.home(wardrobeId)" };
 });
 
 check("RT-11", "record detail pages back to record method", () => {
   const files = [
-    "src/app/wardrobes/[wardrobeId]/(stack)/record/template/page.tsx",
-    "src/app/wardrobes/[wardrobeId]/(stack)/record/combination/page.tsx",
+    "src/components/app/screens/RecordByTemplateScreen.tsx",
+    "src/components/app/screens/RecordByCombinationScreen.tsx",
   ];
-  const invalid = files.filter((file) => !includes(file, "backHref={ROUTES.recordMethod(wardrobeId)}"));
+  const invalid = files.filter((file) => !includes(file, "backHref: ROUTES.recordMethod(wardrobeId),"));
   return {
     ok: invalid.length === 0,
-    detail: `record child pages with wrong back route: ${invalid.join(", ") || "(none)"}`,
+    detail: `record child screens with wrong back route: ${invalid.join(", ") || "(none)"}`,
   };
 });
 
 check("RT-12", "template create/detail/edit back routes follow spec", () => {
   const checks = [
     includes(
-      "src/app/wardrobes/[wardrobeId]/(stack)/templates/new/page.tsx",
-      "backHref={ROUTES.templates(wardrobeId)}",
+      "src/components/app/screens/TemplateCreateScreen.tsx",
+      "backHref: ROUTES.templates(wardrobeId),",
     ),
     includes(
-      "src/app/wardrobes/[wardrobeId]/(stack)/templates/[templateId]/page.tsx",
-      "backHref={ROUTES.templates(wardrobeId)}",
+      "src/components/app/screens/TemplateDetailScreen.tsx",
+      "backHref: ROUTES.templates(wardrobeId),",
     ),
     includes(
-      "src/app/wardrobes/[wardrobeId]/(stack)/templates/[templateId]/edit/page.tsx",
-      "backHref={ROUTES.templateDetail(wardrobeId, templateId)}",
+      "src/components/app/screens/TemplateEditScreen.tsx",
+      "backHref: ROUTES.templateDetail(wardrobeId, templateId),",
     ),
   ];
   return {
     ok: checks.every(Boolean),
-    detail: "template backHref definitions do not match expected flows",
+    detail: "template screen backHref definitions do not match expected flows",
   };
 });
 
 check("RT-13", "clothing create/detail/edit back routes follow spec", () => {
   const checks = [
     includes(
-      "src/app/wardrobes/[wardrobeId]/(stack)/clothings/new/page.tsx",
-      "backHref={ROUTES.clothings(wardrobeId)}",
+      "src/components/app/screens/ClothingCreateScreen.tsx",
+      "backHref: ROUTES.clothings(wardrobeId),",
     ),
     includes(
-      "src/app/wardrobes/[wardrobeId]/(stack)/clothings/[clothingId]/page.tsx",
-      "backHref={ROUTES.clothings(wardrobeId)}",
+      "src/components/app/screens/ClothingDetailScreen.tsx",
+      "backHref: ROUTES.clothings(wardrobeId),",
     ),
     includes(
-      "src/app/wardrobes/[wardrobeId]/(stack)/clothings/[clothingId]/edit/page.tsx",
-      "backHref={ROUTES.clothingDetail(wardrobeId, clothingId)}",
+      "src/components/app/screens/ClothingEditScreen.tsx",
+      "backHref: ROUTES.clothingDetail(wardrobeId, clothingId),",
     ),
   ];
   return {
     ok: checks.every(Boolean),
-    detail: "clothing backHref definitions do not match expected flows",
+    detail: "clothing screen backHref definitions do not match expected flows",
   };
 });
 
 check("RT-14", "history detail from=home returns to home", () => {
-  const ok = includes(HISTORY_CLIENT, 'from === "home" ? ROUTES.home(wardrobeId)');
-  return { ok, detail: "HistoryDetailClient must branch to home when from=home" };
+  const ok = includes(HISTORY_ROUTING, 'from === "home" ? ROUTES.home(wardrobeId)');
+  return { ok, detail: "history routing resolver must branch to home when from=home" };
 });
 
 check("RT-15", "history detail from=histories returns to histories", () => {
-  const ok = includes(HISTORY_CLIENT, "ROUTES.histories(wardrobeId)");
-  return { ok, detail: "HistoryDetailClient must route to histories when from!=home" };
+  const ok = includes(HISTORY_ROUTING, "ROUTES.histories(wardrobeId)");
+  return { ok, detail: "history routing resolver must route to histories when from!=home" };
 });
 
 check("RT-16", "history detail uses histories as fallback for invalid from", () => {
-  const ok = includes(
-    HISTORY_CLIENT,
-    'return from === "home" ? ROUTES.home(wardrobeId) : ROUTES.histories(wardrobeId);',
-  );
+  const ok =
+    includes(
+      HISTORY_ROUTING,
+      'return from === "home" ? ROUTES.home(wardrobeId) : ROUTES.histories(wardrobeId);',
+    ) &&
+    includes(HISTORY_DETAIL_SCREEN, 'resolveHistoryDetailBackHref(wardrobeId, searchParams.get("from"))');
   return {
     ok,
-    detail: "fallback branch for invalid from should return histories",
+    detail:
+      "history detail must use feature resolver and resolver fallback branch should return histories",
   };
 });
 
 check("RT-17", "history detail uses histories when from is omitted", () => {
-  const ok = includes(HISTORY_CLIENT, "searchParams.get(\"from\")");
+  const ok = includes(HISTORY_DETAIL_SCREEN, "searchParams.get(\"from\")");
   return {
     ok,
     detail: "from query should be read as optional value and use fallback branch",
@@ -287,10 +309,7 @@ check("RT-17", "history detail uses histories when from is omitted", () => {
 });
 
 check("RT-18", "history tab has no direct link to home tab", () => {
-  const ok = noIncludes(
-    "src/app/wardrobes/[wardrobeId]/(tabs)/histories/page.tsx",
-    "ホームタブへ",
-  );
+  const ok = noIncludes("src/components/app/screens/HistoriesTabScreen.tsx", "ホームタブへ");
   return {
     ok,
     detail: "histories tab should not expose 'ホームタブへ' link",
@@ -298,9 +317,14 @@ check("RT-18", "history tab has no direct link to home tab", () => {
 });
 
 check("RT-19", "all in-wardrobe route calls use wardrobeId as first argument", () => {
-  const files = collectFiles(path.join(appRoot, "wardrobes", "[wardrobeId]"))
-    .filter((file) => file.endsWith(".tsx"))
-    .map((file) => path.relative(webRoot, file).replaceAll(path.sep, "/"));
+  const routeFiles = [
+    ...collectFiles(path.join(appRoot, "wardrobes", "[wardrobeId]")),
+    ...collectFiles(screenRoot),
+  ];
+  const files = routeFiles
+    .filter((file) => file.endsWith(".ts") || file.endsWith(".tsx"))
+    .map((file) => path.relative(webRoot, file).replaceAll(path.sep, "/"))
+    .filter((file) => file !== CREATE_SCREEN);
 
   const pattern =
     /ROUTES\.(home|histories|templates|clothings|recordMethod|recordByTemplate|recordByCombination|templateNew|templateDetail|templateEdit|clothingNew|clothingDetail|clothingEdit|historyDetail)\(\s*(?!wardrobeId\b)/;
@@ -320,10 +344,10 @@ check("RT-19", "all in-wardrobe route calls use wardrobeId as first argument", (
 });
 
 check("RT-20", "create page links to demo wardrobe home", () => {
-  const ok = includes(CREATE_PAGE, "ROUTES.home(DEMO_IDS.wardrobe)");
+  const ok = includes(CREATE_SCREEN, "ROUTES.home(DEMO_IDS.wardrobe)");
   return {
     ok,
-    detail: "wardrobes/new page should route to demo wardrobe home",
+    detail: "WardrobeCreateScreen should route to demo wardrobe home",
   };
 });
 

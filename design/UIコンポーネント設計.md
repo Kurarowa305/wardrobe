@@ -32,7 +32,8 @@
 ### 2.4 ルーティング文脈
 
 * ワードローブ作成画面を除く画面は `wardrobeId` 文脈で描画する
-* `app/` のページは `params.wardrobeId` を取得して、features/components に渡す
+* `app/` の `page.tsx` は `params` 展開と `generateStaticParams` のみを担当する
+* 画面UIは `components/app/screens/*Screen.tsx` に実装し、`page.tsx` から呼び出す
 * `TabBar` は `wardrobeId` を用いて同一ワードローブ内のタブ遷移URLを生成する
 
 ---
@@ -57,45 +58,27 @@ src/components/
   app/                         # アプリ固有UI
     layout/
       AppLayout.tsx            # Header + Content + TabBar の枠
-      Screen.tsx               # 画面の余白/スクロール
-      Section.tsx              # 見出し＋内容ブロック
 
     navigation/
       Header.tsx               # title/left/right slot
       BackButton.tsx
       TabBar.tsx               # 4タブ（home/history/template/clothing）
-      OverflowMenu.tsx         # ︙（itemsを受け取る）
-
-    primitives/
-      Thumbnail.tsx            # 画像/no image/削除済み
-      ThumbnailList.tsx        # 最大4 +x
-      EmptyState.tsx
-      LoadingSkeleton.tsx
-
-    cards/
-      BasicCard.tsx            # 汎用カード枠（クリック可）
-      HistoryCard.tsx          # 履歴カード（クリック可）
-      TemplateCard.tsx         # テンプレカード（クリック可）
-      ClothingCard.tsx         # 服カード（クリック可：服一覧用）
-      ClothingRow.tsx          # 服行（表示専用：タップ不可）
-
-    forms/
-      fields/
-        TextField.tsx          # Label + Input + error
-        DateField.tsx          # 日付入力（時間なし）
-        ImagePickerField.tsx   # 画像選択（任意）
-      selectors/
-        ClothingMultiSelect.tsx  # 複数選択UI
-        TemplateSingleSelect.tsx # 単一選択UI
-      blocks/
-        ClothingForm.tsx       # 服追加/編集共通（initial注入）
-        TemplateForm.tsx       # テンプレ追加/編集共通（initial注入）
-        RecordMethod.tsx       # 記録（方法選択）
-        RecordByTemplateForm.tsx     # 記録（テンプレ）
-        RecordByCombinationForm.tsx  # 記録（組み合わせ）
-
-    dialogs/
-      ConfirmDialog.tsx        # 削除/破棄確認（title/message/labelsを受け取る）
+    screens/
+      WardrobeCreateScreen.tsx
+      HomeTabScreen.tsx
+      HistoriesTabScreen.tsx
+      TemplatesTabScreen.tsx
+      ClothingsTabScreen.tsx
+      RecordMethodScreen.tsx
+      RecordByTemplateScreen.tsx
+      RecordByCombinationScreen.tsx
+      TemplateCreateScreen.tsx
+      TemplateDetailScreen.tsx
+      TemplateEditScreen.tsx
+      ClothingCreateScreen.tsx
+      ClothingDetailScreen.tsx
+      ClothingEditScreen.tsx
+      HistoryDetailScreen.tsx
 
   index.ts                      # app配下の再export（任意）
 
@@ -112,16 +95,6 @@ src/components/
 **責務**：画面外枠（Header / Content / TabBar）を統合。タブバー表示を制御。
 **主要props**：`title`, `children`, `backHref?`, `tabKey?`, `wardrobeId?`
 **補足**：`tabKey` と `wardrobeId` が揃う場合のみ TabBar を表示する
-
-#### Screen
-
-**責務**：画面共通のスクロール領域・余白を統一。
-**主要props**：`children`, `scroll?`
-
-#### Section
-
-**責務**：見出し＋コンテンツ枠。
-**主要props**：`title?`, `children`
 
 ---
 
@@ -143,122 +116,18 @@ src/components/
 **主要props（TabBar）**：`activeTab`, `wardrobeId`
 **補足**：`wardrobeId` を使って `home/histories/templates/clothings` のURLを生成する
 
-#### OverflowMenu（︙）
-
-**責務**：詳細画面のメニュー（編集/削除）。項目は画面側が渡す。
-**主要props**：`items: { key, label, onSelect }[]`
-
 ---
 
-### 4.3 primitives
+### 4.3 screens
 
-#### Thumbnail
+#### `*Screen.tsx`（画面コンテナ）
 
-**責務**：画像 / `no image` / 削除済みオーバーレイを統一表示。
-**主要props**：`src?`, `alt`, `deleted?`, `size?`
-
-#### ThumbnailList
-
-**責務**：サムネ最大4件 + `+x` 表示を統一。
-**主要props**：`items`, `max?`（default 4）
-
-#### EmptyState
-
-**責務**：空状態の表示。
-**主要props**：`message`, `action?`
-
-#### LoadingSkeleton
-
-**責務**：ローディング表示。
-**主要props**：`variant`, `count?`
-
----
-
-### 4.4 cards（重要：ClothingRowは表示専用）
-
-#### BasicCard
-
-**責務**：クリック可能カードの枠。
-**主要props**：`children`, `onClick?`, `disabled?`
-
-#### HistoryCard（クリック可能）
-
-**責務**：履歴カード（ホーム/履歴一覧）。
-**主要props**：`dateLabel`, `inputTypeLabel`, `title`, `thumbnails`, `onClick`
-
-#### TemplateCard（クリック可能）
-
-**責務**：テンプレカード（テンプレート一覧）。
-**主要props**：`name`, `thumbnails`, `onClick`
-
-#### ClothingCard（クリック可能）
-
-**責務**：服カード（服一覧）。服詳細へ遷移するためのカード。
-**主要props**：`name`, `thumbnail`, `onClick`
-
-#### ClothingRow（表示専用・タップ不可）
-
-**責務**：服の「確認用行表示」（履歴詳細など）。
-**主要props**：`name`, `thumbnail`
-**注意**：`onClick` を持たない（常にタップ不可）
-
----
-
-### 4.5 forms
-
-#### fields/TextField
-
-**責務**：ラベル付きテキスト入力。
-**主要props**：`label`, `value`, `onChange`, `required?`, `error?`
-
-#### fields/DateField（時間なし）
-
-**責務**：記録画面の日付入力（必須、時間は扱わない）。
-**主要props**：`label`, `value`, `onChange`, `required?`, `error?`
-
-#### fields/ImagePickerField
-
-**責務**：服画像入力（任意）。
-**主要props**：`label`, `value?`, `onPick`, `onClear?`
-
-#### selectors/ClothingMultiSelect
-
-**責務**：服の複数選択UI。
-**主要props**：`items`, `selectedIds`, `onToggle`
-
-#### selectors/TemplateSingleSelect
-
-**責務**：テンプレの単一選択UI。
-**主要props**：`items`, `selectedId?`, `onSelect`
-
-#### blocks/ClothingForm（追加/編集共通）
-
-**責務**：服フォーム共通。編集は初期値を画面側が注入。
-**主要props**：`initial`, `submitLabel`, `onSubmit`, `onBack`
-
-#### blocks/TemplateForm（追加/編集共通）
-
-**責務**：テンプレフォーム共通。編集は初期値を画面側が注入。
-**主要props**：`initial`, `submitLabel`, `onSubmit`, `onBack`
-
-#### blocks/RecordMethod
-
-**責務**：記録方法選択（2択）。戻るあり。
-**主要props**：`message`, `byTemplateLabel`, `byCombinationLabel`, `onSelectTemplate`, `onSelectCombination`, `onBack`
-
-#### blocks/RecordByTemplateForm / RecordByCombinationForm
-
-**責務**：記録入力（共通：日付必須、戻るあり、完了はホーム）。
-**主要props（共通）**：`dateValue`, `onChangeDate`, `submitLabel`, `onSubmit`, `onBack`
-
----
-
-### 4.6 dialogs
-
-#### ConfirmDialog
-
-**責務**：削除確認 / 破棄確認の共通UI。
-**主要props**：`open`, `title`, `message`, `primaryLabel`, `secondaryLabel`, `onPrimary`, `onSecondary`
+**責務**：画面単位のUI組み立て（`AppLayout` + 画面内リンク/要素）を担当する。  
+**主要props**：`wardrobeId`、`templateId`、`clothingId` などルーティングで確定した値。  
+**補足**：
+* `app/**/page.tsx` は `params` 展開後に `*Screen` を呼ぶだけにする
+* 履歴詳細のみ `useSearchParams()` を使うため client component とする
+* `from` クエリの戻り先解決は `features/history/routing.ts` に置く
 
 ---
 

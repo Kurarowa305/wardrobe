@@ -1,7 +1,4 @@
-import { AppLayout } from "@/components/app/layout/AppLayout";
-import { ROUTES } from "@/constants/routes";
-import { RECORD_STRINGS } from "@/features/record/strings";
-import Link from "next/link";
+import { RecordByCombinationScreen } from "@/components/app/screens/RecordByCombinationScreen";
 
 type RecordByCombinationPageProps = {
   params: Promise<{ wardrobeId: string }>;
@@ -9,18 +6,5 @@ type RecordByCombinationPageProps = {
 
 export default async function RecordByCombinationPage({ params }: RecordByCombinationPageProps) {
   const { wardrobeId } = await params;
-
-  return (
-    <AppLayout title={RECORD_STRINGS.byCombination.title} backHref={ROUTES.recordMethod(wardrobeId)}>
-      <section className="screen-panel">
-        <ul className="screen-link-list">
-          <li>
-            <Link href={ROUTES.home(wardrobeId)} className="screen-link">
-              {RECORD_STRINGS.byCombination.actions.submit}
-            </Link>
-          </li>
-        </ul>
-      </section>
-    </AppLayout>
-  );
+  return <RecordByCombinationScreen wardrobeId={wardrobeId} />;
 }

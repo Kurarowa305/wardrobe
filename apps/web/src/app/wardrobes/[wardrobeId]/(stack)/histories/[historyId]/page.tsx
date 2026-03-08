@@ -1,5 +1,5 @@
+import { HistoryDetailScreen } from "@/components/app/screens/HistoryDetailScreen";
 import { DEMO_IDS } from "@/constants/routes";
-import HistoryDetailClient from "./HistoryDetailClient";
 
 type HistoryDetailPageProps = {
   params: Promise<{ wardrobeId: string; historyId: string }>;
@@ -11,5 +11,5 @@ export function generateStaticParams() {
 
 export default async function HistoryDetailPage({ params }: HistoryDetailPageProps) {
   const { wardrobeId } = await params;
-  return <HistoryDetailClient wardrobeId={wardrobeId} />;
+  return <HistoryDetailScreen wardrobeId={wardrobeId} />;
 }
