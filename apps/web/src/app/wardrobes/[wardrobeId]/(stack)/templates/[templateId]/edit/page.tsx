@@ -1,7 +1,7 @@
 import { AppLayout } from "@/components/app/layout/AppLayout";
-import { LinkSection } from "@/components/app/layout/LinkSection";
 import { DEMO_IDS, ROUTES } from "@/constants/routes";
 import { TEMPLATE_STRINGS } from "@/features/template/strings";
+import Link from "next/link";
 
 type TemplateEditPageProps = {
   params: Promise<{ wardrobeId: string; templateId: string }>;
@@ -16,9 +16,15 @@ export default async function TemplateEditPage({ params }: TemplateEditPageProps
 
   return (
     <AppLayout title={TEMPLATE_STRINGS.edit.title} backHref={ROUTES.templateDetail(wardrobeId, templateId)}>
-      <LinkSection
-        links={[{ label: TEMPLATE_STRINGS.edit.actions.submit, href: ROUTES.templateDetail(wardrobeId, templateId) }]}
-      />
+      <section className="screen-panel">
+        <ul className="screen-link-list">
+          <li>
+            <Link href={ROUTES.templateDetail(wardrobeId, templateId)} className="screen-link">
+              {TEMPLATE_STRINGS.edit.actions.submit}
+            </Link>
+          </li>
+        </ul>
+      </section>
     </AppLayout>
   );
 }

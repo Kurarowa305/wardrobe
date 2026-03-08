@@ -1,8 +1,8 @@
 import { AppLayout } from "@/components/app/layout/AppLayout";
-import { LinkSection } from "@/components/app/layout/LinkSection";
 import { COMMON_STRINGS } from "@/constants/commonStrings";
 import { DEMO_IDS, ROUTES } from "@/constants/routes";
 import { TEMPLATE_STRINGS } from "@/features/template/strings";
+import Link from "next/link";
 
 type TemplateDetailPageProps = {
   params: Promise<{ wardrobeId: string; templateId: string }>;
@@ -17,12 +17,20 @@ export default async function TemplateDetailPage({ params }: TemplateDetailPageP
 
   return (
     <AppLayout title={TEMPLATE_STRINGS.detail.title} backHref={ROUTES.templates(wardrobeId)}>
-      <LinkSection
-        links={[
-        { label: COMMON_STRINGS.actions.edit, href: ROUTES.templateEdit(wardrobeId, templateId) },
-        { label: COMMON_STRINGS.actions.delete, href: ROUTES.templates(wardrobeId) },
-        ]}
-      />
+      <section className="screen-panel">
+        <ul className="screen-link-list">
+          <li>
+            <Link href={ROUTES.templateEdit(wardrobeId, templateId)} className="screen-link">
+              {COMMON_STRINGS.actions.edit}
+            </Link>
+          </li>
+          <li>
+            <Link href={ROUTES.templates(wardrobeId)} className="screen-link">
+              {COMMON_STRINGS.actions.delete}
+            </Link>
+          </li>
+        </ul>
+      </section>
     </AppLayout>
   );
 }

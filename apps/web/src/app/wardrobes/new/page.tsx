@@ -1,12 +1,20 @@
 import { AppLayout } from "@/components/app/layout/AppLayout";
-import { LinkSection } from "@/components/app/layout/LinkSection";
 import { DEMO_IDS, ROUTES } from "@/constants/routes";
 import { WARDROBE_STRINGS } from "@/features/wardrobe/strings";
+import Link from "next/link";
 
 export default function WardrobeCreatePage() {
   return (
     <AppLayout title={WARDROBE_STRINGS.create.title}>
-      <LinkSection links={[{ label: WARDROBE_STRINGS.create.actions.create, href: ROUTES.home(DEMO_IDS.wardrobe) }]} />
+      <section className="screen-panel">
+        <ul className="screen-link-list">
+          <li>
+            <Link href={ROUTES.home(DEMO_IDS.wardrobe)} className="screen-link">
+              {WARDROBE_STRINGS.create.actions.create}
+            </Link>
+          </li>
+        </ul>
+      </section>
     </AppLayout>
   );
 }

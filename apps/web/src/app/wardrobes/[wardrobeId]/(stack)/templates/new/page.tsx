@@ -1,7 +1,7 @@
 import { AppLayout } from "@/components/app/layout/AppLayout";
-import { LinkSection } from "@/components/app/layout/LinkSection";
 import { ROUTES } from "@/constants/routes";
 import { TEMPLATE_STRINGS } from "@/features/template/strings";
+import Link from "next/link";
 
 type TemplateCreatePageProps = {
   params: Promise<{ wardrobeId: string }>;
@@ -12,7 +12,15 @@ export default async function TemplateCreatePage({ params }: TemplateCreatePageP
 
   return (
     <AppLayout title={TEMPLATE_STRINGS.create.title} backHref={ROUTES.templates(wardrobeId)}>
-      <LinkSection links={[{ label: TEMPLATE_STRINGS.create.actions.submit, href: ROUTES.templates(wardrobeId) }]} />
+      <section className="screen-panel">
+        <ul className="screen-link-list">
+          <li>
+            <Link href={ROUTES.templates(wardrobeId)} className="screen-link">
+              {TEMPLATE_STRINGS.create.actions.submit}
+            </Link>
+          </li>
+        </ul>
+      </section>
     </AppLayout>
   );
 }

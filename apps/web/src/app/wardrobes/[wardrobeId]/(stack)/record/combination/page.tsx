@@ -1,7 +1,7 @@
 import { AppLayout } from "@/components/app/layout/AppLayout";
-import { LinkSection } from "@/components/app/layout/LinkSection";
 import { ROUTES } from "@/constants/routes";
 import { RECORD_STRINGS } from "@/features/record/strings";
+import Link from "next/link";
 
 type RecordByCombinationPageProps = {
   params: Promise<{ wardrobeId: string }>;
@@ -12,7 +12,15 @@ export default async function RecordByCombinationPage({ params }: RecordByCombin
 
   return (
     <AppLayout title={RECORD_STRINGS.byCombination.title} backHref={ROUTES.recordMethod(wardrobeId)}>
-      <LinkSection links={[{ label: RECORD_STRINGS.byCombination.actions.submit, href: ROUTES.home(wardrobeId) }]} />
+      <section className="screen-panel">
+        <ul className="screen-link-list">
+          <li>
+            <Link href={ROUTES.home(wardrobeId)} className="screen-link">
+              {RECORD_STRINGS.byCombination.actions.submit}
+            </Link>
+          </li>
+        </ul>
+      </section>
     </AppLayout>
   );
 }
