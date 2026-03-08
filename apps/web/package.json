@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "test:routing": "node scripts/check-routing-spec.mjs"
   },
   "dependencies": {
     "next": "16.1.1",
