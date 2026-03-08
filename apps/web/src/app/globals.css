@@ -103,7 +103,7 @@ a {
   background: var(--primary-soft);
 }
 
-.stub-panel {
+.screen-panel {
   display: grid;
   gap: 12px;
   padding: 16px;
@@ -112,19 +112,7 @@ a {
   background: #fff;
 }
 
-.stub-description {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.6;
-}
-
-.stub-note {
-  margin: 0;
-  color: var(--text-sub);
-  font-size: 13px;
-}
-
-.stub-link-list {
+.screen-link-list {
   margin: 0;
   padding: 0;
   list-style: none;
@@ -132,7 +120,7 @@ a {
   gap: 8px;
 }
 
-.stub-link {
+.screen-link {
   display: block;
   padding: 10px 12px;
   border-radius: 10px;

@@ -1,4 +1,5 @@
-import { StubScreen } from "@/components/app/layout/StubScreen";
+import { AppLayout } from "@/components/app/layout/AppLayout";
+import { LinkSection } from "@/components/app/layout/LinkSection";
 import { COMMON_STRINGS } from "@/constants/commonStrings";
 import { DEMO_IDS, ROUTES } from "@/constants/routes";
 import { CLOTHING_STRINGS } from "@/features/clothing/strings";
@@ -15,13 +16,13 @@ export default async function ClothingDetailPage({ params }: ClothingDetailPageP
   const { wardrobeId, clothingId } = await params;
 
   return (
-    <StubScreen
-      title={CLOTHING_STRINGS.detail.title}
-      backHref={ROUTES.clothings(wardrobeId)}
-      links={[
+    <AppLayout title={CLOTHING_STRINGS.detail.title} backHref={ROUTES.clothings(wardrobeId)}>
+      <LinkSection
+        links={[
         { label: COMMON_STRINGS.actions.edit, href: ROUTES.clothingEdit(wardrobeId, clothingId) },
         { label: COMMON_STRINGS.actions.delete, href: ROUTES.clothings(wardrobeId) },
-      ]}
-    />
+        ]}
+      />
+    </AppLayout>
   );
 }

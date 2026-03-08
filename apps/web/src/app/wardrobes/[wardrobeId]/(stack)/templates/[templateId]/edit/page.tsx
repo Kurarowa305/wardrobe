@@ -1,4 +1,5 @@
-import { StubScreen } from "@/components/app/layout/StubScreen";
+import { AppLayout } from "@/components/app/layout/AppLayout";
+import { LinkSection } from "@/components/app/layout/LinkSection";
 import { DEMO_IDS, ROUTES } from "@/constants/routes";
 import { TEMPLATE_STRINGS } from "@/features/template/strings";
 
@@ -14,10 +15,10 @@ export default async function TemplateEditPage({ params }: TemplateEditPageProps
   const { wardrobeId, templateId } = await params;
 
   return (
-    <StubScreen
-      title={TEMPLATE_STRINGS.edit.title}
-      backHref={ROUTES.templateDetail(wardrobeId, templateId)}
-      links={[{ label: TEMPLATE_STRINGS.edit.actions.submit, href: ROUTES.templateDetail(wardrobeId, templateId) }]}
-    />
+    <AppLayout title={TEMPLATE_STRINGS.edit.title} backHref={ROUTES.templateDetail(wardrobeId, templateId)}>
+      <LinkSection
+        links={[{ label: TEMPLATE_STRINGS.edit.actions.submit, href: ROUTES.templateDetail(wardrobeId, templateId) }]}
+      />
+    </AppLayout>
   );
 }

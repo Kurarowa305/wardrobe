@@ -1,4 +1,5 @@
-import { StubScreen } from "@/components/app/layout/StubScreen";
+import { AppLayout } from "@/components/app/layout/AppLayout";
+import { LinkSection } from "@/components/app/layout/LinkSection";
 import { ROUTES } from "@/constants/routes";
 import { RECORD_STRINGS } from "@/features/record/strings";
 
@@ -10,10 +11,8 @@ export default async function RecordByTemplatePage({ params }: RecordByTemplateP
   const { wardrobeId } = await params;
 
   return (
-    <StubScreen
-      title={RECORD_STRINGS.byTemplate.title}
-      backHref={ROUTES.recordMethod(wardrobeId)}
-      links={[{ label: RECORD_STRINGS.byTemplate.actions.submit, href: ROUTES.home(wardrobeId) }]}
-    />
+    <AppLayout title={RECORD_STRINGS.byTemplate.title} backHref={ROUTES.recordMethod(wardrobeId)}>
+      <LinkSection links={[{ label: RECORD_STRINGS.byTemplate.actions.submit, href: ROUTES.home(wardrobeId) }]} />
+    </AppLayout>
   );
 }

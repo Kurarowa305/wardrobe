@@ -1,28 +1,26 @@
 "use client";
 
-import { StubScreen } from "@/components/app/layout/StubScreen";
+import { AppLayout } from "@/components/app/layout/AppLayout";
+import { LinkSection } from "@/components/app/layout/LinkSection";
 import { HISTORY_STRINGS } from "@/features/history/strings";
 import { ROUTES } from "@/constants/routes";
 import { useSearchParams } from "next/navigation";
 
 type HistoryDetailClientProps = {
   wardrobeId: string;
-  historyId: string;
 };
 
 function resolveBackHref(wardrobeId: string, from: string | null) {
   return from === "home" ? ROUTES.home(wardrobeId) : ROUTES.histories(wardrobeId);
 }
 
-export default function HistoryDetailClient({ wardrobeId, historyId }: HistoryDetailClientProps) {
+export default function HistoryDetailClient({ wardrobeId }: HistoryDetailClientProps) {
   const searchParams = useSearchParams();
   const backHref = resolveBackHref(wardrobeId, searchParams.get("from"));
 
   return (
-    <StubScreen
-      title={HISTORY_STRINGS.detail.title}
-      backHref={backHref}
-      links={[{ label: HISTORY_STRINGS.detail.menu.delete, href: backHref }]}
-    />
+    <AppLayout title={HISTORY_STRINGS.detail.title} backHref={backHref}>
+      <LinkSection links={[{ label: HISTORY_STRINGS.detail.menu.delete, href: backHref }]} />
+    </AppLayout>
   );
 }

@@ -15,8 +15,6 @@ export const ROUTES = {
 
   home: (wardrobeId: string) => `/wardrobes/${wardrobeId}/home`,
   histories: (wardrobeId: string) => `/wardrobes/${wardrobeId}/histories`,
-  historyDetailBase: (wardrobeId: string, historyId: string) =>
-    `/wardrobes/${wardrobeId}/histories/${historyId}`,
   historyDetail: (wardrobeId: string, historyId: string, from: HistoryOrigin = "histories") =>
     `/wardrobes/${wardrobeId}/histories/${historyId}?from=${from}`,
 

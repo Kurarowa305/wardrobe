@@ -10,6 +10,6 @@ export function generateStaticParams() {
 }
 
 export default async function HistoryDetailPage({ params }: HistoryDetailPageProps) {
-  const { wardrobeId, historyId } = await params;
-  return <HistoryDetailClient wardrobeId={wardrobeId} historyId={historyId} />;
+  const { wardrobeId } = await params;
+  return <HistoryDetailClient wardrobeId={wardrobeId} />;
 }

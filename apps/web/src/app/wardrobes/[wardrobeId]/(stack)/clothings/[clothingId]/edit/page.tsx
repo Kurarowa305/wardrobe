@@ -1,4 +1,5 @@
-import { StubScreen } from "@/components/app/layout/StubScreen";
+import { AppLayout } from "@/components/app/layout/AppLayout";
+import { LinkSection } from "@/components/app/layout/LinkSection";
 import { DEMO_IDS, ROUTES } from "@/constants/routes";
 import { CLOTHING_STRINGS } from "@/features/clothing/strings";
 
@@ -14,10 +15,10 @@ export default async function ClothingEditPage({ params }: ClothingEditPageProps
   const { wardrobeId, clothingId } = await params;
 
   return (
-    <StubScreen
-      title={CLOTHING_STRINGS.edit.title}
-      backHref={ROUTES.clothingDetail(wardrobeId, clothingId)}
-      links={[{ label: CLOTHING_STRINGS.edit.actions.submit, href: ROUTES.clothingDetail(wardrobeId, clothingId) }]}
-    />
+    <AppLayout title={CLOTHING_STRINGS.edit.title} backHref={ROUTES.clothingDetail(wardrobeId, clothingId)}>
+      <LinkSection
+        links={[{ label: CLOTHING_STRINGS.edit.actions.submit, href: ROUTES.clothingDetail(wardrobeId, clothingId) }]}
+      />
+    </AppLayout>
   );
 }
