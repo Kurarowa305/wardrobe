@@ -97,6 +97,7 @@ a {
   list-style: none;
   display: grid;
   gap: 4px;
+  z-index: 20;
 }
 
 .nav-header-action-menu-item {

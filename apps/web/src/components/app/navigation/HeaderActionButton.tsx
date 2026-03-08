@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { NAVIGATION_STRINGS } from "@/constants/navigationStrings";
 
@@ -17,9 +17,36 @@ type HeaderActionButtonProps = {
 
 export function HeaderActionButton({ label = "︙", items }: HeaderActionButtonProps) {
   const [open, setOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    const onPointerDown = (event: PointerEvent) => {
+      if (!menuRef.current?.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    };
+
+    const onEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setOpen(false);
+      }
+    };
+
+    window.addEventListener("pointerdown", onPointerDown);
+    window.addEventListener("keydown", onEscape);
+
+    return () => {
+      window.removeEventListener("pointerdown", onPointerDown);
+      window.removeEventListener("keydown", onEscape);
+    };
+  }, [open]);
 
   return (
-    <div className="nav-header-action-wrap">
+    <div className="nav-header-action-wrap" ref={menuRef}>
       <button
         type="button"
         className="nav-header-action-button"
@@ -33,7 +60,7 @@ export function HeaderActionButton({ label = "︙", items }: HeaderActionButtonP
       {open ? (
         <ul className="nav-header-action-menu" role="menu">
           {items.map((item) => (
-            <li key={item.label} role="none">
+            <li key={`${item.label}-${item.href}`} role="none">
               <Link
                 href={item.href}
                 className="nav-header-action-menu-item"
