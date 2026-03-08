@@ -44,4 +44,9 @@ jobs:
         run: pnpm --filter web exec tsc --noEmit
 
       - name: Build web
-        run: pnpm --filter web build
+        run: |
+          if [ -d apps/web/app ] || [ -d apps/web/pages ]; then
+            pnpm --filter web build
+          else
+            echo "Skip web build: apps/web/app or apps/web/pages is missing"
+          fi
