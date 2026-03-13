@@ -181,3 +181,68 @@ a {
 .overflow-menu-item:hover {
   background: var(--page-bg);
 }
+
+.ui-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ui-button--outline {
+  border-color: var(--line);
+  background: #fff;
+  color: var(--text-main);
+}
+
+.ui-input {
+  width: 100%;
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font-size: 14px;
+  color: var(--text-main);
+  background: #fff;
+}
+
+.ui-input:focus {
+  outline: 2px solid #93c5fd;
+  outline-offset: 1px;
+}
+
+.screen-form {
+  display: grid;
+  gap: 10px;
+}
+
+.toast-viewport {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  width: min(360px, calc(100% - 24px));
+  display: grid;
+  gap: 8px;
+  z-index: 30;
+}
+
+.toast-item {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #0f172a;
+  color: #fff;
+  font-size: 13px;
+}
+
+.toast-item--error {
+  background: #b91c1c;
+}

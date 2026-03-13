@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "test:routing": "node scripts/check-routing-spec.mjs",
-    "test:overflow-menu": "node scripts/check-overflow-menu-spec.mjs"
+    "test:overflow-menu": "node scripts/check-overflow-menu-spec.mjs",
+    "test:ui-foundation": "node scripts/check-ui-foundation.mjs"
   },
   "dependencies": {
     "next": "16.1.1",
