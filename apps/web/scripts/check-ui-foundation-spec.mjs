@@ -115,6 +115,14 @@ check(
   "作成完了トーストの表示連携（home/page.tsx / HomeTabScreen.tsx）が不足しています",
 );
 
+check(
+  "UF-09",
+  "トースト表示時間が2秒に設定されている",
+  includes("src/components/ui/toaster.tsx", "TOAST_DURATION_MS = 2_000") &&
+    includes("src/components/ui/toaster.tsx", "<ToastProvider duration={TOAST_DURATION_MS}>"),
+  "toaster.tsx で duration=2000ms の設定が不足しています",
+);
+
 if (failures.length > 0) {
   console.error(`\n${failures.length}件の失敗 / ${checkCount}件中`);
   console.error(failures.join("\n\n"));
