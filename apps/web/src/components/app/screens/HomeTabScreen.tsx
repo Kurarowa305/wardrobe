@@ -1,8 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { createElement, useEffect, useRef } from "react";
 
 import { AppLayout } from "@/components/app/layout/AppLayout";
+import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { DEMO_IDS, ROUTES } from "@/constants/routes";
 import { HISTORY_STRINGS } from "@/features/history/strings";
@@ -39,11 +41,15 @@ export function HomeTabScreen({ wardrobeId }: HomeTabScreenProps) {
 
   const content = createElement(ScreenCard, {
     children: [
-      createElement(ScreenLinkButton, {
-        key: "record",
-        href: ROUTES.recordMethod(wardrobeId),
-        label: HOME_STRINGS.actions.addRecord,
-      }),
+      createElement(
+        Button,
+        {
+          key: "record",
+          asChild: true,
+          className: "w-full justify-start text-left text-sm font-medium",
+        },
+        createElement(Link, { href: ROUTES.recordMethod(wardrobeId) }, HOME_STRINGS.actions.addRecord),
+      ),
       createElement(ScreenLinkButton, {
         key: "histories",
         href: ROUTES.histories(wardrobeId),

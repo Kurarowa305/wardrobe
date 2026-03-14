@@ -1,9 +1,11 @@
+import Link from "next/link";
 import { createElement } from "react";
 
 import { AppLayout } from "@/components/app/layout/AppLayout";
+import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
 import { CLOTHING_STRINGS } from "@/features/clothing/strings";
-import { ScreenCard, ScreenLinkButton } from "./ScreenPrimitives";
+import { ScreenCard } from "./ScreenPrimitives";
 
 type ClothingCreateScreenProps = {
   wardrobeId: string;
@@ -11,10 +13,14 @@ type ClothingCreateScreenProps = {
 
 export function ClothingCreateScreen({ wardrobeId }: ClothingCreateScreenProps) {
   const content = createElement(ScreenCard, {
-    children: createElement(ScreenLinkButton, {
-      href: ROUTES.clothings(wardrobeId),
-      label: CLOTHING_STRINGS.create.actions.submit,
-    }),
+    children: createElement(
+      Button,
+      {
+        asChild: true,
+        className: "w-full justify-start text-left text-sm font-medium",
+      },
+      createElement(Link, { href: ROUTES.clothings(wardrobeId) }, CLOTHING_STRINGS.create.actions.submit),
+    ),
   });
 
   return createElement(AppLayout, {

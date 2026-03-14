@@ -1,9 +1,11 @@
+import Link from "next/link";
 import { createElement } from "react";
 
 import { AppLayout } from "@/components/app/layout/AppLayout";
+import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
 import { RECORD_STRINGS } from "@/features/record/strings";
-import { ScreenCard, ScreenLinkButton } from "./ScreenPrimitives";
+import { ScreenCard } from "./ScreenPrimitives";
 
 type RecordByTemplateScreenProps = {
   wardrobeId: string;
@@ -11,10 +13,14 @@ type RecordByTemplateScreenProps = {
 
 export function RecordByTemplateScreen({ wardrobeId }: RecordByTemplateScreenProps) {
   const content = createElement(ScreenCard, {
-    children: createElement(ScreenLinkButton, {
-      href: ROUTES.home(wardrobeId),
-      label: RECORD_STRINGS.byTemplate.actions.submit,
-    }),
+    children: createElement(
+      Button,
+      {
+        asChild: true,
+        className: "w-full justify-start text-left text-sm font-medium",
+      },
+      createElement(Link, { href: ROUTES.home(wardrobeId) }, RECORD_STRINGS.byTemplate.actions.submit),
+    ),
   });
 
   return createElement(AppLayout, {

@@ -1,6 +1,8 @@
+import Link from "next/link";
 import { createElement } from "react";
 
 import { AppLayout } from "@/components/app/layout/AppLayout";
+import { Button } from "@/components/ui/button";
 import { DEMO_IDS, ROUTES } from "@/constants/routes";
 import { CLOTHING_STRINGS } from "@/features/clothing/strings";
 import { ScreenCard, ScreenLinkButton } from "./ScreenPrimitives";
@@ -12,11 +14,15 @@ type ClothingsTabScreenProps = {
 export function ClothingsTabScreen({ wardrobeId }: ClothingsTabScreenProps) {
   const content = createElement(ScreenCard, {
     children: [
-      createElement(ScreenLinkButton, {
-        key: "add",
-        href: ROUTES.clothingNew(wardrobeId),
-        label: CLOTHING_STRINGS.list.actions.add,
-      }),
+      createElement(
+        Button,
+        {
+          key: "add",
+          asChild: true,
+          className: "w-full justify-start text-left text-sm font-medium",
+        },
+        createElement(Link, { href: ROUTES.clothingNew(wardrobeId) }, CLOTHING_STRINGS.list.actions.add),
+      ),
       createElement(ScreenLinkButton, {
         key: "detail",
         href: ROUTES.clothingDetail(wardrobeId, DEMO_IDS.clothing),

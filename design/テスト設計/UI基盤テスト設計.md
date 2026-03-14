@@ -63,6 +63,19 @@
 - 観点: 旧スタイル実装からの完全移行
 - 期待結果: `components/app/screens/*.tsx` に `screen-panel` / `screen-link-list` / `screen-link` が残っていない
 
+### UF-11 指定された記録/追加アクションは Button 基盤を利用している
+- 観点: 主要アクション導線のUI統一
+- 期待結果:
+  - `＋ 着た記録`
+  - `テンプレートで記録`
+  - `服の組み合わせで記録`
+  - `記録`（テンプレートで記録画面 / 服の組み合わせで記録画面）
+  - `＋ テンプレートを追加`
+  - `追加`（テンプレートの追加画面）
+  - `＋ 服を追加`
+  - `追加`（服の追加画面）
+  が `ScreenLinkButton` ではなく `Button` で描画されている
+
 ## CI適用
 
 - `.github/workflows/ci.yml` に `UI foundation spec test` を追加し、PR時に自動検証する

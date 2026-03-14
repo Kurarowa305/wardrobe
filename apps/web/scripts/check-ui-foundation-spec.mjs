@@ -158,6 +158,34 @@ check(
   "screen-panel / screen-link-list / screen-link が残っているスクリーンがあります",
 );
 
+check(
+  "UF-11",
+  "指定された記録/追加アクションは ScreenLinkButton ではなく Button 基盤を利用している",
+  includes("src/components/app/screens/HomeTabScreen.tsx", 'import { Button } from "@/components/ui/button";') &&
+    includes("src/components/app/screens/HomeTabScreen.tsx", "HOME_STRINGS.actions.addRecord") &&
+    includes("src/components/app/screens/RecordMethodScreen.tsx", 'import { Button } from "@/components/ui/button";') &&
+    includes("src/components/app/screens/RecordMethodScreen.tsx", "RECORD_STRINGS.method.actions.byTemplate") &&
+    includes("src/components/app/screens/RecordMethodScreen.tsx", "RECORD_STRINGS.method.actions.byCombination") &&
+    noIncludes("src/components/app/screens/RecordMethodScreen.tsx", "ScreenLinkButton") &&
+    includes("src/components/app/screens/RecordByTemplateScreen.tsx", 'import { Button } from "@/components/ui/button";') &&
+    includes("src/components/app/screens/RecordByTemplateScreen.tsx", "RECORD_STRINGS.byTemplate.actions.submit") &&
+    noIncludes("src/components/app/screens/RecordByTemplateScreen.tsx", "ScreenLinkButton") &&
+    includes("src/components/app/screens/RecordByCombinationScreen.tsx", 'import { Button } from "@/components/ui/button";') &&
+    includes("src/components/app/screens/RecordByCombinationScreen.tsx", "RECORD_STRINGS.byCombination.actions.submit") &&
+    noIncludes("src/components/app/screens/RecordByCombinationScreen.tsx", "ScreenLinkButton") &&
+    includes("src/components/app/screens/TemplatesTabScreen.tsx", 'import { Button } from "@/components/ui/button";') &&
+    includes("src/components/app/screens/TemplatesTabScreen.tsx", "TEMPLATE_STRINGS.list.actions.add") &&
+    includes("src/components/app/screens/TemplateCreateScreen.tsx", 'import { Button } from "@/components/ui/button";') &&
+    includes("src/components/app/screens/TemplateCreateScreen.tsx", "TEMPLATE_STRINGS.create.actions.submit") &&
+    noIncludes("src/components/app/screens/TemplateCreateScreen.tsx", "ScreenLinkButton") &&
+    includes("src/components/app/screens/ClothingsTabScreen.tsx", 'import { Button } from "@/components/ui/button";') &&
+    includes("src/components/app/screens/ClothingsTabScreen.tsx", "CLOTHING_STRINGS.list.actions.add") &&
+    includes("src/components/app/screens/ClothingCreateScreen.tsx", 'import { Button } from "@/components/ui/button";') &&
+    includes("src/components/app/screens/ClothingCreateScreen.tsx", "CLOTHING_STRINGS.create.actions.submit") &&
+    noIncludes("src/components/app/screens/ClothingCreateScreen.tsx", "ScreenLinkButton"),
+  "指定アクションの Button 基盤置換が未完了です",
+);
+
 if (failures.length > 0) {
   console.error(`\n${failures.length}件の失敗 / ${checkCount}件中`);
   console.error(failures.join("\n\n"));
