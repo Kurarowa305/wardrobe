@@ -1,32 +1,21 @@
-import Link from "next/link";
 import { createElement } from "react";
 
 import { AppLayout } from "@/components/app/layout/AppLayout";
 import { ROUTES } from "@/constants/routes";
 import { CLOTHING_STRINGS } from "@/features/clothing/strings";
+import { ScreenCard, ScreenLinkButton } from "./ScreenPrimitives";
 
 type ClothingCreateScreenProps = {
   wardrobeId: string;
 };
 
 export function ClothingCreateScreen({ wardrobeId }: ClothingCreateScreenProps) {
-  const content = createElement(
-    "section",
-    { className: "screen-panel" },
-    createElement(
-      "ul",
-      { className: "screen-link-list" },
-      createElement(
-        "li",
-        null,
-        createElement(
-          Link,
-          { href: ROUTES.clothings(wardrobeId), className: "screen-link" },
-          CLOTHING_STRINGS.create.actions.submit,
-        ),
-      ),
-    ),
-  );
+  const content = createElement(ScreenCard, {
+    children: createElement(ScreenLinkButton, {
+      href: ROUTES.clothings(wardrobeId),
+      label: CLOTHING_STRINGS.create.actions.submit,
+    }),
+  });
 
   return createElement(AppLayout, {
     title: CLOTHING_STRINGS.create.title,

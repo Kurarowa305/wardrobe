@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { createElement, useEffect, useRef } from "react";
 
 import { AppLayout } from "@/components/app/layout/AppLayout";
@@ -8,6 +7,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { DEMO_IDS, ROUTES } from "@/constants/routes";
 import { HISTORY_STRINGS } from "@/features/history/strings";
 import { HOME_STRINGS } from "@/features/home/strings";
+import { ScreenCard, ScreenLinkButton } from "./ScreenPrimitives";
 
 type HomeTabScreenProps = {
   wardrobeId: string;
@@ -37,44 +37,25 @@ export function HomeTabScreen({ wardrobeId }: HomeTabScreenProps) {
     window.history.replaceState(window.history.state, "", ROUTES.home(wardrobeId));
   }, [toast, wardrobeId]);
 
-  const content = createElement(
-    "section",
-    { className: "screen-panel" },
-    createElement(
-      "ul",
-      { className: "screen-link-list" },
-      createElement(
-        "li",
-        null,
-        createElement(
-          Link,
-          { href: ROUTES.recordMethod(wardrobeId), className: "screen-link" },
-          HOME_STRINGS.actions.addRecord,
-        ),
-      ),
-      createElement(
-        "li",
-        null,
-        createElement(
-          Link,
-          { href: ROUTES.histories(wardrobeId), className: "screen-link" },
-          HOME_STRINGS.actions.viewAllHistories,
-        ),
-      ),
-      createElement(
-        "li",
-        null,
-        createElement(
-          Link,
-          {
-            href: ROUTES.historyDetail(wardrobeId, DEMO_IDS.history, "home"),
-            className: "screen-link",
-          },
-          HISTORY_STRINGS.detail.title,
-        ),
-      ),
-    ),
-  );
+  const content = createElement(ScreenCard, {
+    children: [
+      createElement(ScreenLinkButton, {
+        key: "record",
+        href: ROUTES.recordMethod(wardrobeId),
+        label: HOME_STRINGS.actions.addRecord,
+      }),
+      createElement(ScreenLinkButton, {
+        key: "histories",
+        href: ROUTES.histories(wardrobeId),
+        label: HOME_STRINGS.actions.viewAllHistories,
+      }),
+      createElement(ScreenLinkButton, {
+        key: "history-detail",
+        href: ROUTES.historyDetail(wardrobeId, DEMO_IDS.history, "home"),
+        label: HISTORY_STRINGS.detail.title,
+      }),
+    ],
+  });
 
   return createElement(AppLayout, {
     title: HOME_STRINGS.titlePlaceholder,

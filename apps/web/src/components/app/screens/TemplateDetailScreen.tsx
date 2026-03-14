@@ -3,6 +3,7 @@ import { createElement } from "react";
 import { AppLayout } from "@/components/app/layout/AppLayout";
 import { ROUTES } from "@/constants/routes";
 import { TEMPLATE_STRINGS } from "@/features/template/strings";
+import { ScreenTextCard } from "./ScreenPrimitives";
 
 type TemplateDetailScreenProps = {
   wardrobeId: string;
@@ -10,7 +11,7 @@ type TemplateDetailScreenProps = {
 };
 
 export function TemplateDetailScreen({ wardrobeId, templateId }: TemplateDetailScreenProps) {
-  const content = createElement("section", { className: "screen-panel" }, "テンプレートの詳細情報");
+  const content = createElement(ScreenTextCard, { text: "テンプレートの詳細情報" });
 
   return createElement(AppLayout, {
     title: TEMPLATE_STRINGS.detail.title,

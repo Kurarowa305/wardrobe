@@ -6,6 +6,7 @@ import { createElement } from "react";
 import { AppLayout } from "@/components/app/layout/AppLayout";
 import { resolveHistoryDetailBackHref } from "@/features/history/routing";
 import { HISTORY_STRINGS } from "@/features/history/strings";
+import { ScreenTextCard } from "./ScreenPrimitives";
 
 type HistoryDetailScreenProps = {
   wardrobeId: string;
@@ -14,7 +15,7 @@ type HistoryDetailScreenProps = {
 export function HistoryDetailScreen({ wardrobeId }: HistoryDetailScreenProps) {
   const searchParams = useSearchParams();
   const backHref = resolveHistoryDetailBackHref(wardrobeId, searchParams.get("from"));
-  const content = createElement("section", { className: "screen-panel" }, "履歴の詳細情報");
+  const content = createElement(ScreenTextCard, { text: "履歴の詳細情報" });
 
   return createElement(AppLayout, {
     title: HISTORY_STRINGS.detail.title,

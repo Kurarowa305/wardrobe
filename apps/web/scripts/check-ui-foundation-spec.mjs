@@ -8,6 +8,23 @@ const webRoot = path.resolve(__dirname, "..");
 
 const failures = [];
 let checkCount = 0;
+const SCREEN_FILES = [
+  "src/components/app/screens/WardrobeCreateScreen.tsx",
+  "src/components/app/screens/HomeTabScreen.tsx",
+  "src/components/app/screens/HistoriesTabScreen.tsx",
+  "src/components/app/screens/TemplatesTabScreen.tsx",
+  "src/components/app/screens/ClothingsTabScreen.tsx",
+  "src/components/app/screens/RecordMethodScreen.tsx",
+  "src/components/app/screens/RecordByTemplateScreen.tsx",
+  "src/components/app/screens/RecordByCombinationScreen.tsx",
+  "src/components/app/screens/TemplateCreateScreen.tsx",
+  "src/components/app/screens/TemplateDetailScreen.tsx",
+  "src/components/app/screens/TemplateEditScreen.tsx",
+  "src/components/app/screens/ClothingCreateScreen.tsx",
+  "src/components/app/screens/ClothingDetailScreen.tsx",
+  "src/components/app/screens/ClothingEditScreen.tsx",
+  "src/components/app/screens/HistoryDetailScreen.tsx",
+];
 
 function abs(relPath) {
   return path.join(webRoot, relPath);
@@ -43,11 +60,13 @@ check(
   "shadcn/ui 基盤ファイル（Button/Input/Toast）が存在する",
   [
     "src/components/ui/button.tsx",
+    "src/components/ui/card.tsx",
     "src/components/ui/input.tsx",
     "src/components/ui/toast.tsx",
     "src/components/ui/toaster.tsx",
     "src/components/ui/use-toast.ts",
     "src/lib/utils.ts",
+    "src/components/app/screens/ScreenPrimitives.tsx",
   ].every((file) => exists(file)),
   "必要な ui 基盤ファイルが不足しています",
 );
@@ -113,6 +132,30 @@ check(
     includes("src/components/app/screens/HomeTabScreen.tsx", "HOME_STRINGS.toasts.wardrobeCreated") &&
     includes("src/components/app/screens/HomeTabScreen.tsx", 'window.history.replaceState(window.history.state, "", ROUTES.home(wardrobeId));'),
   "作成完了トーストの表示連携（home/page.tsx / HomeTabScreen.tsx）が不足しています",
+);
+
+check(
+  "UF-09",
+  "全スクリーンで ScreenCard / ScreenTextCard ベースのUI基盤を利用している",
+  SCREEN_FILES.every((file) => {
+    const source = read(file);
+    return source.includes("ScreenCard") || source.includes("ScreenTextCard");
+  }),
+  "スクリーンの一部で ScreenCard / ScreenTextCard の利用が確認できません",
+);
+
+check(
+  "UF-10",
+  "スクリーン実装から旧 screen-* クラス依存が除去されている",
+  SCREEN_FILES.every((file) => {
+    const source = read(file);
+    return (
+      !source.includes("screen-panel") &&
+      !source.includes("screen-link-list") &&
+      !source.includes("screen-link")
+    );
+  }),
+  "screen-panel / screen-link-list / screen-link が残っているスクリーンがあります",
 );
 
 if (failures.length > 0) {

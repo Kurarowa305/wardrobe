@@ -16,11 +16,13 @@
 - 観点: `Button` / `Input` / `Toast` 実装ファイルと `cn` ユーティリティの有無
 - 期待結果: 以下が存在する
   - `src/components/ui/button.tsx`
+  - `src/components/ui/card.tsx`
   - `src/components/ui/input.tsx`
   - `src/components/ui/toast.tsx`
   - `src/components/ui/toaster.tsx`
   - `src/components/ui/use-toast.ts`
   - `src/lib/utils.ts`
+  - `src/components/app/screens/ScreenPrimitives.tsx`
 
 ### UF-02 RootLayout に Toaster が組み込まれている
 - 観点: 全画面でトースト表示可能か
@@ -52,6 +54,14 @@
   - `home/page.tsx` は `searchParams` を参照しない（静的レンダリング制約を維持）
   - `HomeTabScreen.tsx` で `window.location.search` の `created` クエリを判定し、トースト表示する
   - 表示後に `window.history.replaceState(..., ROUTES.home(wardrobeId))` でクエリを除去する
+
+### UF-09 全スクリーンで ScreenCard / ScreenTextCard ベースのUI基盤を利用している
+- 観点: UI基盤の全画面適用
+- 期待結果: `components/app/screens/*.tsx`（15画面）すべてで `ScreenCard` または `ScreenTextCard` の利用が確認できる
+
+### UF-10 旧 screen-* クラス依存が除去されている
+- 観点: 旧スタイル実装からの完全移行
+- 期待結果: `components/app/screens/*.tsx` に `screen-panel` / `screen-link-list` / `screen-link` が残っていない
 
 ## CI適用
 

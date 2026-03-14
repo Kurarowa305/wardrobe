@@ -1,44 +1,29 @@
-import Link from "next/link";
 import { createElement } from "react";
 
 import { AppLayout } from "@/components/app/layout/AppLayout";
 import { DEMO_IDS, ROUTES } from "@/constants/routes";
 import { TEMPLATE_STRINGS } from "@/features/template/strings";
+import { ScreenCard, ScreenLinkButton } from "./ScreenPrimitives";
 
 type TemplatesTabScreenProps = {
   wardrobeId: string;
 };
 
 export function TemplatesTabScreen({ wardrobeId }: TemplatesTabScreenProps) {
-  const content = createElement(
-    "section",
-    { className: "screen-panel" },
-    createElement(
-      "ul",
-      { className: "screen-link-list" },
-      createElement(
-        "li",
-        null,
-        createElement(
-          Link,
-          { href: ROUTES.templateNew(wardrobeId), className: "screen-link" },
-          TEMPLATE_STRINGS.list.actions.add,
-        ),
-      ),
-      createElement(
-        "li",
-        null,
-        createElement(
-          Link,
-          {
-            href: ROUTES.templateDetail(wardrobeId, DEMO_IDS.template),
-            className: "screen-link",
-          },
-          TEMPLATE_STRINGS.detail.title,
-        ),
-      ),
-    ),
-  );
+  const content = createElement(ScreenCard, {
+    children: [
+      createElement(ScreenLinkButton, {
+        key: "add",
+        href: ROUTES.templateNew(wardrobeId),
+        label: TEMPLATE_STRINGS.list.actions.add,
+      }),
+      createElement(ScreenLinkButton, {
+        key: "detail",
+        href: ROUTES.templateDetail(wardrobeId, DEMO_IDS.template),
+        label: TEMPLATE_STRINGS.detail.title,
+      }),
+    ],
+  });
 
   return createElement(AppLayout, {
     title: TEMPLATE_STRINGS.list.title,
