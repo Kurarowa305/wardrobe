@@ -46,6 +46,9 @@ jobs:
       - name: Routing spec test
         run: pnpm --filter web test:routing
 
+      - name: UI foundation test
+        run: pnpm --filter web test:ui-foundation
+
       - name: Build web
         run: |
           if [ -d apps/web/app ] || [ -d apps/web/pages ]; then
