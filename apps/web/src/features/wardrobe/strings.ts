@@ -5,7 +5,7 @@ export const WARDROBE_STRINGS = {
       name: "ワードローブ名",
     },
     placeholders: {
-      name: "例: 通勤コーデ",
+      name: "例: My Wardrobe",
     },
     actions: {
       create: "作成",
