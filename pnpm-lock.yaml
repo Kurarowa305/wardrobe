@@ -56,6 +56,12 @@ importers:
       tailwind-merge:
         specifier: ^3.5.0
         version: 3.5.0
+      '@tanstack/react-query':
+        specifier: ^5.90.2
+        version: 5.90.2(react@19.2.3)
+      '@tanstack/react-query-devtools':
+        specifier: ^5.90.2
+        version: 5.90.2(@tanstack/react-query@5.90.2(react@19.2.3))(react@19.2.3)
     devDependencies:
       '@tailwindcss/postcss':
         specifier: ^4
@@ -1294,7 +1300,40 @@ packages:
   zod@4.3.4:
     resolution: {integrity: sha512-Zw/uYiiyF6pUT1qmKbZziChgNPRu+ZRneAsMUDU6IwmXdWt5JwcUfy2bvLOCUtz5UniaN/Zx5aFttZYbYc7O/A==}
 
+
+  '@tanstack/query-core@5.90.2':
+    resolution: {tarball: https://registry.npmjs.org/@tanstack/query-core/-/query-core-5.90.2.tgz}
+
+  '@tanstack/query-devtools@5.90.2':
+    resolution: {tarball: https://registry.npmjs.org/@tanstack/query-devtools/-/query-devtools-5.90.2.tgz}
+
+  '@tanstack/react-query-devtools@5.90.2':
+    resolution: {tarball: https://registry.npmjs.org/@tanstack/react-query-devtools/-/react-query-devtools-5.90.2.tgz}
+    peerDependencies:
+      '@tanstack/react-query': ^5.90.2
+      react: ^18 || ^19
+
+  '@tanstack/react-query@5.90.2':
+    resolution: {tarball: https://registry.npmjs.org/@tanstack/react-query/-/react-query-5.90.2.tgz}
+    peerDependencies:
+      react: ^18 || ^19
+
 snapshots:
+
+  '@tanstack/query-core@5.90.2': {}
+
+  '@tanstack/query-devtools@5.90.2': {}
+
+  '@tanstack/react-query-devtools@5.90.2(@tanstack/react-query@5.90.2(react@19.2.3))(react@19.2.3)':
+    dependencies:
+      '@tanstack/query-devtools': 5.90.2
+      '@tanstack/react-query': 5.90.2(react@19.2.3)
+      react: 19.2.3
+
+  '@tanstack/react-query@5.90.2(react@19.2.3)':
+    dependencies:
+      '@tanstack/query-core': 5.90.2
+      react: 19.2.3
 
   '@alloc/quick-lru@5.2.0': {}
 
