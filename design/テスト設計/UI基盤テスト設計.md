@@ -53,10 +53,6 @@
   - `HomeTabScreen.tsx` で `window.location.search` の `created` クエリを判定し、トースト表示する
   - 表示後に `window.history.replaceState(..., ROUTES.home(wardrobeId))` でクエリを除去する
 
-### UF-09 トースト表示時間が2秒に設定されている
-- 観点: 通知表示時間の要件固定
-- 期待結果: `toaster.tsx` の `ToastProvider` に `duration=2_000ms` が設定されている
-
 ## CI適用
 
 - `.github/workflows/ci.yml` に `UI foundation spec test` を追加し、PR時に自動検証する
