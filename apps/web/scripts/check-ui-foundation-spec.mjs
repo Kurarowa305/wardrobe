@@ -25,6 +25,10 @@ function includes(relPath, expected) {
   return read(relPath).includes(expected);
 }
 
+function noIncludes(relPath, unexpected) {
+  return !read(relPath).includes(unexpected);
+}
+
 function check(id, description, passed, detail) {
   checkCount += 1;
   if (passed) {
@@ -102,12 +106,13 @@ check(
 
 check(
   "UF-08",
-  "ホーム画面遷移後に作成完了トーストを表示し、クエリを除去する",
-  includes("src/app/wardrobes/[wardrobeId]/(tabs)/home/page.tsx", 'showCreatedToast={created === "1"}') &&
-    includes("src/components/app/screens/HomeTabScreen.tsx", "showCreatedToast = false") &&
+  "ホーム画面で created クエリをクライアント判定し、表示後にURLを正規化する",
+  noIncludes("src/app/wardrobes/[wardrobeId]/(tabs)/home/page.tsx", "searchParams") &&
+    includes("src/components/app/screens/HomeTabScreen.tsx", "new URLSearchParams(window.location.search)") &&
+    includes("src/components/app/screens/HomeTabScreen.tsx", 'searchParams.get("created") !== "1"') &&
     includes("src/components/app/screens/HomeTabScreen.tsx", "HOME_STRINGS.toasts.wardrobeCreated") &&
-    includes("src/components/app/screens/HomeTabScreen.tsx", "router.replace(ROUTES.home(wardrobeId));"),
-  "作成完了トーストの表示連携（page.tsx / HomeTabScreen.tsx）が不足しています",
+    includes("src/components/app/screens/HomeTabScreen.tsx", 'window.history.replaceState(window.history.state, "", ROUTES.home(wardrobeId));'),
+  "作成完了トーストの表示連携（home/page.tsx / HomeTabScreen.tsx）が不足しています",
 );
 
 if (failures.length > 0) {

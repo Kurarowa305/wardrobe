@@ -49,9 +49,9 @@
 ### UF-08 ホーム画面遷移後に作成完了トーストを表示し、クエリを除去する
 - 観点: ワードローブ作成完了フィードバックの一回表示
 - 期待結果:
-  - `home/page.tsx` で `created` クエリを `HomeTabScreen` に受け渡す
-  - `HomeTabScreen.tsx` で `showCreatedToast` が true のときトースト表示する
-  - 表示後に `router.replace(ROUTES.home(wardrobeId))` でクエリを除去する
+  - `home/page.tsx` は `searchParams` を参照しない（静的レンダリング制約を維持）
+  - `HomeTabScreen.tsx` で `window.location.search` の `created` クエリを判定し、トースト表示する
+  - 表示後に `window.history.replaceState(..., ROUTES.home(wardrobeId))` でクエリを除去する
 
 ## CI適用
 
