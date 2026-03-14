@@ -90,6 +90,15 @@ check(
   "features/wardrobe/strings.ts に入力エラー文言が見つかりません",
 );
 
+check(
+  "UF-07",
+  "ToastViewport が画面最下部中央に配置される",
+  includes("src/components/ui/toast.tsx", "fixed bottom-4 left-1/2") &&
+    includes("src/components/ui/toast.tsx", "-translate-x-1/2") &&
+    includes("src/components/ui/toast.tsx", "slide-in-from-bottom-full"),
+  "toast.tsx の Viewport 配置またはアニメーションが下部中央仕様と一致しません",
+);
+
 if (failures.length > 0) {
   console.error(`\n${failures.length}件の失敗 / ${checkCount}件中`);
   console.error(failures.join("\n\n"));
