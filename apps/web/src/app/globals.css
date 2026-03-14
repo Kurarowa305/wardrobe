@@ -136,3 +136,48 @@ a {
     border-right: 0;
   }
 }
+
+.app-header-side-right {
+  justify-content: flex-end;
+}
+
+.overflow-menu {
+  position: relative;
+}
+
+.overflow-menu-trigger {
+  min-width: 34px;
+  min-height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.overflow-menu-list {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  margin: 0;
+  padding: 6px;
+  min-width: 128px;
+  list-style: none;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  display: grid;
+  gap: 4px;
+}
+
+.overflow-menu-item {
+  display: block;
+  padding: 8px 10px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.overflow-menu-item:hover {
+  background: var(--page-bg);
+}

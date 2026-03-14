@@ -2,6 +2,7 @@ export const NAVIGATION_STRINGS = {
   back: "戻る",
   aria: {
     mainTab: "メインタブ",
+    openOverflowMenu: "メニューを開く",
   },
   tabs: {
     home: "ホーム",
