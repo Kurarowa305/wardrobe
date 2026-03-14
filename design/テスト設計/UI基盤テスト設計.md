@@ -34,9 +34,9 @@
 - 観点: エラー通知がトースト経由で実行されるか
 - 期待結果: 空入力判定時に `variant: "destructive"` の toast 呼び出しがある
 
-### UF-05 作成成功時の遷移先が仕様通り
-- 観点: 既存ルーティング仕様との整合
-- 期待結果: `ROUTES.home(DEMO_IDS.wardrobe)` へ遷移する
+### UF-05 作成成功時は作成完了クエリ付きでホームへ遷移する
+- 観点: 作成完了トースト表示トリガー連携
+- 期待結果: `WardrobeCreateScreen.tsx` で `ROUTES.home(DEMO_IDS.wardrobe)` に `?created=1` を付与して遷移する
 
 ### UF-06 入力エラー文言が strings に定義されている
 - 観点: 文言定義の集約ルール準拠
@@ -45,6 +45,13 @@
 ### UF-07 ToastViewport が画面最下部中央に配置される
 - 観点: スマホ表示時のトースト配置崩れ防止
 - 期待結果: `src/components/ui/toast.tsx` で `ToastViewport` が `bottom + center` 配置になっている
+
+### UF-08 ホーム画面遷移後に作成完了トーストを表示し、クエリを除去する
+- 観点: ワードローブ作成完了フィードバックの一回表示
+- 期待結果:
+  - `home/page.tsx` で `created` クエリを `HomeTabScreen` に受け渡す
+  - `HomeTabScreen.tsx` で `showCreatedToast` が true のときトースト表示する
+  - 表示後に `router.replace(ROUTES.home(wardrobeId))` でクエリを除去する
 
 ## CI適用
 

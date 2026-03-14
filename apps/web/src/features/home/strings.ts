@@ -4,6 +4,12 @@ export const HOME_STRINGS = {
     addRecord: "＋ 着た記録",
     viewAllHistories: "履歴を全て見る",
   },
+  toasts: {
+    wardrobeCreated: {
+      title: "ワードローブを作成しました",
+      description: "ホーム画面に移動しました。",
+    },
+  },
   sections: {
     recentWeekHistories: "直近1週間の履歴",
   },

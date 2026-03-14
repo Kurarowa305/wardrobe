@@ -77,9 +77,10 @@ check(
 
 check(
   "UF-05",
-  "作成成功時はデモワードローブのホームへ遷移する",
-  includes("src/components/app/screens/WardrobeCreateScreen.tsx", "router.push(ROUTES.home(DEMO_IDS.wardrobe));"),
-  "WardrobeCreateScreen.tsx の遷移先が仕様と一致しません",
+  "作成成功時はホーム遷移に作成完了クエリを付与する",
+  includes("src/components/app/screens/WardrobeCreateScreen.tsx", "ROUTES.home(DEMO_IDS.wardrobe)") &&
+    includes("src/components/app/screens/WardrobeCreateScreen.tsx", "?created=1"),
+  "WardrobeCreateScreen.tsx で作成完了クエリ付き遷移が設定されていません",
 );
 
 check(
@@ -97,6 +98,16 @@ check(
     includes("src/components/ui/toast.tsx", "-translate-x-1/2") &&
     includes("src/components/ui/toast.tsx", "slide-in-from-bottom-full"),
   "toast.tsx の Viewport 配置またはアニメーションが下部中央仕様と一致しません",
+);
+
+check(
+  "UF-08",
+  "ホーム画面遷移後に作成完了トーストを表示し、クエリを除去する",
+  includes("src/app/wardrobes/[wardrobeId]/(tabs)/home/page.tsx", 'showCreatedToast={created === "1"}') &&
+    includes("src/components/app/screens/HomeTabScreen.tsx", "showCreatedToast = false") &&
+    includes("src/components/app/screens/HomeTabScreen.tsx", "HOME_STRINGS.toasts.wardrobeCreated") &&
+    includes("src/components/app/screens/HomeTabScreen.tsx", "router.replace(ROUTES.home(wardrobeId));"),
+  "作成完了トーストの表示連携（page.tsx / HomeTabScreen.tsx）が不足しています",
 );
 
 if (failures.length > 0) {

@@ -27,7 +27,7 @@ export function WardrobeCreateScreen() {
       return;
     }
 
-    router.push(ROUTES.home(DEMO_IDS.wardrobe));
+    router.push(`${ROUTES.home(DEMO_IDS.wardrobe)}?created=1`);
   };
 
   return (
