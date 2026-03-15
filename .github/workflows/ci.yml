@@ -55,6 +55,9 @@ jobs:
       - name: Query foundation spec test
         run: pnpm --filter web test:query-foundation
 
+      - name: Query keys spec test
+        run: pnpm --filter web test:query-keys
+
       - name: API client foundation spec test
         run: pnpm --filter web test:api-client-foundation
 
