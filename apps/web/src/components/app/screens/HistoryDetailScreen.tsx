@@ -1,9 +1,10 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { createElement } from "react";
+import { Suspense, createElement } from "react";
 
 import { AppLayout } from "@/components/app/layout/AppLayout";
+import { ROUTES } from "@/constants/routes";
 import { resolveHistoryDetailBackHref } from "@/features/history/routing";
 import { HISTORY_STRINGS } from "@/features/history/strings";
 import { ScreenTextCard } from "./ScreenPrimitives";
@@ -12,9 +13,11 @@ type HistoryDetailScreenProps = {
   wardrobeId: string;
 };
 
-export function HistoryDetailScreen({ wardrobeId }: HistoryDetailScreenProps) {
-  const searchParams = useSearchParams();
-  const backHref = resolveHistoryDetailBackHref(wardrobeId, searchParams.get("from"));
+type HistoryDetailScreenContentProps = {
+  backHref: string;
+};
+
+function HistoryDetailScreenContent({ backHref }: HistoryDetailScreenContentProps) {
   const content = createElement(ScreenTextCard, { text: "履歴の詳細情報" });
 
   return createElement(AppLayout, {
@@ -28,4 +31,19 @@ export function HistoryDetailScreen({ wardrobeId }: HistoryDetailScreenProps) {
     ],
     children: content,
   });
+}
+
+function HistoryDetailScreenSearchParams({ wardrobeId }: HistoryDetailScreenProps) {
+  const searchParams = useSearchParams();
+  const backHref = resolveHistoryDetailBackHref(wardrobeId, searchParams.get("from"));
+
+  return <HistoryDetailScreenContent backHref={backHref} />;
+}
+
+export function HistoryDetailScreen({ wardrobeId }: HistoryDetailScreenProps) {
+  return (
+    <Suspense fallback={<HistoryDetailScreenContent backHref={ROUTES.histories(wardrobeId)} />}>
+      <HistoryDetailScreenSearchParams wardrobeId={wardrobeId} />
+    </Suspense>
+  );
 }

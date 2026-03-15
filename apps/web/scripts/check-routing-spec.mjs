@@ -351,6 +351,20 @@ check("RT-20", "create page links to demo wardrobe home", () => {
   };
 });
 
+check("RT-21", "history detail isolates searchParams access behind Suspense", () => {
+  const ok = containsAll(HISTORY_DETAIL_SCREEN, [
+    "function HistoryDetailScreenSearchParams({ wardrobeId }: HistoryDetailScreenProps)",
+    'const backHref = resolveHistoryDetailBackHref(wardrobeId, searchParams.get("from"));',
+    "<Suspense fallback={<HistoryDetailScreenContent backHref={ROUTES.histories(wardrobeId)} />}>",
+    "<HistoryDetailScreenSearchParams wardrobeId={wardrobeId} />",
+  ]);
+  return {
+    ok,
+    detail:
+      "HistoryDetailScreen must read searchParams in a Suspense-wrapped subtree with histories fallback",
+  };
+});
+
 if (failures.length > 0) {
   console.error("\nRouting spec checks failed:");
   for (const failure of failures) {
