@@ -10,6 +10,7 @@
     "test:overflow-menu": "node scripts/check-overflow-menu-spec.mjs",
     "test:ui-foundation": "node scripts/check-ui-foundation-spec.mjs",
     "test:query-foundation": "node scripts/check-query-foundation-spec.mjs",
+    "test:query-keys": "node scripts/check-query-keys-spec.mjs",
     "test:api-client-foundation": "node scripts/check-api-client-foundation-spec.mjs"
   },
   "dependencies": {
