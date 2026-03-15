@@ -55,6 +55,9 @@ jobs:
       - name: Query foundation spec test
         run: pnpm --filter web test:query-foundation
 
+      - name: API client foundation spec test
+        run: pnpm --filter web test:api-client-foundation
+
       - name: Build web
         run: |
           if [ -d apps/web/app ] || [ -d apps/web/pages ] || [ -d apps/web/src/app ]; then
