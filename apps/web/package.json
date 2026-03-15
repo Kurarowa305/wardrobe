@@ -11,7 +11,8 @@
     "test:ui-foundation": "node scripts/check-ui-foundation-spec.mjs",
     "test:query-foundation": "node scripts/check-query-foundation-spec.mjs",
     "test:query-keys": "node scripts/check-query-keys-spec.mjs",
-    "test:api-client-foundation": "node scripts/check-api-client-foundation-spec.mjs"
+    "test:api-client-foundation": "node scripts/check-api-client-foundation-spec.mjs",
+    "test:msw-foundation": "node scripts/check-msw-foundation-spec.mjs"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.4",
@@ -29,6 +30,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "msw": "^2.12.10",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

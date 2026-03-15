@@ -61,6 +61,9 @@ jobs:
       - name: API client foundation spec test
         run: pnpm --filter web test:api-client-foundation
 
+      - name: MSW foundation spec test
+        run: pnpm --filter web test:msw-foundation
+
       - name: Build web
         run: |
           if [ -d apps/web/app ] || [ -d apps/web/pages ] || [ -d apps/web/src/app ]; then

@@ -5,6 +5,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useState, type ReactNode } from "react";
 
 import { createAppQueryClient } from "@/lib/queryClient";
+import { startMockServiceWorker } from "@/mocks/start";
 
 declare global {
   interface Window {
@@ -18,6 +19,33 @@ type AppProvidersProps = {
 
 export function AppProviders({ children }: AppProvidersProps) {
   const [queryClient] = useState(() => createAppQueryClient());
+  const [isMockReady, setIsMockReady] = useState(process.env.NODE_ENV !== "development");
+
+  useEffect(() => {
+    if (process.env.NODE_ENV !== "development") {
+      return;
+    }
+
+    let isMounted = true;
+
+    const prepare = async () => {
+      try {
+        await startMockServiceWorker();
+      } catch (error) {
+        console.error("[msw] failed to start mock service worker", error);
+      } finally {
+        if (isMounted) {
+          setIsMockReady(true);
+        }
+      }
+    };
+
+    void prepare();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (process.env.NODE_ENV !== "development") {
@@ -43,6 +71,10 @@ export function AppProviders({ children }: AppProvidersProps) {
       delete window.__WARDROBE_QUERY_CLIENT__;
     };
   }, [queryClient]);
+
+  if (!isMockReady) {
+    return null;
+  }
 
   return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 }
