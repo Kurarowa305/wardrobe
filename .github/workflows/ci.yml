@@ -54,8 +54,8 @@ jobs:
 
       - name: Build web
         run: |
-          if [ -d apps/web/app ] || [ -d apps/web/pages ]; then
+          if [ -d apps/web/app ] || [ -d apps/web/pages ] || [ -d apps/web/src/app ]; then
             pnpm --filter web build
           else
-            echo "Skip web build: apps/web/app or apps/web/pages is missing"
+            echo "Skip web build: apps/web/app, apps/web/pages, and apps/web/src/app are missing"
           fi
