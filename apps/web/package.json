@@ -12,7 +12,8 @@
     "test:query-foundation": "node scripts/check-query-foundation-spec.mjs",
     "test:query-keys": "node scripts/check-query-keys-spec.mjs",
     "test:api-client-foundation": "node scripts/check-api-client-foundation-spec.mjs",
-    "test:msw-foundation": "node scripts/check-msw-foundation-spec.mjs"
+    "test:msw-foundation": "node scripts/check-msw-foundation-spec.mjs",
+    "test:msw-scenarios": "node scripts/check-msw-scenarios-spec.mjs"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.4",
