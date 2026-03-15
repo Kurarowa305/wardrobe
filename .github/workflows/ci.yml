@@ -1,10 +1,7 @@
 name: CI
 
 on:
-  pull_request:
-    branches:
-      - main
-      - master
+  push:
 
 permissions:
   contents: read
@@ -60,6 +57,9 @@ jobs:
 
       - name: API client foundation spec test
         run: pnpm --filter web test:api-client-foundation
+
+      - name: MSW foundation spec test
+        run: pnpm --filter web test:msw-foundation
 
       - name: Build web
         run: |
