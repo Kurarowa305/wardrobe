@@ -77,10 +77,13 @@ check(
 
 check(
   "MF-06",
-  "MSW 起動関数が開発環境限定かつ一度だけ起動する",
+  "MSW 起動関数が開発環境またはVercel previewで一度だけ起動する",
   exists("src/mocks/start.ts") &&
     includes("src/mocks/start.ts", "let isStarted = false;") &&
-    includes("src/mocks/start.ts", 'if (process.env.NODE_ENV !== "development")') &&
+    includes("src/mocks/start.ts", "export function shouldEnableMockServiceWorker()") &&
+    includes("src/mocks/start.ts", "process.env.NEXT_PUBLIC_VERCEL_ENV ?? process.env.VERCEL_ENV") &&
+    includes("src/mocks/start.ts", 'process.env.NODE_ENV === "development" || vercelEnv === "preview"') &&
+    includes("src/mocks/start.ts", "if (!shouldEnableMockServiceWorker())") &&
     includes("src/mocks/start.ts", 'if (typeof window === "undefined")') &&
     includes("src/mocks/start.ts", "await worker.start({") &&
     includes("src/mocks/start.ts", 'onUnhandledRequest: "bypass"') &&
@@ -91,7 +94,8 @@ check(
 check(
   "MF-07",
   "AppProviders が起動時に startMockServiceWorker を呼び出す",
-  includes("src/lib/providers/AppProviders.tsx", 'import { startMockServiceWorker } from "@/mocks/start";') &&
+  includes("src/lib/providers/AppProviders.tsx", 'from "@/mocks/start";') &&
+    includes("src/lib/providers/AppProviders.tsx", "startMockServiceWorker") &&
     includes("src/lib/providers/AppProviders.tsx", "await startMockServiceWorker();") &&
     includes("src/lib/providers/AppProviders.tsx", 'console.error("[msw] failed to start mock service worker", error);'),
   "src/lib/providers/AppProviders.tsx の MSW 自動起動実装が不足しています",
@@ -99,8 +103,9 @@ check(
 
 check(
   "MF-08",
-  "開発時は MSW 起動完了まで描画を待機する",
-  includes("src/lib/providers/AppProviders.tsx", 'useState(process.env.NODE_ENV !== "development")') &&
+  "MSW有効環境では起動完了まで描画を待機する",
+  includes("src/lib/providers/AppProviders.tsx", "useState(() => !shouldEnableMockServiceWorker())") &&
+    includes("src/lib/providers/AppProviders.tsx", "if (!shouldEnableMockServiceWorker())") &&
     includes("src/lib/providers/AppProviders.tsx", "if (!isMockReady)") &&
     includes("src/lib/providers/AppProviders.tsx", "return null;"),
   "MSW 起動待機の描画制御が不足しています",

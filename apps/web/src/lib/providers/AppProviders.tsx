@@ -5,7 +5,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useState, type ReactNode } from "react";
 
 import { createAppQueryClient } from "@/lib/queryClient";
-import { startMockServiceWorker } from "@/mocks/start";
+import { shouldEnableMockServiceWorker, startMockServiceWorker } from "@/mocks/start";
 
 declare global {
   interface Window {
@@ -19,10 +19,10 @@ type AppProvidersProps = {
 
 export function AppProviders({ children }: AppProvidersProps) {
   const [queryClient] = useState(() => createAppQueryClient());
-  const [isMockReady, setIsMockReady] = useState(process.env.NODE_ENV !== "development");
+  const [isMockReady, setIsMockReady] = useState(() => !shouldEnableMockServiceWorker());
 
   useEffect(() => {
-    if (process.env.NODE_ENV !== "development") {
+    if (!shouldEnableMockServiceWorker()) {
       return;
     }
 
