@@ -64,6 +64,9 @@ jobs:
       - name: Clothing fixtures spec test
         run: pnpm --filter web test:clothing-fixtures
 
+      - name: Clothing API client spec test
+        run: pnpm --filter web test:clothing-api-client
+
       - name: MSW foundation spec test
         run: pnpm --filter web test:msw-foundation
 
