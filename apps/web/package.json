@@ -18,6 +18,7 @@
     "test:clothing-query-hooks": "node scripts/check-clothing-query-hooks-spec.mjs",
     "test:clothing-mutation-hooks": "node scripts/check-clothing-mutation-hooks-spec.mjs",
     "test:clothing-list-screen": "node scripts/check-clothing-list-screen-spec.mjs",
+    "test:clothing-create-screen": "node scripts/check-clothing-create-screen-spec.mjs",
     "test:msw-foundation": "node scripts/check-msw-foundation-spec.mjs",
     "test:msw-scenarios": "node scripts/check-msw-scenarios-spec.mjs",
     "test:clothing-msw-handlers": "node scripts/check-clothing-msw-handlers-spec.mjs"

@@ -17,8 +17,17 @@ export const CLOTHING_STRINGS = {
       image: "画像",
       name: "服の名前",
     },
+    placeholders: {
+      image: "画像キー（任意）",
+      name: "例: 白シャツ",
+    },
     actions: {
       submit: "追加",
+    },
+    messages: {
+      nameRequired: "服の名前を入力してください。",
+      submitting: "追加中...",
+      submitError: "服の追加に失敗しました。",
     },
   },
   edit: {
