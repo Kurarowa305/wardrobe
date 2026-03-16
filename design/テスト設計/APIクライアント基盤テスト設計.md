@@ -3,7 +3,7 @@
 ## 目的
 
 - MS0-T06（APIクライアント雛形）の完了条件を継続的に検証する
-- `apiClient` の共通呼び出し（GET/POST/PUT/DELETE）、エラー正規化、JSON解析、タイムアウト制御をCIで担保する
+- `apiClient` の共通呼び出し（GET/POST/PATCH/DELETE）、エラー正規化、JSON解析、タイムアウト制御をCIで担保する
 
 ## 対象スクリプト
 
@@ -22,9 +22,9 @@
   - `NEXT_PUBLIC_API_BASE_URL` を参照している
   - `DEFAULT_TIMEOUT_MS = 10_000` が定義されている
 
-### AF-03 GET/POST/PUT/DELETE の統一インターフェースを公開する
+### AF-03 GET/POST/PATCH/DELETE の統一インターフェースを公開する
 - 観点: 呼び出しメソッドの統一
-- 期待結果: `apiClient` が `get` / `post` / `put` / `delete` を公開し、共通 `request` に集約されている
+- 期待結果: `apiClient` が `get` / `post` / `patch` / `delete` を公開し、共通 `request` に集約されている
 
 ### AF-04 AbortController + setTimeout でタイムアウト制御を実装する
 - 観点: ハング防止と中断処理
