@@ -73,6 +73,9 @@ jobs:
       - name: Clothing mutation hooks spec test
         run: pnpm --filter web test:clothing-mutation-hooks
 
+      - name: Clothing list screen spec test
+        run: pnpm --filter web test:clothing-list-screen
+
       - name: MSW foundation spec test
         run: pnpm --filter web test:msw-foundation
 

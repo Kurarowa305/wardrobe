@@ -42,6 +42,12 @@
   - `clothingDetailFixtureById` が定義される
   - `clothingId` をキーとして詳細fixtureを参照できる
 
+### CF-06 clothingDetailFixtures が合計50件（既存3件 + 追加47件）で構成される
+- 観点: 服一覧/ページング検証で十分な件数を固定化する
+- 期待結果:
+  - `GENERATED_CLOTHING_FIXTURE_COUNT = 47` が定義される
+  - `clothingDetailFixtures` が既存3件に加えて `Array.from` で47件を追加する
+
 ## CI適用
 
 - `.github/workflows/ci.yml` に `Clothing fixtures spec test` を追加し、PR時に自動検証する

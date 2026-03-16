@@ -88,6 +88,17 @@ check(
   "src/mocks/handlers/index.ts への clothingHandlers 組み込みが不足しています",
 );
 
+check(
+  "CM-07",
+  "Clothing handler がデモ遷移用 wardrobeId（DEMO_IDS.wardrobe）を許可する",
+  includes("src/mocks/handlers/clothing.ts", 'import { DEMO_IDS } from "@/constants/routes";') &&
+    includes(
+      "src/mocks/handlers/clothing.ts",
+      "return wardrobeId === CLOTHING_FIXTURE_WARDROBE_ID || wardrobeId === DEMO_IDS.wardrobe;",
+    ),
+  "clothing.ts の対応 wardrobeId 判定に DEMO_IDS.wardrobe が含まれていません",
+);
+
 if (failures.length > 0) {
   console.error(`\n${failures.length}件の失敗 / ${checkCount}件中`);
   console.error(failures.join("\n\n"));

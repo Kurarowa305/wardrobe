@@ -78,6 +78,14 @@ check(
   "詳細 fixture を再利用するための ID 辞書定義が不足しています",
 );
 
+check(
+  "CF-06",
+  "clothingDetailFixtures が合計50件（既存3件 + 追加47件）で構成される",
+  includes("src/mocks/fixtures/clothing.ts", "const GENERATED_CLOTHING_FIXTURE_COUNT = 47;") &&
+    includes("src/mocks/fixtures/clothing.ts", "...Array.from({ length: GENERATED_CLOTHING_FIXTURE_COUNT },"),
+  "50件構成（3件 + 47件追加）の定義が不足しています",
+);
+
 if (failures.length > 0) {
   console.error(`\n${failures.length}件の失敗 / ${checkCount}件中`);
   console.error(failures.join("\n\n"));

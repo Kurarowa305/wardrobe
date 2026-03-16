@@ -25,6 +25,7 @@ const SCREEN_FILES = [
   "src/components/app/screens/ClothingEditScreen.tsx",
   "src/components/app/screens/HistoryDetailScreen.tsx",
 ];
+const NO_SCREEN_CARD_FILES = new Set(["src/components/app/screens/ClothingsTabScreen.tsx"]);
 
 function abs(relPath) {
   return path.join(webRoot, relPath);
@@ -136,12 +137,19 @@ check(
 
 check(
   "UF-09",
-  "全スクリーンで ScreenCard / ScreenTextCard ベースのUI基盤を利用している",
+  "スクリーン実装は ScreenCard基盤または画面要件に沿った直接描画で構成される",
   SCREEN_FILES.every((file) => {
     const source = read(file);
+    if (NO_SCREEN_CARD_FILES.has(file)) {
+      return (
+        !source.includes("<ScreenCard") &&
+        !source.includes("ScreenTextCard") &&
+        source.includes("CLOTHING_STRINGS.list.actions.add")
+      );
+    }
     return source.includes("ScreenCard") || source.includes("ScreenTextCard");
   }),
-  "スクリーンの一部で ScreenCard / ScreenTextCard の利用が確認できません",
+  "スクリーンのUI基盤構成が期待値と一致しません",
 );
 
 check(
