@@ -51,6 +51,12 @@
   - `src/mocks/handlers/index.ts` が `clothingHandlers` をimportする
   - `handlers` 配列に `clothingHandlers` を追加する
 
+### CM-07 Clothing handler がデモ遷移用 wardrobeId（DEMO_IDS.wardrobe）を許可する
+- 観点: 画面遷移で利用する `wardrobeId`（`/wardrobes/1/...`）とMSW判定条件の整合
+- 期待結果:
+  - `src/mocks/handlers/clothing.ts` が `DEMO_IDS` をimportする
+  - `isSupportedWardrobeId` が fixture用IDに加えて `DEMO_IDS.wardrobe` も許可する
+
 ## CI適用
 
 - `.github/workflows/ci.yml` に `Clothing MSW handlers spec test` を追加し、PR時に自動検証する

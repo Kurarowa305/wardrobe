@@ -10,6 +10,7 @@ import {
   CLOTHING_FIXTURE_WARDROBE_ID,
   clothingDetailFixtures,
 } from "@/mocks/fixtures/clothing";
+import { DEMO_IDS } from "@/constants/routes";
 import { HttpResponse, http } from "msw";
 
 import { applyMockScenario } from "./scenario";
@@ -27,7 +28,7 @@ function initializeClothingStore(): ClothingDetailResponseDto[] {
 }
 
 function isSupportedWardrobeId(wardrobeId: string) {
-  return wardrobeId === CLOTHING_FIXTURE_WARDROBE_ID;
+  return wardrobeId === CLOTHING_FIXTURE_WARDROBE_ID || wardrobeId === DEMO_IDS.wardrobe;
 }
 
 function createErrorResponse(status: number, code: string, message: string) {

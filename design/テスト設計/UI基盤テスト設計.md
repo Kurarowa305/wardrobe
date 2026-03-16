@@ -55,9 +55,11 @@
   - `HomeTabScreen.tsx` で `window.location.search` の `created` クエリを判定し、トースト表示する
   - 表示後に `window.history.replaceState(..., ROUTES.home(wardrobeId))` でクエリを除去する
 
-### UF-09 全スクリーンで ScreenCard / ScreenTextCard ベースのUI基盤を利用している
-- 観点: UI基盤の全画面適用
-- 期待結果: `components/app/screens/*.tsx`（15画面）すべてで `ScreenCard` または `ScreenTextCard` の利用が確認できる
+### UF-09 スクリーン実装は ScreenCard基盤または画面要件に沿った直接描画で構成される
+- 観点: UI基盤の適用方針と画面要件の両立
+- 期待結果:
+  - `ClothingsTabScreen.tsx` 以外の画面では `ScreenCard` または `ScreenTextCard` の利用が確認できる
+  - `ClothingsTabScreen.tsx` は `ScreenCard` でラップせず、一覧要素を直接描画する
 
 ### UF-10 旧 screen-* クラス依存が除去されている
 - 観点: 旧スタイル実装からの完全移行
