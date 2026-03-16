@@ -73,6 +73,9 @@ jobs:
       - name: MSW scenarios spec test
         run: pnpm --filter web test:msw-scenarios
 
+      - name: Clothing MSW handlers spec test
+        run: pnpm --filter web test:clothing-msw-handlers
+
       - name: Build web
         run: |
           if [ -d apps/web/app ] || [ -d apps/web/pages ] || [ -d apps/web/src/app ]; then
