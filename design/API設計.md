@@ -7,7 +7,7 @@
 | API-02 | GET    | `/wardrobes/{wardrobeId}`                        | ワードローブ取得    | —                                                            | `name`                                                         |                                    |
 | API-03 | GET    | `/wardrobes/{wardrobeId}/clothing`               | 服一覧（登録順）    | `order`(asc/desc), `limit`, `cursor`                         | `items[]`, `nextCursor`                                        | ACTIVEのみ / レスポンス詳細は以下                                       |
 | API-04 | POST   | `/wardrobes/{wardrobeId}/clothing`               | 服の追加        | `name`, `imageKey?`                                          | —                                                              |                                    |
-| API-05 | GET    | `/wardrobes/{wardrobeId}/clothing/{clothingId}`  | 服詳細取得       | —                                                            | `name`, `imageKey?`, `status`, `wearCount`, `lastWornAt`       | レスポンス詳細は以下                                          |
+| API-05 | GET    | `/wardrobes/{wardrobeId}/clothing/{clothingId}`  | 服詳細取得       | —                                                            | `clothingId`, `name`, `imageKey?`, `status`, `wearCount`, `lastWornAt`       | レスポンス詳細は以下                                          |
 | API-06 | PATCH  | `/wardrobes/{wardrobeId}/clothing/{clothingId}`  | 服の編集        | `name?`, `imageKey?`                                         | —                                                              |                                         |
 | API-07 | DELETE | `/wardrobes/{wardrobeId}/clothing/{clothingId}`  | 服の削除（論理）    | —                                                            | —                                                              | 内部で `status=DELETED`                           |
 | API-08 | GET    | `/wardrobes/{wardrobeId}/templates`              | テンプレ一覧（登録順） | `order`(asc/desc), `limit`, `cursor`                         | `items[]`, `nextCursor`                                        | ACTIVEのみ / レスポンス詳細は以下                                       |
@@ -181,6 +181,7 @@
 
 | フィールド      | 型       | 説明                   |
 | ---------- | ------- | -------------------- |
+| clothingId | string  | 服ID                  |
 | name       | string  | 服名                   |
 | imageKey   | string? | 画像キー                 |
 | status     | string  | `ACTIVE` / `DELETED`　※削除済みでも取得可能 |
@@ -189,6 +190,7 @@
 
 ```json
 {
+  "clothingId": "cl_01HZZAAA",
   "name": "黒Tシャツ",
   "imageKey": "clothing/black_t.png",
   "status": "ACTIVE",
@@ -702,4 +704,3 @@
 |  999 | UNKNOWN_ERROR    | 不明なエラー     | -                                         | 全API                      | -                                            |
 
 ---
-
