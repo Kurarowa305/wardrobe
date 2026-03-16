@@ -67,6 +67,9 @@ jobs:
       - name: Clothing API client spec test
         run: pnpm --filter web test:clothing-api-client
 
+      - name: Clothing query hooks spec test
+        run: pnpm --filter web test:clothing-query-hooks
+
       - name: MSW foundation spec test
         run: pnpm --filter web test:msw-foundation
 
