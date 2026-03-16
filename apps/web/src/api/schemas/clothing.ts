@@ -1,4 +1,21 @@
 export type ClothingStatusDto = "ACTIVE" | "DELETED";
+export type ClothingListOrderDto = "asc" | "desc";
+
+export type ClothingListParamsDto = {
+  order?: ClothingListOrderDto;
+  limit?: number;
+  cursor?: string | null;
+};
+
+export type CreateClothingRequestDto = {
+  name: string;
+  imageKey?: string | null;
+};
+
+export type UpdateClothingRequestDto = {
+  name?: string;
+  imageKey?: string | null;
+};
 
 export type ClothingDto = {
   clothingId: string;
