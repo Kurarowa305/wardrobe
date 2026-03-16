@@ -51,11 +51,11 @@ check(
 
 check(
   "AF-03",
-  "GET/POST/PUT/DELETE の統一インターフェースを公開する",
-  includes("src/api/client.ts", 'type RequestMethod = "GET" | "POST" | "PUT" | "DELETE"') &&
+  "GET/POST/PATCH/DELETE の統一インターフェースを公開する",
+  includes("src/api/client.ts", 'type RequestMethod = "GET" | "POST" | "PATCH" | "DELETE"') &&
     includes("src/api/client.ts", 'get: (path, options) => request("GET", path, options, resolved)') &&
     includes("src/api/client.ts", 'post: (path, options) => request("POST", path, options, resolved)') &&
-    includes("src/api/client.ts", 'put: (path, options) => request("PUT", path, options, resolved)') &&
+    includes("src/api/client.ts", 'patch: (path, options) => request("PATCH", path, options, resolved)') &&
     includes("src/api/client.ts", 'delete: (path, options) => request("DELETE", path, options, resolved)'),
   "HTTPメソッドの統一呼び出し実装が不足しています",
 );
