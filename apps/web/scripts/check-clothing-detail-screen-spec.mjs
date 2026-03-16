@@ -35,6 +35,8 @@ function check(id, description, passed, detail) {
 }
 
 const target = "src/components/app/screens/ClothingDetailScreen.tsx";
+const detailPageTarget = "src/app/wardrobes/[wardrobeId]/(stack)/clothings/[clothingId]/page.tsx";
+const editPageTarget = "src/app/wardrobes/[wardrobeId]/(stack)/clothings/[clothingId]/edit/page.tsx";
 const stringsTarget = "src/features/clothing/strings.ts";
 
 check(
@@ -86,6 +88,20 @@ check(
     includes(stringsTarget, 'notFound: "服が見つかりませんでした。"') &&
     includes(stringsTarget, 'deleted: "削除済み"'),
   "features/clothing/strings.ts に詳細画面文言の定義が不足しています",
+);
+
+check(
+  "CDS-07",
+  "静的エクスポート向けに服詳細/編集ページの generateStaticParams が fixture 全件を返す",
+  includes(detailPageTarget, 'import { clothingDetailFixtures } from "@/mocks/fixtures/clothing";') &&
+    includes(detailPageTarget, "return clothingDetailFixtures.map((fixture) => ({") &&
+    includes(detailPageTarget, "wardrobeId: DEMO_IDS.wardrobe,") &&
+    includes(detailPageTarget, "clothingId: fixture.clothingId,") &&
+    includes(editPageTarget, 'import { clothingDetailFixtures } from "@/mocks/fixtures/clothing";') &&
+    includes(editPageTarget, "return clothingDetailFixtures.map((fixture) => ({") &&
+    includes(editPageTarget, "wardrobeId: DEMO_IDS.wardrobe,") &&
+    includes(editPageTarget, "clothingId: fixture.clothingId,"),
+  "detail/edit ページの静的パス生成が fixture 全件対応になっていません",
 );
 
 if (failures.length > 0) {

@@ -44,6 +44,13 @@
 - 期待結果:
   - `src/features/clothing/strings.ts` に `loading` / `error` / `notFound` / `deleted` を定義する
 
+
+### CDS-07 静的エクスポート向けに詳細/編集ルートのパスを fixture 全件で生成する
+- 観点: `output: "export"` 環境で一覧→詳細（および詳細→編集）遷移時に404を防止する
+- 期待結果:
+  - `src/app/wardrobes/[wardrobeId]/(stack)/clothings/[clothingId]/page.tsx` が `clothingDetailFixtures` を使って `generateStaticParams` を構成する
+  - `src/app/wardrobes/[wardrobeId]/(stack)/clothings/[clothingId]/edit/page.tsx` も同様に `clothingDetailFixtures` を使って `generateStaticParams` を構成する
+
 ## CI適用
 
 - `.github/workflows/ci.yml` に `Clothing detail screen spec test` を追加し、PR時に自動検証する
