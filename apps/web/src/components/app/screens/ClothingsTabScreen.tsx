@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { createElement, useEffect, useMemo, useState } from "react";
 
 import { useClothingList } from "@/api/hooks/clothing";
 import { AppLayout } from "@/components/app/layout/AppLayout";
@@ -73,59 +73,56 @@ export function ClothingsTabScreen({ wardrobeId }: ClothingsTabScreenProps) {
     setCursor(nextCursor);
   };
 
-  return (
-    <AppLayout title={CLOTHING_STRINGS.list.title} tabKey="clothings" wardrobeId={wardrobeId}>
-      <>
-        <Button asChild className="w-full justify-start text-left text-sm font-medium">
-          <Link href={ROUTES.clothingNew(wardrobeId)}>{CLOTHING_STRINGS.list.actions.add}</Link>
+  const content = (
+    <>
+      <Button asChild className="w-full justify-start text-left text-sm font-medium">
+        <Link href={ROUTES.clothingNew(wardrobeId)}>{CLOTHING_STRINGS.list.actions.add}</Link>
+      </Button>
+
+      {isInitialLoading ? <p className="m-0 text-sm text-slate-600">{CLOTHING_STRINGS.list.messages.loading}</p> : null}
+
+      {showInitialError ? <p className="m-0 text-sm text-red-700">{CLOTHING_STRINGS.list.messages.error}</p> : null}
+
+      {showEmptyState ? <p className="m-0 text-sm text-slate-600">{CLOTHING_STRINGS.list.messages.empty}</p> : null}
+
+      {hasClothingItems ? (
+        <ul className="m-0 grid list-none gap-2 p-0">
+          {clothingItems.map((item) => (
+            <li key={item.clothingId}>
+              <Link
+                href={ROUTES.clothingDetail(wardrobeId, item.clothingId)}
+                className="grid w-full grid-cols-[56px_minmax(0,1fr)] items-center gap-3 rounded-md border border-slate-300 bg-white p-3 text-left no-underline transition-colors hover:bg-slate-50"
+              >
+                <span className="flex h-14 w-14 items-center justify-center rounded-md border border-slate-200 bg-slate-100 px-1 text-center text-[10px] font-semibold leading-tight text-slate-600">
+                  {item.imageKey ? "image" : COMMON_STRINGS.placeholders.noImage}
+                </span>
+                <span className="truncate text-sm font-medium text-slate-900">{item.name}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+
+      {showInlineError ? <p className="m-0 text-sm text-red-700">{CLOTHING_STRINGS.list.messages.error}</p> : null}
+
+      {nextCursor !== null ? (
+        <Button
+          type="button"
+          variant="secondary"
+          className="w-full text-sm font-medium"
+          disabled={!canLoadMore}
+          onClick={handleLoadMore}
+        >
+          {isFetching ? CLOTHING_STRINGS.list.messages.loading : CLOTHING_STRINGS.list.actions.loadMore}
         </Button>
-
-        {isInitialLoading ? (
-          <p className="m-0 text-sm text-slate-600">{CLOTHING_STRINGS.list.messages.loading}</p>
-        ) : null}
-
-        {showInitialError ? (
-          <p className="m-0 text-sm text-red-700">{CLOTHING_STRINGS.list.messages.error}</p>
-        ) : null}
-
-        {showEmptyState ? (
-          <p className="m-0 text-sm text-slate-600">{CLOTHING_STRINGS.list.messages.empty}</p>
-        ) : null}
-
-        {hasClothingItems ? (
-          <ul className="m-0 grid list-none gap-2 p-0">
-            {clothingItems.map((item) => (
-              <li key={item.clothingId}>
-                <Link
-                  href={ROUTES.clothingDetail(wardrobeId, item.clothingId)}
-                  className="grid w-full grid-cols-[56px_minmax(0,1fr)] items-center gap-3 rounded-md border border-slate-300 bg-white p-3 text-left no-underline transition-colors hover:bg-slate-50"
-                >
-                  <span className="flex h-14 w-14 items-center justify-center rounded-md border border-slate-200 bg-slate-100 px-1 text-center text-[10px] font-semibold leading-tight text-slate-600">
-                    {item.imageKey ? "image" : COMMON_STRINGS.placeholders.noImage}
-                  </span>
-                  <span className="truncate text-sm font-medium text-slate-900">{item.name}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        ) : null}
-
-        {showInlineError ? (
-          <p className="m-0 text-sm text-red-700">{CLOTHING_STRINGS.list.messages.error}</p>
-        ) : null}
-
-        {nextCursor !== null ? (
-          <Button
-            type="button"
-            variant="secondary"
-            className="w-full text-sm font-medium"
-            disabled={!canLoadMore}
-            onClick={handleLoadMore}
-          >
-            {isFetching ? CLOTHING_STRINGS.list.messages.loading : CLOTHING_STRINGS.list.actions.loadMore}
-          </Button>
-        ) : null}
-      </>
-    </AppLayout>
+      ) : null}
+    </>
   );
+
+  return createElement(AppLayout, {
+    title: CLOTHING_STRINGS.list.title,
+    tabKey: "clothings",
+    wardrobeId,
+    children: content,
+  });
 }
