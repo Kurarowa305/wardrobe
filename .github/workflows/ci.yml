@@ -76,6 +76,9 @@ jobs:
       - name: Clothing list screen spec test
         run: pnpm --filter web test:clothing-list-screen
 
+      - name: Clothing detail screen spec test
+        run: pnpm --filter web test:clothing-detail-screen
+
       - name: Clothing create screen spec test
         run: pnpm --filter web test:clothing-create-screen
 
