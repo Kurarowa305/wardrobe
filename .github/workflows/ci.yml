@@ -70,6 +70,9 @@ jobs:
       - name: Image presign API client spec test
         run: pnpm --filter web test:image-presign-api-client
 
+      - name: Image presign MSW handler spec test
+        run: pnpm --filter web test:image-presign-msw-handler
+
       - name: Clothing query hooks spec test
         run: pnpm --filter web test:clothing-query-hooks
 
