@@ -25,6 +25,7 @@ function HistoryDetailScreenContent({ backHref }: HistoryDetailScreenContentProp
     backHref,
     headerActions: [
       {
+        key: "delete",
         label: HISTORY_STRINGS.detail.menu.delete,
         href: backHref,
       },

@@ -85,6 +85,9 @@ jobs:
       - name: Clothing edit screen spec test
         run: pnpm --filter web test:clothing-edit-screen
 
+      - name: Clothing delete flow spec test
+        run: pnpm --filter web test:clothing-delete-flow
+
       - name: MSW foundation spec test
         run: pnpm --filter web test:msw-foundation
 

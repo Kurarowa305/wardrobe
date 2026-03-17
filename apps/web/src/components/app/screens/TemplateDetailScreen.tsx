@@ -18,10 +18,12 @@ export function TemplateDetailScreen({ wardrobeId, templateId }: TemplateDetailS
     backHref: ROUTES.templates(wardrobeId),
     headerActions: [
       {
+        key: "edit",
         label: TEMPLATE_STRINGS.detail.menu.edit,
         href: ROUTES.templateEdit(wardrobeId, templateId),
       },
       {
+        key: "delete",
         label: TEMPLATE_STRINGS.detail.menu.delete,
         href: ROUTES.templates(wardrobeId),
       },

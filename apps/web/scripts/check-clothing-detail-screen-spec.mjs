@@ -50,7 +50,7 @@ check(
   "CDS-02",
   "服詳細画面が useClothing を利用してデータ取得する",
   includes(target, '"use client";') &&
-    includes(target, 'import { useClothing } from "@/api/hooks/clothing";') &&
+    includes(target, "@/api/hooks/clothing") &&
     includes(target, "const clothingQuery = useClothing(wardrobeId, clothingId);"),
   "useClothing を使った詳細データ取得実装が不足しています",
 );

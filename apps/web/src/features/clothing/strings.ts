@@ -62,6 +62,7 @@ export const CLOTHING_STRINGS = {
       error: "服詳細の読み込みに失敗しました。",
       notFound: "服が見つかりませんでした。",
       deleted: "削除済み",
+      deleteError: "服の削除に失敗しました。",
     },
   },
 } as const;
