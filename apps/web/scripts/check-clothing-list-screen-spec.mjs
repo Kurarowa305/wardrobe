@@ -75,12 +75,14 @@ check(
 
 check(
   "CLS-05",
-  "服カードが詳細遷移導線を持ち、画像なし時は no image を表示する",
+  "服カードが詳細遷移導線を持ち、resolveImageUrl で画像表示/no image フォールバックを行う",
   includes(target, "ROUTES.clothingDetail(wardrobeId, item.clothingId)") &&
+    includes(target, 'import { resolveImageUrl } from "@/features/clothing/imageUrl";') &&
+    includes(target, "const imageUrl = resolveImageUrl(item.imageKey);") &&
+    includes(target, "<img") &&
     includes(target, "COMMON_STRINGS.placeholders.noImage") &&
-    includes(target, "item.imageKey ? \"image\" : COMMON_STRINGS.placeholders.noImage") &&
     includes(target, "item.name"),
-  "服カードの詳細遷移または no image 表示実装が不足しています",
+  "服カードの詳細遷移または resolveImageUrl/no image 表示実装が不足しています",
 );
 
 check(

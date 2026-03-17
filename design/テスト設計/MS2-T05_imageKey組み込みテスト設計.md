@@ -24,7 +24,7 @@
 5. create/update DTO が `imageKey` を受け取れること
 6. MSW handler が create/update で `imageKey` を保存すること
 7. 保存後の一覧/詳細再取得に必要な invalidate があること
-8. 一覧/詳細画面が `imageKey` 有無を表示に反映すること
+8. 一覧/詳細画面が `imageKey` を `resolveImageUrl` 経由で表示に反映すること
 
 ## テストケース
 
@@ -85,13 +85,14 @@
 - 期待結果
   - 保存後に最新 `imageKey` を参照できる
 
-### IKP-08: 一覧/詳細画面が imageKey 有無を表示に反映する
+### IKP-08: 一覧/詳細画面が imageKey を resolveImageUrl で表示に反映する
 
 - チェック内容
-  - 一覧画面で `item.imageKey` の有無で表示分岐する
-  - 詳細画面で `clothingQuery.data.imageKey` の有無で表示分岐する
+  - 一覧画面で `resolveImageUrl(item.imageKey)` を使う
+  - 詳細画面で `resolveImageUrl(clothingQuery.data?.imageKey)` を使う
+  - 画像なし時は `no image` フォールバック表示を持つ
 - 期待結果
-  - 保存後に画像あり状態が画面で判別できる
+  - 保存後に `imageKey` から生成した表示URLで画像描画できる
 
 ## 実行方法
 
