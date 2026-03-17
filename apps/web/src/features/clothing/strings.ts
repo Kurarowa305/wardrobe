@@ -14,34 +14,36 @@ export const CLOTHING_STRINGS = {
   create: {
     title: "服の追加",
     labels: {
-      image: "画像",
+      imageFile: "画像ファイル",
       name: "服の名前",
     },
     placeholders: {
-      image: "画像キー（任意）",
       name: "例: 白シャツ",
     },
     actions: {
       submit: "追加",
+      clearImage: "画像をクリア",
     },
     messages: {
       nameRequired: "服の名前を入力してください。",
       submitting: "追加中...",
       submitError: "服の追加に失敗しました。",
+      noPreview: "画像を選択するとここにプレビューが表示されます。",
+      previewAlt: "選択した画像のプレビュー",
     },
   },
   edit: {
     title: "服の編集",
     labels: {
-      image: "画像",
+      imageFile: "画像ファイル",
       name: "服の名前",
     },
     placeholders: {
-      image: "画像キー（任意）",
       name: "例: 白シャツ",
     },
     actions: {
       submit: "保存",
+      clearImage: "画像をクリア",
     },
     messages: {
       loading: "読み込み中...",
@@ -49,6 +51,8 @@ export const CLOTHING_STRINGS = {
       nameRequired: "服の名前を入力してください。",
       submitting: "保存中...",
       submitError: "服の更新に失敗しました。",
+      noPreview: "画像を選択するとここにプレビューが表示されます。",
+      previewAlt: "選択した画像のプレビュー",
     },
   },
   detail: {

@@ -32,6 +32,8 @@ export function ClothingEditScreen({ wardrobeId, clothingId }: ClothingEditScree
 
   const [name, setName] = useState("");
   const [imageKey, setImageKey] = useState("");
+  const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [nameTouched, setNameTouched] = useState(false);
 
   useEffect(() => {
@@ -42,6 +44,20 @@ export function ClothingEditScreen({ wardrobeId, clothingId }: ClothingEditScree
     setName(clothingQuery.data.name);
     setImageKey(clothingQuery.data.imageKey ?? "");
   }, [clothingQuery.data]);
+
+  useEffect(() => {
+    if (!selectedImageFile) {
+      setPreviewUrl(null);
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(selectedImageFile);
+    setPreviewUrl(objectUrl);
+
+    return () => {
+      URL.revokeObjectURL(objectUrl);
+    };
+  }, [selectedImageFile]);
 
   const trimmedName = useMemo(() => name.trim(), [name]);
   const isNameEmpty = trimmedName.length === 0;
@@ -59,10 +75,14 @@ export function ClothingEditScreen({ wardrobeId, clothingId }: ClothingEditScree
 
     await updateMutation.mutateAsync({
       name: trimmedName,
-      imageKey: imageKey.trim().length > 0 ? imageKey.trim() : null,
+      imageKey: selectedImageFile ? selectedImageFile.name : imageKey.trim().length > 0 ? imageKey.trim() : null,
     });
 
     router.push(ROUTES.clothingDetail(wardrobeId, clothingId));
+  };
+
+  const clearSelectedImage = () => {
+    setSelectedImageFile(null);
   };
 
   const content = (
@@ -77,18 +97,31 @@ export function ClothingEditScreen({ wardrobeId, clothingId }: ClothingEditScree
 
       {clothingQuery.data ? (
         <form className="grid gap-3" onSubmit={handleSubmit} noValidate>
-          <label className="grid gap-1 text-sm font-medium text-slate-900" htmlFor="clothing-image-key">
-            <span>{CLOTHING_STRINGS.edit.labels.image}</span>
+          <label className="grid gap-1 text-sm font-medium text-slate-900" htmlFor="clothing-image-file">
+            <span>{CLOTHING_STRINGS.edit.labels.imageFile}</span>
             <Input
-              id="clothing-image-key"
-              name="imageKey"
-              type="text"
-              value={imageKey}
-              onChange={(event) => setImageKey(event.target.value)}
-              placeholder={CLOTHING_STRINGS.edit.placeholders.image}
-              autoComplete="off"
+              id="clothing-image-file"
+              name="imageFile"
+              type="file"
+              accept="image/*"
+              onChange={(event) => setSelectedImageFile(event.target.files?.[0] ?? null)}
             />
           </label>
+
+          {previewUrl ? (
+            <div className="grid gap-2">
+              <img
+                src={previewUrl}
+                alt={CLOTHING_STRINGS.edit.messages.previewAlt}
+                className="h-40 w-full rounded-md border border-slate-200 object-cover"
+              />
+              <Button type="button" variant="outline" onClick={clearSelectedImage}>
+                {CLOTHING_STRINGS.edit.actions.clearImage}
+              </Button>
+            </div>
+          ) : (
+            <p className="m-0 text-sm text-slate-600">{CLOTHING_STRINGS.edit.messages.noPreview}</p>
+          )}
 
           <label className="grid gap-1 text-sm font-medium text-slate-900" htmlFor="clothing-name">
             <span>{CLOTHING_STRINGS.edit.labels.name}</span>

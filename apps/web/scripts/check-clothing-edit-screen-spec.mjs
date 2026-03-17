@@ -58,7 +58,7 @@ check(
   "既存データ取得後にフォーム初期値（name/imageKey）を反映する",
   includes(target, "useEffect(() => {") &&
     includes(target, "setName(clothingQuery.data.name);") &&
-    includes(target, "setImageKey(clothingQuery.data.imageKey ?? \"\");"),
+    includes(target, 'setImageKey(clothingQuery.data.imageKey ?? "");'),
   "既存値反映の useEffect 実装が不足しています",
 );
 
@@ -97,9 +97,20 @@ check(
     includes(stringsTarget, 'nameRequired: "服の名前を入力してください。"') &&
     includes(stringsTarget, 'submitting: "保存中..."') &&
     includes(stringsTarget, 'submitError: "服の更新に失敗しました。"') &&
-    includes(stringsTarget, 'image: "画像キー（任意）"') &&
+    includes(stringsTarget, 'imageFile: "画像ファイル"') &&
     includes(stringsTarget, 'name: "例: 白シャツ"'),
   "features/clothing/strings.ts の服編集画面文言定義が不足しています",
+);
+
+check(
+  "CES-08",
+  "服編集画面は imageKey 入力を持たず、画像選択時はファイル名を imageKey として送る",
+  !includes(target, 'name="imageKey"') &&
+    includes(
+      target,
+      "imageKey: selectedImageFile ? selectedImageFile.name : imageKey.trim().length > 0 ? imageKey.trim() : null,",
+    ),
+  "imageKey入力の削除、または画像選択時のimageKeyファイル名連携が不足しています",
 );
 
 if (failures.length > 0) {

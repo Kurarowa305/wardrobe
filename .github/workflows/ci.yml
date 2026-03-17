@@ -85,6 +85,9 @@ jobs:
       - name: Clothing edit screen spec test
         run: pnpm --filter web test:clothing-edit-screen
 
+      - name: Clothing image selection UI spec test
+        run: pnpm --filter web test:clothing-image-selection-ui
+
       - name: Clothing delete flow spec test
         run: pnpm --filter web test:clothing-delete-flow
 
