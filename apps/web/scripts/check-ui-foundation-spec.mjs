@@ -25,7 +25,10 @@ const SCREEN_FILES = [
   "src/components/app/screens/ClothingEditScreen.tsx",
   "src/components/app/screens/HistoryDetailScreen.tsx",
 ];
-const NO_SCREEN_CARD_FILES = new Set(["src/components/app/screens/ClothingsTabScreen.tsx"]);
+const NO_SCREEN_CARD_FILES = new Set([
+  "src/components/app/screens/ClothingsTabScreen.tsx",
+  "src/components/app/screens/TemplatesTabScreen.tsx",
+]);
 
 function abs(relPath) {
   return path.join(webRoot, relPath);
@@ -144,7 +147,8 @@ check(
       return (
         !source.includes("<ScreenCard") &&
         !source.includes("ScreenTextCard") &&
-        source.includes("CLOTHING_STRINGS.list.actions.add")
+        (source.includes("CLOTHING_STRINGS.list.actions.add") ||
+          source.includes("TEMPLATE_STRINGS.list.actions.add"))
       );
     }
     return source.includes("ScreenCard") || source.includes("ScreenTextCard");

@@ -11,7 +11,6 @@ import { ROUTES } from "@/constants/routes";
 import { resolveImageUrl } from "@/features/clothing/imageUrl";
 import { TEMPLATE_STRINGS } from "@/features/template/strings";
 import type { TemplateListItem } from "@/features/template/types";
-
 type TemplatesTabScreenProps = {
   wardrobeId: string;
 };
@@ -77,7 +76,6 @@ export function TemplatesTabScreen({ wardrobeId }: TemplatesTabScreenProps) {
 
   const content = (
     <>
-      <Button asChild className="w-full justify-start text-left text-sm font-medium">
         <Link href={ROUTES.templateNew(wardrobeId)}>{TEMPLATE_STRINGS.list.actions.add}</Link>
       </Button>
 
