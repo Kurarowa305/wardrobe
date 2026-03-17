@@ -1,9 +1,11 @@
 "use client";
 
 import { createElement } from "react";
+import { useRouter } from "next/navigation";
 
-import { useClothing } from "@/api/hooks/clothing";
+import { useClothing, useDeleteClothingMutation } from "@/api/hooks/clothing";
 import { AppLayout } from "@/components/app/layout/AppLayout";
+import { useToast } from "@/components/ui/use-toast";
 import { COMMON_STRINGS } from "@/constants/commonStrings";
 import { ROUTES } from "@/constants/routes";
 import { CLOTHING_STRINGS } from "@/features/clothing/strings";
@@ -24,7 +26,29 @@ function resolveErrorMessage(error: unknown): string {
 }
 
 export function ClothingDetailScreen({ wardrobeId, clothingId }: ClothingDetailScreenProps) {
+  const router = useRouter();
+  const { toast } = useToast();
   const clothingQuery = useClothing(wardrobeId, clothingId);
+  const deleteMutation = useDeleteClothingMutation(wardrobeId, clothingId);
+
+  const handleDelete = async () => {
+    const confirmed = window.confirm(
+      `${COMMON_STRINGS.dialogs.confirmDelete.title}\n${COMMON_STRINGS.dialogs.confirmDelete.message}`,
+    );
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await deleteMutation.mutateAsync();
+      router.push(ROUTES.clothings(wardrobeId));
+    } catch {
+      toast({
+        variant: "destructive",
+        title: CLOTHING_STRINGS.detail.messages.deleteError,
+      });
+    }
+  };
 
   const content = (
     <ScreenCard>
@@ -55,12 +79,16 @@ export function ClothingDetailScreen({ wardrobeId, clothingId }: ClothingDetailS
     backHref: ROUTES.clothings(wardrobeId),
     headerActions: [
       {
+        key: "edit",
         label: CLOTHING_STRINGS.detail.menu.edit,
         href: ROUTES.clothingEdit(wardrobeId, clothingId),
+        disabled: !clothingQuery.data || clothingQuery.data.deleted,
       },
       {
+        key: "delete",
         label: CLOTHING_STRINGS.detail.menu.delete,
-        href: ROUTES.clothings(wardrobeId),
+        onSelect: handleDelete,
+        disabled: !clothingQuery.data || clothingQuery.data.deleted || deleteMutation.isPending,
       },
     ],
     children: content,

@@ -6,8 +6,11 @@ import { Header } from "../navigation/Header";
 import { TabBar } from "../navigation/TabBar";
 
 type HeaderAction = {
+  key: string;
   label: string;
-  href: string;
+  href?: string;
+  onSelect?: () => void;
+  disabled?: boolean;
 };
 
 type AppLayoutProps = {

@@ -62,6 +62,16 @@ check(
   "TemplateDetailScreen.tsx のメニュー移行が未完了です",
 );
 
+
+check(
+  "OM-05",
+  "OverflowMenu が onSelect を使った非リンクアクションにも対応する",
+  includes("src/components/app/navigation/OverflowMenu.tsx", "onSelect?: () => void;") &&
+    includes("src/components/app/navigation/OverflowMenu.tsx", "{action.href ? (") &&
+    includes("src/components/app/navigation/OverflowMenu.tsx", "action.onSelect?.();"),
+  "OverflowMenu.tsx の非リンクアクション対応が不足しています",
+);
+
 if (failures.length > 0) {
   console.error(`\n${failures.length}件の失敗 / ${checkCount}件中`);
   console.error(failures.join("\n\n"));
