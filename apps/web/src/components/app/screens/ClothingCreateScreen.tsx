@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, createElement, useMemo, useState } from "react";
+import { FormEvent, createElement, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { useCreateClothingMutation } from "@/api/hooks/clothing";
@@ -19,9 +19,25 @@ export function ClothingCreateScreen({ wardrobeId }: ClothingCreateScreenProps) 
   const router = useRouter();
   const [name, setName] = useState("");
   const [imageKey, setImageKey] = useState("");
+  const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [nameTouched, setNameTouched] = useState(false);
 
   const createMutation = useCreateClothingMutation(wardrobeId);
+
+  useEffect(() => {
+    if (!selectedImageFile) {
+      setPreviewUrl(null);
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(selectedImageFile);
+    setPreviewUrl(objectUrl);
+
+    return () => {
+      URL.revokeObjectURL(objectUrl);
+    };
+  }, [selectedImageFile]);
 
   const trimmedName = useMemo(() => name.trim(), [name]);
   const isNameEmpty = trimmedName.length === 0;
@@ -45,9 +61,39 @@ export function ClothingCreateScreen({ wardrobeId }: ClothingCreateScreenProps) 
     router.push(ROUTES.clothings(wardrobeId));
   };
 
+  const clearSelectedImage = () => {
+    setSelectedImageFile(null);
+  };
+
   const content = (
     <ScreenCard>
       <form className="grid gap-3" onSubmit={handleSubmit} noValidate>
+        <label className="grid gap-1 text-sm font-medium text-slate-900" htmlFor="clothing-image-file">
+          <span>{CLOTHING_STRINGS.create.labels.imageFile}</span>
+          <Input
+            id="clothing-image-file"
+            name="imageFile"
+            type="file"
+            accept="image/*"
+            onChange={(event) => setSelectedImageFile(event.target.files?.[0] ?? null)}
+          />
+        </label>
+
+        {previewUrl ? (
+          <div className="grid gap-2">
+            <img
+              src={previewUrl}
+              alt={CLOTHING_STRINGS.create.messages.previewAlt}
+              className="h-40 w-full rounded-md border border-slate-200 object-cover"
+            />
+            <Button type="button" variant="outline" onClick={clearSelectedImage}>
+              {CLOTHING_STRINGS.create.actions.clearImage}
+            </Button>
+          </div>
+        ) : (
+          <p className="m-0 text-sm text-slate-600">{CLOTHING_STRINGS.create.messages.noPreview}</p>
+        )}
+
         <label className="grid gap-1 text-sm font-medium text-slate-900" htmlFor="clothing-image-key">
           <span>{CLOTHING_STRINGS.create.labels.image}</span>
           <Input
