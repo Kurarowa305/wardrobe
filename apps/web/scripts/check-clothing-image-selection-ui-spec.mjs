@@ -72,8 +72,23 @@ check(
   "服編集画面の画像選択/プレビュー/クリア実装が不足しています",
 );
 
+
 check(
   "CIS-04",
+  "追加/編集画面に imageKey テキスト入力が存在しない",
+  !includes(createScreen, 'name="imageKey"') && !includes(editScreen, 'name="imageKey"'),
+  "imageKey入力が画面に残っています",
+);
+
+check(
+  "CIS-05",
+  "服追加時は選択画像ファイル名を imageKey に設定する",
+  includes(createScreen, "imageKey: selectedImageFile ? selectedImageFile.name : null,"),
+  "服追加時の imageKey 設定がファイル名連携になっていません",
+);
+
+check(
+  "CIS-06",
   "画像選択UI向け文言が clothing strings に追加されている",
   includes(stringsTarget, 'imageFile: "画像ファイル"') &&
     includes(stringsTarget, 'clearImage: "画像をクリア"') &&

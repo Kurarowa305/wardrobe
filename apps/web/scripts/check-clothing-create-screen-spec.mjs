@@ -49,8 +49,8 @@ check(
   "服追加画面が client component で、追加mutationとフォーム状態を持つ",
   includes(target, '"use client";') &&
     includes(target, 'import { useCreateClothingMutation } from "@/api/hooks/clothing";') &&
-    includes(target, "const [name, setName] = useState(\"\");") &&
-    includes(target, "const [imageKey, setImageKey] = useState(\"\");") &&
+    includes(target, 'const [name, setName] = useState("");') &&
+    includes(target, "const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);") &&
     includes(target, "const createMutation = useCreateClothingMutation(wardrobeId);"),
   "client component化、useCreateClothingMutation、入力state実装が不足しています",
 );
@@ -75,22 +75,30 @@ check(
 
 check(
   "CCS-05",
-  "服追加画面が画像任意・服名必須の入力UIを持つ",
-  includes(target, "CLOTHING_STRINGS.create.labels.image") &&
-    includes(target, "name=\"imageKey\"") &&
+  "服追加画面が画像選択UIと服名入力UIを持ち、imageKey入力を持たない",
+  includes(target, 'name="imageFile"') &&
+    includes(target, 'type="file"') &&
     includes(target, "CLOTHING_STRINGS.create.labels.name") &&
-    includes(target, "name=\"name\""),
-  "画像/服名の入力フィールド定義が不足しています",
+    includes(target, 'name="name"') &&
+    !includes(target, 'name="imageKey"'),
+  "画像ファイル/服名入力の定義、またはimageKey入力削除が不足しています",
 );
 
 check(
   "CCS-06",
+  "服追加時は選択画像のファイル名を imageKey に設定する",
+  includes(target, "imageKey: selectedImageFile ? selectedImageFile.name : null,"),
+  "追加時の imageKey 設定がファイル名連携になっていません",
+);
+
+check(
+  "CCS-07",
   "服追加画面向け文言が clothing strings に定義される",
-  includes(stringsTarget, "nameRequired: \"服の名前を入力してください。\"") &&
-    includes(stringsTarget, "submitting: \"追加中...\"") &&
-    includes(stringsTarget, "submitError: \"服の追加に失敗しました。\"") &&
-    includes(stringsTarget, "image: \"画像キー（任意）\"") &&
-    includes(stringsTarget, "name: \"例: 白シャツ\""),
+  includes(stringsTarget, 'nameRequired: "服の名前を入力してください。"') &&
+    includes(stringsTarget, 'submitting: "追加中..."') &&
+    includes(stringsTarget, 'submitError: "服の追加に失敗しました。"') &&
+    includes(stringsTarget, 'imageFile: "画像ファイル"') &&
+    includes(stringsTarget, 'name: "例: 白シャツ"'),
   "features/clothing/strings.ts の服追加画面文言定義が不足しています",
 );
 

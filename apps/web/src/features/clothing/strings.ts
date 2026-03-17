@@ -15,11 +15,9 @@ export const CLOTHING_STRINGS = {
     title: "服の追加",
     labels: {
       imageFile: "画像ファイル",
-      image: "画像",
       name: "服の名前",
     },
     placeholders: {
-      image: "画像キー（任意）",
       name: "例: 白シャツ",
     },
     actions: {
@@ -38,11 +36,9 @@ export const CLOTHING_STRINGS = {
     title: "服の編集",
     labels: {
       imageFile: "画像ファイル",
-      image: "画像",
       name: "服の名前",
     },
     placeholders: {
-      image: "画像キー（任意）",
       name: "例: 白シャツ",
     },
     actions: {

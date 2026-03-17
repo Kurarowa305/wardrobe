@@ -75,7 +75,7 @@ export function ClothingEditScreen({ wardrobeId, clothingId }: ClothingEditScree
 
     await updateMutation.mutateAsync({
       name: trimmedName,
-      imageKey: imageKey.trim().length > 0 ? imageKey.trim() : null,
+      imageKey: selectedImageFile ? selectedImageFile.name : imageKey.trim().length > 0 ? imageKey.trim() : null,
     });
 
     router.push(ROUTES.clothingDetail(wardrobeId, clothingId));
@@ -122,19 +122,6 @@ export function ClothingEditScreen({ wardrobeId, clothingId }: ClothingEditScree
           ) : (
             <p className="m-0 text-sm text-slate-600">{CLOTHING_STRINGS.edit.messages.noPreview}</p>
           )}
-
-          <label className="grid gap-1 text-sm font-medium text-slate-900" htmlFor="clothing-image-key">
-            <span>{CLOTHING_STRINGS.edit.labels.image}</span>
-            <Input
-              id="clothing-image-key"
-              name="imageKey"
-              type="text"
-              value={imageKey}
-              onChange={(event) => setImageKey(event.target.value)}
-              placeholder={CLOTHING_STRINGS.edit.placeholders.image}
-              autoComplete="off"
-            />
-          </label>
 
           <label className="grid gap-1 text-sm font-medium text-slate-900" htmlFor="clothing-name">
             <span>{CLOTHING_STRINGS.edit.labels.name}</span>
