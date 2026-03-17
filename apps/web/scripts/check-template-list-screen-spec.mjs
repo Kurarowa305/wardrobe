@@ -1,0 +1,118 @@
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const webRoot = path.resolve(__dirname, "..");
+
+const failures = [];
+let checkCount = 0;
+
+function abs(relPath) {
+  return path.join(webRoot, relPath);
+}
+
+function exists(relPath) {
+  return fs.existsSync(abs(relPath));
+}
+
+function read(relPath) {
+  return fs.readFileSync(abs(relPath), "utf8");
+}
+
+function includes(relPath, expected) {
+  return read(relPath).includes(expected);
+}
+
+function check(id, description, passed, detail) {
+  checkCount += 1;
+  if (passed) {
+    console.log(`PASS ${id}: ${description}`);
+    return;
+  }
+  failures.push(`FAIL ${id}: ${description}\n  ${detail}`);
+}
+
+const target = "src/components/app/screens/TemplatesTabScreen.tsx";
+const stringsTarget = "src/features/template/strings.ts";
+
+check(
+  "TLS-01",
+  "テンプレ一覧画面が src/components/app/screens/TemplatesTabScreen.tsx に存在する",
+  exists(target),
+  `${target} が存在しません`,
+);
+
+check(
+  "TLS-02",
+  "テンプレ一覧画面が useTemplateList を利用し、cursorページングでデータ取得する",
+  includes(target, '"use client";') &&
+    includes(target, 'import { useTemplateList } from "@/api/hooks/template";') &&
+    includes(target, "const TEMPLATE_LIST_PAGE_SIZE = 20;") &&
+    includes(target, "useTemplateList(wardrobeId, {") &&
+    includes(target, "limit: TEMPLATE_LIST_PAGE_SIZE,") &&
+    includes(target, "cursor,"),
+  "useTemplateList または cursor/limit 指定が不足しています",
+);
+
+check(
+  "TLS-03",
+  "一覧画面に「＋ テンプレートを追加」導線があり、追加画面へ遷移できる",
+  includes(target, "ROUTES.templateNew(wardrobeId)") &&
+    includes(target, "TEMPLATE_STRINGS.list.actions.add"),
+  "テンプレ追加導線（ROUTES.templateNew / actions.add）の実装が不足しています",
+);
+
+check(
+  "TLS-04",
+  "一覧画面が読込中・空状態・読込失敗の表示文言を持つ",
+  includes(target, "TEMPLATE_STRINGS.list.messages.loading") &&
+    includes(target, "TEMPLATE_STRINGS.list.messages.empty") &&
+    includes(target, "TEMPLATE_STRINGS.list.messages.error"),
+  "読込/空/エラー状態の文言表示が不足しています",
+);
+
+check(
+  "TLS-05",
+  "テンプレカードが詳細遷移導線を持ち、サムネ最大4件・+x・no image・削除済み表示に対応する",
+  includes(target, "ROUTES.templateDetail(wardrobeId, item.templateId)") &&
+    includes(target, "const TEMPLATE_THUMBNAIL_MAX = 4;") &&
+    includes(target, "const thumbnails = item.clothingItems.slice(0, TEMPLATE_THUMBNAIL_MAX);") &&
+    includes(target, "const overflowCount = Math.max(item.clothingItems.length - TEMPLATE_THUMBNAIL_MAX, 0);") &&
+    includes(target, "resolveImageUrl(clothingItem.imageKey)") &&
+    includes(target, "COMMON_STRINGS.placeholders.noImage") &&
+    includes(target, "TEMPLATE_STRINGS.list.messages.deleted") &&
+    includes(target, "+{overflowCount}"),
+  "テンプレカードのサムネ仕様（最大4 / +x / no image / 削除済み）実装が不足しています",
+);
+
+check(
+  "TLS-06",
+  "nextCursor がある場合に「さらに読み込む」で追加取得できる",
+  includes(target, "const [nextCursor, setNextCursor] = useState<string | null>(null);") &&
+    includes(target, "setNextCursor(data.nextCursor);") &&
+    includes(target, "setCursor(nextCursor);") &&
+    includes(target, "TEMPLATE_STRINGS.list.actions.loadMore") &&
+    includes(target, "onClick={handleLoadMore}"),
+  "nextCursor を使った追加読み込み導線が不足しています",
+);
+
+check(
+  "TLS-07",
+  "テンプレ一覧画面向け文言（loadMore/messages/deleted）が template strings に定義される",
+  includes(stringsTarget, 'loadMore: "さらに読み込む"') &&
+    includes(stringsTarget, 'loading: "読み込み中..."') &&
+    includes(stringsTarget, 'empty: "テンプレートがまだ登録されていません。"') &&
+    includes(stringsTarget, 'error: "テンプレート一覧の読み込みに失敗しました。"') &&
+    includes(stringsTarget, 'deleted: "削除済み"'),
+  "features/template/strings.ts に一覧状態文言の定義が不足しています",
+);
+
+if (failures.length > 0) {
+  console.error(`\n${failures.length}件の失敗 / ${checkCount}件中`);
+  console.error(failures.join("\n\n"));
+  process.exit(1);
+}
+
+console.log(`\nAll checks passed (${checkCount}件)`);

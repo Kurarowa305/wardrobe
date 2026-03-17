@@ -106,6 +106,9 @@ jobs:
       - name: Clothing list screen spec test
         run: pnpm --filter web test:clothing-list-screen
 
+      - name: Template list screen spec test
+        run: pnpm --filter web test:template-list-screen
+
       - name: Clothing detail screen spec test
         run: pnpm --filter web test:clothing-detail-screen
 

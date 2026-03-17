@@ -35,7 +35,8 @@
     "test:msw-foundation": "node scripts/check-msw-foundation-spec.mjs",
     "test:msw-scenarios": "node scripts/check-msw-scenarios-spec.mjs",
     "test:clothing-msw-handlers": "node scripts/check-clothing-msw-handlers-spec.mjs",
-    "test:clothing-delete-flow": "node scripts/check-clothing-delete-flow-spec.mjs"
+    "test:clothing-delete-flow": "node scripts/check-clothing-delete-flow-spec.mjs",
+    "test:template-list-screen": "node scripts/check-template-list-screen-spec.mjs"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.4",
