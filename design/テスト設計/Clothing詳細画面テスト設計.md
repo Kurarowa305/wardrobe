@@ -51,6 +51,13 @@
   - `src/app/wardrobes/[wardrobeId]/(stack)/clothings/[clothingId]/page.tsx` が `clothingDetailFixtures` を使って `generateStaticParams` を構成する
   - `src/app/wardrobes/[wardrobeId]/(stack)/clothings/[clothingId]/edit/page.tsx` も同様に `clothingDetailFixtures` を使って `generateStaticParams` を構成する
 
+### CDS-08 追加直後の服ID（cl_mock_XXXX）向け静的パスを事前生成する
+- 観点: 服追加後に一覧から詳細へ遷移した際の404再発防止
+- 期待結果:
+  - 詳細/編集ページで `MOCK_CLOTHING_ID_PREFIX = "cl_mock_"` を定義する
+  - 詳細/編集ページで `generateMockStaticClothingIds()` により `cl_mock_0001` 形式のIDレンジを生成する
+  - 詳細/編集ページの `generateStaticParams` が fixture ID に加えて mock IDレンジも含めて返す
+
 ## CI適用
 
 - `.github/workflows/ci.yml` に `Clothing detail screen spec test` を追加し、PR時に自動検証する
