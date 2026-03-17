@@ -36,8 +36,19 @@ export const CLOTHING_STRINGS = {
       image: "画像",
       name: "服の名前",
     },
+    placeholders: {
+      image: "画像キー（任意）",
+      name: "例: 白シャツ",
+    },
     actions: {
       submit: "保存",
+    },
+    messages: {
+      loading: "読み込み中...",
+      loadError: "服編集画面の読み込みに失敗しました。",
+      nameRequired: "服の名前を入力してください。",
+      submitting: "保存中...",
+      submitError: "服の更新に失敗しました。",
     },
   },
   detail: {
