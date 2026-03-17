@@ -79,6 +79,9 @@ jobs:
       - name: Image key payload spec test
         run: pnpm --filter web test:image-key-payload
 
+      - name: Image URL resolution spec test
+        run: pnpm --filter web test:image-url-resolution
+
       - name: Clothing query hooks spec test
         run: pnpm --filter web test:clothing-query-hooks
 

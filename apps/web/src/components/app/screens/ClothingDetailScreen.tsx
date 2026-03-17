@@ -8,6 +8,7 @@ import { AppLayout } from "@/components/app/layout/AppLayout";
 import { useToast } from "@/components/ui/use-toast";
 import { COMMON_STRINGS } from "@/constants/commonStrings";
 import { ROUTES } from "@/constants/routes";
+import { resolveImageUrl } from "@/features/clothing/imageUrl";
 import { CLOTHING_STRINGS } from "@/features/clothing/strings";
 import { isAppError } from "@/lib/error/normalize";
 import { ScreenCard } from "./ScreenPrimitives";
@@ -30,6 +31,7 @@ export function ClothingDetailScreen({ wardrobeId, clothingId }: ClothingDetailS
   const { toast } = useToast();
   const clothingQuery = useClothing(wardrobeId, clothingId);
   const deleteMutation = useDeleteClothingMutation(wardrobeId, clothingId);
+  const imageUrl = resolveImageUrl(clothingQuery.data?.imageKey);
 
   const handleDelete = async () => {
     const confirmed = window.confirm(
@@ -62,9 +64,17 @@ export function ClothingDetailScreen({ wardrobeId, clothingId }: ClothingDetailS
 
       {clothingQuery.data ? (
         <>
-          <div className="flex h-48 items-center justify-center rounded-md border border-slate-200 bg-slate-100 px-2 text-center text-xs font-semibold uppercase tracking-wide text-slate-600">
-            {clothingQuery.data.imageKey ? "image" : COMMON_STRINGS.placeholders.noImage}
-          </div>
+          {imageUrl ? (
+            <img
+              src={imageUrl}
+              alt={`${clothingQuery.data.name}の画像`}
+              className="h-48 w-full rounded-md border border-slate-200 bg-slate-100 object-cover"
+            />
+          ) : (
+            <div className="flex h-48 items-center justify-center rounded-md border border-slate-200 bg-slate-100 px-2 text-center text-xs font-semibold uppercase tracking-wide text-slate-600">
+              {COMMON_STRINGS.placeholders.noImage}
+            </div>
+          )}
           <p className="m-0 text-base font-semibold text-slate-900">{clothingQuery.data.name}</p>
           {clothingQuery.data.deleted ? (
             <p className="m-0 text-sm font-medium text-amber-700">{CLOTHING_STRINGS.detail.messages.deleted}</p>

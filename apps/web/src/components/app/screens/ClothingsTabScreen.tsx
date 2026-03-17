@@ -8,6 +8,7 @@ import { AppLayout } from "@/components/app/layout/AppLayout";
 import { Button } from "@/components/ui/button";
 import { COMMON_STRINGS } from "@/constants/commonStrings";
 import { ROUTES } from "@/constants/routes";
+import { resolveImageUrl } from "@/features/clothing/imageUrl";
 import { CLOTHING_STRINGS } from "@/features/clothing/strings";
 import type { ClothingListItem } from "@/features/clothing/types";
 
@@ -87,19 +88,31 @@ export function ClothingsTabScreen({ wardrobeId }: ClothingsTabScreenProps) {
 
       {hasClothingItems ? (
         <ul className="m-0 grid list-none gap-2 p-0">
-          {clothingItems.map((item) => (
-            <li key={item.clothingId}>
-              <Link
-                href={ROUTES.clothingDetail(wardrobeId, item.clothingId)}
-                className="grid w-full grid-cols-[56px_minmax(0,1fr)] items-center gap-3 rounded-md border border-slate-300 bg-white p-3 text-left no-underline transition-colors hover:bg-slate-50"
-              >
-                <span className="flex h-14 w-14 items-center justify-center rounded-md border border-slate-200 bg-slate-100 px-1 text-center text-[10px] font-semibold leading-tight text-slate-600">
-                  {item.imageKey ? "image" : COMMON_STRINGS.placeholders.noImage}
-                </span>
-                <span className="truncate text-sm font-medium text-slate-900">{item.name}</span>
-              </Link>
-            </li>
-          ))}
+          {clothingItems.map((item) => {
+            const imageUrl = resolveImageUrl(item.imageKey);
+
+            return (
+              <li key={item.clothingId}>
+                <Link
+                  href={ROUTES.clothingDetail(wardrobeId, item.clothingId)}
+                  className="grid w-full grid-cols-[56px_minmax(0,1fr)] items-center gap-3 rounded-md border border-slate-300 bg-white p-3 text-left no-underline transition-colors hover:bg-slate-50"
+                >
+                  {imageUrl ? (
+                    <img
+                      src={imageUrl}
+                      alt={`${item.name}の画像`}
+                      className="h-14 w-14 rounded-md border border-slate-200 bg-slate-100 object-cover"
+                    />
+                  ) : (
+                    <span className="flex h-14 w-14 items-center justify-center rounded-md border border-slate-200 bg-slate-100 px-1 text-center text-[10px] font-semibold leading-tight text-slate-600">
+                      {COMMON_STRINGS.placeholders.noImage}
+                    </span>
+                  )}
+                  <span className="truncate text-sm font-medium text-slate-900">{item.name}</span>
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       ) : null}
 

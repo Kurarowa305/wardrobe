@@ -57,10 +57,13 @@ check(
 
 check(
   "CDS-03",
-  "詳細画面に画像と服名を表示し、画像未設定時は no image を表示する",
-  includes(target, "clothingQuery.data.imageKey ? \"image\" : COMMON_STRINGS.placeholders.noImage") &&
+  "詳細画面に画像と服名を表示し、resolveImageUrl と no image フォールバックを利用する",
+  includes(target, 'import { resolveImageUrl } from "@/features/clothing/imageUrl";') &&
+    includes(target, "const imageUrl = resolveImageUrl(clothingQuery.data?.imageKey);") &&
+    includes(target, "<img") &&
+    includes(target, "COMMON_STRINGS.placeholders.noImage") &&
     includes(target, "clothingQuery.data.name"),
-  "画像または服名表示、no image フォールバック実装が不足しています",
+  "画像または服名表示、resolveImageUrl/no image フォールバック実装が不足しています",
 );
 
 check(
