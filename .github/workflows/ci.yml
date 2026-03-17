@@ -73,6 +73,9 @@ jobs:
       - name: Template MSW handlers spec test
         run: pnpm --filter web test:template-msw-handlers
 
+      - name: Template Query/Mutation hooks spec test
+        run: pnpm --filter web test:template-query-mutation-hooks
+
       - name: Clothing fixtures spec test
         run: pnpm --filter web test:clothing-fixtures
 
