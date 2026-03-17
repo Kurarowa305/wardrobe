@@ -152,6 +152,18 @@ function buildExpiresAt() {
   return new Date(Date.now() + DEFAULT_EXPIRES_IN_MS).toISOString();
 }
 
+function buildImageKeyFromUploadParams(category: string, wardrobeId: string, fileName: string) {
+  return `${category}/${wardrobeId}/${fileName}`;
+}
+
+function parseUploadFileExtension(fileName: string): string | null {
+  const matched = fileName.toLowerCase().match(/\.([a-z0-9]+)$/);
+  if (!matched) {
+    return null;
+  }
+  return normalizeExtension(matched[1] ?? null);
+}
+
 export const imagePresignHandlers = [
   http.post("*/wardrobes/:wardrobeId/images/presign", async ({ params, request }) => {
     const scenarioResponse = await applyMockScenario(request);
@@ -183,6 +195,43 @@ export const imagePresignHandlers = [
       method: "PUT",
       expiresAt: buildExpiresAt(),
     });
+  }),
+  http.put(`${MOCK_UPLOAD_ORIGIN}/upload/:category/:wardrobeId/:fileName`, async ({ params, request }) => {
+    const scenarioResponse = await applyMockScenario(request);
+    if (scenarioResponse) {
+      return scenarioResponse;
+    }
+
+    const category = String(params.category ?? "");
+    const wardrobeId = String(params.wardrobeId ?? "");
+    const fileName = String(params.fileName ?? "");
+
+    if (!isSupportedWardrobeId(wardrobeId)) {
+      return createNotFoundResponse("wardrobe");
+    }
+
+    if (!normalizeCategory(category)) {
+      return createNotFoundResponse("image");
+    }
+
+    const extension = parseUploadFileExtension(fileName);
+    if (!extension) {
+      return createErrorResponse(400, "VALIDATION_ERROR", "upload path is invalid");
+    }
+
+    const body = await request.arrayBuffer();
+    if (body.byteLength === 0) {
+      return createErrorResponse(400, "VALIDATION_ERROR", "upload body is empty");
+    }
+
+    const imageKey = buildImageKeyFromUploadParams(category, wardrobeId, fileName);
+    return HttpResponse.json(
+      {
+        imageKey,
+        size: body.byteLength,
+      },
+      { status: 200 },
+    );
   }),
 ];
 

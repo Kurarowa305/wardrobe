@@ -3,6 +3,7 @@
 import { FormEvent, createElement, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { uploadImageWithPresign } from "@/api/endpoints/image";
 import { useClothing, useUpdateClothingMutation } from "@/api/hooks/clothing";
 import { AppLayout } from "@/components/app/layout/AppLayout";
 import { Button } from "@/components/ui/button";
@@ -34,6 +35,8 @@ export function ClothingEditScreen({ wardrobeId, clothingId }: ClothingEditScree
   const [imageKey, setImageKey] = useState("");
   const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const [nameTouched, setNameTouched] = useState(false);
 
   useEffect(() => {
@@ -62,7 +65,20 @@ export function ClothingEditScreen({ wardrobeId, clothingId }: ClothingEditScree
   const trimmedName = useMemo(() => name.trim(), [name]);
   const isNameEmpty = trimmedName.length === 0;
   const showNameError = nameTouched && isNameEmpty;
-  const isPending = updateMutation.isPending;
+  const isPending = updateMutation.isPending || isUploadingImage;
+
+  const uploadImage = async (file: File) => {
+    setUploadError(null);
+    setIsUploadingImage(true);
+    try {
+      await uploadImageWithPresign(wardrobeId, "clothing", file);
+    } catch (error) {
+      setUploadError(CLOTHING_STRINGS.edit.messages.uploadError);
+      throw error;
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -71,6 +87,14 @@ export function ClothingEditScreen({ wardrobeId, clothingId }: ClothingEditScree
 
     if (isNameEmpty || isPending) {
       return;
+    }
+
+    if (selectedImageFile) {
+      try {
+        await uploadImage(selectedImageFile);
+      } catch {
+        return;
+      }
     }
 
     await updateMutation.mutateAsync({
@@ -83,6 +107,19 @@ export function ClothingEditScreen({ wardrobeId, clothingId }: ClothingEditScree
 
   const clearSelectedImage = () => {
     setSelectedImageFile(null);
+    setUploadError(null);
+  };
+
+  const handleRetryUpload = async () => {
+    if (!selectedImageFile || isUploadingImage) {
+      return;
+    }
+
+    try {
+      await uploadImage(selectedImageFile);
+    } catch {
+      // エラー文言は uploadImage 内で設定する。
+    }
   };
 
   const content = (
@@ -104,7 +141,10 @@ export function ClothingEditScreen({ wardrobeId, clothingId }: ClothingEditScree
               name="imageFile"
               type="file"
               accept="image/*"
-              onChange={(event) => setSelectedImageFile(event.target.files?.[0] ?? null)}
+              onChange={(event) => {
+                setSelectedImageFile(event.target.files?.[0] ?? null);
+                setUploadError(null);
+              }}
             />
           </label>
 
@@ -149,8 +189,29 @@ export function ClothingEditScreen({ wardrobeId, clothingId }: ClothingEditScree
             <p className="m-0 text-sm text-red-700">{CLOTHING_STRINGS.edit.messages.submitError}</p>
           ) : null}
 
+          {uploadError ? (
+            <div className="grid gap-2">
+              <p className="m-0 text-sm text-red-700">{uploadError}</p>
+              <Button type="button" variant="outline" onClick={handleRetryUpload} disabled={isUploadingImage}>
+                {CLOTHING_STRINGS.edit.actions.retryUpload}
+              </Button>
+            </div>
+          ) : null}
+
           <Button type="submit" className="w-full text-sm font-medium" disabled={isNameEmpty || isPending}>
-            {isPending ? CLOTHING_STRINGS.edit.messages.submitting : CLOTHING_STRINGS.edit.actions.submit}
+            {isUploadingImage ? (
+              <span className="inline-flex items-center gap-2">
+                <span
+                  className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent"
+                  aria-hidden="true"
+                />
+                {CLOTHING_STRINGS.edit.messages.uploadingImage}
+              </span>
+            ) : updateMutation.isPending ? (
+              CLOTHING_STRINGS.edit.messages.submitting
+            ) : (
+              CLOTHING_STRINGS.edit.actions.submit
+            )}
           </Button>
         </form>
       ) : null}

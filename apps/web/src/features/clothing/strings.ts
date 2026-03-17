@@ -23,6 +23,7 @@ export const CLOTHING_STRINGS = {
     actions: {
       submit: "追加",
       clearImage: "画像をクリア",
+      retryUpload: "アップロードを再試行",
     },
     messages: {
       nameRequired: "服の名前を入力してください。",
@@ -30,6 +31,8 @@ export const CLOTHING_STRINGS = {
       submitError: "服の追加に失敗しました。",
       noPreview: "画像を選択するとここにプレビューが表示されます。",
       previewAlt: "選択した画像のプレビュー",
+      uploadingImage: "画像アップロード中...",
+      uploadError: "画像アップロードに失敗しました。再試行してください。",
     },
   },
   edit: {
@@ -44,6 +47,7 @@ export const CLOTHING_STRINGS = {
     actions: {
       submit: "保存",
       clearImage: "画像をクリア",
+      retryUpload: "アップロードを再試行",
     },
     messages: {
       loading: "読み込み中...",
@@ -53,6 +57,8 @@ export const CLOTHING_STRINGS = {
       submitError: "服の更新に失敗しました。",
       noPreview: "画像を選択するとここにプレビューが表示されます。",
       previewAlt: "選択した画像のプレビュー",
+      uploadingImage: "画像アップロード中...",
+      uploadError: "画像アップロードに失敗しました。再試行してください。",
     },
   },
   detail: {
