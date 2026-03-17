@@ -1,17 +1,54 @@
+"use client";
+
 import { createElement } from "react";
 
+import { useClothing } from "@/api/hooks/clothing";
 import { AppLayout } from "@/components/app/layout/AppLayout";
+import { COMMON_STRINGS } from "@/constants/commonStrings";
 import { ROUTES } from "@/constants/routes";
 import { CLOTHING_STRINGS } from "@/features/clothing/strings";
-import { ScreenTextCard } from "./ScreenPrimitives";
+import { isAppError } from "@/lib/error/normalize";
+import { ScreenCard } from "./ScreenPrimitives";
 
 type ClothingDetailScreenProps = {
   wardrobeId: string;
   clothingId: string;
 };
 
+function resolveErrorMessage(error: unknown): string {
+  if (isAppError(error) && error.status === 404) {
+    return CLOTHING_STRINGS.detail.messages.notFound;
+  }
+
+  return CLOTHING_STRINGS.detail.messages.error;
+}
+
 export function ClothingDetailScreen({ wardrobeId, clothingId }: ClothingDetailScreenProps) {
-  const content = createElement(ScreenTextCard, { text: "服の詳細情報" });
+  const clothingQuery = useClothing(wardrobeId, clothingId);
+
+  const content = (
+    <ScreenCard>
+      {clothingQuery.isPending ? (
+        <p className="m-0 text-sm text-slate-600">{CLOTHING_STRINGS.detail.messages.loading}</p>
+      ) : null}
+
+      {clothingQuery.isError ? (
+        <p className="m-0 text-sm text-red-700">{resolveErrorMessage(clothingQuery.error)}</p>
+      ) : null}
+
+      {clothingQuery.data ? (
+        <>
+          <div className="flex h-48 items-center justify-center rounded-md border border-slate-200 bg-slate-100 px-2 text-center text-xs font-semibold uppercase tracking-wide text-slate-600">
+            {clothingQuery.data.imageKey ? "image" : COMMON_STRINGS.placeholders.noImage}
+          </div>
+          <p className="m-0 text-base font-semibold text-slate-900">{clothingQuery.data.name}</p>
+          {clothingQuery.data.deleted ? (
+            <p className="m-0 text-sm font-medium text-amber-700">{CLOTHING_STRINGS.detail.messages.deleted}</p>
+          ) : null}
+        </>
+      ) : null}
+    </ScreenCard>
+  );
 
   return createElement(AppLayout, {
     title: CLOTHING_STRINGS.detail.title,

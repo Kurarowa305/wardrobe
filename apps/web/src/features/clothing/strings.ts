@@ -46,5 +46,11 @@ export const CLOTHING_STRINGS = {
       edit: "編集",
       delete: "削除",
     },
+    messages: {
+      loading: "読み込み中...",
+      error: "服詳細の読み込みに失敗しました。",
+      notFound: "服が見つかりませんでした。",
+      deleted: "削除済み",
+    },
   },
 } as const;
