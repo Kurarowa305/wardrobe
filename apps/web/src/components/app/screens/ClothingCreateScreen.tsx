@@ -46,11 +46,12 @@ export function ClothingCreateScreen({ wardrobeId }: ClothingCreateScreenProps) 
   const showNameError = nameTouched && isNameEmpty;
   const isPending = createMutation.isPending || isUploadingImage;
 
-  const uploadImage = async (file: File) => {
+  const uploadImage = async (file: File): Promise<string> => {
     setUploadError(null);
     setIsUploadingImage(true);
     try {
-      await uploadImageWithPresign(wardrobeId, "clothing", file);
+      const presigned = await uploadImageWithPresign(wardrobeId, "clothing", file);
+      return presigned.imageKey;
     } catch (error) {
       setUploadError(CLOTHING_STRINGS.create.messages.uploadError);
       throw error;
@@ -68,9 +69,11 @@ export function ClothingCreateScreen({ wardrobeId }: ClothingCreateScreenProps) 
       return;
     }
 
+    let uploadedImageKey: string | null = null;
+
     if (selectedImageFile) {
       try {
-        await uploadImage(selectedImageFile);
+        uploadedImageKey = await uploadImage(selectedImageFile);
       } catch {
         return;
       }
@@ -78,7 +81,7 @@ export function ClothingCreateScreen({ wardrobeId }: ClothingCreateScreenProps) 
 
     await createMutation.mutateAsync({
       name: trimmedName,
-      imageKey: selectedImageFile ? selectedImageFile.name : null,
+      imageKey: uploadedImageKey,
     });
 
     router.push(ROUTES.clothings(wardrobeId));

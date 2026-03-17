@@ -76,6 +76,9 @@ jobs:
       - name: Image pseudo upload spec test
         run: pnpm --filter web test:image-pseudo-upload
 
+      - name: Image key payload spec test
+        run: pnpm --filter web test:image-key-payload
+
       - name: Clothing query hooks spec test
         run: pnpm --filter web test:clothing-query-hooks
 
