@@ -17,6 +17,7 @@
     "test:template-fixtures": "node scripts/check-template-fixtures-spec.mjs",
     "test:template-api-client": "node scripts/check-template-api-client-spec.mjs",
     "test:template-msw-handlers": "node scripts/check-template-msw-handlers-spec.mjs",
+    "test:template-query-mutation-hooks": "node scripts/check-template-query-mutation-hooks-spec.mjs",
     "test:clothing-fixtures": "node scripts/check-clothing-fixtures-spec.mjs",
     "test:clothing-api-client": "node scripts/check-clothing-api-client-spec.mjs",
     "test:image-presign-api-client": "node scripts/check-image-presign-api-client-spec.mjs",
