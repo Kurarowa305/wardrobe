@@ -15,6 +15,7 @@
     "test:clothing-types": "node scripts/check-clothing-types-spec.mjs",
     "test:clothing-fixtures": "node scripts/check-clothing-fixtures-spec.mjs",
     "test:clothing-api-client": "node scripts/check-clothing-api-client-spec.mjs",
+    "test:image-presign-api-client": "node scripts/check-image-presign-api-client-spec.mjs",
     "test:clothing-query-hooks": "node scripts/check-clothing-query-hooks-spec.mjs",
     "test:clothing-mutation-hooks": "node scripts/check-clothing-mutation-hooks-spec.mjs",
     "test:clothing-list-screen": "node scripts/check-clothing-list-screen-spec.mjs",
