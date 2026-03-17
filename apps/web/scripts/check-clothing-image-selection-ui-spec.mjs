@@ -82,9 +82,12 @@ check(
 
 check(
   "CIS-05",
-  "服追加時は選択画像ファイル名を imageKey に設定する",
-  includes(createScreen, "imageKey: selectedImageFile ? selectedImageFile.name : null,"),
-  "服追加時の imageKey 設定がファイル名連携になっていません",
+  "服追加時はアップロード結果の imageKey を保存payloadに設定する",
+  includes(createScreen, "const uploadImage = async (file: File): Promise<string> => {") &&
+    includes(createScreen, "const presigned = await uploadImageWithPresign(wardrobeId, \"clothing\", file);") &&
+    includes(createScreen, "return presigned.imageKey;") &&
+    includes(createScreen, "imageKey: uploadedImageKey,"),
+  "服追加時の imageKey 設定が presign返却キー連携になっていません",
 );
 
 check(

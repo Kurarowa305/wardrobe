@@ -86,9 +86,12 @@ check(
 
 check(
   "CCS-06",
-  "服追加時は選択画像のファイル名を imageKey に設定する",
-  includes(target, "imageKey: selectedImageFile ? selectedImageFile.name : null,"),
-  "追加時の imageKey 設定がファイル名連携になっていません",
+  "服追加時はアップロード成功時の imageKey を保存payloadに設定する",
+  includes(target, "const uploadImage = async (file: File): Promise<string> => {") &&
+    includes(target, "const presigned = await uploadImageWithPresign(wardrobeId, \"clothing\", file);") &&
+    includes(target, "uploadedImageKey = await uploadImage(selectedImageFile);") &&
+    includes(target, "imageKey: uploadedImageKey,"),
+  "追加時の imageKey 設定が presign返却キー連携になっていません",
 );
 
 check(

@@ -67,11 +67,12 @@ export function ClothingEditScreen({ wardrobeId, clothingId }: ClothingEditScree
   const showNameError = nameTouched && isNameEmpty;
   const isPending = updateMutation.isPending || isUploadingImage;
 
-  const uploadImage = async (file: File) => {
+  const uploadImage = async (file: File): Promise<string> => {
     setUploadError(null);
     setIsUploadingImage(true);
     try {
-      await uploadImageWithPresign(wardrobeId, "clothing", file);
+      const presigned = await uploadImageWithPresign(wardrobeId, "clothing", file);
+      return presigned.imageKey;
     } catch (error) {
       setUploadError(CLOTHING_STRINGS.edit.messages.uploadError);
       throw error;
@@ -89,9 +90,11 @@ export function ClothingEditScreen({ wardrobeId, clothingId }: ClothingEditScree
       return;
     }
 
+    let nextImageKey = imageKey.trim().length > 0 ? imageKey.trim() : null;
+
     if (selectedImageFile) {
       try {
-        await uploadImage(selectedImageFile);
+        nextImageKey = await uploadImage(selectedImageFile);
       } catch {
         return;
       }
@@ -99,7 +102,7 @@ export function ClothingEditScreen({ wardrobeId, clothingId }: ClothingEditScree
 
     await updateMutation.mutateAsync({
       name: trimmedName,
-      imageKey: selectedImageFile ? selectedImageFile.name : imageKey.trim().length > 0 ? imageKey.trim() : null,
+      imageKey: nextImageKey,
     });
 
     router.push(ROUTES.clothingDetail(wardrobeId, clothingId));

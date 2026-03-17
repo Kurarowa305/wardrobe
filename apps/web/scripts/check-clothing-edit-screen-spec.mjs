@@ -104,13 +104,14 @@ check(
 
 check(
   "CES-08",
-  "服編集画面は imageKey 入力を持たず、画像選択時はファイル名を imageKey として送る",
+  "服編集画面は imageKey 入力を持たず、画像選択時はアップロード結果の imageKey を送る",
   !includes(target, 'name="imageKey"') &&
-    includes(
-      target,
-      "imageKey: selectedImageFile ? selectedImageFile.name : imageKey.trim().length > 0 ? imageKey.trim() : null,",
-    ),
-  "imageKey入力の削除、または画像選択時のimageKeyファイル名連携が不足しています",
+    includes(target, "const uploadImage = async (file: File): Promise<string> => {") &&
+    includes(target, "const presigned = await uploadImageWithPresign(wardrobeId, \"clothing\", file);") &&
+    includes(target, "let nextImageKey = imageKey.trim().length > 0 ? imageKey.trim() : null;") &&
+    includes(target, "nextImageKey = await uploadImage(selectedImageFile);") &&
+    includes(target, "imageKey: nextImageKey,"),
+  "imageKey入力の削除、または画像選択時のpresign imageKey連携が不足しています",
 );
 
 if (failures.length > 0) {
