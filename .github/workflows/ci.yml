@@ -64,6 +64,9 @@ jobs:
       - name: Template types spec test
         run: pnpm --filter web test:template-types
 
+      - name: Template fixtures spec test
+        run: pnpm --filter web test:template-fixtures
+
       - name: Clothing fixtures spec test
         run: pnpm --filter web test:clothing-fixtures
 
