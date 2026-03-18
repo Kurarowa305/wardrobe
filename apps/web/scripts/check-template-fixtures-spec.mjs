@@ -105,10 +105,20 @@ check(
 
 check(
   "TF-08",
-  "templateDetailFixtures が合計30件（既存3件 + 追加27件）で構成される",
-  includes("src/mocks/fixtures/template.ts", "const GENERATED_TEMPLATE_FIXTURE_COUNT = 27;") &&
+  "fixture に構成服が5件のテンプレートが含まれ、+x 表示検証に利用できる",
+  includes("src/mocks/fixtures/template.ts", 'templateId: "tp_01HZZBBX"') &&
+    includes("src/mocks/fixtures/template.ts", 'name: "旅行セット"') &&
+    includes("src/mocks/fixtures/template.ts", '"cl_auto_002",') &&
+    includes("src/mocks/fixtures/template.ts", 'clothingIds: ['),
+  "構成服5件の template fixture が不足しています",
+);
+
+check(
+  "TF-09",
+  "templateDetailFixtures が合計30件（既存4件 + 追加26件）で構成される",
+  includes("src/mocks/fixtures/template.ts", "const GENERATED_TEMPLATE_FIXTURE_COUNT = 26;") &&
     includes("src/mocks/fixtures/template.ts", "...Array.from({ length: GENERATED_TEMPLATE_FIXTURE_COUNT },"),
-  "30件構成（3件 + 27件追加）の定義が不足しています",
+  "30件構成（4件 + 26件追加）の定義が不足しています",
 );
 
 if (failures.length > 0) {

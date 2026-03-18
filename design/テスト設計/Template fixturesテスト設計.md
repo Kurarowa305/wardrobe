@@ -54,11 +54,17 @@
   - `templateDetailFixtureById` が定義される
   - `templateId` をキーとして詳細fixtureを参照できる
 
-### TF-08 templateDetailFixtures が合計30件（既存3件 + 追加27件）で構成される
+### TF-08 fixture に構成服が5件のテンプレートが含まれ、`+x` 表示検証に利用できる
+- 観点: テンプレ一覧画面のサムネ上限4件 + `+x` 表示をfixtureで再現できること
+- 期待結果:
+  - 構成服5件の ACTIVE テンプレートが存在する
+  - 画像あり/画像なし/削除済み服を含む複数サムネの表示検証に利用できる
+
+### TF-09 templateDetailFixtures が合計30件（既存4件 + 追加26件）で構成される
 - 観点: テンプレ一覧のページング・画面確認に必要な件数の固定化
 - 期待結果:
-  - `GENERATED_TEMPLATE_FIXTURE_COUNT = 27` が定義される
-  - `templateDetailFixtureSeeds` が既存3件に加えて `Array.from` で27件を追加する
+  - `GENERATED_TEMPLATE_FIXTURE_COUNT = 26` が定義される
+  - `templateDetailFixtureSeeds` が既存4件に加えて `Array.from` で26件を追加する
 
 ## CI適用
 

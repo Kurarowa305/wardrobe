@@ -7,7 +7,7 @@ import type {
 import { CLOTHING_FIXTURE_WARDROBE_ID, clothingDetailFixtureById } from "@/mocks/fixtures/clothing";
 
 export const TEMPLATE_FIXTURE_WARDROBE_ID = CLOTHING_FIXTURE_WARDROBE_ID;
-const GENERATED_TEMPLATE_FIXTURE_COUNT = 27;
+const GENERATED_TEMPLATE_FIXTURE_COUNT = 26;
 const GENERATED_TEMPLATE_FIXTURE_BASE_TIMESTAMP = 1735620000000;
 
 export type TemplateDetailFixture = TemplateDetailResponseDto & {
@@ -39,6 +39,20 @@ const templateDetailFixtureSeeds: TemplateDetailFixtureSeed[] = [
     wearCount: 3,
     lastWornAt: 1735610000000,
     clothingIds: ["cl_01HZZAAB", "cl_01HZZAAC"],
+  },
+  {
+    templateId: "tp_01HZZBBX",
+    name: "旅行セット",
+    status: "ACTIVE",
+    wearCount: 6,
+    lastWornAt: 1735615000000,
+    clothingIds: [
+      "cl_01HZZAAA",
+      "cl_01HZZAAB",
+      "cl_01HZZAAC",
+      "cl_auto_001",
+      "cl_auto_002",
+    ],
   },
   {
     templateId: "tp_01HZZBBD",
