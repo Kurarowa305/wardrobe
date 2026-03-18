@@ -30,7 +30,13 @@ const templateDetailFixtureSeeds: TemplateDetailFixtureSeed[] = [
     status: "ACTIVE",
     wearCount: 8,
     lastWornAt: 1735600000000,
-    clothingIds: ["cl_01HZZAAA", "cl_01HZZAAB"],
+    clothingIds: [
+      "cl_01HZZAAA",
+      "cl_01HZZAAB",
+      "cl_auto_001",
+      "cl_auto_002",
+      "cl_auto_003",
+    ],
   },
   {
     templateId: "tp_01HZZBBC",

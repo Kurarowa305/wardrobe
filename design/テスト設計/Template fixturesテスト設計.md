@@ -60,6 +60,12 @@
   - `GENERATED_TEMPLATE_FIXTURE_COUNT = 27` が定義される
   - `templateDetailFixtureSeeds` が既存3件に加えて `Array.from` で27件を追加する
 
+### TF-09 fixture に構成服が5つ以上のテンプレートが含まれる
+- 観点: 構成服が多いテンプレートの一覧/詳細表示や後続タスクの選択UI検証に使えるデータ確保
+- 期待結果:
+  - `tp_01HZZBBB` が5件の `clothingIds` を持つ
+  - 先頭テンプレートでも `clothingDetailFixtureById` から順序付きで同梱服が解決される
+
 ## CI適用
 
 - `.github/workflows/ci.yml` に `Template fixtures spec test` を追加し、PR時に自動検証する
