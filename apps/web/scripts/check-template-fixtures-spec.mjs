@@ -111,6 +111,14 @@ check(
   "30件構成（3件 + 27件追加）の定義が不足しています",
 );
 
+check(
+  "TF-09",
+  "fixture に構成服が5つ以上のテンプレートが含まれる",
+  includes("src/mocks/fixtures/template.ts", 'templateId: "tp_01HZZBBB"') &&
+    includes("src/mocks/fixtures/template.ts", '      "cl_auto_003",'),
+  "5件以上の構成服を持つテンプレート fixture が不足しています",
+);
+
 if (failures.length > 0) {
   console.error(`\n${failures.length}件の失敗 / ${checkCount}件中`);
   console.error(failures.join("\n\n"));
