@@ -20,6 +20,7 @@
     "test:history-msw-handlers": "node scripts/check-history-msw-handlers-spec.mjs",
     "test:history-query-mutation-hooks": "node scripts/check-history-query-mutation-hooks-spec.mjs",
     "test:history-list-screen": "node scripts/check-history-list-screen-spec.mjs",
+    "test:history-detail-screen": "node scripts/check-history-detail-screen-spec.mjs",
     "test:template-fixtures": "node scripts/check-template-fixtures-spec.mjs",
     "test:template-api-client": "node scripts/check-template-api-client-spec.mjs",
     "test:template-msw-handlers": "node scripts/check-template-msw-handlers-spec.mjs",
