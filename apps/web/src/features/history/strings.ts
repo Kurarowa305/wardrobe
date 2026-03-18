@@ -1,6 +1,18 @@
 export const HISTORY_STRINGS = {
   list: {
     title: "履歴",
+    actions: {
+      loadMore: "さらに読み込む",
+    },
+    messages: {
+      loading: "読み込み中...",
+      empty: "履歴がまだ登録されていません。",
+      error: "履歴一覧の読み込みに失敗しました。",
+      combinationSummary: "選択した服の組み合わせ",
+    },
+    badges: {
+      deleted: "削除済み",
+    },
   },
   detail: {
     title: "履歴詳細",

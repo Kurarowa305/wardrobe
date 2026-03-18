@@ -79,6 +79,9 @@ jobs:
       - name: History Query/Mutation hooks spec test
         run: pnpm --filter web test:history-query-mutation-hooks
 
+      - name: History list screen spec test
+        run: pnpm --filter web test:history-list-screen
+
       - name: Template fixtures spec test
         run: pnpm --filter web test:template-fixtures
 
