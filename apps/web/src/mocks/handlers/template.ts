@@ -13,7 +13,7 @@ import {
   templateDetailFixtures,
 } from "@/mocks/fixtures/template";
 import { clothingDetailFixtureById } from "@/mocks/fixtures/clothing";
-import { HttpResponse, http } from "msw";
+import { HttpResponse, http, passthrough } from "msw";
 
 import { applyMockScenario } from "./scenario";
 
@@ -233,8 +233,29 @@ function createMockTemplateId() {
   return nextId;
 }
 
+function shouldBypassTemplateApiMock(request: Request) {
+  if (request.mode === "navigate" || request.destination === "document") {
+    return true;
+  }
+
+  if (
+    request.headers.has("rsc") ||
+    request.headers.has("next-router-prefetch") ||
+    request.headers.has("next-router-state-tree")
+  ) {
+    return true;
+  }
+
+  const accept = request.headers.get("accept")?.toLowerCase() ?? "";
+  return accept.includes("text/x-component") || accept.includes("text/html");
+}
+
 export const templateHandlers = [
   http.get("*/wardrobes/:wardrobeId/templates", async ({ params, request }) => {
+    if (shouldBypassTemplateApiMock(request)) {
+      return passthrough();
+    }
+
     const scenarioResponse = await applyMockScenario(request);
     if (scenarioResponse) {
       return scenarioResponse;
@@ -277,6 +298,10 @@ export const templateHandlers = [
   }),
 
   http.get("*/wardrobes/:wardrobeId/templates/:templateId", async ({ params, request }) => {
+    if (shouldBypassTemplateApiMock(request)) {
+      return passthrough();
+    }
+
     const scenarioResponse = await applyMockScenario(request);
     if (scenarioResponse) {
       return scenarioResponse;
@@ -303,6 +328,10 @@ export const templateHandlers = [
   }),
 
   http.post("*/wardrobes/:wardrobeId/templates", async ({ params, request }) => {
+    if (shouldBypassTemplateApiMock(request)) {
+      return passthrough();
+    }
+
     const scenarioResponse = await applyMockScenario(request);
     if (scenarioResponse) {
       return scenarioResponse;
@@ -340,6 +369,10 @@ export const templateHandlers = [
   }),
 
   http.patch("*/wardrobes/:wardrobeId/templates/:templateId", async ({ params, request }) => {
+    if (shouldBypassTemplateApiMock(request)) {
+      return passthrough();
+    }
+
     const scenarioResponse = await applyMockScenario(request);
     if (scenarioResponse) {
       return scenarioResponse;
@@ -387,6 +420,10 @@ export const templateHandlers = [
   }),
 
   http.delete("*/wardrobes/:wardrobeId/templates/:templateId", async ({ params, request }) => {
+    if (shouldBypassTemplateApiMock(request)) {
+      return passthrough();
+    }
+
     const scenarioResponse = await applyMockScenario(request);
     if (scenarioResponse) {
       return scenarioResponse;
