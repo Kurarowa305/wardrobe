@@ -14,6 +14,7 @@
     "test:api-client-foundation": "node scripts/check-api-client-foundation-spec.mjs",
     "test:clothing-types": "node scripts/check-clothing-types-spec.mjs",
     "test:template-types": "node scripts/check-template-types-spec.mjs",
+    "test:history-types": "node scripts/check-history-types-spec.mjs",
     "test:template-fixtures": "node scripts/check-template-fixtures-spec.mjs",
     "test:template-api-client": "node scripts/check-template-api-client-spec.mjs",
     "test:template-msw-handlers": "node scripts/check-template-msw-handlers-spec.mjs",
