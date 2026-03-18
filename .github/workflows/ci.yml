@@ -73,6 +73,9 @@ jobs:
       - name: History API client spec test
         run: pnpm --filter web test:history-api-client
 
+      - name: History MSW handlers spec test
+        run: pnpm --filter web test:history-msw-handlers
+
       - name: Template fixtures spec test
         run: pnpm --filter web test:template-fixtures
 
