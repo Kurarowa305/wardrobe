@@ -139,11 +139,6 @@ function HistoryDetailScreenContent({ wardrobeId, historyId, backHref }: History
     backHref,
     headerActions: [
       {
-        key: "edit",
-        label: HISTORY_STRINGS.detail.menu.edit,
-        disabled: true,
-      },
-      {
         key: "delete",
         label: HISTORY_STRINGS.detail.menu.delete,
         disabled: true,

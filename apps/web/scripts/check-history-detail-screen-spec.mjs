@@ -82,11 +82,11 @@ check(
 
 check(
   "HDS-05",
-  "履歴詳細画面のヘッダーメニューに編集/削除がある",
+  "履歴詳細画面のヘッダーメニューに削除のみがある",
   includes(target, "headerActions:") &&
-    includes(target, "HISTORY_STRINGS.detail.menu.edit") &&
+    !includes(target, "HISTORY_STRINGS.detail.menu.edit") &&
     includes(target, "HISTORY_STRINGS.detail.menu.delete"),
-  "ヘッダーメニューの編集/削除項目が不足しています",
+  "ヘッダーメニューの削除項目、または編集項目の除去が不足しています",
 );
 
 check(
