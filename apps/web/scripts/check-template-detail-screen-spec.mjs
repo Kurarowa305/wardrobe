@@ -55,13 +55,14 @@ check(
 
 check(
   "TDS-03",
-  "構成アイテムが服詳細へ遷移でき、画像/プレースホルダ/削除済み表示に対応する",
-  includes(target, "ROUTES.clothingDetail(wardrobeId, item.clothingId)") &&
+  "構成アイテムが非リンク表示で、画像/プレースホルダ/削除済み表示に対応する",
+  !includes(target, "ROUTES.clothingDetail(wardrobeId, item.clothingId)") &&
+    !includes(target, "import Link from \"next/link\";") &&
     includes(target, 'import { resolveImageUrl } from "@/features/clothing/imageUrl";') &&
     includes(target, "const imageUrl = resolveImageUrl(item.imageKey);") &&
     includes(target, "COMMON_STRINGS.placeholders.noImage") &&
     includes(target, "TEMPLATE_STRINGS.detail.messages.clothingDeleted"),
-  "構成アイテムの遷移・画像表示・削除済み表示の実装が不足しています",
+  "構成アイテムの非リンク表示・画像表示・削除済み表示の実装が不足しています",
 );
 
 check(

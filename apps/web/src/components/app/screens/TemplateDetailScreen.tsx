@@ -1,8 +1,6 @@
 "use client";
 
 import { createElement } from "react";
-import Link from "next/link";
-
 import { useTemplate } from "@/api/hooks/template";
 import { AppLayout } from "@/components/app/layout/AppLayout";
 import { COMMON_STRINGS } from "@/constants/commonStrings";
@@ -82,10 +80,7 @@ export function TemplateDetailScreen({ wardrobeId, templateId }: TemplateDetailS
 
                 return (
                   <li key={item.clothingId}>
-                    <Link
-                      href={ROUTES.clothingDetail(wardrobeId, item.clothingId)}
-                      className="grid grid-cols-[4rem_1fr] gap-3 rounded-md border border-slate-200 p-3 no-underline transition-colors hover:bg-slate-50"
-                    >
+                    <div className="grid grid-cols-[4rem_1fr] gap-3 rounded-md border border-slate-200 p-3">
                       {imageUrl ? (
                         <img
                           src={imageUrl}
@@ -112,7 +107,7 @@ export function TemplateDetailScreen({ wardrobeId, templateId }: TemplateDetailS
                           {TEMPLATE_STRINGS.detail.labels.clothingLastWornAt}: {formatLastWornAt(item.lastWornAt)}
                         </p>
                       </div>
-                    </Link>
+                    </div>
                   </li>
                 );
               })}
