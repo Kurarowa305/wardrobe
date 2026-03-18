@@ -123,6 +123,9 @@ jobs:
       - name: Template list screen spec test
         run: pnpm --filter web test:template-list-screen
 
+      - name: Template form screens spec test
+        run: pnpm --filter web test:template-form-screens
+
       - name: MSW foundation spec test
         run: pnpm --filter web test:msw-foundation
 
