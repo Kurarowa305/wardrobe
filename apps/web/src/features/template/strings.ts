@@ -67,5 +67,19 @@ export const TEMPLATE_STRINGS = {
       edit: "編集",
       delete: "削除",
     },
+    labels: {
+      wearCount: "着用回数",
+      lastWornAt: "最終着用日",
+      clothingItems: "構成アイテム",
+      clothingWearCount: "服の着用回数",
+      clothingLastWornAt: "服の最終着用日",
+    },
+    messages: {
+      loading: "読み込み中...",
+      error: "テンプレート詳細の読み込みに失敗しました。",
+      deleted: "削除済みのテンプレートです。",
+      clothingDeleted: "削除済みの服です",
+      neverWorn: "未着用",
+    },
   },
 } as const;
