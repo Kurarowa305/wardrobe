@@ -130,6 +130,9 @@ jobs:
       - name: Template detail screen spec test
         run: pnpm --filter web test:template-detail-screen
 
+      - name: Template delete flow spec test
+        run: pnpm --filter web test:template-delete-flow
+
       - name: MSW foundation spec test
         run: pnpm --filter web test:msw-foundation
 
