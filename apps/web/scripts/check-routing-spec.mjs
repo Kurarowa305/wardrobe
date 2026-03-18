@@ -365,7 +365,7 @@ check("RT-21", "history detail isolates searchParams access behind Suspense", ()
   };
 });
 
-check("RT-22", "template detail/edit pages generate static params from template fixtures", () => {
+check("RT-22", "template detail/edit pages generate static params from fixtures and reserved mock ids", () => {
   const pages = [
     "src/app/wardrobes/[wardrobeId]/(stack)/templates/[templateId]/page.tsx",
     "src/app/wardrobes/[wardrobeId]/(stack)/templates/[templateId]/edit/page.tsx",
@@ -374,14 +374,17 @@ check("RT-22", "template detail/edit pages generate static params from template 
     (file) =>
       !containsAll(file, [
         'import { templateDetailFixtures } from "@/mocks/fixtures/template";',
-        "return templateDetailFixtures.map((fixture) => ({",
+        'const MOCK_TEMPLATE_ID_PREFIX = "tp_mock_";',
+        "const MOCK_TEMPLATE_STATIC_PARAMS_COUNT = 200;",
+        "...templateDetailFixtures.map((fixture) => fixture.templateId)",
+        "...generateMockStaticTemplateIds(),",
         "wardrobeId: DEMO_IDS.wardrobe,",
-        "templateId: fixture.templateId,",
+        "templateId,",
       ]),
   );
   return {
     ok: invalid.length === 0,
-    detail: `template detail/edit generateStaticParams must cover fixture ids: ${invalid.join(", ") || "(none)"}`,
+    detail: `template detail/edit generateStaticParams must cover fixture and reserved mock ids: ${invalid.join(", ") || "(none)"}`,
   };
 });
 
