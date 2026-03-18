@@ -1,12 +1,16 @@
 import { TemplateEditScreen } from "@/components/app/screens/TemplateEditScreen";
 import { DEMO_IDS } from "@/constants/routes";
+import { templateDetailFixtures } from "@/mocks/fixtures/template";
 
 type TemplateEditPageProps = {
   params: Promise<{ wardrobeId: string; templateId: string }>;
 };
 
 export function generateStaticParams() {
-  return [{ templateId: DEMO_IDS.template }];
+  return templateDetailFixtures.map((fixture) => ({
+    wardrobeId: DEMO_IDS.wardrobe,
+    templateId: fixture.templateId,
+  }));
 }
 
 export default async function TemplateEditPage({ params }: TemplateEditPageProps) {

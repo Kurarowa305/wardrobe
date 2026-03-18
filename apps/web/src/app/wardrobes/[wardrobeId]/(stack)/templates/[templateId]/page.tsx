@@ -1,12 +1,16 @@
 import { TemplateDetailScreen } from "@/components/app/screens/TemplateDetailScreen";
 import { DEMO_IDS } from "@/constants/routes";
+import { templateDetailFixtures } from "@/mocks/fixtures/template";
 
 type TemplateDetailPageProps = {
   params: Promise<{ wardrobeId: string; templateId: string }>;
 };
 
 export function generateStaticParams() {
-  return [{ templateId: DEMO_IDS.template }];
+  return templateDetailFixtures.map((fixture) => ({
+    wardrobeId: DEMO_IDS.wardrobe,
+    templateId: fixture.templateId,
+  }));
 }
 
 export default async function TemplateDetailPage({ params }: TemplateDetailPageProps) {
