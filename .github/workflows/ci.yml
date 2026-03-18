@@ -70,6 +70,9 @@ jobs:
       - name: History fixtures spec test
         run: pnpm --filter web test:history-fixtures
 
+      - name: History API client spec test
+        run: pnpm --filter web test:history-api-client
+
       - name: Template fixtures spec test
         run: pnpm --filter web test:template-fixtures
 
