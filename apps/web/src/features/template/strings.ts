@@ -1,4 +1,18 @@
 export const TEMPLATE_STRINGS = {
+  placeholders: {
+    name: "例: 通勤コーデ",
+  },
+  actions: {
+    cancel: "キャンセル",
+    loadMoreClothings: "服をさらに読み込む",
+  },
+  messages: {
+    clothingLoading: "服一覧を読み込み中...",
+    clothingLoadError: "服一覧の読み込みに失敗しました。",
+    clothingEmpty: "選択できる服がまだ登録されていません。",
+    clothingRequired: "テンプレートに含める服を1つ以上選択してください。",
+    templateNotFound: "テンプレートが見つかりませんでした。",
+  },
   list: {
     title: "テンプレート",
     actions: {
@@ -16,6 +30,12 @@ export const TEMPLATE_STRINGS = {
   },
   create: {
     title: "テンプレートの追加",
+    messages: {
+      loadError: "テンプレート追加画面の読み込みに失敗しました。",
+      nameRequired: "テンプレート名を入力してください。",
+      submitting: "追加中...",
+      submitError: "テンプレートの追加に失敗しました。",
+    },
     labels: {
       name: "テンプレート名",
       selectClothing: "服を選択",
@@ -26,6 +46,13 @@ export const TEMPLATE_STRINGS = {
   },
   edit: {
     title: "テンプレートの編集",
+    messages: {
+      loading: "読み込み中...",
+      loadError: "テンプレート編集画面の読み込みに失敗しました。",
+      nameRequired: "テンプレート名を入力してください。",
+      submitting: "保存中...",
+      submitError: "テンプレートの更新に失敗しました。",
+    },
     labels: {
       name: "テンプレート名",
       selectClothing: "服を選択",

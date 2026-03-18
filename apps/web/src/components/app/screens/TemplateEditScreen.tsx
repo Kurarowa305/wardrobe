@@ -3,7 +3,8 @@ import { createElement } from "react";
 import { AppLayout } from "@/components/app/layout/AppLayout";
 import { ROUTES } from "@/constants/routes";
 import { TEMPLATE_STRINGS } from "@/features/template/strings";
-import { ScreenCard, ScreenLinkButton } from "./ScreenPrimitives";
+import { ScreenCard } from "./ScreenPrimitives";
+import { TemplateForm } from "./TemplateForm";
 
 type TemplateEditScreenProps = {
   wardrobeId: string;
@@ -12,9 +13,12 @@ type TemplateEditScreenProps = {
 
 export function TemplateEditScreen({ wardrobeId, templateId }: TemplateEditScreenProps) {
   const content = createElement(ScreenCard, {
-    children: createElement(ScreenLinkButton, {
-      href: ROUTES.templateDetail(wardrobeId, templateId),
-      label: TEMPLATE_STRINGS.edit.actions.submit,
+    children: createElement(TemplateForm, {
+      wardrobeId,
+      mode: "edit",
+      templateId,
+      backHref: ROUTES.templateDetail(wardrobeId, templateId),
+      submitLabel: TEMPLATE_STRINGS.edit.actions.submit,
     }),
   });
 
