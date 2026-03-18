@@ -67,6 +67,9 @@ jobs:
       - name: History types spec test
         run: pnpm --filter web test:history-types
 
+      - name: History fixtures spec test
+        run: pnpm --filter web test:history-fixtures
+
       - name: Template fixtures spec test
         run: pnpm --filter web test:template-fixtures
 
