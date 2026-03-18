@@ -349,6 +349,11 @@ export const clothingHandlers = [
   }),
 ];
 
+export function getClothingSnapshotById(clothingId: string): ClothingDetailResponseDto | undefined {
+  const clothing = clothingStore.find((item) => item.clothingId === clothingId);
+  return clothing ? { ...clothing } : undefined;
+}
+
 export function resetClothingHandlersState() {
   clothingStore = initializeClothingStore();
   mockClothingIdSequence = 1;

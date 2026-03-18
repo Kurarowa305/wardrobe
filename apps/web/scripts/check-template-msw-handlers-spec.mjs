@@ -75,8 +75,9 @@ check(
   "TM-05",
   "Template handler が clothingIds を clothingItems に解決して返却する",
   includes("src/mocks/handlers/template.ts", "function resolveClothingItems(clothingIds: string[]):") &&
-    includes("src/mocks/handlers/template.ts", "clothingDetailFixtureById[clothingId]") &&
-    includes("src/mocks/handlers/template.ts", "clothingItems: template.clothingItems") &&
+    includes("src/mocks/handlers/template.ts", "getClothingSnapshotById(clothingId)") &&
+    includes("src/mocks/handlers/template.ts", "const syncedTemplate = syncTemplateClothingItems(template);") &&
+    includes("src/mocks/handlers/template.ts", "clothingItems: syncedTemplate.clothingItems,") &&
     includes("src/mocks/handlers/template.ts", "clothingItems: nextClothingItems"),
   "clothingIds から clothingItems への解決実装が不足しています",
 );

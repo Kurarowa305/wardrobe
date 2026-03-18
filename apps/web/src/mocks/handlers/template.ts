@@ -12,7 +12,7 @@ import {
   TEMPLATE_FIXTURE_WARDROBE_ID,
   templateDetailFixtures,
 } from "@/mocks/fixtures/template";
-import { clothingDetailFixtureById } from "@/mocks/fixtures/clothing";
+import { getClothingSnapshotById } from "./clothing";
 import { HttpResponse, http, passthrough } from "msw";
 
 import { applyMockScenario } from "./scenario";
@@ -143,15 +143,28 @@ function normalizeClothingIds(value: unknown): string[] | null {
 
 function resolveClothingItems(clothingIds: string[]): TemplateDetailClothingItemDto[] | null {
   const clothingItems = clothingIds
-    .map((clothingId) => clothingDetailFixtureById[clothingId])
-    .filter((clothing): clothing is TemplateDetailClothingItemDto => clothing !== undefined)
-    .map((clothing) => ({ ...clothing }));
+    .map((clothingId) => getClothingSnapshotById(clothingId))
+    .filter((clothing): clothing is TemplateDetailClothingItemDto => clothing !== undefined);
 
   if (clothingItems.length !== clothingIds.length) {
     return null;
   }
 
   return clothingItems;
+}
+
+function syncTemplateClothingItems(template: TemplateRecord): TemplateRecord {
+  const clothingIds = template.clothingItems.map((item) => item.clothingId);
+  const resolvedClothingItems = resolveClothingItems(clothingIds);
+
+  if (!resolvedClothingItems) {
+    return template;
+  }
+
+  return {
+    ...template,
+    clothingItems: resolvedClothingItems,
+  };
 }
 
 function parseCreateRequest(body: unknown): CreateTemplateRequestDto | null {
@@ -210,6 +223,7 @@ function parseUpdateRequest(body: unknown): UpdateTemplateRequestDto | null {
 function buildListItems(order: TemplateListOrderDto): TemplateListItemDto[] {
   const activeItems = templateStore
     .filter((template) => template.status === "ACTIVE")
+    .map(syncTemplateClothingItems)
     .map((template) => ({
       templateId: template.templateId,
       name: template.name,
@@ -318,12 +332,14 @@ export const templateHandlers = [
       return createNotFoundResponse("template");
     }
 
+    const syncedTemplate = syncTemplateClothingItems(template);
+
     return HttpResponse.json<TemplateDetailResponseDto>({
-      name: template.name,
-      status: template.status,
-      wearCount: template.wearCount,
-      lastWornAt: template.lastWornAt,
-      clothingItems: template.clothingItems,
+      name: syncedTemplate.name,
+      status: syncedTemplate.status,
+      wearCount: syncedTemplate.wearCount,
+      lastWornAt: syncedTemplate.lastWornAt,
+      clothingItems: syncedTemplate.clothingItems,
     });
   }),
 

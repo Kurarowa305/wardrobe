@@ -136,6 +136,9 @@ jobs:
       - name: Template detail screen spec test
         run: pnpm --filter web test:template-detail-screen
 
+      - name: Template clothing reference spec test
+        run: pnpm --filter web test:template-clothing-reference
+
       - name: Template delete flow spec test
         run: pnpm --filter web test:template-delete-flow
 
