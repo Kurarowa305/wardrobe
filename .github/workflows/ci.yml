@@ -120,8 +120,12 @@ jobs:
 
       - name: Clothing delete flow spec test
         run: pnpm --filter web test:clothing-delete-flow
+
       - name: Template list screen spec test
         run: pnpm --filter web test:template-list-screen
+
+      - name: Template form screen spec test
+        run: pnpm --filter web test:template-form-screen
 
       - name: MSW foundation spec test
         run: pnpm --filter web test:msw-foundation
