@@ -4,7 +4,7 @@ export type HistoryOrigin = "home" | "histories";
 export const DEMO_IDS = {
   wardrobe: "1",
   history: "history-001",
-  template: "template-001",
+  template: "tp_01HZZBBB",
   clothing: "clothing-001",
 } as const;
 
