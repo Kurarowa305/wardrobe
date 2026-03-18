@@ -18,6 +18,7 @@
     "test:history-fixtures": "node scripts/check-history-fixtures-spec.mjs",
     "test:history-api-client": "node scripts/check-history-api-client-spec.mjs",
     "test:history-msw-handlers": "node scripts/check-history-msw-handlers-spec.mjs",
+    "test:history-query-mutation-hooks": "node scripts/check-history-query-mutation-hooks-spec.mjs",
     "test:template-fixtures": "node scripts/check-template-fixtures-spec.mjs",
     "test:template-api-client": "node scripts/check-template-api-client-spec.mjs",
     "test:template-msw-handlers": "node scripts/check-template-msw-handlers-spec.mjs",
