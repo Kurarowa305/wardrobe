@@ -190,9 +190,11 @@ check(
     noIncludes("src/components/app/screens/RecordByCombinationScreen.tsx", "ScreenLinkButton") &&
     includes("src/components/app/screens/TemplatesTabScreen.tsx", 'import { Button } from "@/components/ui/button";') &&
     includes("src/components/app/screens/TemplatesTabScreen.tsx", "TEMPLATE_STRINGS.list.actions.add") &&
-    includes("src/components/app/screens/TemplateCreateScreen.tsx", 'import { Button } from "@/components/ui/button";') &&
-    includes("src/components/app/screens/TemplateCreateScreen.tsx", "TEMPLATE_STRINGS.create.actions.submit") &&
+    includes("src/components/app/screens/TemplateCreateScreen.tsx", 'import { TemplateForm } from "./TemplateForm";') &&
+    includes("src/components/app/screens/TemplateCreateScreen.tsx", "strings={TEMPLATE_STRINGS.create}") &&
     noIncludes("src/components/app/screens/TemplateCreateScreen.tsx", "ScreenLinkButton") &&
+    includes("src/components/app/screens/TemplateForm.tsx", 'import { Button } from "@/components/ui/button";') &&
+    includes("src/components/app/screens/TemplateForm.tsx", "strings.actions.submit") &&
     includes("src/components/app/screens/ClothingsTabScreen.tsx", 'import { Button } from "@/components/ui/button";') &&
     includes("src/components/app/screens/ClothingsTabScreen.tsx", "CLOTHING_STRINGS.list.actions.add") &&
     includes("src/components/app/screens/ClothingCreateScreen.tsx", 'import { Button } from "@/components/ui/button";') &&
