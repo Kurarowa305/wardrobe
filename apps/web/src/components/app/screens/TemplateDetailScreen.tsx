@@ -1,8 +1,10 @@
 "use client";
 
 import { createElement } from "react";
-import { useTemplate } from "@/api/hooks/template";
+import { useRouter } from "next/navigation";
+import { useDeleteTemplateMutation, useTemplate } from "@/api/hooks/template";
 import { AppLayout } from "@/components/app/layout/AppLayout";
+import { useToast } from "@/components/ui/use-toast";
 import { COMMON_STRINGS } from "@/constants/commonStrings";
 import { ROUTES } from "@/constants/routes";
 import { resolveImageUrl } from "@/features/clothing/imageUrl";
@@ -36,7 +38,29 @@ function formatLastWornAt(lastWornAt: number | null) {
 }
 
 export function TemplateDetailScreen({ wardrobeId, templateId }: TemplateDetailScreenProps) {
+  const router = useRouter();
+  const { toast } = useToast();
   const templateQuery = useTemplate(wardrobeId, templateId);
+  const deleteMutation = useDeleteTemplateMutation(wardrobeId, templateId);
+
+  const handleDelete = async () => {
+    const confirmed = window.confirm(
+      `${COMMON_STRINGS.dialogs.confirmDelete.title}\n${COMMON_STRINGS.dialogs.confirmDelete.message}`,
+    );
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await deleteMutation.mutateAsync();
+      router.push(ROUTES.templates(wardrobeId));
+    } catch {
+      toast({
+        variant: "destructive",
+        title: TEMPLATE_STRINGS.detail.messages.deleteError,
+      });
+    }
+  };
 
   const content = (
     <ScreenCard>
@@ -131,8 +155,8 @@ export function TemplateDetailScreen({ wardrobeId, templateId }: TemplateDetailS
       {
         key: "delete",
         label: TEMPLATE_STRINGS.detail.menu.delete,
-        href: ROUTES.templates(wardrobeId),
-        disabled: !templateQuery.data || templateQuery.data.deleted,
+        onSelect: handleDelete,
+        disabled: !templateQuery.data || templateQuery.data.deleted || deleteMutation.isPending,
       },
     ],
     children: content,

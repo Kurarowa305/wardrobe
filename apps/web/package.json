@@ -38,7 +38,9 @@
     "test:clothing-delete-flow": "node scripts/check-clothing-delete-flow-spec.mjs",
     "test:template-list-screen": "node scripts/check-template-list-screen-spec.mjs",
     "test:template-form-screen": "node scripts/check-template-form-screen-spec.mjs",
-    "test:template-detail-screen": "node scripts/check-template-detail-screen-spec.mjs"
+    "test:template-detail-screen": "node scripts/check-template-detail-screen-spec.mjs",
+    "test:template-delete-flow": "node scripts/check-template-delete-flow-spec.mjs",
+    "test:template-tab-navigation": "node scripts/check-template-tab-navigation-spec.mjs"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.4",

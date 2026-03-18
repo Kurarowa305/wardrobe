@@ -73,6 +73,9 @@ jobs:
       - name: Template MSW handlers spec test
         run: pnpm --filter web test:template-msw-handlers
 
+      - name: Template tab navigation spec test
+        run: pnpm --filter web test:template-tab-navigation
+
       - name: Template Query/Mutation hooks spec test
         run: pnpm --filter web test:template-query-mutation-hooks
 
@@ -129,6 +132,9 @@ jobs:
 
       - name: Template detail screen spec test
         run: pnpm --filter web test:template-detail-screen
+
+      - name: Template delete flow spec test
+        run: pnpm --filter web test:template-delete-flow
 
       - name: MSW foundation spec test
         run: pnpm --filter web test:msw-foundation

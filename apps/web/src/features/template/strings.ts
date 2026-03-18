@@ -77,6 +77,7 @@ export const TEMPLATE_STRINGS = {
     messages: {
       loading: "読み込み中...",
       error: "テンプレート詳細の読み込みに失敗しました。",
+      deleteError: "テンプレートの削除に失敗しました。",
       deleted: "削除済みのテンプレートです。",
       clothingDeleted: "削除済みの服です",
       neverWorn: "未着用",

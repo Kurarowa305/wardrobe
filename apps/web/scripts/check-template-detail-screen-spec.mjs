@@ -28,11 +28,14 @@ function check(id, description, passed, detail) {
 
 const target = "src/components/app/screens/TemplateDetailScreen.tsx";
 const stringsTarget = "src/features/template/strings.ts";
+const hasTemplateHookImport =
+  includes(target, 'import { useTemplate } from "@/api/hooks/template";') ||
+  includes(target, 'import { useDeleteTemplateMutation, useTemplate } from "@/api/hooks/template";');
 
 check(
   "TDS-01",
   "TemplateDetailScreen が useTemplate でテンプレ詳細を取得し、ロード/エラー状態を表示する",
-  includes(target, 'import { useTemplate } from "@/api/hooks/template";') &&
+  hasTemplateHookImport &&
     includes(target, "const templateQuery = useTemplate(wardrobeId, templateId);") &&
     includes(target, "templateQuery.isPending") &&
     includes(target, "templateQuery.isError") &&
