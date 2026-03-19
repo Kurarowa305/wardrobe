@@ -3,7 +3,8 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, createElement } from "react";
 
-import { useHistory, useDeleteHistoryMutation } from "@/api/hooks/history";
+import { useDeleteHistoryMutation } from "@/api/hooks/history";
+import { useHistory } from "@/api/hooks/history";
 import { AppLayout } from "@/components/app/layout/AppLayout";
 import { useToast } from "@/components/ui/use-toast";
 import { COMMON_STRINGS } from "@/constants/commonStrings";

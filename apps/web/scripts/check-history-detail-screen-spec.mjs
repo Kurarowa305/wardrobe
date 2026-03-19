@@ -48,7 +48,7 @@ check(
 check(
   "HDS-02",
   "履歴詳細画面が useHistory を利用し、ロード/エラー状態を表示する",
-  includes(target, 'import { useHistory, useDeleteHistoryMutation } from "@/api/hooks/history";') &&
+  includes(target, 'import { useHistory } from "@/api/hooks/history";') &&
     includes(target, "const historyQuery = useHistory(wardrobeId, historyId);") &&
     includes(target, "historyQuery.isPending") &&
     includes(target, "historyQuery.isError") &&

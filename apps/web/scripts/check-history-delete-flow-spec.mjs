@@ -32,7 +32,7 @@ const stringsTarget = "src/features/history/strings.ts";
 check(
   "HDL-01",
   "履歴詳細画面で useDeleteHistoryMutation を利用して削除処理を実行する",
-  includes(screenTarget, 'import { useHistory, useDeleteHistoryMutation } from "@/api/hooks/history";') &&
+  includes(screenTarget, 'import { useDeleteHistoryMutation } from "@/api/hooks/history";') &&
     includes(screenTarget, "const deleteMutation = useDeleteHistoryMutation(wardrobeId, historyId);") &&
     includes(screenTarget, "await deleteMutation.mutateAsync();"),
   "HistoryDetailScreen.tsx に削除Mutation連携が不足しています",
