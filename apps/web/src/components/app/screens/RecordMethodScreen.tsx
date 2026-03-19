@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { createElement } from "react";
 
 import { AppLayout } from "@/components/app/layout/AppLayout";
 import { Button } from "@/components/ui/button";
@@ -12,36 +11,19 @@ type RecordMethodScreenProps = {
 };
 
 export function RecordMethodScreen({ wardrobeId }: RecordMethodScreenProps) {
-  const content = createElement(ScreenCard, {
-    children: [
-      createElement(
-        Button,
-        {
-          key: "by-template",
-          asChild: true,
-          className: "w-full justify-start text-left text-sm font-medium",
-        },
-        createElement(Link, { href: ROUTES.recordByTemplate(wardrobeId) }, RECORD_STRINGS.method.actions.byTemplate),
-      ),
-      createElement(
-        Button,
-        {
-          key: "by-combination",
-          asChild: true,
-          className: "w-full justify-start text-left text-sm font-medium",
-        },
-        createElement(
-          Link,
-          { href: ROUTES.recordByCombination(wardrobeId) },
-          RECORD_STRINGS.method.actions.byCombination,
-        ),
-      ),
-    ],
-  });
-
-  return createElement(AppLayout, {
-    title: RECORD_STRINGS.method.title,
-    backHref: ROUTES.home(wardrobeId),
-    children: content,
-  });
+  return (
+    <AppLayout title={RECORD_STRINGS.method.title} backHref={ROUTES.home(wardrobeId)}>
+      <ScreenCard>
+        <p className="m-0 text-sm text-slate-600">{RECORD_STRINGS.method.message}</p>
+        <Button asChild variant="outline" className="w-full justify-start text-left text-sm font-medium">
+          <Link href={ROUTES.recordByTemplate(wardrobeId)}>{RECORD_STRINGS.method.actions.byTemplate}</Link>
+        </Button>
+        <Button asChild variant="outline" className="w-full justify-start text-left text-sm font-medium">
+          <Link href={ROUTES.recordByCombination(wardrobeId)}>
+            {RECORD_STRINGS.method.actions.byCombination}
+          </Link>
+        </Button>
+      </ScreenCard>
+    </AppLayout>
+  );
 }
