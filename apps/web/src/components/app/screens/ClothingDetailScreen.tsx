@@ -10,6 +10,7 @@ import { COMMON_STRINGS } from "@/constants/commonStrings";
 import { ROUTES } from "@/constants/routes";
 import { resolveImageUrl } from "@/features/clothing/imageUrl";
 import { CLOTHING_STRINGS } from "@/features/clothing/strings";
+import { formatLastWornDate } from "@/features/history/date";
 import { isAppError } from "@/lib/error/normalize";
 import { ScreenCard } from "./ScreenPrimitives";
 
@@ -24,18 +25,6 @@ function resolveErrorMessage(error: unknown): string {
   }
 
   return CLOTHING_STRINGS.detail.messages.error;
-}
-
-function formatLastWornAt(lastWornAt: number | null) {
-  if (lastWornAt === null) {
-    return CLOTHING_STRINGS.detail.messages.neverWorn;
-  }
-
-  return new Intl.DateTimeFormat("ja-JP", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(lastWornAt);
 }
 
 export function ClothingDetailScreen({ wardrobeId, clothingId }: ClothingDetailScreenProps) {
@@ -105,7 +94,7 @@ export function ClothingDetailScreen({ wardrobeId, clothingId }: ClothingDetailS
               <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">
                 {CLOTHING_STRINGS.detail.labels.lastWornAt}
               </dt>
-              <dd className="m-0 text-sm text-slate-900">{formatLastWornAt(clothingQuery.data.lastWornAt)}</dd>
+              <dd className="m-0 text-sm text-slate-900">{formatLastWornDate(clothingQuery.data.lastWornAt, CLOTHING_STRINGS.detail.messages.neverWorn)}</dd>
             </div>
           </dl>
         </>
