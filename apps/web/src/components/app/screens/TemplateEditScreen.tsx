@@ -10,12 +10,14 @@ type TemplateEditScreenProps = {
   templateId: string;
 };
 
-export function TemplateEditScreen({ wardrobeId, templateId }: TemplateEditScreenProps) {
+export function TemplateEditScreen({
+  wardrobeId,
+  templateId,
+}: TemplateEditScreenProps) {
   const content = createElement(TemplateForm, {
     wardrobeId,
     mode: "edit",
     templateId,
-    backHref: ROUTES.templateDetail(wardrobeId, templateId),
     submitLabel: TEMPLATE_STRINGS.edit.actions.submit,
   });
 

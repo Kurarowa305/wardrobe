@@ -9,11 +9,12 @@ type TemplateCreateScreenProps = {
   wardrobeId: string;
 };
 
-export function TemplateCreateScreen({ wardrobeId }: TemplateCreateScreenProps) {
+export function TemplateCreateScreen({
+  wardrobeId,
+}: TemplateCreateScreenProps) {
   const content = createElement(TemplateForm, {
     wardrobeId,
     mode: "create",
-    backHref: ROUTES.templates(wardrobeId),
     submitLabel: TEMPLATE_STRINGS.create.actions.submit,
   });
 

@@ -22,7 +22,6 @@ type TemplateFormProps = {
   wardrobeId: string;
   mode: TemplateFormMode;
   templateId?: string;
-  backHref: string;
   submitLabel: string;
 };
 
@@ -33,7 +32,10 @@ type ClothingPage = {
 
 const TEMPLATE_FORM_CLOTHING_LIMIT = 50;
 
-function resolveLoadErrorMessage(error: unknown, mode: TemplateFormMode): string {
+function resolveLoadErrorMessage(
+  error: unknown,
+  mode: TemplateFormMode,
+): string {
   if (isAppError(error) && error.status === 404) {
     return TEMPLATE_STRINGS.messages.templateNotFound;
   }
@@ -43,11 +45,19 @@ function resolveLoadErrorMessage(error: unknown, mode: TemplateFormMode): string
     : TEMPLATE_STRINGS.create.messages.loadError;
 }
 
-export function TemplateForm({ wardrobeId, mode, templateId, backHref, submitLabel }: TemplateFormProps) {
+export function TemplateForm({
+  wardrobeId,
+  mode,
+  templateId,
+  submitLabel,
+}: TemplateFormProps) {
   const router = useRouter();
   const templateQuery = useTemplate(wardrobeId, templateId ?? "");
   const createMutation = useCreateTemplateMutation(wardrobeId);
-  const updateMutation = useUpdateTemplateMutation(wardrobeId, templateId ?? "");
+  const updateMutation = useUpdateTemplateMutation(
+    wardrobeId,
+    templateId ?? "",
+  );
 
   const [name, setName] = useState("");
   const [nameTouched, setNameTouched] = useState(false);
@@ -55,7 +65,9 @@ export function TemplateForm({ wardrobeId, mode, templateId, backHref, submitLab
   const [cursor, setCursor] = useState<string | null>(null);
   const [pages, setPages] = useState<ClothingPage[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
-  const [hasInitializedEditValues, setHasInitializedEditValues] = useState(mode === "create");
+  const [hasInitializedEditValues, setHasInitializedEditValues] = useState(
+    mode === "create",
+  );
 
   const clothingListQuery = useClothingList(wardrobeId, {
     limit: TEMPLATE_FORM_CLOTHING_LIMIT,
@@ -97,11 +109,16 @@ export function TemplateForm({ wardrobeId, mode, templateId, backHref, submitLab
     }
 
     setName(templateQuery.data.name);
-    setSelectedClothingIds(templateQuery.data.clothingItems.map((item) => item.clothingId));
+    setSelectedClothingIds(
+      templateQuery.data.clothingItems.map((item) => item.clothingId),
+    );
     setHasInitializedEditValues(true);
   }, [hasInitializedEditValues, mode, templateQuery.data]);
 
-  const clothingItems = useMemo(() => pages.flatMap((page) => page.items), [pages]);
+  const clothingItems = useMemo(
+    () => pages.flatMap((page) => page.items),
+    [pages],
+  );
   const trimmedName = useMemo(() => name.trim(), [name]);
   const isNameEmpty = trimmedName.length === 0;
   const isSelectionEmpty = selectedClothingIds.length === 0;
@@ -136,7 +153,13 @@ export function TemplateForm({ wardrobeId, mode, templateId, backHref, submitLab
 
     setNameTouched(true);
 
-    if (isNameEmpty || isSelectionEmpty || isPending || showTemplateLoading || showTemplateError) {
+    if (
+      isNameEmpty ||
+      isSelectionEmpty ||
+      isPending ||
+      showTemplateLoading ||
+      showTemplateError
+    ) {
       return;
     }
 
@@ -161,16 +184,29 @@ export function TemplateForm({ wardrobeId, mode, templateId, backHref, submitLab
 
   return (
     <form className="grid gap-3" onSubmit={handleSubmit} noValidate>
-      {showTemplateLoading ? <p className="m-0 text-sm text-slate-600">{TEMPLATE_STRINGS.edit.messages.loading}</p> : null}
+      {showTemplateLoading ? (
+        <p className="m-0 text-sm text-slate-600">
+          {TEMPLATE_STRINGS.edit.messages.loading}
+        </p>
+      ) : null}
 
       {showTemplateError ? (
-        <p className="m-0 text-sm text-red-700">{resolveLoadErrorMessage(templateQuery.error, mode)}</p>
+        <p className="m-0 text-sm text-red-700">
+          {resolveLoadErrorMessage(templateQuery.error, mode)}
+        </p>
       ) : null}
 
       {mode === "create" || templateQuery.data ? (
         <>
-          <label className="grid gap-1 text-sm font-medium text-slate-900" htmlFor="template-name">
-            <span>{mode === "create" ? TEMPLATE_STRINGS.create.labels.name : TEMPLATE_STRINGS.edit.labels.name}</span>
+          <label
+            className="grid gap-1 text-sm font-medium text-slate-900"
+            htmlFor="template-name"
+          >
+            <span>
+              {mode === "create"
+                ? TEMPLATE_STRINGS.create.labels.name
+                : TEMPLATE_STRINGS.edit.labels.name}
+            </span>
             <Input
               id="template-name"
               name="name"
@@ -181,7 +217,9 @@ export function TemplateForm({ wardrobeId, mode, templateId, backHref, submitLab
               placeholder={TEMPLATE_STRINGS.placeholders.name}
               autoComplete="off"
               aria-invalid={showNameError}
-              aria-describedby={showNameError ? "template-name-error" : undefined}
+              aria-describedby={
+                showNameError ? "template-name-error" : undefined
+              }
             />
           </label>
 
@@ -200,10 +238,20 @@ export function TemplateForm({ wardrobeId, mode, templateId, backHref, submitLab
                 : TEMPLATE_STRINGS.edit.labels.selectClothing}
             </legend>
 
-            {showClothingLoading ? <p className="m-0 text-sm text-slate-600">{TEMPLATE_STRINGS.messages.clothingLoading}</p> : null}
-            {showClothingError ? <p className="m-0 text-sm text-red-700">{TEMPLATE_STRINGS.messages.clothingLoadError}</p> : null}
+            {showClothingLoading ? (
+              <p className="m-0 text-sm text-slate-600">
+                {TEMPLATE_STRINGS.messages.clothingLoading}
+              </p>
+            ) : null}
+            {showClothingError ? (
+              <p className="m-0 text-sm text-red-700">
+                {TEMPLATE_STRINGS.messages.clothingLoadError}
+              </p>
+            ) : null}
             {!showClothingLoading && !showClothingError && !hasClothingItems ? (
-              <p className="m-0 text-sm text-slate-600">{TEMPLATE_STRINGS.messages.clothingEmpty}</p>
+              <p className="m-0 text-sm text-slate-600">
+                {TEMPLATE_STRINGS.messages.clothingEmpty}
+              </p>
             ) : null}
 
             {hasClothingItems ? (
@@ -229,7 +277,12 @@ export function TemplateForm({ wardrobeId, mode, templateId, backHref, submitLab
             ) : null}
 
             {nextCursor !== null ? (
-              <Button type="button" variant="secondary" onClick={handleLoadMore} disabled={!canLoadMore}>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={handleLoadMore}
+                disabled={!canLoadMore}
+              >
                 {clothingListQuery.isFetching
                   ? TEMPLATE_STRINGS.messages.clothingLoading
                   : TEMPLATE_STRINGS.actions.loadMoreClothings}
@@ -237,27 +290,34 @@ export function TemplateForm({ wardrobeId, mode, templateId, backHref, submitLab
             ) : null}
           </fieldset>
 
-          {showSelectionError ? <p className="m-0 text-sm text-red-700">{TEMPLATE_STRINGS.messages.clothingRequired}</p> : null}
+          {showSelectionError ? (
+            <p className="m-0 text-sm text-red-700">
+              {TEMPLATE_STRINGS.messages.clothingRequired}
+            </p>
+          ) : null}
 
           {createMutation.isError && mode === "create" ? (
-            <p className="m-0 text-sm text-red-700">{TEMPLATE_STRINGS.create.messages.submitError}</p>
+            <p className="m-0 text-sm text-red-700">
+              {TEMPLATE_STRINGS.create.messages.submitError}
+            </p>
           ) : null}
           {updateMutation.isError && mode === "edit" ? (
-            <p className="m-0 text-sm text-red-700">{TEMPLATE_STRINGS.edit.messages.submitError}</p>
+            <p className="m-0 text-sm text-red-700">
+              {TEMPLATE_STRINGS.edit.messages.submitError}
+            </p>
           ) : null}
 
-          <div className="grid gap-2 sm:grid-cols-2">
-            <Button type="button" variant="outline" onClick={() => router.push(backHref)} disabled={isPending}>
-              {TEMPLATE_STRINGS.actions.cancel}
-            </Button>
-            <Button type="submit" className="w-full text-sm font-medium" disabled={isNameEmpty || isSelectionEmpty || isPending}>
-              {isPending
-                ? mode === "create"
-                  ? TEMPLATE_STRINGS.create.messages.submitting
-                  : TEMPLATE_STRINGS.edit.messages.submitting
-                : submitLabel}
-            </Button>
-          </div>
+          <Button
+            type="submit"
+            className="w-full text-sm font-medium"
+            disabled={isNameEmpty || isSelectionEmpty || isPending}
+          >
+            {isPending
+              ? mode === "create"
+                ? TEMPLATE_STRINGS.create.messages.submitting
+                : TEMPLATE_STRINGS.edit.messages.submitting
+              : submitLabel}
+          </Button>
         </>
       ) : null}
     </form>
