@@ -24,19 +24,19 @@ const checks = [
     detail: "button.tsx の default variant が指定アクセントカラーになっていません",
   },
   {
-    name: "対象導線が default Button を利用している",
+    name: "対象3ボタンが白文字・太字・大きめで default Button を利用している",
     ok:
       includes(
         "src/components/app/screens/HomeTabScreen.tsx",
-        '<Button asChild className="w-full justify-start text-left text-sm font-medium">',
+        '<Button asChild className="w-full justify-start text-left text-base font-bold text-white">',
       ) &&
       includes(
         "src/components/app/screens/TemplatesTabScreen.tsx",
-        '<Button asChild className="w-full justify-start text-left text-sm font-medium">',
+        '<Button asChild className="w-full justify-start text-left text-base font-bold text-white">',
       ) &&
       includes(
         "src/components/app/screens/ClothingsTabScreen.tsx",
-        '<Button asChild className="w-full justify-start text-left text-sm font-medium">',
+        '<Button asChild className="w-full justify-start text-left text-base font-bold text-white">',
       ) &&
       includes("src/components/app/screens/WardrobeCreateScreen.tsx", '<Button type="submit" className="w-full">') &&
       includes(
@@ -59,7 +59,7 @@ const checks = [
         "src/components/app/screens/RecordByCombinationScreen.tsx",
         '<Button\n          type="submit"\n          className="w-full text-sm font-medium"',
       ),
-    detail: "対象画面の primary Button 導線が想定どおり存在しません",
+    detail: "対象画面の primary Button 導線または3ボタンの文字スタイル指定が不足しています",
   },
 ];
 
