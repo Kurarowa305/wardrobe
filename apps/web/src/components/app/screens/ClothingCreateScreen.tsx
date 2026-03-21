@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ROUTES } from "@/constants/routes";
 import { CLOTHING_STRINGS } from "@/features/clothing/strings";
-import { ScreenCard } from "./ScreenPrimitives";
 
 type ClothingCreateScreenProps = {
   wardrobeId: string;
@@ -105,7 +104,7 @@ export function ClothingCreateScreen({ wardrobeId }: ClothingCreateScreenProps) 
   };
 
   const content = (
-    <ScreenCard>
+    <div className="grid gap-4">
       <form className="grid gap-3" onSubmit={handleSubmit} noValidate>
         <label className="grid gap-1 text-sm font-medium text-slate-900" htmlFor="clothing-image-file">
           <span>{CLOTHING_STRINGS.create.labels.imageFile}</span>
@@ -187,7 +186,7 @@ export function ClothingCreateScreen({ wardrobeId }: ClothingCreateScreenProps) 
           )}
         </Button>
       </form>
-    </ScreenCard>
+    </div>
   );
 
   return createElement(AppLayout, {

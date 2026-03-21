@@ -25,15 +25,6 @@ const SCREEN_FILES = [
   "src/components/app/screens/ClothingEditScreen.tsx",
   "src/components/app/screens/HistoryDetailScreen.tsx",
 ];
-const NO_SCREEN_CARD_FILES = new Set([
-  "src/components/app/screens/WardrobeCreateScreen.tsx",
-  "src/components/app/screens/HistoriesTabScreen.tsx",
-  "src/components/app/screens/ClothingsTabScreen.tsx",
-  "src/components/app/screens/TemplatesTabScreen.tsx",
-  "src/components/app/screens/RecordMethodScreen.tsx",
-  "src/components/app/screens/RecordByCombinationScreen.tsx",
-  "src/components/app/screens/HomeTabScreen.tsx",
-]);
 
 function abs(relPath) {
   return path.join(webRoot, relPath);
@@ -75,7 +66,6 @@ check(
     "src/components/ui/toaster.tsx",
     "src/components/ui/use-toast.ts",
     "src/lib/utils.ts",
-    "src/components/app/screens/ScreenPrimitives.tsx",
   ].every((file) => exists(file)),
   "必要な ui 基盤ファイルが不足しています",
 );
@@ -145,15 +135,14 @@ check(
 
 check(
   "UF-09",
-  "スクリーン実装は ScreenCard基盤または画面要件に沿った直接描画で構成される",
+  "スクリーン実装は全画面で ScreenCard を使わない直接描画に統一される",
   SCREEN_FILES.every((file) => {
     const source = read(file);
-    if (NO_SCREEN_CARD_FILES.has(file)) {
-      const directRenderingGuard = file.endsWith("WardrobeCreateScreen.tsx")
-        ? source.includes("showHeader={false}") && source.includes("WARDROBE_STRINGS.create.heroTitle") && source.includes("<form")
-        : file.endsWith("HistoriesTabScreen.tsx")
-          ? source.includes("HISTORY_STRINGS.list.messages.loading")
-          : file.endsWith("ClothingsTabScreen.tsx")
+    const directRenderingGuard = file.endsWith("WardrobeCreateScreen.tsx")
+      ? source.includes("showHeader={false}") && source.includes("WARDROBE_STRINGS.create.heroTitle") && source.includes("<form")
+      : file.endsWith("HistoriesTabScreen.tsx")
+        ? source.includes("HISTORY_STRINGS.list.messages.loading")
+        : file.endsWith("ClothingsTabScreen.tsx")
           ? source.includes("CLOTHING_STRINGS.list.actions.add")
           : file.endsWith("TemplatesTabScreen.tsx")
             ? source.includes("TEMPLATE_STRINGS.list.actions.add")
@@ -162,17 +151,27 @@ check(
               : file.endsWith("RecordMethodScreen.tsx")
                 ? source.includes("RECORD_STRINGS.method.descriptions.byTemplate") &&
                   source.includes("RECORD_STRINGS.method.descriptions.byCombination")
-              : source.includes("<form") && source.includes("RECORD_STRINGS.byCombination.labels.clothing");
+                : file.endsWith("RecordByCombinationScreen.tsx")
+                  ? source.includes("<form") && source.includes("RECORD_STRINGS.byCombination.labels.clothing")
+                  : file.endsWith("RecordByTemplateScreen.tsx")
+                    ? source.includes("<form") && source.includes('className="grid gap-4"')
+                    : file.endsWith("TemplateCreateScreen.tsx")
+                      ? source.includes("createElement(TemplateForm")
+                      : file.endsWith("TemplateDetailScreen.tsx")
+                        ? source.includes("TEMPLATE_STRINGS.detail.labels.clothingItems") && source.includes('className="grid gap-4"')
+                        : file.endsWith("TemplateEditScreen.tsx")
+                          ? source.includes("createElement(TemplateForm")
+                          : file.endsWith("ClothingCreateScreen.tsx")
+                            ? source.includes("CLOTHING_STRINGS.create.actions.submit") && source.includes('className="grid gap-4"')
+                            : file.endsWith("ClothingDetailScreen.tsx")
+                              ? source.includes("CLOTHING_STRINGS.detail.labels.wearCount") && source.includes('className="grid gap-4"')
+                              : file.endsWith("ClothingEditScreen.tsx")
+                                ? source.includes("CLOTHING_STRINGS.edit.actions.submit") && source.includes('className="grid gap-4"')
+                                : source.includes("HISTORY_STRINGS.detail.labels.clothingItems") && source.includes('className="grid gap-4"');
 
-      return (
-        !source.includes("<ScreenCard") &&
-        !source.includes("ScreenTextCard") &&
-        directRenderingGuard
-      );
-    }
-    return source.includes("ScreenCard") || source.includes("ScreenTextCard");
+    return !source.includes("ScreenCard") && !source.includes("ScreenTextCard") && directRenderingGuard;
   }),
-  "スクリーンのUI基盤構成が期待値と一致しません",
+  "スクリーンの直接描画構成が期待値と一致しません",
 );
 
 check(

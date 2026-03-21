@@ -9,11 +9,10 @@ import { useToast } from "@/components/ui/use-toast";
 import { COMMON_STRINGS } from "@/constants/commonStrings";
 import { ROUTES } from "@/constants/routes";
 import { resolveImageUrl } from "@/features/clothing/imageUrl";
-import { resolveHistoryDetailBackHref } from "@/features/history/routing";
 import { formatHistoryDate } from "@/features/history/date";
+import { resolveHistoryDetailBackHref } from "@/features/history/routing";
 import { HISTORY_STRINGS } from "@/features/history/strings";
 import { isAppError } from "@/lib/error/normalize";
-import { ScreenCard } from "./ScreenPrimitives";
 
 type HistoryDetailScreenProps = {
   wardrobeId: string;
@@ -61,7 +60,7 @@ ${COMMON_STRINGS.dialogs.confirmDelete.message}`,
   };
 
   const content = (
-    <ScreenCard>
+    <div className="grid gap-4">
       {historyQuery.isPending ? (
         <p className="m-0 text-sm text-slate-600">{HISTORY_STRINGS.detail.messages.loading}</p>
       ) : null}
@@ -142,7 +141,7 @@ ${COMMON_STRINGS.dialogs.confirmDelete.message}`,
           </div>
         </>
       ) : null}
-    </ScreenCard>
+    </div>
   );
 
   return createElement(AppLayout, {

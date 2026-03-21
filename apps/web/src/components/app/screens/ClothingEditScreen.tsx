@@ -11,7 +11,6 @@ import { Input } from "@/components/ui/input";
 import { ROUTES } from "@/constants/routes";
 import { CLOTHING_STRINGS } from "@/features/clothing/strings";
 import { isAppError } from "@/lib/error/normalize";
-import { ScreenCard } from "./ScreenPrimitives";
 
 type ClothingEditScreenProps = {
   wardrobeId: string;
@@ -126,7 +125,7 @@ export function ClothingEditScreen({ wardrobeId, clothingId }: ClothingEditScree
   };
 
   const content = (
-    <ScreenCard>
+    <div className="grid gap-4">
       {clothingQuery.isPending ? (
         <p className="m-0 text-sm text-slate-600">{CLOTHING_STRINGS.edit.messages.loading}</p>
       ) : null}
@@ -218,7 +217,7 @@ export function ClothingEditScreen({ wardrobeId, clothingId }: ClothingEditScree
           </Button>
         </form>
       ) : null}
-    </ScreenCard>
+    </div>
   );
 
   return createElement(AppLayout, {

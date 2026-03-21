@@ -12,7 +12,6 @@ import { resolveImageUrl } from "@/features/clothing/imageUrl";
 import { CLOTHING_STRINGS } from "@/features/clothing/strings";
 import { formatLastWornDate } from "@/features/history/date";
 import { isAppError } from "@/lib/error/normalize";
-import { ScreenCard } from "./ScreenPrimitives";
 
 type ClothingDetailScreenProps = {
   wardrobeId: string;
@@ -54,7 +53,7 @@ export function ClothingDetailScreen({ wardrobeId, clothingId }: ClothingDetailS
   };
 
   const content = (
-    <ScreenCard>
+    <div className="grid gap-4">
       {clothingQuery.isPending ? (
         <p className="m-0 text-sm text-slate-600">{CLOTHING_STRINGS.detail.messages.loading}</p>
       ) : null}
@@ -99,7 +98,7 @@ export function ClothingDetailScreen({ wardrobeId, clothingId }: ClothingDetailS
           </dl>
         </>
       ) : null}
-    </ScreenCard>
+    </div>
   );
 
   return createElement(AppLayout, {
