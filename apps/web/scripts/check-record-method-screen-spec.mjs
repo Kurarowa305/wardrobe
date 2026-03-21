@@ -71,21 +71,23 @@ check(
 
 check(
   "RMS-05",
-  "選択肢が outline ボタンとしてカード内に並ぶ",
-  includes(target, '<ScreenCard>') &&
+  "選択肢が ScreenCard を使わず直接描画のカード風 outline ボタンとして並ぶ",
+  !includes(target, "ScreenCard") &&
     includes(target, 'variant="outline"') &&
-    includes(target, 'className="w-full justify-start text-left text-sm font-medium"'),
-  "ScreenCard 内の outline ボタン実装が不足しています",
+    includes(target, 'className="h-auto w-full justify-start rounded-2xl px-4 py-5 text-left"'),
+  "ScreenCard を除去したカード風 outline ボタン実装が不足しています",
 );
 
 check(
   "RMS-06",
-  "記録方法選択画面向け文言が record strings に定義される",
+  "記録方法選択画面向け文言と説明文が record strings に定義される",
   includes(stringsTarget, 'title: "記録"') &&
     includes(stringsTarget, 'message: "どの方法で記録しますか？"') &&
     includes(stringsTarget, 'byTemplate: "テンプレートで記録"') &&
-    includes(stringsTarget, 'byCombination: "服の組み合わせで記録"'),
-  "features/record/strings.ts に方法選択画面向け文言の定義が不足しています",
+    includes(stringsTarget, 'byCombination: "服の組み合わせで記録"') &&
+    includes(stringsTarget, 'byTemplate: "服装テンプレートから選択します"') &&
+    includes(stringsTarget, 'byCombination: "服を選んで組み合わせます"'),
+  "features/record/strings.ts に方法選択画面向け文言または説明文の定義が不足しています",
 );
 
 if (failures.length > 0) {

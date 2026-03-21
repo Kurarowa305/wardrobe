@@ -6,6 +6,10 @@ export const RECORD_STRINGS = {
       byTemplate: "テンプレートで記録",
       byCombination: "服の組み合わせで記録",
     },
+    descriptions: {
+      byTemplate: "服装テンプレートから選択します",
+      byCombination: "服を選んで組み合わせます",
+    },
   },
   byTemplate: {
     title: "テンプレートで記録",
