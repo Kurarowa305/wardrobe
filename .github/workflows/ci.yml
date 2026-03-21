@@ -49,6 +49,9 @@ jobs:
       - name: UI foundation spec test
         run: pnpm --filter web test:ui-foundation
 
+      - name: Tab bar fixed spec test
+        run: pnpm --filter web test:tab-bar-fixed
+
       - name: Query foundation spec test
         run: pnpm --filter web test:query-foundation
 
