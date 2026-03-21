@@ -30,6 +30,7 @@ const NO_SCREEN_CARD_FILES = new Set([
   "src/components/app/screens/HistoriesTabScreen.tsx",
   "src/components/app/screens/ClothingsTabScreen.tsx",
   "src/components/app/screens/TemplatesTabScreen.tsx",
+  "src/components/app/screens/RecordMethodScreen.tsx",
   "src/components/app/screens/RecordByCombinationScreen.tsx",
   "src/components/app/screens/HomeTabScreen.tsx",
 ]);
@@ -158,6 +159,9 @@ check(
             ? source.includes("TEMPLATE_STRINGS.list.actions.add")
             : file.endsWith("HomeTabScreen.tsx")
               ? source.includes("HOME_STRINGS.sections.recentWeekHistories") && source.includes("useRecentHistories")
+              : file.endsWith("RecordMethodScreen.tsx")
+                ? source.includes("RECORD_STRINGS.method.descriptions.byTemplate") &&
+                  source.includes("RECORD_STRINGS.method.descriptions.byCombination")
               : source.includes("<form") && source.includes("RECORD_STRINGS.byCombination.labels.clothing");
 
       return (
