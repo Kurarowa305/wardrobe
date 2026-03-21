@@ -58,6 +58,7 @@
 ### UF-09 スクリーン実装は ScreenCard基盤または画面要件に沿った直接描画で構成される
 - 観点: UI基盤の適用方針と画面要件の両立
 - 期待結果:
+  - `WardrobeCreateScreen.tsx` はヘッダー非表示・ヒーロータイトル表示の画面要件に合わせて `ScreenCard` を使わず直接描画する
   - `HomeTabScreen.tsx` / `HistoriesTabScreen.tsx` / `ClothingsTabScreen.tsx` / `TemplatesTabScreen.tsx` は `ScreenCard` でラップせず、画面要件に沿って直接描画する
   - `RecordByCombinationScreen.tsx` はフォーム画面要件に合わせて `ScreenCard` でラップせず、`form` と `fieldset` を直接描画する
   - それ以外の画面では `ScreenCard` または `ScreenTextCard` の利用が確認できる

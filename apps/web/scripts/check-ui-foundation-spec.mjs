@@ -26,6 +26,7 @@ const SCREEN_FILES = [
   "src/components/app/screens/HistoryDetailScreen.tsx",
 ];
 const NO_SCREEN_CARD_FILES = new Set([
+  "src/components/app/screens/WardrobeCreateScreen.tsx",
   "src/components/app/screens/HistoriesTabScreen.tsx",
   "src/components/app/screens/ClothingsTabScreen.tsx",
   "src/components/app/screens/TemplatesTabScreen.tsx",
@@ -147,9 +148,11 @@ check(
   SCREEN_FILES.every((file) => {
     const source = read(file);
     if (NO_SCREEN_CARD_FILES.has(file)) {
-      const directRenderingGuard = file.endsWith("HistoriesTabScreen.tsx")
-        ? source.includes("HISTORY_STRINGS.list.messages.loading")
-        : file.endsWith("ClothingsTabScreen.tsx")
+      const directRenderingGuard = file.endsWith("WardrobeCreateScreen.tsx")
+        ? source.includes("showHeader={false}") && source.includes("WARDROBE_STRINGS.create.heroTitle") && source.includes("<form")
+        : file.endsWith("HistoriesTabScreen.tsx")
+          ? source.includes("HISTORY_STRINGS.list.messages.loading")
+          : file.endsWith("ClothingsTabScreen.tsx")
           ? source.includes("CLOTHING_STRINGS.list.actions.add")
           : file.endsWith("TemplatesTabScreen.tsx")
             ? source.includes("TEMPLATE_STRINGS.list.actions.add")
