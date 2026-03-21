@@ -35,8 +35,10 @@ function check(id, description, passed, detail) {
 }
 
 const target = "src/components/app/screens/ClothingDetailScreen.tsx";
-const detailPageTarget = "src/app/wardrobes/[wardrobeId]/(stack)/clothings/[clothingId]/page.tsx";
-const editPageTarget = "src/app/wardrobes/[wardrobeId]/(stack)/clothings/[clothingId]/edit/page.tsx";
+const detailPageTarget =
+  "src/app/wardrobes/[wardrobeId]/(stack)/clothings/[clothingId]/page.tsx";
+const editPageTarget =
+  "src/app/wardrobes/[wardrobeId]/(stack)/clothings/[clothingId]/edit/page.tsx";
 const stringsTarget = "src/features/clothing/strings.ts";
 
 check(
@@ -51,22 +53,33 @@ check(
   "服詳細画面が useClothing を利用してデータ取得する",
   includes(target, '"use client";') &&
     includes(target, "@/api/hooks/clothing") &&
-    includes(target, "const clothingQuery = useClothing(wardrobeId, clothingId);"),
+    includes(
+      target,
+      "const clothingQuery = useClothing(wardrobeId, clothingId);",
+    ),
   "useClothing を使った詳細データ取得実装が不足しています",
 );
 
 check(
   "CDS-03",
   "詳細画面に画像・服名・着た回数・最後に着た日を表示し、resolveImageUrl と no image フォールバックを利用する",
-  includes(target, 'import { resolveImageUrl } from "@/features/clothing/imageUrl";') &&
-    includes(target, "const imageUrl = resolveImageUrl(clothingQuery.data?.imageKey);") &&
+  includes(
+    target,
+    'import { resolveImageUrl } from "@/features/clothing/imageUrl";',
+  ) &&
+    includes(
+      target,
+      "const imageUrl = resolveImageUrl(clothingQuery.data?.imageKey);",
+    ) &&
     includes(target, "<img") &&
     includes(target, "COMMON_STRINGS.placeholders.noImage") &&
     includes(target, "clothingQuery.data.name") &&
     includes(target, "CLOTHING_STRINGS.detail.labels.wearCount") &&
     includes(target, "clothingQuery.data.wearCount") &&
     includes(target, "CLOTHING_STRINGS.detail.labels.lastWornAt") &&
-    includes(target, "formatLastWornDate(clothingQuery.data.lastWornAt, CLOTHING_STRINGS.detail.messages.neverWorn)"),
+    includes(target, "formatLastWornDate(") &&
+    includes(target, "clothingQuery.data.lastWornAt") &&
+    includes(target, "CLOTHING_STRINGS.detail.messages.neverWorn"),
   "画像・服名・曜日付き着用情報表示、resolveImageUrl/no image フォールバック実装が不足しています",
 );
 
@@ -103,11 +116,23 @@ check(
 check(
   "CDS-07",
   "静的エクスポート向けに服詳細/編集ページの generateStaticParams が fixture 全件を返す",
-  includes(detailPageTarget, 'import { clothingDetailFixtures } from "@/mocks/fixtures/clothing";') &&
-    includes(detailPageTarget, "...clothingDetailFixtures.map((fixture) => fixture.clothingId),") &&
+  includes(
+    detailPageTarget,
+    'import { clothingDetailFixtures } from "@/mocks/fixtures/clothing";',
+  ) &&
+    includes(
+      detailPageTarget,
+      "...clothingDetailFixtures.map((fixture) => fixture.clothingId),",
+    ) &&
     includes(detailPageTarget, "wardrobeId: DEMO_IDS.wardrobe,") &&
-    includes(editPageTarget, 'import { clothingDetailFixtures } from "@/mocks/fixtures/clothing";') &&
-    includes(editPageTarget, "...clothingDetailFixtures.map((fixture) => fixture.clothingId),") &&
+    includes(
+      editPageTarget,
+      'import { clothingDetailFixtures } from "@/mocks/fixtures/clothing";',
+    ) &&
+    includes(
+      editPageTarget,
+      "...clothingDetailFixtures.map((fixture) => fixture.clothingId),",
+    ) &&
     includes(editPageTarget, "wardrobeId: DEMO_IDS.wardrobe,"),
   "detail/edit ページの静的パス生成が fixture 全件対応になっていません",
 );
@@ -116,10 +141,16 @@ check(
   "CDS-08",
   "追加直後の服ID（cl_mock_XXXX）向け静的パスを事前生成する",
   includes(detailPageTarget, 'const MOCK_CLOTHING_ID_PREFIX = "cl_mock_";') &&
-    includes(detailPageTarget, "const MOCK_CLOTHING_STATIC_PARAMS_COUNT = 200;") &&
+    includes(
+      detailPageTarget,
+      "const MOCK_CLOTHING_STATIC_PARAMS_COUNT = 200;",
+    ) &&
     includes(detailPageTarget, "...generateMockStaticClothingIds(),") &&
     includes(editPageTarget, 'const MOCK_CLOTHING_ID_PREFIX = "cl_mock_";') &&
-    includes(editPageTarget, "const MOCK_CLOTHING_STATIC_PARAMS_COUNT = 200;") &&
+    includes(
+      editPageTarget,
+      "const MOCK_CLOTHING_STATIC_PARAMS_COUNT = 200;",
+    ) &&
     includes(editPageTarget, "...generateMockStaticClothingIds(),"),
   "detail/edit ページの cl_mock 系静的パス事前生成が不足しています",
 );

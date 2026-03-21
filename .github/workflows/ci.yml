@@ -49,6 +49,9 @@ jobs:
       - name: UI foundation spec test
         run: pnpm --filter web test:ui-foundation
 
+      - name: ScreenCard removal spec test
+        run: pnpm --filter web test:screen-card-removal
+
       - name: Wardrobe create screen spec test
         run: pnpm --filter web test:wardrobe-create-screen
 

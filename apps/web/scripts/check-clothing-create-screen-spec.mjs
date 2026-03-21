@@ -48,10 +48,19 @@ check(
   "CCS-02",
   "服追加画面が client component で、追加mutationとフォーム状態を持つ",
   includes(target, '"use client";') &&
-    includes(target, 'import { useCreateClothingMutation } from "@/api/hooks/clothing";') &&
+    includes(
+      target,
+      'import { useCreateClothingMutation } from "@/api/hooks/clothing";',
+    ) &&
     includes(target, 'const [name, setName] = useState("");') &&
-    includes(target, "const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);") &&
-    includes(target, "const createMutation = useCreateClothingMutation(wardrobeId);"),
+    includes(
+      target,
+      "const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);",
+    ) &&
+    includes(
+      target,
+      "const createMutation = useCreateClothingMutation(wardrobeId);",
+    ),
   "client component化、useCreateClothingMutation、入力state実装が不足しています",
 );
 
@@ -87,9 +96,16 @@ check(
 check(
   "CCS-06",
   "服追加時はアップロード成功時の imageKey を保存payloadに設定する",
-  includes(target, "const uploadImage = async (file: File): Promise<string> => {") &&
-    includes(target, "const presigned = await uploadImageWithPresign(wardrobeId, \"clothing\", file);") &&
-    includes(target, "uploadedImageKey = await uploadImage(selectedImageFile);") &&
+  includes(
+    target,
+    "const uploadImage = async (file: File): Promise<string> => {",
+  ) &&
+    includes(target, "uploadImageWithPresign(") &&
+    includes(target, "presigned.imageKey") &&
+    includes(
+      target,
+      "uploadedImageKey = await uploadImage(selectedImageFile);",
+    ) &&
     includes(target, "imageKey: uploadedImageKey,"),
   "追加時の imageKey 設定が presign返却キー連携になっていません",
 );

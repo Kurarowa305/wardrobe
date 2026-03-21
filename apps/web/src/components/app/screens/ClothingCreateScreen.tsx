@@ -10,13 +10,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ROUTES } from "@/constants/routes";
 import { CLOTHING_STRINGS } from "@/features/clothing/strings";
-import { ScreenCard } from "./ScreenPrimitives";
 
 type ClothingCreateScreenProps = {
   wardrobeId: string;
 };
 
-export function ClothingCreateScreen({ wardrobeId }: ClothingCreateScreenProps) {
+export function ClothingCreateScreen({
+  wardrobeId,
+}: ClothingCreateScreenProps) {
   const router = useRouter();
   const [name, setName] = useState("");
   const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
@@ -50,7 +51,11 @@ export function ClothingCreateScreen({ wardrobeId }: ClothingCreateScreenProps) 
     setUploadError(null);
     setIsUploadingImage(true);
     try {
-      const presigned = await uploadImageWithPresign(wardrobeId, "clothing", file);
+      const presigned = await uploadImageWithPresign(
+        wardrobeId,
+        "clothing",
+        file,
+      );
       return presigned.imageKey;
     } catch (error) {
       setUploadError(CLOTHING_STRINGS.create.messages.uploadError);
@@ -105,9 +110,12 @@ export function ClothingCreateScreen({ wardrobeId }: ClothingCreateScreenProps) 
   };
 
   const content = (
-    <ScreenCard>
+    <div className="grid gap-2 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
       <form className="grid gap-3" onSubmit={handleSubmit} noValidate>
-        <label className="grid gap-1 text-sm font-medium text-slate-900" htmlFor="clothing-image-file">
+        <label
+          className="grid gap-1 text-sm font-medium text-slate-900"
+          htmlFor="clothing-image-file"
+        >
           <span>{CLOTHING_STRINGS.create.labels.imageFile}</span>
           <Input
             id="clothing-image-file"
@@ -128,15 +136,24 @@ export function ClothingCreateScreen({ wardrobeId }: ClothingCreateScreenProps) 
               alt={CLOTHING_STRINGS.create.messages.previewAlt}
               className="h-40 w-full rounded-md border border-slate-200 object-cover"
             />
-            <Button type="button" variant="outline" onClick={clearSelectedImage}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={clearSelectedImage}
+            >
               {CLOTHING_STRINGS.create.actions.clearImage}
             </Button>
           </div>
         ) : (
-          <p className="m-0 text-sm text-slate-600">{CLOTHING_STRINGS.create.messages.noPreview}</p>
+          <p className="m-0 text-sm text-slate-600">
+            {CLOTHING_STRINGS.create.messages.noPreview}
+          </p>
         )}
 
-        <label className="grid gap-1 text-sm font-medium text-slate-900" htmlFor="clothing-name">
+        <label
+          className="grid gap-1 text-sm font-medium text-slate-900"
+          htmlFor="clothing-name"
+        >
           <span>{CLOTHING_STRINGS.create.labels.name}</span>
           <Input
             id="clothing-name"
@@ -159,19 +176,30 @@ export function ClothingCreateScreen({ wardrobeId }: ClothingCreateScreenProps) 
         ) : null}
 
         {createMutation.isError ? (
-          <p className="m-0 text-sm text-red-700">{CLOTHING_STRINGS.create.messages.submitError}</p>
+          <p className="m-0 text-sm text-red-700">
+            {CLOTHING_STRINGS.create.messages.submitError}
+          </p>
         ) : null}
 
         {uploadError ? (
           <div className="grid gap-2">
             <p className="m-0 text-sm text-red-700">{uploadError}</p>
-            <Button type="button" variant="outline" onClick={handleRetryUpload} disabled={isUploadingImage}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleRetryUpload}
+              disabled={isUploadingImage}
+            >
               {CLOTHING_STRINGS.create.actions.retryUpload}
             </Button>
           </div>
         ) : null}
 
-        <Button type="submit" className="w-full text-sm font-medium" disabled={isNameEmpty || isPending}>
+        <Button
+          type="submit"
+          className="w-full text-sm font-medium"
+          disabled={isNameEmpty || isPending}
+        >
           {isUploadingImage ? (
             <span className="inline-flex items-center gap-2">
               <span
@@ -187,7 +215,7 @@ export function ClothingCreateScreen({ wardrobeId }: ClothingCreateScreenProps) 
           )}
         </Button>
       </form>
-    </ScreenCard>
+    </div>
   );
 
   return createElement(AppLayout, {

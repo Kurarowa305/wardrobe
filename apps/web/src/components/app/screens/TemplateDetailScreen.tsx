@@ -11,7 +11,6 @@ import { resolveImageUrl } from "@/features/clothing/imageUrl";
 import { formatLastWornDate } from "@/features/history/date";
 import { TEMPLATE_STRINGS } from "@/features/template/strings";
 import { isAppError } from "@/lib/error/normalize";
-import { ScreenCard } from "./ScreenPrimitives";
 
 type TemplateDetailScreenProps = {
   wardrobeId: string;
@@ -26,7 +25,10 @@ function resolveErrorMessage(error: unknown): string {
   return TEMPLATE_STRINGS.detail.messages.error;
 }
 
-export function TemplateDetailScreen({ wardrobeId, templateId }: TemplateDetailScreenProps) {
+export function TemplateDetailScreen({
+  wardrobeId,
+  templateId,
+}: TemplateDetailScreenProps) {
   const router = useRouter();
   const { toast } = useToast();
   const templateQuery = useTemplate(wardrobeId, templateId);
@@ -52,21 +54,29 @@ export function TemplateDetailScreen({ wardrobeId, templateId }: TemplateDetailS
   };
 
   const content = (
-    <ScreenCard>
+    <div className="grid gap-2 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
       {templateQuery.isPending ? (
-        <p className="m-0 text-sm text-slate-600">{TEMPLATE_STRINGS.detail.messages.loading}</p>
+        <p className="m-0 text-sm text-slate-600">
+          {TEMPLATE_STRINGS.detail.messages.loading}
+        </p>
       ) : null}
 
       {templateQuery.isError ? (
-        <p className="m-0 text-sm text-red-700">{resolveErrorMessage(templateQuery.error)}</p>
+        <p className="m-0 text-sm text-red-700">
+          {resolveErrorMessage(templateQuery.error)}
+        </p>
       ) : null}
 
       {templateQuery.data ? (
         <>
           <div className="grid gap-1">
-            <p className="m-0 text-lg font-semibold text-slate-900">{templateQuery.data.name}</p>
+            <p className="m-0 text-lg font-semibold text-slate-900">
+              {templateQuery.data.name}
+            </p>
             {templateQuery.data.deleted ? (
-              <p className="m-0 text-sm font-medium text-amber-700">{TEMPLATE_STRINGS.detail.messages.deleted}</p>
+              <p className="m-0 text-sm font-medium text-amber-700">
+                {TEMPLATE_STRINGS.detail.messages.deleted}
+              </p>
             ) : null}
           </div>
 
@@ -75,18 +85,27 @@ export function TemplateDetailScreen({ wardrobeId, templateId }: TemplateDetailS
               <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">
                 {TEMPLATE_STRINGS.detail.labels.wearCount}
               </dt>
-              <dd className="m-0 text-sm text-slate-900">{templateQuery.data.wearCount}</dd>
+              <dd className="m-0 text-sm text-slate-900">
+                {templateQuery.data.wearCount}
+              </dd>
             </div>
             <div className="grid gap-1">
               <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">
                 {TEMPLATE_STRINGS.detail.labels.lastWornAt}
               </dt>
-              <dd className="m-0 text-sm text-slate-900">{formatLastWornDate(templateQuery.data.lastWornAt, TEMPLATE_STRINGS.detail.messages.neverWorn)}</dd>
+              <dd className="m-0 text-sm text-slate-900">
+                {formatLastWornDate(
+                  templateQuery.data.lastWornAt,
+                  TEMPLATE_STRINGS.detail.messages.neverWorn,
+                )}
+              </dd>
             </div>
           </dl>
 
           <div className="grid gap-2">
-            <p className="m-0 text-sm font-medium text-slate-900">{TEMPLATE_STRINGS.detail.labels.clothingItems}</p>
+            <p className="m-0 text-sm font-medium text-slate-900">
+              {TEMPLATE_STRINGS.detail.labels.clothingItems}
+            </p>
             <ul className="m-0 grid list-none gap-2 p-0">
               {templateQuery.data.clothingItems.map((item) => {
                 const imageUrl = resolveImageUrl(item.imageKey);
@@ -107,17 +126,23 @@ export function TemplateDetailScreen({ wardrobeId, templateId }: TemplateDetailS
                       )}
 
                       <div className="grid gap-1">
-                        <p className="m-0 text-sm font-medium text-slate-900">{item.name}</p>
+                        <p className="m-0 text-sm font-medium text-slate-900">
+                          {item.name}
+                        </p>
                         {item.deleted ? (
                           <p className="m-0 text-xs font-medium text-amber-700">
                             {TEMPLATE_STRINGS.detail.messages.clothingDeleted}
                           </p>
                         ) : null}
                         <p className="m-0 text-xs text-slate-600">
-                          {TEMPLATE_STRINGS.detail.labels.clothingWearCount}: {item.wearCount}
+                          {TEMPLATE_STRINGS.detail.labels.clothingWearCount}:{" "}
+                          {item.wearCount}
                         </p>
                         <p className="m-0 text-xs text-slate-600">
-                          {formatLastWornDate(item.lastWornAt, TEMPLATE_STRINGS.detail.messages.neverWorn)}
+                          {formatLastWornDate(
+                            item.lastWornAt,
+                            TEMPLATE_STRINGS.detail.messages.neverWorn,
+                          )}
                         </p>
                       </div>
                     </div>
@@ -128,7 +153,7 @@ export function TemplateDetailScreen({ wardrobeId, templateId }: TemplateDetailS
           </div>
         </>
       ) : null}
-    </ScreenCard>
+    </div>
   );
 
   return createElement(AppLayout, {
@@ -145,7 +170,10 @@ export function TemplateDetailScreen({ wardrobeId, templateId }: TemplateDetailS
         key: "delete",
         label: TEMPLATE_STRINGS.detail.menu.delete,
         onSelect: handleDelete,
-        disabled: !templateQuery.data || templateQuery.data.deleted || deleteMutation.isPending,
+        disabled:
+          !templateQuery.data ||
+          templateQuery.data.deleted ||
+          deleteMutation.isPending,
       },
     ],
     children: content,

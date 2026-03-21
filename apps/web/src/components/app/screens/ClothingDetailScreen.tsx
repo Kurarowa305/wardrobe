@@ -12,7 +12,6 @@ import { resolveImageUrl } from "@/features/clothing/imageUrl";
 import { CLOTHING_STRINGS } from "@/features/clothing/strings";
 import { formatLastWornDate } from "@/features/history/date";
 import { isAppError } from "@/lib/error/normalize";
-import { ScreenCard } from "./ScreenPrimitives";
 
 type ClothingDetailScreenProps = {
   wardrobeId: string;
@@ -27,7 +26,10 @@ function resolveErrorMessage(error: unknown): string {
   return CLOTHING_STRINGS.detail.messages.error;
 }
 
-export function ClothingDetailScreen({ wardrobeId, clothingId }: ClothingDetailScreenProps) {
+export function ClothingDetailScreen({
+  wardrobeId,
+  clothingId,
+}: ClothingDetailScreenProps) {
   const router = useRouter();
   const { toast } = useToast();
   const clothingQuery = useClothing(wardrobeId, clothingId);
@@ -54,13 +56,17 @@ export function ClothingDetailScreen({ wardrobeId, clothingId }: ClothingDetailS
   };
 
   const content = (
-    <ScreenCard>
+    <div className="grid gap-2 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
       {clothingQuery.isPending ? (
-        <p className="m-0 text-sm text-slate-600">{CLOTHING_STRINGS.detail.messages.loading}</p>
+        <p className="m-0 text-sm text-slate-600">
+          {CLOTHING_STRINGS.detail.messages.loading}
+        </p>
       ) : null}
 
       {clothingQuery.isError ? (
-        <p className="m-0 text-sm text-red-700">{resolveErrorMessage(clothingQuery.error)}</p>
+        <p className="m-0 text-sm text-red-700">
+          {resolveErrorMessage(clothingQuery.error)}
+        </p>
       ) : null}
 
       {clothingQuery.data ? (
@@ -77,9 +83,13 @@ export function ClothingDetailScreen({ wardrobeId, clothingId }: ClothingDetailS
             </div>
           )}
           <div className="grid gap-1">
-            <p className="m-0 text-base font-semibold text-slate-900">{clothingQuery.data.name}</p>
+            <p className="m-0 text-base font-semibold text-slate-900">
+              {clothingQuery.data.name}
+            </p>
             {clothingQuery.data.deleted ? (
-              <p className="m-0 text-sm font-medium text-amber-700">{CLOTHING_STRINGS.detail.messages.deleted}</p>
+              <p className="m-0 text-sm font-medium text-amber-700">
+                {CLOTHING_STRINGS.detail.messages.deleted}
+              </p>
             ) : null}
           </div>
 
@@ -88,18 +98,25 @@ export function ClothingDetailScreen({ wardrobeId, clothingId }: ClothingDetailS
               <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">
                 {CLOTHING_STRINGS.detail.labels.wearCount}
               </dt>
-              <dd className="m-0 text-sm text-slate-900">{clothingQuery.data.wearCount}</dd>
+              <dd className="m-0 text-sm text-slate-900">
+                {clothingQuery.data.wearCount}
+              </dd>
             </div>
             <div className="grid gap-1">
               <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">
                 {CLOTHING_STRINGS.detail.labels.lastWornAt}
               </dt>
-              <dd className="m-0 text-sm text-slate-900">{formatLastWornDate(clothingQuery.data.lastWornAt, CLOTHING_STRINGS.detail.messages.neverWorn)}</dd>
+              <dd className="m-0 text-sm text-slate-900">
+                {formatLastWornDate(
+                  clothingQuery.data.lastWornAt,
+                  CLOTHING_STRINGS.detail.messages.neverWorn,
+                )}
+              </dd>
             </div>
           </dl>
         </>
       ) : null}
-    </ScreenCard>
+    </div>
   );
 
   return createElement(AppLayout, {
@@ -116,7 +133,10 @@ export function ClothingDetailScreen({ wardrobeId, clothingId }: ClothingDetailS
         key: "delete",
         label: CLOTHING_STRINGS.detail.menu.delete,
         onSelect: handleDelete,
-        disabled: !clothingQuery.data || clothingQuery.data.deleted || deleteMutation.isPending,
+        disabled:
+          !clothingQuery.data ||
+          clothingQuery.data.deleted ||
+          deleteMutation.isPending,
       },
     ],
     children: content,

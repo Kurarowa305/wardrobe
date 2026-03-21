@@ -11,7 +11,6 @@ import { Input } from "@/components/ui/input";
 import { ROUTES } from "@/constants/routes";
 import { CLOTHING_STRINGS } from "@/features/clothing/strings";
 import { isAppError } from "@/lib/error/normalize";
-import { ScreenCard } from "./ScreenPrimitives";
 
 type ClothingEditScreenProps = {
   wardrobeId: string;
@@ -26,7 +25,10 @@ function resolveErrorMessage(error: unknown): string {
   return CLOTHING_STRINGS.edit.messages.loadError;
 }
 
-export function ClothingEditScreen({ wardrobeId, clothingId }: ClothingEditScreenProps) {
+export function ClothingEditScreen({
+  wardrobeId,
+  clothingId,
+}: ClothingEditScreenProps) {
   const router = useRouter();
   const clothingQuery = useClothing(wardrobeId, clothingId);
   const updateMutation = useUpdateClothingMutation(wardrobeId, clothingId);
@@ -71,7 +73,11 @@ export function ClothingEditScreen({ wardrobeId, clothingId }: ClothingEditScree
     setUploadError(null);
     setIsUploadingImage(true);
     try {
-      const presigned = await uploadImageWithPresign(wardrobeId, "clothing", file);
+      const presigned = await uploadImageWithPresign(
+        wardrobeId,
+        "clothing",
+        file,
+      );
       return presigned.imageKey;
     } catch (error) {
       setUploadError(CLOTHING_STRINGS.edit.messages.uploadError);
@@ -126,18 +132,25 @@ export function ClothingEditScreen({ wardrobeId, clothingId }: ClothingEditScree
   };
 
   const content = (
-    <ScreenCard>
+    <div className="grid gap-2 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
       {clothingQuery.isPending ? (
-        <p className="m-0 text-sm text-slate-600">{CLOTHING_STRINGS.edit.messages.loading}</p>
+        <p className="m-0 text-sm text-slate-600">
+          {CLOTHING_STRINGS.edit.messages.loading}
+        </p>
       ) : null}
 
       {clothingQuery.isError ? (
-        <p className="m-0 text-sm text-red-700">{resolveErrorMessage(clothingQuery.error)}</p>
+        <p className="m-0 text-sm text-red-700">
+          {resolveErrorMessage(clothingQuery.error)}
+        </p>
       ) : null}
 
       {clothingQuery.data ? (
         <form className="grid gap-3" onSubmit={handleSubmit} noValidate>
-          <label className="grid gap-1 text-sm font-medium text-slate-900" htmlFor="clothing-image-file">
+          <label
+            className="grid gap-1 text-sm font-medium text-slate-900"
+            htmlFor="clothing-image-file"
+          >
             <span>{CLOTHING_STRINGS.edit.labels.imageFile}</span>
             <Input
               id="clothing-image-file"
@@ -158,15 +171,24 @@ export function ClothingEditScreen({ wardrobeId, clothingId }: ClothingEditScree
                 alt={CLOTHING_STRINGS.edit.messages.previewAlt}
                 className="h-40 w-full rounded-md border border-slate-200 object-cover"
               />
-              <Button type="button" variant="outline" onClick={clearSelectedImage}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={clearSelectedImage}
+              >
                 {CLOTHING_STRINGS.edit.actions.clearImage}
               </Button>
             </div>
           ) : (
-            <p className="m-0 text-sm text-slate-600">{CLOTHING_STRINGS.edit.messages.noPreview}</p>
+            <p className="m-0 text-sm text-slate-600">
+              {CLOTHING_STRINGS.edit.messages.noPreview}
+            </p>
           )}
 
-          <label className="grid gap-1 text-sm font-medium text-slate-900" htmlFor="clothing-name">
+          <label
+            className="grid gap-1 text-sm font-medium text-slate-900"
+            htmlFor="clothing-name"
+          >
             <span>{CLOTHING_STRINGS.edit.labels.name}</span>
             <Input
               id="clothing-name"
@@ -178,7 +200,9 @@ export function ClothingEditScreen({ wardrobeId, clothingId }: ClothingEditScree
               placeholder={CLOTHING_STRINGS.edit.placeholders.name}
               autoComplete="off"
               aria-invalid={showNameError}
-              aria-describedby={showNameError ? "clothing-name-error" : undefined}
+              aria-describedby={
+                showNameError ? "clothing-name-error" : undefined
+              }
             />
           </label>
 
@@ -189,19 +213,30 @@ export function ClothingEditScreen({ wardrobeId, clothingId }: ClothingEditScree
           ) : null}
 
           {updateMutation.isError ? (
-            <p className="m-0 text-sm text-red-700">{CLOTHING_STRINGS.edit.messages.submitError}</p>
+            <p className="m-0 text-sm text-red-700">
+              {CLOTHING_STRINGS.edit.messages.submitError}
+            </p>
           ) : null}
 
           {uploadError ? (
             <div className="grid gap-2">
               <p className="m-0 text-sm text-red-700">{uploadError}</p>
-              <Button type="button" variant="outline" onClick={handleRetryUpload} disabled={isUploadingImage}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleRetryUpload}
+                disabled={isUploadingImage}
+              >
                 {CLOTHING_STRINGS.edit.actions.retryUpload}
               </Button>
             </div>
           ) : null}
 
-          <Button type="submit" className="w-full text-sm font-medium" disabled={isNameEmpty || isPending}>
+          <Button
+            type="submit"
+            className="w-full text-sm font-medium"
+            disabled={isNameEmpty || isPending}
+          >
             {isUploadingImage ? (
               <span className="inline-flex items-center gap-2">
                 <span
@@ -218,7 +253,7 @@ export function ClothingEditScreen({ wardrobeId, clothingId }: ClothingEditScree
           </Button>
         </form>
       ) : null}
-    </ScreenCard>
+    </div>
   );
 
   return createElement(AppLayout, {

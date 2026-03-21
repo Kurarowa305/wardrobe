@@ -30,13 +30,19 @@ const target = "src/components/app/screens/TemplateDetailScreen.tsx";
 const stringsTarget = "src/features/template/strings.ts";
 const hasTemplateHookImport =
   includes(target, 'import { useTemplate } from "@/api/hooks/template";') ||
-  includes(target, 'import { useDeleteTemplateMutation, useTemplate } from "@/api/hooks/template";');
+  includes(
+    target,
+    'import { useDeleteTemplateMutation, useTemplate } from "@/api/hooks/template";',
+  );
 
 check(
   "TDS-01",
   "TemplateDetailScreen が useTemplate でテンプレ詳細を取得し、ロード/エラー状態を表示する",
   hasTemplateHookImport &&
-    includes(target, "const templateQuery = useTemplate(wardrobeId, templateId);") &&
+    includes(
+      target,
+      "const templateQuery = useTemplate(wardrobeId, templateId);",
+    ) &&
     includes(target, "templateQuery.isPending") &&
     includes(target, "templateQuery.isError") &&
     includes(target, "resolveErrorMessage(templateQuery.error)"),
@@ -52,7 +58,9 @@ check(
     includes(target, "TEMPLATE_STRINGS.detail.labels.clothingItems") &&
     includes(target, "templateQuery.data.clothingItems.map((item) => {") &&
     includes(target, "item.wearCount") &&
-    includes(target, "formatLastWornDate(item.lastWornAt, TEMPLATE_STRINGS.detail.messages.neverWorn)"),
+    includes(target, "formatLastWornDate(") &&
+    includes(target, "item.lastWornAt") &&
+    includes(target, "TEMPLATE_STRINGS.detail.messages.neverWorn"),
   "テンプレ詳細の主要表示項目または曜日付き構成アイテム一覧が不足しています",
 );
 
@@ -60,8 +68,11 @@ check(
   "TDS-03",
   "構成アイテムが非リンク表示で、画像/プレースホルダ/削除済み表示に対応する",
   !includes(target, "ROUTES.clothingDetail(wardrobeId, item.clothingId)") &&
-    !includes(target, "import Link from \"next/link\";") &&
-    includes(target, 'import { resolveImageUrl } from "@/features/clothing/imageUrl";') &&
+    !includes(target, 'import Link from "next/link";') &&
+    includes(
+      target,
+      'import { resolveImageUrl } from "@/features/clothing/imageUrl";',
+    ) &&
     includes(target, "const imageUrl = resolveImageUrl(item.imageKey);") &&
     includes(target, "COMMON_STRINGS.placeholders.noImage") &&
     includes(target, "TEMPLATE_STRINGS.detail.messages.clothingDeleted"),
@@ -74,7 +85,10 @@ check(
   includes(target, "headerActions:") &&
     includes(target, "TEMPLATE_STRINGS.detail.menu.edit") &&
     includes(target, "TEMPLATE_STRINGS.detail.menu.delete") &&
-    includes(target, "disabled: !templateQuery.data || templateQuery.data.deleted"),
+    includes(
+      target,
+      "disabled: !templateQuery.data || templateQuery.data.deleted",
+    ),
   "ヘッダーメニューまたは削除済みテンプレート時の無効化が不足しています",
 );
 
@@ -84,7 +98,10 @@ check(
   includes(stringsTarget, 'wearCount: "着た回数"') &&
     includes(stringsTarget, 'lastWornAt: "最後に着た日"') &&
     includes(stringsTarget, 'clothingItems: "構成アイテム"') &&
-    includes(stringsTarget, 'error: "テンプレート詳細の読み込みに失敗しました。"') &&
+    includes(
+      stringsTarget,
+      'error: "テンプレート詳細の読み込みに失敗しました。"',
+    ) &&
     includes(stringsTarget, 'clothingDeleted: "削除済みの服です"') &&
     includes(stringsTarget, 'neverWorn: "未着用"'),
   "詳細画面向け文言の定義が不足しています",

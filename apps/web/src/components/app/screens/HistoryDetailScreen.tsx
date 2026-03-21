@@ -13,7 +13,6 @@ import { resolveHistoryDetailBackHref } from "@/features/history/routing";
 import { formatHistoryDate } from "@/features/history/date";
 import { HISTORY_STRINGS } from "@/features/history/strings";
 import { isAppError } from "@/lib/error/normalize";
-import { ScreenCard } from "./ScreenPrimitives";
 
 type HistoryDetailScreenProps = {
   wardrobeId: string;
@@ -34,7 +33,11 @@ function resolveErrorMessage(error: unknown): string {
   return HISTORY_STRINGS.detail.messages.error;
 }
 
-function HistoryDetailScreenContent({ wardrobeId, historyId, backHref }: HistoryDetailScreenContentProps) {
+function HistoryDetailScreenContent({
+  wardrobeId,
+  historyId,
+  backHref,
+}: HistoryDetailScreenContentProps) {
   const router = useRouter();
   const { toast } = useToast();
   const historyQuery = useHistory(wardrobeId, historyId);
@@ -61,13 +64,17 @@ ${COMMON_STRINGS.dialogs.confirmDelete.message}`,
   };
 
   const content = (
-    <ScreenCard>
+    <div className="grid gap-2 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
       {historyQuery.isPending ? (
-        <p className="m-0 text-sm text-slate-600">{HISTORY_STRINGS.detail.messages.loading}</p>
+        <p className="m-0 text-sm text-slate-600">
+          {HISTORY_STRINGS.detail.messages.loading}
+        </p>
       ) : null}
 
       {historyQuery.isError ? (
-        <p className="m-0 text-sm text-red-700">{resolveErrorMessage(historyQuery.error)}</p>
+        <p className="m-0 text-sm text-red-700">
+          {resolveErrorMessage(historyQuery.error)}
+        </p>
       ) : null}
 
       {historyQuery.data ? (
@@ -77,7 +84,9 @@ ${COMMON_STRINGS.dialogs.confirmDelete.message}`,
               <p className="m-0 text-xs font-medium uppercase tracking-wide text-slate-500">
                 {HISTORY_STRINGS.detail.labels.date}
               </p>
-              <p className="m-0 text-base font-semibold text-slate-900">{formatHistoryDate(historyQuery.data.date)}</p>
+              <p className="m-0 text-base font-semibold text-slate-900">
+                {formatHistoryDate(historyQuery.data.date)}
+              </p>
             </div>
 
             <div className="grid gap-1">
@@ -92,18 +101,25 @@ ${COMMON_STRINGS.dialogs.confirmDelete.message}`,
 
           {historyQuery.data.template ? (
             <div className="grid gap-2">
-              <p className="m-0 text-sm font-medium text-slate-900">{HISTORY_STRINGS.detail.labels.template}</p>
+              <p className="m-0 text-sm font-medium text-slate-900">
+                {HISTORY_STRINGS.detail.labels.template}
+              </p>
               <div className="grid gap-1 rounded-md border border-slate-200 bg-white p-3">
-                <p className="m-0 text-sm font-medium text-slate-900">{historyQuery.data.template.name}</p>
+                <p className="m-0 text-sm font-medium text-slate-900">
+                  {historyQuery.data.template.name}
+                </p>
                 <p className="m-0 text-xs text-slate-600">
-                  {HISTORY_STRINGS.detail.labels.templateWearCount}: {historyQuery.data.template.wearCount}
+                  {HISTORY_STRINGS.detail.labels.templateWearCount}:{" "}
+                  {historyQuery.data.template.wearCount}
                 </p>
               </div>
             </div>
           ) : null}
 
           <div className="grid gap-2">
-            <p className="m-0 text-sm font-medium text-slate-900">{HISTORY_STRINGS.detail.labels.clothingItems}</p>
+            <p className="m-0 text-sm font-medium text-slate-900">
+              {HISTORY_STRINGS.detail.labels.clothingItems}
+            </p>
             <ul className="m-0 grid list-none gap-2 p-0">
               {historyQuery.data.clothingItems.map((item) => {
                 const imageUrl = resolveImageUrl(item.imageKey);
@@ -124,14 +140,17 @@ ${COMMON_STRINGS.dialogs.confirmDelete.message}`,
                       )}
 
                       <div className="grid gap-1">
-                        <p className="m-0 text-sm font-medium text-slate-900">{item.name}</p>
+                        <p className="m-0 text-sm font-medium text-slate-900">
+                          {item.name}
+                        </p>
                         {item.deleted ? (
                           <p className="m-0 text-xs font-medium text-amber-700">
                             {HISTORY_STRINGS.detail.messages.clothingDeleted}
                           </p>
                         ) : null}
                         <p className="m-0 text-xs text-slate-600">
-                          {HISTORY_STRINGS.detail.labels.clothingWearCount}: {item.wearCount}
+                          {HISTORY_STRINGS.detail.labels.clothingWearCount}:{" "}
+                          {item.wearCount}
                         </p>
                       </div>
                     </div>
@@ -142,7 +161,7 @@ ${COMMON_STRINGS.dialogs.confirmDelete.message}`,
           </div>
         </>
       ) : null}
-    </ScreenCard>
+    </div>
   );
 
   return createElement(AppLayout, {
@@ -160,14 +179,29 @@ ${COMMON_STRINGS.dialogs.confirmDelete.message}`,
   });
 }
 
-function HistoryDetailScreenSearchParams({ wardrobeId, historyId }: HistoryDetailScreenProps) {
+function HistoryDetailScreenSearchParams({
+  wardrobeId,
+  historyId,
+}: HistoryDetailScreenProps) {
   const searchParams = useSearchParams();
-  const backHref = resolveHistoryDetailBackHref(wardrobeId, searchParams.get("from"));
+  const backHref = resolveHistoryDetailBackHref(
+    wardrobeId,
+    searchParams.get("from"),
+  );
 
-  return <HistoryDetailScreenContent wardrobeId={wardrobeId} historyId={historyId} backHref={backHref} />;
+  return (
+    <HistoryDetailScreenContent
+      wardrobeId={wardrobeId}
+      historyId={historyId}
+      backHref={backHref}
+    />
+  );
 }
 
-export function HistoryDetailScreen({ wardrobeId, historyId }: HistoryDetailScreenProps) {
+export function HistoryDetailScreen({
+  wardrobeId,
+  historyId,
+}: HistoryDetailScreenProps) {
   return (
     <Suspense
       fallback={
@@ -178,7 +212,10 @@ export function HistoryDetailScreen({ wardrobeId, historyId }: HistoryDetailScre
         />
       }
     >
-      <HistoryDetailScreenSearchParams wardrobeId={wardrobeId} historyId={historyId} />
+      <HistoryDetailScreenSearchParams
+        wardrobeId={wardrobeId}
+        historyId={historyId}
+      />
     </Suspense>
   );
 }

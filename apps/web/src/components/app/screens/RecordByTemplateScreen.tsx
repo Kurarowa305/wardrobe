@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { useCreateHistoryMutation } from "@/api/hooks/history";
 import { useTemplateList } from "@/api/hooks/template";
 import { AppLayout } from "@/components/app/layout/AppLayout";
-import { ScreenCard } from "@/components/app/screens/ScreenPrimitives";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ROUTES } from "@/constants/routes";
@@ -32,7 +31,9 @@ function toHistoryApiDate(dateInputValue: string) {
   return dateInputValue.replaceAll("-", "");
 }
 
-export function RecordByTemplateScreen({ wardrobeId }: RecordByTemplateScreenProps) {
+export function RecordByTemplateScreen({
+  wardrobeId,
+}: RecordByTemplateScreenProps) {
   const router = useRouter();
   const createHistoryMutation = useCreateHistoryMutation(wardrobeId);
 
@@ -78,9 +79,13 @@ export function RecordByTemplateScreen({ wardrobeId }: RecordByTemplateScreenPro
     setNextCursor(templateListQuery.data.nextCursor);
   }, [templateListQuery.data, cursor]);
 
-  const templateItems = useMemo(() => pages.flatMap((page) => page.items), [pages]);
+  const templateItems = useMemo(
+    () => pages.flatMap((page) => page.items),
+    [pages],
+  );
   const templateItemsById = useMemo(
-    () => new Map(templateItems.map((item) => [item.templateId, item] as const)),
+    () =>
+      new Map(templateItems.map((item) => [item.templateId, item] as const)),
     [templateItems],
   );
   const selectedTemplate = useMemo(
@@ -97,7 +102,8 @@ export function RecordByTemplateScreen({ wardrobeId }: RecordByTemplateScreenPro
   const showTemplateError = templateTouched && isTemplateEmpty;
   const showTemplateLoading = templateListQuery.isPending && !hasTemplateItems;
   const showTemplateLoadError = templateListQuery.isError && !hasTemplateItems;
-  const showTemplateEmpty = !showTemplateLoading && !showTemplateLoadError && !hasTemplateItems;
+  const showTemplateEmpty =
+    !showTemplateLoading && !showTemplateLoadError && !hasTemplateItems;
   const canLoadMore = nextCursor !== null && !templateListQuery.isFetching;
   const isSubmitting = createHistoryMutation.isPending;
 
@@ -127,10 +133,16 @@ export function RecordByTemplateScreen({ wardrobeId }: RecordByTemplateScreenPro
   };
 
   return (
-    <AppLayout title={RECORD_STRINGS.byTemplate.title} backHref={ROUTES.recordMethod(wardrobeId)}>
-      <ScreenCard>
+    <AppLayout
+      title={RECORD_STRINGS.byTemplate.title}
+      backHref={ROUTES.recordMethod(wardrobeId)}
+    >
+      <div className="grid gap-2 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
         <form className="grid gap-3" onSubmit={handleSubmit} noValidate>
-          <label className="grid gap-1 text-sm font-medium text-slate-900" htmlFor="record-template-date">
+          <label
+            className="grid gap-1 text-sm font-medium text-slate-900"
+            htmlFor="record-template-date"
+          >
             <span>{RECORD_STRINGS.byTemplate.labels.date}</span>
             <Input
               id="record-template-date"
@@ -140,12 +152,17 @@ export function RecordByTemplateScreen({ wardrobeId }: RecordByTemplateScreenPro
               onBlur={() => setDateTouched(true)}
               onChange={(event) => setDate(event.target.value)}
               aria-invalid={showDateError}
-              aria-describedby={showDateError ? "record-template-date-error" : undefined}
+              aria-describedby={
+                showDateError ? "record-template-date-error" : undefined
+              }
             />
           </label>
 
           {showDateError ? (
-            <p id="record-template-date-error" className="m-0 text-sm text-red-700">
+            <p
+              id="record-template-date-error"
+              className="m-0 text-sm text-red-700"
+            >
               {RECORD_STRINGS.byTemplate.messages.dateRequired}
             </p>
           ) : null}
@@ -156,15 +173,21 @@ export function RecordByTemplateScreen({ wardrobeId }: RecordByTemplateScreenPro
             </legend>
 
             {showTemplateLoading ? (
-              <p className="m-0 text-sm text-slate-600">{RECORD_STRINGS.byTemplate.messages.loading}</p>
+              <p className="m-0 text-sm text-slate-600">
+                {RECORD_STRINGS.byTemplate.messages.loading}
+              </p>
             ) : null}
 
             {showTemplateLoadError ? (
-              <p className="m-0 text-sm text-red-700">{RECORD_STRINGS.byTemplate.messages.loadError}</p>
+              <p className="m-0 text-sm text-red-700">
+                {RECORD_STRINGS.byTemplate.messages.loadError}
+              </p>
             ) : null}
 
             {showTemplateEmpty ? (
-              <p className="m-0 text-sm text-slate-600">{RECORD_STRINGS.byTemplate.messages.empty}</p>
+              <p className="m-0 text-sm text-slate-600">
+                {RECORD_STRINGS.byTemplate.messages.empty}
+              </p>
             ) : null}
 
             {selectedTemplate ? (
@@ -205,7 +228,12 @@ export function RecordByTemplateScreen({ wardrobeId }: RecordByTemplateScreenPro
             ) : null}
 
             {nextCursor !== null ? (
-              <Button type="button" variant="secondary" onClick={handleLoadMore} disabled={!canLoadMore}>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={handleLoadMore}
+                disabled={!canLoadMore}
+              >
                 {templateListQuery.isFetching
                   ? RECORD_STRINGS.byTemplate.messages.loading
                   : RECORD_STRINGS.byTemplate.actions.loadMore}
@@ -220,7 +248,9 @@ export function RecordByTemplateScreen({ wardrobeId }: RecordByTemplateScreenPro
           ) : null}
 
           {createHistoryMutation.isError ? (
-            <p className="m-0 text-sm text-red-700">{RECORD_STRINGS.byTemplate.messages.submitError}</p>
+            <p className="m-0 text-sm text-red-700">
+              {RECORD_STRINGS.byTemplate.messages.submitError}
+            </p>
           ) : null}
 
           <Button
@@ -233,7 +263,7 @@ export function RecordByTemplateScreen({ wardrobeId }: RecordByTemplateScreenPro
               : RECORD_STRINGS.byTemplate.actions.submit}
           </Button>
         </form>
-      </ScreenCard>
+      </div>
     </AppLayout>
   );
 }

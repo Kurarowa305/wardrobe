@@ -47,9 +47,18 @@ check(
 check(
   "CES-02",
   "服編集画面が useClothing と useUpdateClothingMutation を利用する",
-  includes(target, 'import { useClothing, useUpdateClothingMutation } from "@/api/hooks/clothing";') &&
-    includes(target, "const clothingQuery = useClothing(wardrobeId, clothingId);") &&
-    includes(target, "const updateMutation = useUpdateClothingMutation(wardrobeId, clothingId);"),
+  includes(
+    target,
+    'import { useClothing, useUpdateClothingMutation } from "@/api/hooks/clothing";',
+  ) &&
+    includes(
+      target,
+      "const clothingQuery = useClothing(wardrobeId, clothingId);",
+    ) &&
+    includes(
+      target,
+      "const updateMutation = useUpdateClothingMutation(wardrobeId, clothingId);",
+    ),
   "既存値取得または更新mutation連携が不足しています",
 );
 
@@ -85,7 +94,10 @@ check(
   "CES-06",
   "更新成功時に詳細画面へ遷移する",
   includes(target, "await updateMutation.mutateAsync({") &&
-    includes(target, "router.push(ROUTES.clothingDetail(wardrobeId, clothingId));"),
+    includes(
+      target,
+      "router.push(ROUTES.clothingDetail(wardrobeId, clothingId));",
+    ),
   "更新成功後の詳細遷移（router.push）が不足しています",
 );
 
@@ -93,7 +105,10 @@ check(
   "CES-07",
   "服編集画面向け文言が clothing strings に定義される",
   includes(stringsTarget, 'loading: "読み込み中..."') &&
-    includes(stringsTarget, 'loadError: "服編集画面の読み込みに失敗しました。"') &&
+    includes(
+      stringsTarget,
+      'loadError: "服編集画面の読み込みに失敗しました。"',
+    ) &&
     includes(stringsTarget, 'nameRequired: "服の名前を入力してください。"') &&
     includes(stringsTarget, 'submitting: "保存中..."') &&
     includes(stringsTarget, 'submitError: "服の更新に失敗しました。"') &&
@@ -106,9 +121,16 @@ check(
   "CES-08",
   "服編集画面は imageKey 入力を持たず、画像選択時はアップロード結果の imageKey を送る",
   !includes(target, 'name="imageKey"') &&
-    includes(target, "const uploadImage = async (file: File): Promise<string> => {") &&
-    includes(target, "const presigned = await uploadImageWithPresign(wardrobeId, \"clothing\", file);") &&
-    includes(target, "let nextImageKey = imageKey.trim().length > 0 ? imageKey.trim() : null;") &&
+    includes(
+      target,
+      "const uploadImage = async (file: File): Promise<string> => {",
+    ) &&
+    includes(target, "uploadImageWithPresign(") &&
+    includes(target, "presigned.imageKey") &&
+    includes(
+      target,
+      "let nextImageKey = imageKey.trim().length > 0 ? imageKey.trim() : null;",
+    ) &&
     includes(target, "nextImageKey = await uploadImage(selectedImageFile);") &&
     includes(target, "imageKey: nextImageKey,"),
   "imageKey入力の削除、または画像選択時のpresign imageKey連携が不足しています",

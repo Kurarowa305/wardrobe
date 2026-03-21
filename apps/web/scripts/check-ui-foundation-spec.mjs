@@ -83,16 +83,24 @@ check(
 check(
   "UF-02",
   "RootLayout に Toaster が組み込まれている",
-  includes("src/app/layout.tsx", 'import { Toaster } from "@/components/ui/toaster";') &&
-    includes("src/app/layout.tsx", "<Toaster />"),
+  includes(
+    "src/app/layout.tsx",
+    'import { Toaster } from "@/components/ui/toaster";',
+  ) && includes("src/app/layout.tsx", "<Toaster />"),
   "layout.tsx で Toaster の import または描画が不足しています",
 );
 
 check(
   "UF-03",
   "ワードローブ作成画面で Button と Input を利用している",
-  includes("src/components/app/screens/WardrobeCreateScreen.tsx", 'import { Button } from "@/components/ui/button";') &&
-    includes("src/components/app/screens/WardrobeCreateScreen.tsx", 'import { Input } from "@/components/ui/input";') &&
+  includes(
+    "src/components/app/screens/WardrobeCreateScreen.tsx",
+    'import { Button } from "@/components/ui/button";',
+  ) &&
+    includes(
+      "src/components/app/screens/WardrobeCreateScreen.tsx",
+      'import { Input } from "@/components/ui/input";',
+    ) &&
     includes("src/components/app/screens/WardrobeCreateScreen.tsx", "<Input") &&
     includes("src/components/app/screens/WardrobeCreateScreen.tsx", "<Button"),
   "WardrobeCreateScreen.tsx で Button/Input の利用が確認できません",
@@ -101,17 +109,32 @@ check(
 check(
   "UF-04",
   "入力未設定時に destructive トーストでエラー通知する",
-  includes("src/components/app/screens/WardrobeCreateScreen.tsx", "if (name.trim().length === 0)") &&
-    includes("src/components/app/screens/WardrobeCreateScreen.tsx", 'variant: "destructive"') &&
-    includes("src/components/app/screens/WardrobeCreateScreen.tsx", "WARDROBE_STRINGS.create.errors.nameRequired"),
+  includes(
+    "src/components/app/screens/WardrobeCreateScreen.tsx",
+    "if (name.trim().length === 0)",
+  ) &&
+    includes(
+      "src/components/app/screens/WardrobeCreateScreen.tsx",
+      'variant: "destructive"',
+    ) &&
+    includes(
+      "src/components/app/screens/WardrobeCreateScreen.tsx",
+      "WARDROBE_STRINGS.create.errors.nameRequired",
+    ),
   "入力エラー時のトースト通知実装が不足しています",
 );
 
 check(
   "UF-05",
   "作成成功時はホーム遷移に作成完了クエリを付与する",
-  includes("src/components/app/screens/WardrobeCreateScreen.tsx", "ROUTES.home(DEMO_IDS.wardrobe)") &&
-    includes("src/components/app/screens/WardrobeCreateScreen.tsx", "?created=1"),
+  includes(
+    "src/components/app/screens/WardrobeCreateScreen.tsx",
+    "ROUTES.home(DEMO_IDS.wardrobe)",
+  ) &&
+    includes(
+      "src/components/app/screens/WardrobeCreateScreen.tsx",
+      "?created=1",
+    ),
   "WardrobeCreateScreen.tsx で作成完了クエリ付き遷移が設定されていません",
 );
 
@@ -119,7 +142,10 @@ check(
   "UF-06",
   "ワードローブ文言に入力エラー文言が定義されている",
   includes("src/features/wardrobe/strings.ts", "nameRequired") &&
-    includes("src/features/wardrobe/strings.ts", "ワードローブ名を入力してください。"),
+    includes(
+      "src/features/wardrobe/strings.ts",
+      "ワードローブ名を入力してください。",
+    ),
   "features/wardrobe/strings.ts に入力エラー文言が見つかりません",
 );
 
@@ -135,34 +161,60 @@ check(
 check(
   "UF-08",
   "ホーム画面で created クエリをクライアント判定し、表示後にURLを正規化する",
-  noIncludes("src/app/wardrobes/[wardrobeId]/(tabs)/home/page.tsx", "searchParams") &&
-    includes("src/components/app/screens/HomeTabScreen.tsx", "new URLSearchParams(window.location.search)") &&
-    includes("src/components/app/screens/HomeTabScreen.tsx", 'searchParams.get("created") !== "1"') &&
-    includes("src/components/app/screens/HomeTabScreen.tsx", "HOME_STRINGS.toasts.wardrobeCreated") &&
-    includes("src/components/app/screens/HomeTabScreen.tsx", 'window.history.replaceState(window.history.state, "", ROUTES.home(wardrobeId));'),
+  noIncludes(
+    "src/app/wardrobes/[wardrobeId]/(tabs)/home/page.tsx",
+    "searchParams",
+  ) &&
+    includes(
+      "src/components/app/screens/HomeTabScreen.tsx",
+      "new URLSearchParams(window.location.search)",
+    ) &&
+    includes(
+      "src/components/app/screens/HomeTabScreen.tsx",
+      'searchParams.get("created") !== "1"',
+    ) &&
+    includes(
+      "src/components/app/screens/HomeTabScreen.tsx",
+      "HOME_STRINGS.toasts.wardrobeCreated",
+    ) &&
+    includes(
+      "src/components/app/screens/HomeTabScreen.tsx",
+      'window.history.replaceState(window.history.state, "", ROUTES.home(wardrobeId));',
+    ),
   "作成完了トーストの表示連携（home/page.tsx / HomeTabScreen.tsx）が不足しています",
 );
 
 check(
   "UF-09",
-  "スクリーン実装は ScreenCard基盤または画面要件に沿った直接描画で構成される",
+  "スクリーン実装は画面要件に沿った直接描画または ScreenTextCard で構成される",
   SCREEN_FILES.every((file) => {
     const source = read(file);
     if (NO_SCREEN_CARD_FILES.has(file)) {
       const directRenderingGuard = file.endsWith("WardrobeCreateScreen.tsx")
-        ? source.includes("showHeader={false}") && source.includes("WARDROBE_STRINGS.create.heroTitle") && source.includes("<form")
+        ? source.includes("showHeader={false}") &&
+          source.includes("WARDROBE_STRINGS.create.heroTitle") &&
+          source.includes("<form")
         : file.endsWith("HistoriesTabScreen.tsx")
           ? source.includes("HISTORY_STRINGS.list.messages.loading")
           : file.endsWith("ClothingsTabScreen.tsx")
-          ? source.includes("CLOTHING_STRINGS.list.actions.add")
-          : file.endsWith("TemplatesTabScreen.tsx")
-            ? source.includes("TEMPLATE_STRINGS.list.actions.add")
-            : file.endsWith("HomeTabScreen.tsx")
-              ? source.includes("HOME_STRINGS.sections.recentWeekHistories") && source.includes("useRecentHistories")
-              : file.endsWith("RecordMethodScreen.tsx")
-                ? source.includes("RECORD_STRINGS.method.descriptions.byTemplate") &&
-                  source.includes("RECORD_STRINGS.method.descriptions.byCombination")
-              : source.includes("<form") && source.includes("RECORD_STRINGS.byCombination.labels.clothing");
+            ? source.includes("CLOTHING_STRINGS.list.actions.add")
+            : file.endsWith("TemplatesTabScreen.tsx")
+              ? source.includes("TEMPLATE_STRINGS.list.actions.add")
+              : file.endsWith("HomeTabScreen.tsx")
+                ? source.includes(
+                    "HOME_STRINGS.sections.recentWeekHistories",
+                  ) && source.includes("useRecentHistories")
+                : file.endsWith("RecordMethodScreen.tsx")
+                  ? source.includes(
+                      "RECORD_STRINGS.method.descriptions.byTemplate",
+                    ) &&
+                    source.includes(
+                      "RECORD_STRINGS.method.descriptions.byCombination",
+                    )
+                  : source.includes("<form") &&
+                    source.includes(
+                      "RECORD_STRINGS.byCombination.labels.clothing",
+                    );
 
       return (
         !source.includes("<ScreenCard") &&
@@ -170,7 +222,11 @@ check(
         directRenderingGuard
       );
     }
-    return source.includes("ScreenCard") || source.includes("ScreenTextCard");
+    return (
+      (!source.includes("ScreenCard") &&
+        source.includes("rounded-xl border border-slate-200 bg-white")) ||
+      source.includes("ScreenTextCard")
+    );
   }),
   "スクリーンのUI基盤構成が期待値と一致しません",
 );
@@ -192,28 +248,94 @@ check(
 check(
   "UF-11",
   "指定された記録/追加アクションは ScreenLinkButton ではなく Button 基盤を利用している",
-  includes("src/components/app/screens/HomeTabScreen.tsx", 'import { Button } from "@/components/ui/button";') &&
-    includes("src/components/app/screens/HomeTabScreen.tsx", "HOME_STRINGS.actions.addRecord") &&
-    includes("src/components/app/screens/RecordMethodScreen.tsx", 'import { Button } from "@/components/ui/button";') &&
-    includes("src/components/app/screens/RecordMethodScreen.tsx", "RECORD_STRINGS.method.actions.byTemplate") &&
-    includes("src/components/app/screens/RecordMethodScreen.tsx", "RECORD_STRINGS.method.actions.byCombination") &&
-    noIncludes("src/components/app/screens/RecordMethodScreen.tsx", "ScreenLinkButton") &&
-    includes("src/components/app/screens/RecordByTemplateScreen.tsx", 'import { Button } from "@/components/ui/button";') &&
-    includes("src/components/app/screens/RecordByTemplateScreen.tsx", "RECORD_STRINGS.byTemplate.actions.submit") &&
-    noIncludes("src/components/app/screens/RecordByTemplateScreen.tsx", "ScreenLinkButton") &&
-    includes("src/components/app/screens/RecordByCombinationScreen.tsx", 'import { Button } from "@/components/ui/button";') &&
-    includes("src/components/app/screens/RecordByCombinationScreen.tsx", "RECORD_STRINGS.byCombination.actions.submit") &&
-    noIncludes("src/components/app/screens/RecordByCombinationScreen.tsx", "ScreenLinkButton") &&
-    includes("src/components/app/screens/TemplatesTabScreen.tsx", 'import { Button } from "@/components/ui/button";') &&
-    includes("src/components/app/screens/TemplatesTabScreen.tsx", "TEMPLATE_STRINGS.list.actions.add") &&
-    includes("src/components/app/screens/TemplateCreateScreen.tsx", 'import { TemplateForm } from "./TemplateForm";') &&
-    includes("src/components/app/screens/TemplateCreateScreen.tsx", "createElement(TemplateForm") &&
-    noIncludes("src/components/app/screens/TemplateCreateScreen.tsx", "ScreenLinkButton") &&
-    includes("src/components/app/screens/ClothingsTabScreen.tsx", 'import { Button } from "@/components/ui/button";') &&
-    includes("src/components/app/screens/ClothingsTabScreen.tsx", "CLOTHING_STRINGS.list.actions.add") &&
-    includes("src/components/app/screens/ClothingCreateScreen.tsx", 'import { Button } from "@/components/ui/button";') &&
-    includes("src/components/app/screens/ClothingCreateScreen.tsx", "CLOTHING_STRINGS.create.actions.submit") &&
-    noIncludes("src/components/app/screens/ClothingCreateScreen.tsx", "ScreenLinkButton"),
+  includes(
+    "src/components/app/screens/HomeTabScreen.tsx",
+    'import { Button } from "@/components/ui/button";',
+  ) &&
+    includes(
+      "src/components/app/screens/HomeTabScreen.tsx",
+      "HOME_STRINGS.actions.addRecord",
+    ) &&
+    includes(
+      "src/components/app/screens/RecordMethodScreen.tsx",
+      'import { Button } from "@/components/ui/button";',
+    ) &&
+    includes(
+      "src/components/app/screens/RecordMethodScreen.tsx",
+      "RECORD_STRINGS.method.actions.byTemplate",
+    ) &&
+    includes(
+      "src/components/app/screens/RecordMethodScreen.tsx",
+      "RECORD_STRINGS.method.actions.byCombination",
+    ) &&
+    noIncludes(
+      "src/components/app/screens/RecordMethodScreen.tsx",
+      "ScreenLinkButton",
+    ) &&
+    includes(
+      "src/components/app/screens/RecordByTemplateScreen.tsx",
+      'import { Button } from "@/components/ui/button";',
+    ) &&
+    includes(
+      "src/components/app/screens/RecordByTemplateScreen.tsx",
+      "RECORD_STRINGS.byTemplate.actions.submit",
+    ) &&
+    noIncludes(
+      "src/components/app/screens/RecordByTemplateScreen.tsx",
+      "ScreenLinkButton",
+    ) &&
+    includes(
+      "src/components/app/screens/RecordByCombinationScreen.tsx",
+      'import { Button } from "@/components/ui/button";',
+    ) &&
+    includes(
+      "src/components/app/screens/RecordByCombinationScreen.tsx",
+      "RECORD_STRINGS.byCombination.actions.submit",
+    ) &&
+    noIncludes(
+      "src/components/app/screens/RecordByCombinationScreen.tsx",
+      "ScreenLinkButton",
+    ) &&
+    includes(
+      "src/components/app/screens/TemplatesTabScreen.tsx",
+      'import { Button } from "@/components/ui/button";',
+    ) &&
+    includes(
+      "src/components/app/screens/TemplatesTabScreen.tsx",
+      "TEMPLATE_STRINGS.list.actions.add",
+    ) &&
+    includes(
+      "src/components/app/screens/TemplateCreateScreen.tsx",
+      'import { TemplateForm } from "./TemplateForm";',
+    ) &&
+    includes(
+      "src/components/app/screens/TemplateCreateScreen.tsx",
+      "createElement(TemplateForm",
+    ) &&
+    noIncludes(
+      "src/components/app/screens/TemplateCreateScreen.tsx",
+      "ScreenLinkButton",
+    ) &&
+    includes(
+      "src/components/app/screens/ClothingsTabScreen.tsx",
+      'import { Button } from "@/components/ui/button";',
+    ) &&
+    includes(
+      "src/components/app/screens/ClothingsTabScreen.tsx",
+      "CLOTHING_STRINGS.list.actions.add",
+    ) &&
+    includes(
+      "src/components/app/screens/ClothingCreateScreen.tsx",
+      'import { Button } from "@/components/ui/button";',
+    ) &&
+    includes(
+      "src/components/app/screens/ClothingCreateScreen.tsx",
+      "CLOTHING_STRINGS.create.actions.submit",
+    ) &&
+    noIncludes(
+      "src/components/app/screens/ClothingCreateScreen.tsx",
+      "ScreenLinkButton",
+    ),
   "指定アクションの Button 基盤置換が未完了です",
 );
 
