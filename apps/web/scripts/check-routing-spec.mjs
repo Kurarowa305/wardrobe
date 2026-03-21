@@ -120,6 +120,37 @@ function includesAny(relPath, expectedList) {
   return expectedList.some((item) => source.includes(item));
 }
 
+function extractFunctionBody(source, functionName) {
+  const signature = `function ${functionName}(`;
+  const start = source.indexOf(signature);
+  if (start === -1) {
+    return null;
+  }
+
+  const paramsEnd = source.indexOf(") {", start);
+  if (paramsEnd === -1) {
+    return null;
+  }
+
+  const braceStart = paramsEnd + 2;
+  let depth = 0;
+  for (let index = braceStart; index < source.length; index += 1) {
+    const char = source[index];
+    if (char === "{") {
+      depth += 1;
+      continue;
+    }
+    if (char === "}") {
+      depth -= 1;
+      if (depth === 0) {
+        return source.slice(braceStart + 1, index);
+      }
+    }
+  }
+
+  return null;
+}
+
 function findPageFiles() {
   return collectFiles(appRoot)
     .filter((file) => file.endsWith("/page.tsx"))
@@ -363,16 +394,30 @@ check("RT-20", "create page links to demo wardrobe home", () => {
 });
 
 check("RT-21", "history detail isolates searchParams access behind Suspense", () => {
-  const ok = containsAll(HISTORY_DETAIL_SCREEN, [
-    "function HistoryDetailScreenSearchParams({ wardrobeId }: HistoryDetailScreenProps)",
-    'const backHref = resolveHistoryDetailBackHref(wardrobeId, searchParams.get("from"));',
-    "<Suspense fallback={<HistoryDetailScreenContent backHref={ROUTES.histories(wardrobeId)} />}>",
-    "<HistoryDetailScreenSearchParams wardrobeId={wardrobeId} />",
-  ]);
+  const source = read(HISTORY_DETAIL_SCREEN);
+  const searchParamsBody = extractFunctionBody(source, "HistoryDetailScreenSearchParams");
+  const screenBody = extractFunctionBody(source, "HistoryDetailScreen");
+
+  const searchParamsIsolated =
+    searchParamsBody !== null &&
+    searchParamsBody.includes("useSearchParams()") &&
+    searchParamsBody.includes('resolveHistoryDetailBackHref(wardrobeId, searchParams.get("from"))') &&
+    !screenBody?.includes("useSearchParams()");
+
+  const suspenseWrapsSearchParams =
+    screenBody !== null &&
+    /<Suspense\b/.test(screenBody) &&
+    /<HistoryDetailScreenSearchParams\b/.test(screenBody);
+
+  const fallbackUsesSafeRoute =
+    /fallback=\{[\s\S]*?<HistoryDetailScreenContent\b[\s\S]*?backHref=\{ROUTES\.histories\(wardrobeId\)\}/.test(
+      screenBody ?? "",
+    );
+
   return {
-    ok,
+    ok: searchParamsIsolated && suspenseWrapsSearchParams && fallbackUsesSafeRoute,
     detail:
-      "HistoryDetailScreen must read searchParams in a Suspense-wrapped subtree with histories fallback",
+      `isolated=${searchParamsIsolated}, suspenseWraps=${suspenseWrapsSearchParams}, fallbackSafe=${fallbackUsesSafeRoute}`,
   };
 });
 
