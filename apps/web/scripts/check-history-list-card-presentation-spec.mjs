@@ -36,12 +36,12 @@ const dateTarget = "src/features/history/date.ts";
 
 check(
   "HLCP-01",
-  "履歴カードの日付表示が YYYY/MM/DD 形式で整形される",
+  "履歴カードの日付表示が YYYY/MM/DD (曜) 形式で整形される",
   includes(target, 'import { SharedHistoryCard } from "@/components/app/history/HistoryCard";') &&
     includes(target, '<SharedHistoryCard key={item.historyId} wardrobeId={wardrobeId} item={item} from="histories" />') &&
     includes(sharedTarget, 'import { formatHistoryDate } from "@/features/history/date";') &&
     includes(sharedTarget, '{formatHistoryDate(item.date)}') &&
-    includes(dateTarget, 'return `${date.slice(0, 4)}/${date.slice(4, 6)}/${date.slice(6, 8)}`;'),
+    includes(dateTarget, 'return `${date.slice(0, 4)}/${date.slice(4, 6)}/${date.slice(6, 8)} (${weekday})`;'),
   "履歴カードの日付整形実装が不足しています",
 );
 

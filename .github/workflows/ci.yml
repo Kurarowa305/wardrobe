@@ -88,6 +88,9 @@ jobs:
       - name: History list card presentation spec test
         run: pnpm --filter web test:history-list-card-presentation
 
+      - name: History date weekday spec test
+        run: pnpm --filter web test:history-date-weekday
+
       - name: History detail screen spec test
         run: pnpm --filter web test:history-detail-screen
 
