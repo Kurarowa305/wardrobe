@@ -26,9 +26,7 @@ export const HISTORY_STRINGS = {
       template: "着たテンプレート",
       clothingItems: "着た服",
       templateWearCount: "着た回数",
-      templateLastWornAt: "最後に着た日",
       clothingWearCount: "着た回数",
-      clothingLastWornAt: "最後に着た日",
     },
     messages: {
       loading: "読み込み中...",
@@ -36,7 +34,6 @@ export const HISTORY_STRINGS = {
       notFound: "履歴が見つかりませんでした。",
       combinationSummary: "選択した服の組み合わせ",
       clothingDeleted: "削除済みの服です",
-      neverWorn: "未着用",
       deleteError: "履歴の削除に失敗しました。",
     },
   },

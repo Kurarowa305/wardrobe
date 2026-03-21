@@ -65,12 +65,13 @@ check(
     includes(target, "historyQuery.data.template ? (") &&
     includes(target, "historyQuery.data.template.name") &&
     includes(target, "historyQuery.data.template.wearCount") &&
-    includes(target, "formatLastWornDate(historyQuery.data.template.lastWornAt, HISTORY_STRINGS.detail.messages.neverWorn)") &&
     includes(target, "historyQuery.data.clothingItems.map((item) => {") &&
     includes(target, "item.wearCount") &&
-    includes(target, "formatLastWornDate(item.lastWornAt, HISTORY_STRINGS.detail.messages.neverWorn)") &&
-    !includes(target, "HISTORY_STRINGS.detail.labels.templateLastWornAt"),
-  "履歴詳細の主要表示項目・曜日付き日付表示・着用服一覧の実装が不足しています",
+    !includes(target, "formatLastWornDate(") &&
+    !includes(target, "templateLastWornAt") &&
+    !includes(target, "clothingLastWornAt") &&
+    !includes(target, "neverWorn"),
+  "履歴詳細の主要表示項目、または最後に着た日行削除の実装が不足しています",
 );
 
 check(
@@ -115,11 +116,12 @@ check(
     includes(stringsTarget, 'notFound: "履歴が見つかりませんでした。"') &&
     includes(stringsTarget, 'template: "着たテンプレート"') &&
     includes(stringsTarget, 'templateWearCount: "着た回数"') &&
-    includes(stringsTarget, 'templateLastWornAt: "最後に着た日"') &&
     includes(stringsTarget, 'clothingItems: "着た服"') &&
     includes(stringsTarget, 'clothingDeleted: "削除済みの服です"') &&
-    includes(stringsTarget, 'neverWorn: "未着用"'),
-  "履歴詳細向け文言の定義が不足しています",
+    !includes(stringsTarget, 'templateLastWornAt: "最後に着た日"') &&
+    !includes(stringsTarget, 'clothingLastWornAt: "最後に着た日"') &&
+    !includes(stringsTarget, 'neverWorn: "未着用"'),
+  "履歴詳細向け文言の定義整理が不足しています",
 );
 
 if (failures.length > 0) {
