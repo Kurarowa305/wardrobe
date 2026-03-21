@@ -47,14 +47,14 @@ check(
 
 check(
   "HDS-CP-03",
-  "履歴詳細文言が『着たテンプレート』『着た服』『着た回数』『最後に着た日』へ更新されている",
+  "履歴詳細文言が『着たテンプレート』『着た服』『着た回数』へ整理され、最後に着た日文言を持たない",
   includes("src/features/history/strings.ts", 'template: "着たテンプレート"') &&
     includes("src/features/history/strings.ts", 'clothingItems: "着た服"') &&
     includes("src/features/history/strings.ts", 'templateWearCount: "着た回数"') &&
-    includes("src/features/history/strings.ts", 'templateLastWornAt: "最後に着た日"') &&
     includes("src/features/history/strings.ts", 'clothingWearCount: "着た回数"') &&
-    includes("src/features/history/strings.ts", 'clothingLastWornAt: "最後に着た日"'),
-  "履歴詳細画面の文言更新が不足しています",
+    !includes("src/features/history/strings.ts", 'templateLastWornAt: "最後に着た日"') &&
+    !includes("src/features/history/strings.ts", 'clothingLastWornAt: "最後に着た日"'),
+  "履歴詳細画面の文言整理が不足しています",
 );
 
 if (failures.length > 0) {

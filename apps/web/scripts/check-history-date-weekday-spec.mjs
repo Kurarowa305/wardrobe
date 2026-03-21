@@ -64,13 +64,13 @@ check(
 
 check(
   "HDW-04",
-  "履歴詳細画面が日付に曜日を付け、テンプレート最終着用日の行を削除する",
+  "履歴詳細画面が日付に曜日を付け、最後に着た日行をすべて削除する",
   includes(historyDetailTarget, 'formatHistoryDate(historyQuery.data.date)') &&
-    includes(historyDetailTarget, 'formatLastWornDate(historyQuery.data.template.lastWornAt, HISTORY_STRINGS.detail.messages.neverWorn)') &&
-    includes(historyDetailTarget, 'formatLastWornDate(item.lastWornAt, HISTORY_STRINGS.detail.messages.neverWorn)') &&
-    !includes(historyDetailTarget, 'HISTORY_STRINGS.detail.labels.templateLastWornAt') &&
-    !includes(historyDetailTarget, '最後に着た日: {formatLastWornAt('),
-  "履歴詳細画面の曜日表示追加またはテンプレート最終着用日行の削除が不足しています",
+    !includes(historyDetailTarget, 'formatLastWornDate(') &&
+    !includes(historyDetailTarget, 'templateLastWornAt') &&
+    !includes(historyDetailTarget, 'clothingLastWornAt') &&
+    !includes(historyDetailTarget, 'neverWorn'),
+  "履歴詳細画面の日付曜日表示または最後に着た日行の削除が不足しています",
 );
 
 check(
