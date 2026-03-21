@@ -47,13 +47,13 @@ check(
 
 check(
   "HDT-02",
-  "テンプレート入力時のみ着用テンプレートカードを白背景で表示し、名称・着た回数・曜日付き最終着用日を描画する",
+  "テンプレート入力時のみ着用テンプレートカードを白背景で表示し、名称・着た回数を描画する",
   includes(screenTarget, "historyQuery.data.template ? (") &&
     includes(screenTarget, "rounded-md border border-slate-200 bg-white p-3") &&
     includes(screenTarget, "historyQuery.data.template.name") &&
     includes(screenTarget, "HISTORY_STRINGS.detail.labels.templateWearCount}: {historyQuery.data.template.wearCount}") &&
-    includes(screenTarget, "formatLastWornDate(historyQuery.data.template.lastWornAt, HISTORY_STRINGS.detail.messages.neverWorn)"),
-  "着用テンプレートカードの見た目または曜日付き最終着用日表示の実装が不足しています",
+    !includes(screenTarget, "formatLastWornDate(historyQuery.data.template.lastWornAt, HISTORY_STRINGS.detail.messages.neverWorn)"),
+  "着用テンプレートカードの見た目、または最後に着た日行削除の実装が不足しています",
 );
 
 check(
@@ -79,11 +79,11 @@ check(
 
 check(
   "HDT-05",
-  "履歴詳細向け文言に着用テンプレートカード用ラベルが定義される",
+  "履歴詳細向け文言に着用テンプレートカード用ラベルが定義され、最後に着た日文言を持たない",
   includes(stringsTarget, 'template: "着たテンプレート"') &&
     includes(stringsTarget, 'templateWearCount: "着た回数"') &&
-    includes(stringsTarget, 'templateLastWornAt: "最後に着た日"'),
-  "着用テンプレートカード向け文言が不足しています",
+    !includes(stringsTarget, 'templateLastWornAt: "最後に着た日"'),
+  "着用テンプレートカード向け文言の整理が不足しています",
 );
 
 if (failures.length > 0) {
