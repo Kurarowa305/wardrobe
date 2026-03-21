@@ -10,6 +10,7 @@ import { ROUTES } from "@/constants/routes";
 import { resolveImageUrl } from "@/features/clothing/imageUrl";
 import { TEMPLATE_STRINGS } from "@/features/template/strings";
 import { isAppError } from "@/lib/error/normalize";
+import { formatTimestampDateWithWeekday } from "@/lib/date";
 import { ScreenCard } from "./ScreenPrimitives";
 
 type TemplateDetailScreenProps = {
@@ -30,11 +31,7 @@ function formatLastWornAt(lastWornAt: number | null) {
     return TEMPLATE_STRINGS.detail.messages.neverWorn;
   }
 
-  return new Intl.DateTimeFormat("ja-JP", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(lastWornAt);
+  return formatTimestampDateWithWeekday(lastWornAt);
 }
 
 export function TemplateDetailScreen({ wardrobeId, templateId }: TemplateDetailScreenProps) {

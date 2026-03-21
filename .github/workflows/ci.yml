@@ -91,6 +91,9 @@ jobs:
       - name: History date weekday spec test
         run: pnpm --filter web test:history-date-weekday
 
+      - name: Last worn at weekday spec test
+        run: pnpm --filter web test:last-worn-at-weekday
+
       - name: History detail screen spec test
         run: pnpm --filter web test:history-detail-screen
 

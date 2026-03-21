@@ -13,6 +13,7 @@ import { resolveHistoryDetailBackHref } from "@/features/history/routing";
 import { formatHistoryDate } from "@/features/history/date";
 import { HISTORY_STRINGS } from "@/features/history/strings";
 import { isAppError } from "@/lib/error/normalize";
+import { formatTimestampDateWithWeekday } from "@/lib/date";
 import { ScreenCard } from "./ScreenPrimitives";
 
 type HistoryDetailScreenProps = {
@@ -40,11 +41,7 @@ function formatLastWornAt(lastWornAt: number | null) {
     return HISTORY_STRINGS.detail.messages.neverWorn;
   }
 
-  return new Intl.DateTimeFormat("ja-JP", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(lastWornAt);
+  return formatTimestampDateWithWeekday(lastWornAt);
 }
 
 function HistoryDetailScreenContent({ wardrobeId, historyId, backHref }: HistoryDetailScreenContentProps) {
