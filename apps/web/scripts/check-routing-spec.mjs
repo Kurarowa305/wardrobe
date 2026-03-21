@@ -115,6 +115,10 @@ function containsAll(relPath, expectedList) {
   return expectedList.every((item) => source.includes(item));
 }
 
+function readNormalized(relPath) {
+  return read(relPath).replace(/\s+/g, " ").trim();
+}
+
 function includesAny(relPath, expectedList) {
   const source = read(relPath);
   return expectedList.some((item) => source.includes(item));
@@ -363,14 +367,29 @@ check("RT-20", "create page links to demo wardrobe home", () => {
 });
 
 check("RT-21", "history detail isolates searchParams access behind Suspense", () => {
-  const ok = containsAll(HISTORY_DETAIL_SCREEN, [
-    "function HistoryDetailScreenSearchParams({ wardrobeId }: HistoryDetailScreenProps)",
+  const normalized = readNormalized(HISTORY_DETAIL_SCREEN);
+  const searchParamsIndex = normalized.indexOf("const searchParams = useSearchParams();");
+  const contentIndex = normalized.indexOf("function HistoryDetailScreenContent(");
+  const suspenseIndex = normalized.indexOf("<Suspense");
+  const fallbackIndex = normalized.indexOf("fallback={");
+  const searchSubtreeIndex = normalized.indexOf("<HistoryDetailScreenSearchParams wardrobeId={wardrobeId} historyId={historyId} />");
+  const fallbackContentIndex = normalized.indexOf("<HistoryDetailScreenContent wardrobeId={wardrobeId} historyId={historyId} backHref={ROUTES.histories(wardrobeId)} />");
+  const resolvesFromQuery = normalized.includes(
     'const backHref = resolveHistoryDetailBackHref(wardrobeId, searchParams.get("from"));',
-    "<Suspense fallback={<HistoryDetailScreenContent backHref={ROUTES.histories(wardrobeId)} />}>",
-    "<HistoryDetailScreenSearchParams wardrobeId={wardrobeId} />",
-  ]);
+  );
+
   return {
-    ok,
+    ok:
+      searchParamsIndex !== -1 &&
+      contentIndex !== -1 &&
+      suspenseIndex !== -1 &&
+      fallbackIndex !== -1 &&
+      searchSubtreeIndex !== -1 &&
+      fallbackContentIndex !== -1 &&
+      resolvesFromQuery &&
+      contentIndex < searchParamsIndex &&
+      searchParamsIndex < suspenseIndex &&
+      fallbackIndex < searchSubtreeIndex,
     detail:
       "HistoryDetailScreen must read searchParams in a Suspense-wrapped subtree with histories fallback",
   };

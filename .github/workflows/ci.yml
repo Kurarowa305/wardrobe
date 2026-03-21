@@ -148,6 +148,9 @@ jobs:
       - name: Clothing delete flow spec test
         run: pnpm --filter web test:clothing-delete-flow
 
+      - name: History delete flow spec test
+        run: pnpm --filter web test:history-delete-flow
+
       - name: Template list screen spec test
         run: pnpm --filter web test:template-list-screen
 
