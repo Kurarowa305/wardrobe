@@ -15,6 +15,16 @@ export const RECORD_STRINGS = {
     },
     actions: {
       submit: "記録",
+      loadMore: "テンプレートをさらに読み込む",
+    },
+    messages: {
+      loading: "テンプレート一覧を読み込み中...",
+      loadError: "テンプレート一覧の読み込みに失敗しました。",
+      empty: "選択できるテンプレートがまだ登録されていません。",
+      dateRequired: "日付を入力してください。",
+      templateRequired: "テンプレートを選択してください。",
+      submitting: "記録中...",
+      submitError: "テンプレートでの記録に失敗しました。",
     },
   },
   byCombination: {
