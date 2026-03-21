@@ -93,7 +93,7 @@ export function HistoriesTabScreen({ wardrobeId }: HistoriesTabScreenProps) {
         <Button
           type="button"
           variant="secondary"
-          className="w-full text-sm font-medium"
+          className="mt-4 w-full text-sm font-medium"
           disabled={!canLoadMore}
           onClick={handleLoadMore}
         >

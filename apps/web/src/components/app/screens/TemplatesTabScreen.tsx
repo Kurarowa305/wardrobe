@@ -124,7 +124,7 @@ export function TemplatesTabScreen({ wardrobeId }: TemplatesTabScreenProps) {
 
   const content = (
     <>
-      <Button asChild className="w-full justify-start text-left text-base font-bold text-white">
+      <Button asChild className="mb-4 w-full justify-start text-left text-base font-bold text-white">
         <Link href={ROUTES.templateNew(wardrobeId)}>{TEMPLATE_STRINGS.list.actions.add}</Link>
       </Button>
 
@@ -148,7 +148,7 @@ export function TemplatesTabScreen({ wardrobeId }: TemplatesTabScreenProps) {
         <Button
           type="button"
           variant="secondary"
-          className="w-full text-sm font-medium"
+          className="mt-4 w-full text-sm font-medium"
           disabled={!canLoadMore}
           onClick={handleLoadMore}
         >
