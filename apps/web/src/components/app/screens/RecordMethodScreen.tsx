@@ -29,12 +29,10 @@ export function RecordMethodScreen({ wardrobeId }: RecordMethodScreenProps) {
           variant="outline"
           className="h-auto w-full justify-start rounded-2xl px-4 py-5 text-left"
         >
-          <Link href={ROUTES.recordByCombination(wardrobeId)}>
-            <span className="flex flex-col items-start gap-1">
-              <span className="text-sm font-medium">{RECORD_STRINGS.method.actions.byCombination}</span>
-              <span className="text-xs font-normal text-slate-600">
-                {RECORD_STRINGS.method.descriptions.byCombination}
-              </span>
+          <Link href={ROUTES.recordByCombination(wardrobeId)} className="flex flex-col items-start gap-1">
+            <span className="text-sm font-medium">{RECORD_STRINGS.method.actions.byCombination}</span>
+            <span className="text-xs font-normal text-slate-600">
+              {RECORD_STRINGS.method.descriptions.byCombination}
             </span>
           </Link>
         </Button>
