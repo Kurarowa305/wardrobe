@@ -57,13 +57,17 @@ check(
 
 check(
   "CDS-03",
-  "詳細画面に画像と服名を表示し、resolveImageUrl と no image フォールバックを利用する",
+  "詳細画面に画像・服名・着用回数・最終着用日を表示し、resolveImageUrl と no image フォールバックを利用する",
   includes(target, 'import { resolveImageUrl } from "@/features/clothing/imageUrl";') &&
     includes(target, "const imageUrl = resolveImageUrl(clothingQuery.data?.imageKey);") &&
     includes(target, "<img") &&
     includes(target, "COMMON_STRINGS.placeholders.noImage") &&
-    includes(target, "clothingQuery.data.name"),
-  "画像または服名表示、resolveImageUrl/no image フォールバック実装が不足しています",
+    includes(target, "clothingQuery.data.name") &&
+    includes(target, "CLOTHING_STRINGS.detail.labels.wearCount") &&
+    includes(target, "clothingQuery.data.wearCount") &&
+    includes(target, "CLOTHING_STRINGS.detail.labels.lastWornAt") &&
+    includes(target, "formatLastWornAt(clothingQuery.data.lastWornAt)"),
+  "画像・服名・着用情報表示、resolveImageUrl/no image フォールバック実装が不足しています",
 );
 
 check(
@@ -86,10 +90,13 @@ check(
 check(
   "CDS-06",
   "服詳細画面向け文言が clothing strings に定義される",
-  includes(stringsTarget, 'loading: "読み込み中..."') &&
+  includes(stringsTarget, 'wearCount: "着用回数"') &&
+    includes(stringsTarget, 'lastWornAt: "最終着用日"') &&
+    includes(stringsTarget, 'loading: "読み込み中..."') &&
     includes(stringsTarget, 'error: "服詳細の読み込みに失敗しました。"') &&
     includes(stringsTarget, 'notFound: "服が見つかりませんでした。"') &&
-    includes(stringsTarget, 'deleted: "削除済み"'),
+    includes(stringsTarget, 'deleted: "削除済み"') &&
+    includes(stringsTarget, 'neverWorn: "未着用"'),
   "features/clothing/strings.ts に詳細画面文言の定義が不足しています",
 );
 
