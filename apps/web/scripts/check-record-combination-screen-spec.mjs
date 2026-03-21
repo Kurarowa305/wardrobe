@@ -67,11 +67,12 @@ check(
 
 check(
   "RCS-05",
-  "選択済み服を選択順で確認できる領域を持つ",
-  includes(target, 'selectedClothingIds') &&
-    includes(target, 'selectedClothingItems.map') &&
-    includes(target, 'RECORD_STRINGS.byCombination.messages.selected'),
-  "選択済み服の確認表示が不足しています",
+  "服一覧がサムネイル付き選択リストとして描画される",
+  includes(target, 'function ClothingThumbnail') &&
+    includes(target, 'type="checkbox"') &&
+    includes(target, 'className="sr-only"') &&
+    includes(target, 'alt={`${item.name}のサムネイル`}'),
+  "服一覧のサムネイル付き選択リスト実装が不足しています",
 );
 
 check(
@@ -97,7 +98,7 @@ check(
   "服組み合わせ記録向け文言が record strings に定義される",
   includes(stringsTarget, 'title: "服の組み合わせで記録"') &&
     includes(stringsTarget, 'clothing: "服"') &&
-    includes(stringsTarget, 'selected: "選択中の服"') &&
+    !includes(stringsTarget, 'selected: "選択中の服"') &&
     includes(stringsTarget, 'clothingRequired: "服を1着以上選択してください。"'),
   "features/record/strings.ts に服組み合わせ記録向け文言の定義が不足しています",
 );

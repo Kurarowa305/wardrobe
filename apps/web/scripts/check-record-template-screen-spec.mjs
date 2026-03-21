@@ -53,9 +53,9 @@ check(
 );
 check(
   "RTS-05",
-  "選択中テンプレートを確認できる領域を持つ",
-  () => includes(target, 'selectedTemplate') && includes(target, 'RECORD_STRINGS.byTemplate.messages.selected') && includes(target, 'selectedTemplate.name'),
-  "選択中テンプレート確認表示の実装が不足しています",
+  "テンプレート一覧がサムネイル付き選択リストとして描画される",
+  () => includes(target, 'function TemplateThumbnail') && includes(target, 'item.clothingItems.slice(0, TEMPLATE_THUMBNAIL_LIMIT)') && includes(target, 'className="grid grid-cols-2 gap-2"') && includes(target, 'type="radio"'),
+  "テンプレート一覧のサムネイル付き選択リスト実装が不足しています",
 );
 check(
   "RTS-06",
@@ -72,7 +72,7 @@ check(
 check(
   "RTS-08",
   "テンプレート記録向け文言が record strings に定義される",
-  () => includes(stringsTarget, 'selected: "選択中のテンプレート"') && includes(stringsTarget, 'dateRequired: "日付を入力してください。"') && includes(stringsTarget, 'templateRequired: "テンプレートを選択してください。"') && includes(stringsTarget, 'loading: "テンプレートを読み込んでいます…"') && includes(stringsTarget, 'submitError: "記録に失敗しました。時間をおいて再度お試しください。"'),
+  () => !includes(stringsTarget, 'selected: "選択中のテンプレート"') && includes(stringsTarget, 'dateRequired: "日付を入力してください。"') && includes(stringsTarget, 'templateRequired: "テンプレートを選択してください。"') && includes(stringsTarget, 'loading: "テンプレートを読み込んでいます…"') && includes(stringsTarget, 'submitError: "記録に失敗しました。時間をおいて再度お試しください。"'),
   "features/record/strings.ts にテンプレート記録向け文言の定義が不足しています",
 );
 
