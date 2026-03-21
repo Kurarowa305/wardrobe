@@ -94,6 +94,9 @@ jobs:
       - name: History detail template card spec test
         run: pnpm --filter web test:history-detail-template-card
 
+      - name: Copy labels spec test
+        run: pnpm --filter web test:copy-labels
+
       - name: Home screen spec test
         run: pnpm --filter web test:home-screen
 

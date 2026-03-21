@@ -64,8 +64,8 @@ export const CLOTHING_STRINGS = {
   detail: {
     title: "服の詳細",
     labels: {
-      wearCount: "着用回数",
-      lastWornAt: "最終着用日",
+      wearCount: "着た回数",
+      lastWornAt: "最後に着た日",
     },
     menu: {
       edit: "編集",

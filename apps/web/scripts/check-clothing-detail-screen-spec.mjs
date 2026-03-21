@@ -57,7 +57,7 @@ check(
 
 check(
   "CDS-03",
-  "詳細画面に画像・服名・着用回数・最終着用日を表示し、resolveImageUrl と no image フォールバックを利用する",
+  "詳細画面に画像・服名・着た回数・最後に着た日を表示し、resolveImageUrl と no image フォールバックを利用する",
   includes(target, 'import { resolveImageUrl } from "@/features/clothing/imageUrl";') &&
     includes(target, "const imageUrl = resolveImageUrl(clothingQuery.data?.imageKey);") &&
     includes(target, "<img") &&
@@ -90,8 +90,8 @@ check(
 check(
   "CDS-06",
   "服詳細画面向け文言が clothing strings に定義される",
-  includes(stringsTarget, 'wearCount: "着用回数"') &&
-    includes(stringsTarget, 'lastWornAt: "最終着用日"') &&
+  includes(stringsTarget, 'wearCount: "着た回数"') &&
+    includes(stringsTarget, 'lastWornAt: "最後に着た日"') &&
     includes(stringsTarget, 'loading: "読み込み中..."') &&
     includes(stringsTarget, 'error: "服詳細の読み込みに失敗しました。"') &&
     includes(stringsTarget, 'notFound: "服が見つかりませんでした。"') &&

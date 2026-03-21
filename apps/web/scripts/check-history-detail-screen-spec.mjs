@@ -112,10 +112,10 @@ check(
   includes(stringsTarget, 'loading: "読み込み中..."') &&
     includes(stringsTarget, 'error: "履歴詳細の読み込みに失敗しました。"') &&
     includes(stringsTarget, 'notFound: "履歴が見つかりませんでした。"') &&
-    includes(stringsTarget, 'template: "着用したテンプレート"') &&
-    includes(stringsTarget, 'templateWearCount: "着用回数"') &&
-    includes(stringsTarget, 'templateLastWornAt: "最終着用日"') &&
-    includes(stringsTarget, 'clothingItems: "着用した服"') &&
+    includes(stringsTarget, 'template: "着たテンプレート"') &&
+    includes(stringsTarget, 'templateWearCount: "着た回数"') &&
+    includes(stringsTarget, 'templateLastWornAt: "最後に着た日"') &&
+    includes(stringsTarget, 'clothingItems: "着た服"') &&
     includes(stringsTarget, 'clothingDeleted: "削除済みの服です"') &&
     includes(stringsTarget, 'neverWorn: "未着用"'),
   "履歴詳細向け文言の定義が不足しています",
