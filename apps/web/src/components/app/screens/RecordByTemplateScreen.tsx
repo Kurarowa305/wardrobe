@@ -38,7 +38,7 @@ function TemplateThumbnail({ item }: { item: TemplateListClothingItem }) {
   const imageUrl = resolveImageUrl(item.imageKey);
 
   return (
-    <span className="relative block h-14 w-full overflow-hidden rounded-md border border-slate-200 bg-slate-100">
+    <span className="relative block h-14 w-14 overflow-hidden rounded-md border border-slate-200 bg-slate-100">
       {imageUrl ? (
         <img src={imageUrl} alt="テンプレート構成服のサムネイル" className="h-full w-full object-cover" />
       ) : (
@@ -183,7 +183,7 @@ export function RecordByTemplateScreen({ wardrobeId }: RecordByTemplateScreenPro
             ) : null}
 
             {hasTemplateItems ? (
-              <div className="grid gap-3">
+              <div className="grid gap-2">
                 {templateItems.map((item) => {
                   const checked = selectedTemplateId === item.templateId;
                   const visibleThumbnails = item.clothingItems.slice(0, TEMPLATE_THUMBNAIL_LIMIT);
@@ -193,28 +193,40 @@ export function RecordByTemplateScreen({ wardrobeId }: RecordByTemplateScreenPro
                     <label
                       key={item.templateId}
                       className={[
-                        "grid gap-3 rounded-xl px-3 py-3 text-sm text-slate-900 transition-colors",
+                        "grid w-full grid-cols-[minmax(0,1fr)_40px] gap-3 rounded-md border border-slate-300 bg-white p-3 text-left transition-colors",
                         checked
-                          ? "bg-[color:color-mix(in_srgb,var(--primary)_16%,white)] text-[var(--text-main)]"
-                          : "bg-white",
+                          ? "border-[var(--primary)] bg-[color:color-mix(in_srgb,var(--primary)_10%,white)]"
+                          : "hover:bg-slate-50",
                       ].join(" ")}
                     >
-                      <span className="flex items-start gap-3">
-                        <input
-                          type="radio"
-                          name="templateId"
-                          checked={checked}
-                          onChange={() => {
-                            setTemplateTouched(true);
-                            setSelectedTemplateId(item.templateId);
-                          }}
-                          className="sr-only"
-                        />
-                        <span className="min-w-0 flex-1 truncate font-medium">{item.name}</span>
+                      <input
+                        type="radio"
+                        name="templateId"
+                        checked={checked}
+                        onChange={() => {
+                          setTemplateTouched(true);
+                          setSelectedTemplateId(item.templateId);
+                        }}
+                        className="sr-only"
+                      />
+                      <span className="grid gap-3">
+                        <span className="truncate text-sm font-medium text-slate-900">{item.name}</span>
+                        <span className="flex flex-wrap gap-2">
+                          {visibleThumbnails.map((clothingItem) => (
+                            <TemplateThumbnail key={clothingItem.clothingId} item={clothingItem} />
+                          ))}
+                          {hiddenCount > 0 ? (
+                            <span className="flex h-14 w-14 items-center justify-center rounded-md border border-dashed border-slate-300 bg-slate-50 text-sm font-semibold text-slate-700">
+                              +{hiddenCount}
+                            </span>
+                          ) : null}
+                        </span>
+                      </span>
+                      <span className="flex items-start justify-end pt-0.5">
                         <span
                           aria-hidden="true"
                           className={[
-                            "flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-sm font-bold transition-colors",
+                            "flex h-7 w-7 items-center justify-center rounded-full border text-sm font-bold transition-colors",
                             checked
                               ? "border-[var(--primary)] bg-[var(--primary)] text-white"
                               : "border-slate-300 bg-white text-transparent",
@@ -222,16 +234,6 @@ export function RecordByTemplateScreen({ wardrobeId }: RecordByTemplateScreenPro
                         >
                           ✓
                         </span>
-                      </span>
-                      <span className="grid grid-cols-2 gap-2">
-                        {visibleThumbnails.map((clothingItem) => (
-                          <TemplateThumbnail key={clothingItem.clothingId} item={clothingItem} />
-                        ))}
-                        {hiddenCount > 0 ? (
-                          <span className="flex h-14 items-center justify-center rounded-md border border-dashed border-slate-300 bg-slate-50 text-sm font-semibold text-slate-700">
-                            +{hiddenCount}
-                          </span>
-                        ) : null}
                       </span>
                     </label>
                   );

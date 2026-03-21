@@ -71,7 +71,8 @@ check(
   includes(target, 'function ClothingThumbnail') &&
     includes(target, 'type="checkbox"') &&
     includes(target, 'className="sr-only"') &&
-    includes(target, 'alt={`${item.name}のサムネイル`}'),
+    includes(target, 'grid-cols-[56px_minmax(0,1fr)_40px]') &&
+    includes(target, 'alt={`${item.name}の画像`}'),
   "服一覧のサムネイル付き選択リスト実装が不足しています",
 );
 

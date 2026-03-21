@@ -36,15 +36,15 @@ function toHistoryApiDate(dateInputValue: string) {
 function ClothingThumbnail({ item }: { item: ClothingListItem }) {
   const imageUrl = resolveImageUrl(item.imageKey);
 
-  return (
-    <span className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-md border border-slate-200 bg-slate-100">
-      {imageUrl ? (
-        <img src={imageUrl} alt={`${item.name}のサムネイル`} className="h-full w-full object-cover" />
-      ) : (
-        <span className="px-1 text-center text-[10px] font-semibold leading-tight text-slate-600">
-          {COMMON_STRINGS.placeholders.noImage}
-        </span>
-      )}
+  return imageUrl ? (
+    <img
+      src={imageUrl}
+      alt={`${item.name}の画像`}
+      className="h-14 w-14 rounded-md border border-slate-200 bg-slate-100 object-cover"
+    />
+  ) : (
+    <span className="flex h-14 w-14 items-center justify-center rounded-md border border-slate-200 bg-slate-100 px-1 text-center text-[10px] font-semibold leading-tight text-slate-600">
+      {COMMON_STRINGS.placeholders.noImage}
     </span>
   );
 }
@@ -190,10 +190,10 @@ export function RecordByCombinationScreen({ wardrobeId }: RecordByCombinationScr
                   <label
                     key={item.clothingId}
                     className={[
-                      "flex items-center gap-3 rounded-xl px-3 py-3 text-sm text-slate-900 transition-colors",
+                      "grid w-full grid-cols-[56px_minmax(0,1fr)_40px] items-center gap-3 rounded-md border border-slate-300 bg-white p-3 text-left transition-colors",
                       checked
-                        ? "bg-[color:color-mix(in_srgb,var(--primary)_16%,white)] text-[var(--text-main)]"
-                        : "bg-white",
+                        ? "border-[var(--primary)] bg-[color:color-mix(in_srgb,var(--primary)_10%,white)]"
+                        : "hover:bg-slate-50",
                     ].join(" ")}
                   >
                     <input
@@ -203,17 +203,19 @@ export function RecordByCombinationScreen({ wardrobeId }: RecordByCombinationScr
                       className="sr-only"
                     />
                     <ClothingThumbnail item={item} />
-                    <span className="min-w-0 flex-1 truncate font-medium">{item.name}</span>
-                    <span
-                      aria-hidden="true"
-                      className={[
-                        "flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-sm font-bold transition-colors",
-                        checked
-                          ? "border-[var(--primary)] bg-[var(--primary)] text-white"
-                          : "border-slate-300 bg-white text-transparent",
-                      ].join(" ")}
-                    >
-                      ✓
+                    <span className="truncate text-sm font-medium text-slate-900">{item.name}</span>
+                    <span className="flex justify-end">
+                      <span
+                        aria-hidden="true"
+                        className={[
+                          "flex h-7 w-7 items-center justify-center rounded-full border text-sm font-bold transition-colors",
+                          checked
+                            ? "border-[var(--primary)] bg-[var(--primary)] text-white"
+                            : "border-slate-300 bg-white text-transparent",
+                        ].join(" ")}
+                      >
+                        ✓
+                      </span>
                     </span>
                   </label>
                 );
