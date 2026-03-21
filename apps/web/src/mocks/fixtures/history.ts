@@ -11,7 +11,7 @@ import {
 } from "@/mocks/fixtures/template";
 
 export const HISTORY_FIXTURE_WARDROBE_ID = TEMPLATE_FIXTURE_WARDROBE_ID;
-const GENERATED_HISTORY_FIXTURE_COUNT = 24;
+const GENERATED_HISTORY_FIXTURE_COUNT = 17;
 
 type HistoryDetailFixture = HistoryDetailResponseDto & {
   historyId: string;
@@ -27,20 +27,44 @@ type HistoryDetailFixtureSeed = {
 const historyDetailFixtureSeeds: HistoryDetailFixtureSeed[] = [
   {
     historyId: "hs_01HZZCCC",
-    date: "20260101",
+    date: "20260321",
     templateId: "tp_01HZZBBB",
     clothingIds: [],
   },
   {
     historyId: "hs_01HZZCCD",
-    date: "20251231",
+    date: "20260320",
     templateId: null,
     clothingIds: ["cl_01HZZAAB", "cl_auto_004", "cl_01HZZAAC"],
   },
   {
     historyId: "hs_01HZZCCE",
-    date: "20251230",
+    date: "20260319",
     templateId: "tp_01HZZBBD",
+    clothingIds: [],
+  },
+  {
+    historyId: "hs_01HZZCCF",
+    date: "20260318",
+    templateId: null,
+    clothingIds: ["cl_auto_001", "cl_auto_002", "cl_auto_003"],
+  },
+  {
+    historyId: "hs_01HZZCCG",
+    date: "20260317",
+    templateId: "tp_auto_001",
+    clothingIds: [],
+  },
+  {
+    historyId: "hs_01HZZCCH",
+    date: "20260316",
+    templateId: null,
+    clothingIds: ["cl_auto_005", "cl_auto_006", "cl_auto_007", "cl_auto_008", "cl_auto_009"],
+  },
+  {
+    historyId: "hs_01HZZCCI",
+    date: "20260315",
+    templateId: "tp_auto_002",
     clothingIds: [],
   },
   ...Array.from({ length: GENERATED_HISTORY_FIXTURE_COUNT }, (_, index): HistoryDetailFixtureSeed => {

@@ -111,10 +111,20 @@ check(
 
 check(
   "HF-09",
-  "historyDetailFixtures が合計27件（既存3件 + 追加24件）で構成される",
-  includes(target, "const GENERATED_HISTORY_FIXTURE_COUNT = 24;") &&
+  "history fixture にホーム用の直近1週間分データが含まれる",
+  includes(target, 'historyId: "hs_01HZZCCC"') &&
+    includes(target, 'date: "20260321"') &&
+    includes(target, 'historyId: "hs_01HZZCCI"') &&
+    includes(target, 'date: "20260315"'),
+  "ホーム画面向けの直近1週間データが fixture に含まれていません",
+);
+
+check(
+  "HF-10",
+  "historyDetailFixtures が合計27件（既存7件 + 追加17件）で構成される",
+  includes(target, "const GENERATED_HISTORY_FIXTURE_COUNT = 17;") &&
     includes(target, "...Array.from({ length: GENERATED_HISTORY_FIXTURE_COUNT },"),
-  "27件構成（3件 + 24件追加）の定義が不足しています",
+  "27件構成（7件 + 17件追加）の定義が不足しています",
 );
 
 if (failures.length > 0) {

@@ -30,6 +30,7 @@ const NO_SCREEN_CARD_FILES = new Set([
   "src/components/app/screens/ClothingsTabScreen.tsx",
   "src/components/app/screens/TemplatesTabScreen.tsx",
   "src/components/app/screens/RecordByCombinationScreen.tsx",
+  "src/components/app/screens/HomeTabScreen.tsx",
 ]);
 
 function abs(relPath) {
@@ -152,7 +153,9 @@ check(
           ? source.includes("CLOTHING_STRINGS.list.actions.add")
           : file.endsWith("TemplatesTabScreen.tsx")
             ? source.includes("TEMPLATE_STRINGS.list.actions.add")
-            : source.includes("<form") && source.includes("RECORD_STRINGS.byCombination.labels.clothing");
+            : file.endsWith("HomeTabScreen.tsx")
+              ? source.includes("HOME_STRINGS.sections.recentWeekHistories") && source.includes("useRecentHistories")
+              : source.includes("<form") && source.includes("RECORD_STRINGS.byCombination.labels.clothing");
 
       return (
         !source.includes("<ScreenCard") &&

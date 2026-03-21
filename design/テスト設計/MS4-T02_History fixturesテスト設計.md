@@ -61,11 +61,16 @@
   - `historyDetailFixtureById` が定義される
   - `historyId` をキーとして詳細fixtureを参照できる
 
-### HF-09 historyDetailFixtures が合計27件（既存3件 + 追加24件）で構成される
+### HF-09 history fixture にホーム用の直近1週間分データが含まれる
+- 観点: ホーム画面の直近1週間表示で安定したfixtureを利用できるか
+- 期待結果:
+  - `20260321` から `20260315` までの7日分データが `historyDetailFixtureSeeds` に存在する
+
+### HF-10 historyDetailFixtures が合計27件（既存7件 + 追加17件）で構成される
 - 観点: 履歴一覧のスクロールやページング検証に必要な件数の固定化
 - 期待結果:
-  - `GENERATED_HISTORY_FIXTURE_COUNT = 24` が定義される
-  - `historyDetailFixtureSeeds` が既存3件に加えて `Array.from` で24件を追加する
+  - `GENERATED_HISTORY_FIXTURE_COUNT = 17` が定義される
+  - `historyDetailFixtureSeeds` が既存7件に加えて `Array.from` で17件を追加する
 
 ## CI適用
 
