@@ -1,7 +1,7 @@
 export const HOME_STRINGS = {
   titlePlaceholder: "ワードローブ名",
   actions: {
-    addRecord: "+記録する",
+    addRecord: "＋ 記録する",
     viewAllHistories: "履歴を全て見る",
   },
   toasts: {

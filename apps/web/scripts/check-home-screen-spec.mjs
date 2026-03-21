@@ -44,12 +44,12 @@ check(
 
 check(
   "HS-02",
-  "+記録するボタンが画面上部に配置される",
+  "＋ 記録するボタンが画面上部に配置される",
   includes(target, 'HOME_STRINGS.actions.addRecord') &&
-    includes("src/features/home/strings.ts", 'addRecord: "+記録する"') &&
+    includes("src/features/home/strings.ts", 'addRecord: "＋ 記録する"') &&
     includes(target, '<Button asChild className="w-full justify-start text-left text-sm font-medium">') &&
     read(target).indexOf('HOME_STRINGS.actions.addRecord') < read(target).indexOf('HOME_STRINGS.sections.recentWeekHistories'),
-  "+記録するボタンが上部アクションとして正しい文言で配置されていません",
+  "＋ 記録するボタンが上部アクションとして正しい文言で配置されていません",
 );
 
 check(
