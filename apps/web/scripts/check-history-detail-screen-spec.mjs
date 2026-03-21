@@ -65,11 +65,12 @@ check(
     includes(target, "historyQuery.data.template ? (") &&
     includes(target, "historyQuery.data.template.name") &&
     includes(target, "historyQuery.data.template.wearCount") &&
-    includes(target, "formatLastWornAt(historyQuery.data.template.lastWornAt)") &&
+    includes(target, "formatLastWornDate(historyQuery.data.template.lastWornAt, HISTORY_STRINGS.detail.messages.neverWorn)") &&
     includes(target, "historyQuery.data.clothingItems.map((item) => {") &&
     includes(target, "item.wearCount") &&
-    includes(target, "formatLastWornAt(item.lastWornAt)"),
-  "履歴詳細の主要表示項目・テンプレート情報・着用服一覧の実装が不足しています",
+    includes(target, "formatLastWornDate(item.lastWornAt, HISTORY_STRINGS.detail.messages.neverWorn)") &&
+    !includes(target, "HISTORY_STRINGS.detail.labels.templateLastWornAt"),
+  "履歴詳細の主要表示項目・曜日付き日付表示・着用服一覧の実装が不足しています",
 );
 
 check(

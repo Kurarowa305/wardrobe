@@ -66,8 +66,8 @@ check(
     includes(target, "CLOTHING_STRINGS.detail.labels.wearCount") &&
     includes(target, "clothingQuery.data.wearCount") &&
     includes(target, "CLOTHING_STRINGS.detail.labels.lastWornAt") &&
-    includes(target, "formatLastWornAt(clothingQuery.data.lastWornAt)"),
-  "画像・服名・着用情報表示、resolveImageUrl/no image フォールバック実装が不足しています",
+    includes(target, "formatLastWornDate(clothingQuery.data.lastWornAt, CLOTHING_STRINGS.detail.messages.neverWorn)"),
+  "画像・服名・曜日付き着用情報表示、resolveImageUrl/no image フォールバック実装が不足しています",
 );
 
 check(

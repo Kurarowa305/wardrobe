@@ -8,6 +8,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { COMMON_STRINGS } from "@/constants/commonStrings";
 import { ROUTES } from "@/constants/routes";
 import { resolveImageUrl } from "@/features/clothing/imageUrl";
+import { formatLastWornDate } from "@/features/history/date";
 import { TEMPLATE_STRINGS } from "@/features/template/strings";
 import { isAppError } from "@/lib/error/normalize";
 import { ScreenCard } from "./ScreenPrimitives";
@@ -23,18 +24,6 @@ function resolveErrorMessage(error: unknown): string {
   }
 
   return TEMPLATE_STRINGS.detail.messages.error;
-}
-
-function formatLastWornAt(lastWornAt: number | null) {
-  if (lastWornAt === null) {
-    return TEMPLATE_STRINGS.detail.messages.neverWorn;
-  }
-
-  return new Intl.DateTimeFormat("ja-JP", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(lastWornAt);
 }
 
 export function TemplateDetailScreen({ wardrobeId, templateId }: TemplateDetailScreenProps) {
@@ -92,7 +81,7 @@ export function TemplateDetailScreen({ wardrobeId, templateId }: TemplateDetailS
               <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">
                 {TEMPLATE_STRINGS.detail.labels.lastWornAt}
               </dt>
-              <dd className="m-0 text-sm text-slate-900">{formatLastWornAt(templateQuery.data.lastWornAt)}</dd>
+              <dd className="m-0 text-sm text-slate-900">{formatLastWornDate(templateQuery.data.lastWornAt, TEMPLATE_STRINGS.detail.messages.neverWorn)}</dd>
             </div>
           </dl>
 
@@ -128,7 +117,7 @@ export function TemplateDetailScreen({ wardrobeId, templateId }: TemplateDetailS
                           {TEMPLATE_STRINGS.detail.labels.clothingWearCount}: {item.wearCount}
                         </p>
                         <p className="m-0 text-xs text-slate-600">
-                          {TEMPLATE_STRINGS.detail.labels.clothingLastWornAt}: {formatLastWornAt(item.lastWornAt)}
+                          {formatLastWornDate(item.lastWornAt, TEMPLATE_STRINGS.detail.messages.neverWorn)}
                         </p>
                       </div>
                     </div>

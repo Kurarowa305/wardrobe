@@ -10,7 +10,7 @@ import { COMMON_STRINGS } from "@/constants/commonStrings";
 import { ROUTES } from "@/constants/routes";
 import { resolveImageUrl } from "@/features/clothing/imageUrl";
 import { resolveHistoryDetailBackHref } from "@/features/history/routing";
-import { formatHistoryDate } from "@/features/history/date";
+import { formatHistoryDate, formatLastWornDate } from "@/features/history/date";
 import { HISTORY_STRINGS } from "@/features/history/strings";
 import { isAppError } from "@/lib/error/normalize";
 import { ScreenCard } from "./ScreenPrimitives";
@@ -34,18 +34,6 @@ function resolveErrorMessage(error: unknown): string {
   return HISTORY_STRINGS.detail.messages.error;
 }
 
-
-function formatLastWornAt(lastWornAt: number | null) {
-  if (lastWornAt === null) {
-    return HISTORY_STRINGS.detail.messages.neverWorn;
-  }
-
-  return new Intl.DateTimeFormat("ja-JP", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(lastWornAt);
-}
 
 function HistoryDetailScreenContent({ wardrobeId, historyId, backHref }: HistoryDetailScreenContentProps) {
   const router = useRouter();
@@ -112,7 +100,7 @@ ${COMMON_STRINGS.dialogs.confirmDelete.message}`,
                   {HISTORY_STRINGS.detail.labels.templateWearCount}: {historyQuery.data.template.wearCount}
                 </p>
                 <p className="m-0 text-xs text-slate-600">
-                  {HISTORY_STRINGS.detail.labels.templateLastWornAt}: {formatLastWornAt(historyQuery.data.template.lastWornAt)}
+                  {formatLastWornDate(historyQuery.data.template.lastWornAt, HISTORY_STRINGS.detail.messages.neverWorn)}
                 </p>
               </div>
             </div>
@@ -150,7 +138,7 @@ ${COMMON_STRINGS.dialogs.confirmDelete.message}`,
                           {HISTORY_STRINGS.detail.labels.clothingWearCount}: {item.wearCount}
                         </p>
                         <p className="m-0 text-xs text-slate-600">
-                          {HISTORY_STRINGS.detail.labels.clothingLastWornAt}: {formatLastWornAt(item.lastWornAt)}
+                          {formatLastWornDate(item.lastWornAt, HISTORY_STRINGS.detail.messages.neverWorn)}
                         </p>
                       </div>
                     </div>

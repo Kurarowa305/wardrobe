@@ -97,6 +97,9 @@ jobs:
       - name: Copy labels spec test
         run: pnpm --filter web test:copy-labels
 
+      - name: History date weekday spec test
+        run: pnpm --filter web test:history-date-weekday
+
       - name: Home screen spec test
         run: pnpm --filter web test:home-screen
 
