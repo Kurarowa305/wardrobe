@@ -1,4 +1,7 @@
 export const RECORD_STRINGS = {
+  common: {
+    deleted: "削除済み",
+  },
   method: {
     title: "記録",
     message: "どの方法で記録しますか？",
@@ -22,7 +25,6 @@ export const RECORD_STRINGS = {
       loadMore: "さらに読み込む",
     },
     messages: {
-      selected: "選択中のテンプレート",
       loading: "テンプレートを読み込んでいます…",
       loadError: "テンプレート一覧の取得に失敗しました。時間をおいて再度お試しください。",
       empty: "記録できるテンプレートがまだありません。先にテンプレートを追加してください。",
@@ -43,7 +45,6 @@ export const RECORD_STRINGS = {
       loadMore: "さらに読み込む",
     },
     messages: {
-      selected: "選択中の服",
       loading: "服を読み込んでいます…",
       loadError: "服一覧の取得に失敗しました。時間をおいて再度お試しください。",
       empty: "記録できる服がまだありません。先に服を追加してください。",
