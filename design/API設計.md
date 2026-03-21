@@ -276,6 +276,14 @@
 | name          | string         | テンプレ名          |
 | clothingItems | [] | 構成服（順序付き・最大4件）   |
 
+### template
+| フィールド      | 型      | 説明 |
+| ---------- | ------ | ---- |
+| templateId | string | テンプレートID |
+| name       | string | テンプレート名 |
+| wearCount  | number | 着用回数 |
+| lastWornAt | number | 最終着用日時（未着用は 0） |
+
 ### clothingItems[]
 | フィールド      | 型       | 説明             |
 | ---------- | ------- | -------------- |
@@ -362,6 +370,14 @@
 | wearCount     | number         | 着用回数                 |
 | lastWornAt    | number         | 最終着用                 |
 | clothingItems | [] | 構成服（順序付き）            |
+
+### template
+| フィールド      | 型      | 説明 |
+| ---------- | ------ | ---- |
+| templateId | string | テンプレートID |
+| name       | string | テンプレート名 |
+| wearCount  | number | 着用回数 |
+| lastWornAt | number | 最終着用日時（未着用は 0） |
 
 ### clothingItems[]
 | フィールド      | 型       | 説明             |
@@ -474,6 +490,14 @@
 | name  | string?        | テンプレ入力ならテンプレ名（組み合わせ入力なら null） |
 | clothingItems | [] | 着用服（順序付き・最大4件）                     |
 
+### template
+| フィールド      | 型      | 説明 |
+| ---------- | ------ | ---- |
+| templateId | string | テンプレートID |
+| name       | string | テンプレート名 |
+| wearCount  | number | 着用回数 |
+| lastWornAt | number | 最終着用日時（未着用は 0） |
+
 ### clothingItems[]
 | フィールド      | 型       | 説明             |
 | ---------- | ------- | -------------- |
@@ -564,7 +588,16 @@
 | ------------- | -------------- | ------------- |
 | date          | string         | `yyyymmdd`    |
 | templateName  | string?        | テンプレ入力ならテンプレ名 |
+| template      | object?         | テンプレ入力時のテンプレート詳細 |
 | clothingItems | [] | 着用服（順序付き）     |
+
+### template
+| フィールド      | 型      | 説明 |
+| ---------- | ------ | ---- |
+| templateId | string | テンプレートID |
+| name       | string | テンプレート名 |
+| wearCount  | number | 着用回数 |
+| lastWornAt | number | 最終着用日時（未着用は 0） |
 
 ### clothingItems[]
 | フィールド      | 型       | 説明             |
@@ -580,6 +613,12 @@
 {
   "date": "20260101",
   "templateName": "普段着",
+  "template": {
+    "templateId": "tp_01",
+    "name": "普段着",
+    "wearCount": 12,
+    "lastWornAt": 1735600000000
+  },
   "clothingItems": [
     {
       "clothingId": "cl_01",

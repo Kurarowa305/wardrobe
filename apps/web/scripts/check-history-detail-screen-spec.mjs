@@ -58,14 +58,18 @@ check(
 
 check(
   "HDS-03",
-  "履歴詳細画面が日付・入力方法・着用服一覧を表示する",
+  "履歴詳細画面が日付・入力方法・テンプレート情報・着用服一覧を表示する",
   includes(target, "formatHistoryDate(historyQuery.data.date)") &&
     includes(target, "HISTORY_STRINGS.labels.inputType[historyQuery.data.inputType]") &&
-    includes(target, "historyQuery.data.templateName ?? HISTORY_STRINGS.detail.messages.combinationSummary") &&
+    !includes(target, "historyQuery.data.templateName ?? HISTORY_STRINGS.detail.messages.combinationSummary") &&
+    includes(target, "historyQuery.data.template ? (") &&
+    includes(target, "historyQuery.data.template.name") &&
+    includes(target, "historyQuery.data.template.wearCount") &&
+    includes(target, "formatLastWornAt(historyQuery.data.template.lastWornAt)") &&
     includes(target, "historyQuery.data.clothingItems.map((item) => {") &&
     includes(target, "item.wearCount") &&
     includes(target, "formatLastWornAt(item.lastWornAt)"),
-  "履歴詳細の主要表示項目または着用服一覧が不足しています",
+  "履歴詳細の主要表示項目・テンプレート情報・着用服一覧の実装が不足しています",
 );
 
 check(
@@ -108,6 +112,9 @@ check(
   includes(stringsTarget, 'loading: "読み込み中..."') &&
     includes(stringsTarget, 'error: "履歴詳細の読み込みに失敗しました。"') &&
     includes(stringsTarget, 'notFound: "履歴が見つかりませんでした。"') &&
+    includes(stringsTarget, 'template: "着用したテンプレート"') &&
+    includes(stringsTarget, 'templateWearCount: "着用回数"') &&
+    includes(stringsTarget, 'templateLastWornAt: "最終着用日"') &&
     includes(stringsTarget, 'clothingItems: "着用した服"') &&
     includes(stringsTarget, 'clothingDeleted: "削除済みの服です"') &&
     includes(stringsTarget, 'neverWorn: "未着用"'),

@@ -35,6 +35,7 @@ function initializeHistoryStore(): HistoryRecord[] {
     historyId: fixture.historyId,
     date: fixture.date,
     templateName: fixture.templateName,
+    template: fixture.template ? { ...fixture.template } : null,
     clothingItems: fixture.clothingItems.map((item) => ({ ...item })),
   }));
 }
@@ -335,6 +336,7 @@ export const historyHandlers = [
     return HttpResponse.json<HistoryDetailResponseDto>({
       date: history.date,
       templateName: history.templateName,
+      template: history.template ? { ...history.template } : null,
       clothingItems: history.clothingItems.map((item) => ({ ...item })),
     });
   }),
@@ -369,6 +371,12 @@ export const historyHandlers = [
           historyId: createMockHistoryId(),
           date: payload.date,
           templateName: template.name,
+          template: {
+            templateId: payload.templateId,
+            name: template.name,
+            wearCount: template.wearCount,
+            lastWornAt: template.lastWornAt,
+          },
           clothingItems: template.clothingItems.map((item: HistoryDetailClothingItemDto) => ({ ...item })),
         };
       }
@@ -379,6 +387,7 @@ export const historyHandlers = [
           historyId: createMockHistoryId(),
           date: payload.date,
           templateName: null,
+          template: null,
           clothingItems,
         };
       }

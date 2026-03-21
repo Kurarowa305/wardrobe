@@ -21,6 +21,7 @@
     "test:history-query-mutation-hooks": "node scripts/check-history-query-mutation-hooks-spec.mjs",
     "test:history-list-screen": "node scripts/check-history-list-screen-spec.mjs",
     "test:history-detail-screen": "node scripts/check-history-detail-screen-spec.mjs",
+    "test:history-detail-template-card": "node scripts/check-history-detail-template-card-spec.mjs",
     "test:history-delete-flow": "node scripts/check-history-delete-flow-spec.mjs",
     "test:home-screen": "node scripts/check-home-screen-spec.mjs",
     "test:template-fixtures": "node scripts/check-template-fixtures-spec.mjs",
