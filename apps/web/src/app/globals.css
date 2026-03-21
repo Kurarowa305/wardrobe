@@ -6,8 +6,8 @@
   --line: #d7dce2;
   --text-main: #1d2530;
   --text-sub: #5b6573;
-  --primary: #2563eb;
-  --primary-soft: #dbeafe;
+  --primary: #687a88;
+  --primary-soft: #687a88;
 }
 
 * {
@@ -108,7 +108,7 @@ a {
 }
 
 .tab-item.is-active {
-  color: var(--primary);
+  color: #fff;
   background: var(--primary-soft);
 }
 
