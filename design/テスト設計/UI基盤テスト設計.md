@@ -22,7 +22,6 @@
   - `src/components/ui/toaster.tsx`
   - `src/components/ui/use-toast.ts`
   - `src/lib/utils.ts`
-  - `src/components/app/screens/ScreenPrimitives.tsx`
 
 ### UF-02 RootLayout に Toaster が組み込まれている
 - 観点: 全画面でトースト表示可能か
@@ -55,14 +54,12 @@
   - `HomeTabScreen.tsx` で `window.location.search` の `created` クエリを判定し、トースト表示する
   - 表示後に `window.history.replaceState(..., ROUTES.home(wardrobeId))` でクエリを除去する
 
-### UF-09 スクリーン実装は ScreenCard基盤または画面要件に沿った直接描画で構成される
-- 観点: UI基盤の適用方針と画面要件の両立
+### UF-09 スクリーン実装は全画面で ScreenCard を使わない直接描画に統一される
+- 観点: UI基盤の適用方針を画面単位の直接描画へ統一できていること
 - 期待結果:
-  - `WardrobeCreateScreen.tsx` はヘッダー非表示・ヒーロータイトル表示の画面要件に合わせて `ScreenCard` を使わず直接描画する
-  - `HomeTabScreen.tsx` / `HistoriesTabScreen.tsx` / `ClothingsTabScreen.tsx` / `TemplatesTabScreen.tsx` は `ScreenCard` でラップせず、画面要件に沿って直接描画する
-  - `RecordMethodScreen.tsx` は `ScreenCard` でラップせず、説明文付きの2択カード風ボタンを直接描画する
-  - `RecordByCombinationScreen.tsx` はフォーム画面要件に合わせて `ScreenCard` でラップせず、`form` と `fieldset` を直接描画する
-  - それ以外の画面では `ScreenCard` または `ScreenTextCard` の利用が確認できる
+  - すべての対象画面で `ScreenCard` / `ScreenTextCard` / `ScreenPrimitives` の参照が存在しない
+  - 一覧・詳細・フォーム画面のいずれも外側カードデザインなしで描画される
+  - 直接描画へ移行した画面が、それぞれの文言・フォーム・一覧表示要件を継続して満たす
 
 ### UF-10 旧 screen-* クラス依存が除去されている
 - 観点: 旧スタイル実装からの完全移行

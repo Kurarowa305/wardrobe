@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { useCreateHistoryMutation } from "@/api/hooks/history";
 import { useTemplateList } from "@/api/hooks/template";
 import { AppLayout } from "@/components/app/layout/AppLayout";
-import { ScreenCard } from "@/components/app/screens/ScreenPrimitives";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ROUTES } from "@/constants/routes";
@@ -128,7 +127,7 @@ export function RecordByTemplateScreen({ wardrobeId }: RecordByTemplateScreenPro
 
   return (
     <AppLayout title={RECORD_STRINGS.byTemplate.title} backHref={ROUTES.recordMethod(wardrobeId)}>
-      <ScreenCard>
+      <div className="grid gap-4">
         <form className="grid gap-3" onSubmit={handleSubmit} noValidate>
           <label className="grid gap-1 text-sm font-medium text-slate-900" htmlFor="record-template-date">
             <span>{RECORD_STRINGS.byTemplate.labels.date}</span>
@@ -233,7 +232,7 @@ export function RecordByTemplateScreen({ wardrobeId }: RecordByTemplateScreenPro
               : RECORD_STRINGS.byTemplate.actions.submit}
           </Button>
         </form>
-      </ScreenCard>
+      </div>
     </AppLayout>
   );
 }

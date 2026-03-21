@@ -11,7 +11,6 @@ import { resolveImageUrl } from "@/features/clothing/imageUrl";
 import { formatLastWornDate } from "@/features/history/date";
 import { TEMPLATE_STRINGS } from "@/features/template/strings";
 import { isAppError } from "@/lib/error/normalize";
-import { ScreenCard } from "./ScreenPrimitives";
 
 type TemplateDetailScreenProps = {
   wardrobeId: string;
@@ -52,7 +51,7 @@ export function TemplateDetailScreen({ wardrobeId, templateId }: TemplateDetailS
   };
 
   const content = (
-    <ScreenCard>
+    <div className="grid gap-4">
       {templateQuery.isPending ? (
         <p className="m-0 text-sm text-slate-600">{TEMPLATE_STRINGS.detail.messages.loading}</p>
       ) : null}
@@ -128,7 +127,7 @@ export function TemplateDetailScreen({ wardrobeId, templateId }: TemplateDetailS
           </div>
         </>
       ) : null}
-    </ScreenCard>
+    </div>
   );
 
   return createElement(AppLayout, {
