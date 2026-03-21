@@ -13,7 +13,7 @@ import { resolveHistoryDetailBackHref } from "@/features/history/routing";
 import { formatHistoryDate } from "@/features/history/date";
 import { HISTORY_STRINGS } from "@/features/history/strings";
 import { isAppError } from "@/lib/error/normalize";
-import { ScreenCard } from "./ScreenPrimitives";
+import { Card, CardContent } from "@/components/ui/card";
 
 type HistoryDetailScreenProps = {
   wardrobeId: string;
@@ -34,7 +34,11 @@ function resolveErrorMessage(error: unknown): string {
   return HISTORY_STRINGS.detail.messages.error;
 }
 
-function HistoryDetailScreenContent({ wardrobeId, historyId, backHref }: HistoryDetailScreenContentProps) {
+function HistoryDetailScreenContent({
+  wardrobeId,
+  historyId,
+  backHref,
+}: HistoryDetailScreenContentProps) {
   const router = useRouter();
   const { toast } = useToast();
   const historyQuery = useHistory(wardrobeId, historyId);
@@ -61,88 +65,110 @@ ${COMMON_STRINGS.dialogs.confirmDelete.message}`,
   };
 
   const content = (
-    <ScreenCard>
-      {historyQuery.isPending ? (
-        <p className="m-0 text-sm text-slate-600">{HISTORY_STRINGS.detail.messages.loading}</p>
-      ) : null}
+    <Card>
+      <CardContent className="grid gap-2 p-4">
+        {historyQuery.isPending ? (
+          <p className="m-0 text-sm text-slate-600">
+            {HISTORY_STRINGS.detail.messages.loading}
+          </p>
+        ) : null}
 
-      {historyQuery.isError ? (
-        <p className="m-0 text-sm text-red-700">{resolveErrorMessage(historyQuery.error)}</p>
-      ) : null}
+        {historyQuery.isError ? (
+          <p className="m-0 text-sm text-red-700">
+            {resolveErrorMessage(historyQuery.error)}
+          </p>
+        ) : null}
 
-      {historyQuery.data ? (
-        <>
-          <div className="grid gap-3 rounded-md border border-slate-200 bg-slate-50 p-3">
-            <div className="grid gap-1">
-              <p className="m-0 text-xs font-medium uppercase tracking-wide text-slate-500">
-                {HISTORY_STRINGS.detail.labels.date}
-              </p>
-              <p className="m-0 text-base font-semibold text-slate-900">{formatHistoryDate(historyQuery.data.date)}</p>
-            </div>
+        {historyQuery.data ? (
+          <>
+            <div className="grid gap-3 rounded-md border border-slate-200 bg-slate-50 p-3">
+              <div className="grid gap-1">
+                <p className="m-0 text-xs font-medium uppercase tracking-wide text-slate-500">
+                  {HISTORY_STRINGS.detail.labels.date}
+                </p>
+                <p className="m-0 text-base font-semibold text-slate-900">
+                  {formatHistoryDate(historyQuery.data.date)}
+                </p>
+              </div>
 
-            <div className="grid gap-1">
-              <p className="m-0 text-xs font-medium uppercase tracking-wide text-slate-500">
-                {HISTORY_STRINGS.detail.labels.inputType}
-              </p>
-              <p className="m-0 text-sm font-medium text-slate-900">
-                {HISTORY_STRINGS.labels.inputType[historyQuery.data.inputType]}
-              </p>
-            </div>
-          </div>
-
-          {historyQuery.data.template ? (
-            <div className="grid gap-2">
-              <p className="m-0 text-sm font-medium text-slate-900">{HISTORY_STRINGS.detail.labels.template}</p>
-              <div className="grid gap-1 rounded-md border border-slate-200 bg-white p-3">
-                <p className="m-0 text-sm font-medium text-slate-900">{historyQuery.data.template.name}</p>
-                <p className="m-0 text-xs text-slate-600">
-                  {HISTORY_STRINGS.detail.labels.templateWearCount}: {historyQuery.data.template.wearCount}
+              <div className="grid gap-1">
+                <p className="m-0 text-xs font-medium uppercase tracking-wide text-slate-500">
+                  {HISTORY_STRINGS.detail.labels.inputType}
+                </p>
+                <p className="m-0 text-sm font-medium text-slate-900">
+                  {
+                    HISTORY_STRINGS.labels.inputType[
+                      historyQuery.data.inputType
+                    ]
+                  }
                 </p>
               </div>
             </div>
-          ) : null}
 
-          <div className="grid gap-2">
-            <p className="m-0 text-sm font-medium text-slate-900">{HISTORY_STRINGS.detail.labels.clothingItems}</p>
-            <ul className="m-0 grid list-none gap-2 p-0">
-              {historyQuery.data.clothingItems.map((item) => {
-                const imageUrl = resolveImageUrl(item.imageKey);
+            {historyQuery.data.template ? (
+              <div className="grid gap-2">
+                <p className="m-0 text-sm font-medium text-slate-900">
+                  {HISTORY_STRINGS.detail.labels.template}
+                </p>
+                <div className="grid gap-1 rounded-md border border-slate-200 bg-white p-3">
+                  <p className="m-0 text-sm font-medium text-slate-900">
+                    {historyQuery.data.template.name}
+                  </p>
+                  <p className="m-0 text-xs text-slate-600">
+                    {HISTORY_STRINGS.detail.labels.templateWearCount}:{" "}
+                    {historyQuery.data.template.wearCount}
+                  </p>
+                </div>
+              </div>
+            ) : null}
 
-                return (
-                  <li key={item.clothingId}>
-                    <div className="grid grid-cols-[4rem_1fr] gap-3 rounded-md border border-slate-200 p-3">
-                      {imageUrl ? (
-                        <img
-                          src={imageUrl}
-                          alt={`${item.name}の画像`}
-                          className="h-16 w-16 rounded-md border border-slate-200 bg-slate-100 object-cover"
-                        />
-                      ) : (
-                        <div className="flex h-16 w-16 items-center justify-center rounded-md border border-slate-200 bg-slate-100 px-1 text-center text-[10px] font-semibold uppercase tracking-wide text-slate-600">
-                          {COMMON_STRINGS.placeholders.noImage}
-                        </div>
-                      )}
+            <div className="grid gap-2">
+              <p className="m-0 text-sm font-medium text-slate-900">
+                {HISTORY_STRINGS.detail.labels.clothingItems}
+              </p>
+              <ul className="m-0 grid list-none gap-2 p-0">
+                {historyQuery.data.clothingItems.map((item) => {
+                  const imageUrl = resolveImageUrl(item.imageKey);
 
-                      <div className="grid gap-1">
-                        <p className="m-0 text-sm font-medium text-slate-900">{item.name}</p>
-                        {item.deleted ? (
-                          <p className="m-0 text-xs font-medium text-amber-700">
-                            {HISTORY_STRINGS.detail.messages.clothingDeleted}
+                  return (
+                    <li key={item.clothingId}>
+                      <div className="grid grid-cols-[4rem_1fr] gap-3 rounded-md border border-slate-200 p-3">
+                        {imageUrl ? (
+                          <img
+                            src={imageUrl}
+                            alt={`${item.name}の画像`}
+                            className="h-16 w-16 rounded-md border border-slate-200 bg-slate-100 object-cover"
+                          />
+                        ) : (
+                          <div className="flex h-16 w-16 items-center justify-center rounded-md border border-slate-200 bg-slate-100 px-1 text-center text-[10px] font-semibold uppercase tracking-wide text-slate-600">
+                            {COMMON_STRINGS.placeholders.noImage}
+                          </div>
+                        )}
+
+                        <div className="grid gap-1">
+                          <p className="m-0 text-sm font-medium text-slate-900">
+                            {item.name}
                           </p>
-                        ) : null}
-                        <p className="m-0 text-xs text-slate-600">
-                          {HISTORY_STRINGS.detail.labels.clothingWearCount}: {item.wearCount}
-                        </p>
+                          {item.deleted ? (
+                            <p className="m-0 text-xs font-medium text-amber-700">
+                              {HISTORY_STRINGS.detail.messages.clothingDeleted}
+                            </p>
+                          ) : null}
+                          <p className="m-0 text-xs text-slate-600">
+                            {HISTORY_STRINGS.detail.labels.clothingWearCount}:{" "}
+                            {item.wearCount}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        </>
-      ) : null}
-    </ScreenCard>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          </>
+        ) : null}
+      </CardContent>
+    </Card>
   );
 
   return createElement(AppLayout, {
@@ -160,14 +186,29 @@ ${COMMON_STRINGS.dialogs.confirmDelete.message}`,
   });
 }
 
-function HistoryDetailScreenSearchParams({ wardrobeId, historyId }: HistoryDetailScreenProps) {
+function HistoryDetailScreenSearchParams({
+  wardrobeId,
+  historyId,
+}: HistoryDetailScreenProps) {
   const searchParams = useSearchParams();
-  const backHref = resolveHistoryDetailBackHref(wardrobeId, searchParams.get("from"));
+  const backHref = resolveHistoryDetailBackHref(
+    wardrobeId,
+    searchParams.get("from"),
+  );
 
-  return <HistoryDetailScreenContent wardrobeId={wardrobeId} historyId={historyId} backHref={backHref} />;
+  return (
+    <HistoryDetailScreenContent
+      wardrobeId={wardrobeId}
+      historyId={historyId}
+      backHref={backHref}
+    />
+  );
 }
 
-export function HistoryDetailScreen({ wardrobeId, historyId }: HistoryDetailScreenProps) {
+export function HistoryDetailScreen({
+  wardrobeId,
+  historyId,
+}: HistoryDetailScreenProps) {
   return (
     <Suspense
       fallback={
@@ -178,7 +219,10 @@ export function HistoryDetailScreen({ wardrobeId, historyId }: HistoryDetailScre
         />
       }
     >
-      <HistoryDetailScreenSearchParams wardrobeId={wardrobeId} historyId={historyId} />
+      <HistoryDetailScreenSearchParams
+        wardrobeId={wardrobeId}
+        historyId={historyId}
+      />
     </Suspense>
   );
 }
