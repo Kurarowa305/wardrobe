@@ -58,7 +58,7 @@
 ### UF-09 スクリーン実装は ScreenCard基盤または画面要件に沿った直接描画で構成される
 - 観点: UI基盤の適用方針と画面要件の両立
 - 期待結果:
-  - `HistoriesTabScreen.tsx` / `ClothingsTabScreen.tsx` / `TemplatesTabScreen.tsx` は `ScreenCard` でラップせず、一覧要素を直接描画する
+  - `HomeTabScreen.tsx` / `HistoriesTabScreen.tsx` / `ClothingsTabScreen.tsx` / `TemplatesTabScreen.tsx` は `ScreenCard` でラップせず、画面要件に沿って直接描画する
   - `RecordByCombinationScreen.tsx` はフォーム画面要件に合わせて `ScreenCard` でラップせず、`form` と `fieldset` を直接描画する
   - それ以外の画面では `ScreenCard` または `ScreenTextCard` の利用が確認できる
 

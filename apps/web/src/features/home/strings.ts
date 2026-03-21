@@ -13,4 +13,9 @@ export const HOME_STRINGS = {
   sections: {
     recentWeekHistories: "直近1週間の履歴",
   },
+  messages: {
+    loadingRecentHistories: "履歴を読み込み中...",
+    errorRecentHistories: "履歴の読み込みに失敗しました。",
+    emptyRecentHistories: "直近1週間の履歴はまだありません。",
+  },
 } as const;
