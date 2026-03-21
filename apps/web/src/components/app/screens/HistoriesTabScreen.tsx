@@ -90,15 +90,17 @@ export function HistoriesTabScreen({ wardrobeId }: HistoriesTabScreenProps) {
       {showInlineError ? <p className="m-0 text-sm text-red-700">{HISTORY_STRINGS.list.messages.error}</p> : null}
 
       {nextCursor !== null ? (
-        <Button
-          type="button"
-          variant="secondary"
-          className="w-full text-sm font-medium"
-          disabled={!canLoadMore}
-          onClick={handleLoadMore}
-        >
-          {isFetching ? HISTORY_STRINGS.list.messages.loading : HISTORY_STRINGS.list.actions.loadMore}
-        </Button>
+        <div className="mt-4">
+          <Button
+            type="button"
+            variant="secondary"
+            className="w-full text-sm font-medium"
+            disabled={!canLoadMore}
+            onClick={handleLoadMore}
+          >
+            {isFetching ? HISTORY_STRINGS.list.messages.loading : HISTORY_STRINGS.list.actions.loadMore}
+          </Button>
+        </div>
       ) : null}
     </>
   );

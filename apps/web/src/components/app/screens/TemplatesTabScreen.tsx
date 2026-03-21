@@ -124,9 +124,11 @@ export function TemplatesTabScreen({ wardrobeId }: TemplatesTabScreenProps) {
 
   const content = (
     <>
-      <Button asChild className="w-full justify-start text-left text-base font-bold text-white">
-        <Link href={ROUTES.templateNew(wardrobeId)}>{TEMPLATE_STRINGS.list.actions.add}</Link>
-      </Button>
+      <div className="mb-4">
+        <Button asChild className="w-full justify-start text-left text-base font-bold text-white">
+          <Link href={ROUTES.templateNew(wardrobeId)}>{TEMPLATE_STRINGS.list.actions.add}</Link>
+        </Button>
+      </div>
 
       {isInitialLoading ? <p className="m-0 text-sm text-slate-600">{TEMPLATE_STRINGS.list.messages.loading}</p> : null}
 
@@ -145,15 +147,17 @@ export function TemplatesTabScreen({ wardrobeId }: TemplatesTabScreenProps) {
       {showInlineError ? <p className="m-0 text-sm text-red-700">{TEMPLATE_STRINGS.list.messages.error}</p> : null}
 
       {nextCursor !== null ? (
-        <Button
-          type="button"
-          variant="secondary"
-          className="w-full text-sm font-medium"
-          disabled={!canLoadMore}
-          onClick={handleLoadMore}
-        >
-          {isFetching ? TEMPLATE_STRINGS.list.messages.loading : TEMPLATE_STRINGS.list.actions.loadMore}
-        </Button>
+        <div className="mt-4">
+          <Button
+            type="button"
+            variant="secondary"
+            className="w-full text-sm font-medium"
+            disabled={!canLoadMore}
+            onClick={handleLoadMore}
+          >
+            {isFetching ? TEMPLATE_STRINGS.list.messages.loading : TEMPLATE_STRINGS.list.actions.loadMore}
+          </Button>
+        </div>
       ) : null}
     </>
   );

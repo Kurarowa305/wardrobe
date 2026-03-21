@@ -52,6 +52,9 @@ jobs:
       - name: Wardrobe create screen spec test
         run: pnpm --filter web test:wardrobe-create-screen
 
+      - name: List screen spacing spec test
+        run: pnpm --filter web test:list-screen-spacing
+
       - name: Tab bar fixed spec test
         run: pnpm --filter web test:tab-bar-fixed
 
