@@ -8,7 +8,9 @@ import { useCreateHistoryMutation } from "@/api/hooks/history";
 import { AppLayout } from "@/components/app/layout/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { COMMON_STRINGS } from "@/constants/commonStrings";
 import { ROUTES } from "@/constants/routes";
+import { resolveImageUrl } from "@/features/clothing/imageUrl";
 import { RECORD_STRINGS } from "@/features/record/strings";
 import type { ClothingListItem } from "@/features/clothing/types";
 
@@ -29,6 +31,38 @@ function createTodayDateString() {
 
 function toHistoryApiDate(dateInputValue: string) {
   return dateInputValue.replaceAll("-", "");
+}
+
+function ClothingListCard({
+  item,
+  checked,
+  onChange,
+}: {
+  item: ClothingListItem;
+  checked: boolean;
+  onChange?: () => void;
+}) {
+  const imageUrl = resolveImageUrl(item.imageKey);
+
+  return (
+    <label
+      className={[
+        "grid grid-cols-[56px_minmax(0,1fr)] items-center gap-3 rounded-md border px-3 py-2 text-sm text-slate-900",
+        checked ? "border-slate-400 bg-slate-50" : "border-slate-200 bg-white",
+        onChange ? "cursor-pointer" : "",
+      ].join(" ")}
+    >
+      {onChange ? <input type="checkbox" checked={checked} onChange={onChange} className="sr-only" /> : null}
+      {imageUrl ? (
+        <img src={imageUrl} alt={`${item.name}の画像`} className="h-14 w-14 rounded-md border border-slate-200 bg-slate-100 object-cover" />
+      ) : (
+        <span className="flex h-14 w-14 items-center justify-center rounded-md border border-slate-200 bg-slate-100 px-1 text-center text-[10px] font-semibold leading-tight text-slate-600">
+          {COMMON_STRINGS.placeholders.noImage}
+        </span>
+      )}
+      <span className="truncate font-medium">{item.name}</span>
+    </label>
+  );
 }
 
 export function RecordByCombinationScreen({ wardrobeId }: RecordByCombinationScreenProps) {
@@ -135,7 +169,7 @@ export function RecordByCombinationScreen({ wardrobeId }: RecordByCombinationScr
 
   return (
     <AppLayout title={RECORD_STRINGS.byCombination.title} backHref={ROUTES.recordMethod(wardrobeId)}>
-      <form className="grid gap-3" onSubmit={handleSubmit} noValidate>
+      <form className="grid gap-3 pb-24" onSubmit={handleSubmit} noValidate>
         <label className="grid gap-1 text-sm font-medium text-slate-900" htmlFor="record-combination-date">
           <span>{RECORD_STRINGS.byCombination.labels.date}</span>
           <Input
@@ -173,16 +207,16 @@ export function RecordByCombinationScreen({ wardrobeId }: RecordByCombinationScr
 
           {selectedClothingItems.length > 0 ? (
             <div className="grid gap-2 rounded-md border border-slate-200 bg-slate-50 p-3">
-              <p className="m-0 text-sm font-medium text-slate-900">{RECORD_STRINGS.byCombination.messages.selected}</p>
-              <ul className="m-0 grid list-none gap-2 p-0">
-                {selectedClothingItems.map((item) => (
-                  <li key={`selected-${item.clothingId}`} className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900">
-                    {item.name}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
+                <p className="m-0 text-sm font-medium text-slate-900">{RECORD_STRINGS.byCombination.messages.selected}</p>
+                <ul className="m-0 grid list-none gap-2 p-0">
+                  {selectedClothingItems.map((item) => (
+                    <li key={`selected-${item.clothingId}`}>
+                      <ClothingListCard item={item} checked onChange={() => toggleClothing(item.clothingId)} />
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
 
           {hasClothingItems ? (
             <div className="grid gap-2">
@@ -190,13 +224,12 @@ export function RecordByCombinationScreen({ wardrobeId }: RecordByCombinationScr
                 const checked = selectedClothingIds.includes(item.clothingId);
 
                 return (
-                  <label
+                  <ClothingListCard
                     key={item.clothingId}
-                    className="flex items-center gap-3 rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-900"
-                  >
-                    <input type="checkbox" checked={checked} onChange={() => toggleClothing(item.clothingId)} />
-                    <span className="truncate">{item.name}</span>
-                  </label>
+                    item={item}
+                    checked={checked}
+                    onChange={() => toggleClothing(item.clothingId)}
+                  />
                 );
               })}
             </div>
@@ -219,13 +252,15 @@ export function RecordByCombinationScreen({ wardrobeId }: RecordByCombinationScr
           <p className="m-0 text-sm text-red-700">{RECORD_STRINGS.byCombination.messages.submitError}</p>
         ) : null}
 
-        <Button
-          type="submit"
-          className="w-full text-sm font-medium"
-          disabled={isDateEmpty || isSelectionEmpty || isSubmitting}
-        >
-          {isSubmitting ? RECORD_STRINGS.byCombination.messages.submitting : RECORD_STRINGS.byCombination.actions.submit}
-        </Button>
+        <div className="fixed bottom-0 left-1/2 z-20 w-full max-w-[420px] -translate-x-1/2 border-t border-slate-200 bg-white p-4 pb-[calc(16px+env(safe-area-inset-bottom))]">
+          <Button
+            type="submit"
+            className="w-full text-sm font-medium"
+            disabled={isDateEmpty || isSelectionEmpty || isSubmitting}
+          >
+            {isSubmitting ? RECORD_STRINGS.byCombination.messages.submitting : RECORD_STRINGS.byCombination.actions.submit}
+          </Button>
+        </div>
       </form>
     </AppLayout>
   );

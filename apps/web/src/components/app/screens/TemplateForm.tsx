@@ -11,7 +11,9 @@ import {
 } from "@/api/hooks/template";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { COMMON_STRINGS } from "@/constants/commonStrings";
 import { ROUTES } from "@/constants/routes";
+import { resolveImageUrl } from "@/features/clothing/imageUrl";
 import type { ClothingListItem } from "@/features/clothing/types";
 import { TEMPLATE_STRINGS } from "@/features/template/strings";
 import { isAppError } from "@/lib/error/normalize";
@@ -43,6 +45,46 @@ function resolveLoadErrorMessage(
   return mode === "edit"
     ? TEMPLATE_STRINGS.edit.messages.loadError
     : TEMPLATE_STRINGS.create.messages.loadError;
+}
+
+function ClothingSelectCard({
+  item,
+  checked,
+  onChange,
+}: {
+  item: ClothingListItem;
+  checked: boolean;
+  onChange: () => void;
+}) {
+  const imageUrl = resolveImageUrl(item.imageKey);
+
+  return (
+    <label
+      className={[
+        "grid grid-cols-[56px_minmax(0,1fr)] items-center gap-3 rounded-md border px-3 py-2 text-sm text-slate-900",
+        checked ? "border-slate-400 bg-slate-50" : "border-slate-200 bg-white",
+      ].join(" ")}
+    >
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={onChange}
+        className="sr-only"
+      />
+      {imageUrl ? (
+        <img
+          src={imageUrl}
+          alt={`${item.name}の画像`}
+          className="h-14 w-14 rounded-md border border-slate-200 bg-slate-100 object-cover"
+        />
+      ) : (
+        <span className="flex h-14 w-14 items-center justify-center rounded-md border border-slate-200 bg-slate-100 px-1 text-center text-[10px] font-semibold leading-tight text-slate-600">
+          {COMMON_STRINGS.placeholders.noImage}
+        </span>
+      )}
+      <span className="truncate font-medium">{item.name}</span>
+    </label>
+  );
 }
 
 export function TemplateForm({
@@ -183,7 +225,7 @@ export function TemplateForm({
   };
 
   return (
-    <form className="grid gap-3" onSubmit={handleSubmit} noValidate>
+    <form className="grid gap-3 pb-24" onSubmit={handleSubmit} noValidate>
       {showTemplateLoading ? (
         <p className="m-0 text-sm text-slate-600">
           {TEMPLATE_STRINGS.edit.messages.loading}
@@ -260,17 +302,12 @@ export function TemplateForm({
                   const checked = selectedClothingIds.includes(item.clothingId);
 
                   return (
-                    <label
+                    <ClothingSelectCard
                       key={item.clothingId}
-                      className="flex items-center gap-3 rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-900"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={checked}
-                        onChange={() => toggleClothing(item.clothingId)}
-                      />
-                      <span className="truncate">{item.name}</span>
-                    </label>
+                      item={item}
+                      checked={checked}
+                      onChange={() => toggleClothing(item.clothingId)}
+                    />
                   );
                 })}
               </div>
@@ -307,17 +344,19 @@ export function TemplateForm({
             </p>
           ) : null}
 
-          <Button
-            type="submit"
-            className="w-full text-sm font-medium"
-            disabled={isNameEmpty || isSelectionEmpty || isPending}
-          >
-            {isPending
-              ? mode === "create"
-                ? TEMPLATE_STRINGS.create.messages.submitting
-                : TEMPLATE_STRINGS.edit.messages.submitting
-              : submitLabel}
-          </Button>
+          <div className="fixed bottom-0 left-1/2 z-20 w-full max-w-[420px] -translate-x-1/2 border-t border-slate-200 bg-white p-4 pb-[calc(16px+env(safe-area-inset-bottom))]">
+            <Button
+              type="submit"
+              className="w-full text-sm font-medium"
+              disabled={isNameEmpty || isSelectionEmpty || isPending}
+            >
+              {isPending
+                ? mode === "create"
+                  ? TEMPLATE_STRINGS.create.messages.submitting
+                  : TEMPLATE_STRINGS.edit.messages.submitting
+                : submitLabel}
+            </Button>
+          </div>
         </>
       ) : null}
     </form>

@@ -54,7 +54,7 @@ check(
 
 check(
   "TF-02",
-  "TemplateForm がテンプレート名入力と服複数選択UIを提供している",
+  "TemplateForm がテンプレート名入力とサムネイル付き服複数選択UIを提供している",
   includes(
     "src/components/app/screens/TemplateForm.tsx",
     'import { Input } from "@/components/ui/input";',
@@ -69,9 +69,17 @@ check(
     ) &&
     includes(
       "src/components/app/screens/TemplateForm.tsx",
+      "resolveImageUrl(item.imageKey)",
+    ) &&
+    includes(
+      "src/components/app/screens/TemplateForm.tsx",
+      "grid-cols-[56px_minmax(0,1fr)]",
+    ) &&
+    includes(
+      "src/components/app/screens/TemplateForm.tsx",
       "TEMPLATE_STRINGS.messages.clothingRequired",
     ),
-  "TemplateForm の入力UIまたは複数選択UIが不足しています",
+  "TemplateForm の入力UIまたはサムネイル付き複数選択UIが不足しています",
 );
 
 check(
@@ -138,6 +146,20 @@ check(
 
 check(
   "TF-06",
+  "TemplateForm の追加/保存ボタンが画面下部に固定表示される",
+  includes(
+    "src/components/app/screens/TemplateForm.tsx",
+    'className="grid gap-3 pb-24"',
+  ) &&
+    includes(
+      "src/components/app/screens/TemplateForm.tsx",
+      'className="fixed bottom-0 left-1/2 z-20 w-full max-w-[420px] -translate-x-1/2 border-t border-slate-200 bg-white p-4 pb-[calc(16px+env(safe-area-inset-bottom))]"',
+    ),
+  "TemplateForm の固定表示ボタン実装が不足しています",
+);
+
+check(
+  "TF-07",
   "TemplateForm はキャンセルボタンを描画しない",
   !includes(
     "src/components/app/screens/TemplateForm.tsx",
