@@ -3,7 +3,6 @@ export const TEMPLATE_STRINGS = {
     name: "例: 通勤コーデ",
   },
   actions: {
-    cancel: "キャンセル",
     loadMoreClothings: "服をさらに読み込む",
   },
   messages: {
