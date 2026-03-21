@@ -25,6 +25,17 @@ export const RECORD_STRINGS = {
     },
     actions: {
       submit: "記録",
+      loadMore: "さらに読み込む",
+    },
+    messages: {
+      selected: "選択中の服",
+      loading: "服を読み込んでいます…",
+      loadError: "服一覧の取得に失敗しました。時間をおいて再度お試しください。",
+      empty: "記録できる服がまだありません。先に服を追加してください。",
+      dateRequired: "日付を入力してください。",
+      clothingRequired: "服を1着以上選択してください。",
+      submitting: "記録しています…",
+      submitError: "記録に失敗しました。時間をおいて再度お試しください。",
     },
   },
 } as const;
