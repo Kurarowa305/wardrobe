@@ -68,11 +68,11 @@ export const TEMPLATE_STRINGS = {
       delete: "削除",
     },
     labels: {
-      wearCount: "着用回数",
-      lastWornAt: "最終着用日",
+      wearCount: "着た回数",
+      lastWornAt: "最後に着た日",
       clothingItems: "構成アイテム",
-      clothingWearCount: "服の着用回数",
-      clothingLastWornAt: "服の最終着用日",
+      clothingWearCount: "着た回数",
+      clothingLastWornAt: "最後に着た日",
     },
     messages: {
       loading: "読み込み中...",

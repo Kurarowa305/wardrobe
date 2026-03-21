@@ -81,8 +81,8 @@ check(
 check(
   "TDS-05",
   "Template strings に詳細画面向けのラベル・状態文言が定義される",
-  includes(stringsTarget, 'wearCount: "着用回数"') &&
-    includes(stringsTarget, 'lastWornAt: "最終着用日"') &&
+  includes(stringsTarget, 'wearCount: "着た回数"') &&
+    includes(stringsTarget, 'lastWornAt: "最後に着た日"') &&
     includes(stringsTarget, 'clothingItems: "構成アイテム"') &&
     includes(stringsTarget, 'error: "テンプレート詳細の読み込みに失敗しました。"') &&
     includes(stringsTarget, 'clothingDeleted: "削除済みの服です"') &&

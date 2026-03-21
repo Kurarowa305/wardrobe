@@ -47,7 +47,7 @@ check(
 
 check(
   "HDT-02",
-  "テンプレート入力時のみ着用テンプレートカードを白背景で表示し、名称・着用回数・最終着用日を服カード風の文言で描画する",
+  "テンプレート入力時のみ着用テンプレートカードを白背景で表示し、名称・着た回数・最後に着た日を服カード風の文言で描画する",
   includes(screenTarget, "historyQuery.data.template ? (") &&
     includes(screenTarget, "rounded-md border border-slate-200 bg-white p-3") &&
     includes(screenTarget, "historyQuery.data.template.name") &&
@@ -80,9 +80,9 @@ check(
 check(
   "HDT-05",
   "履歴詳細向け文言に着用テンプレートカード用ラベルが定義される",
-  includes(stringsTarget, 'template: "着用したテンプレート"') &&
-    includes(stringsTarget, 'templateWearCount: "着用回数"') &&
-    includes(stringsTarget, 'templateLastWornAt: "最終着用日"'),
+  includes(stringsTarget, 'template: "着たテンプレート"') &&
+    includes(stringsTarget, 'templateWearCount: "着た回数"') &&
+    includes(stringsTarget, 'templateLastWornAt: "最後に着た日"'),
   "着用テンプレートカード向け文言が不足しています",
 );
 
