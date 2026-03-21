@@ -79,14 +79,21 @@ a {
 
 .app-content {
   flex: 1;
-  padding: 16px;
+  padding: 16px 16px calc(16px + 56px + env(safe-area-inset-bottom));
 }
 
 .tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  z-index: 20;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
+  width: min(100%, 420px);
   border-top: 1px solid var(--line);
   background: var(--surface);
+  transform: translateX(-50%);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .tab-item {
