@@ -157,6 +157,9 @@ jobs:
       - name: Template delete flow spec test
         run: pnpm --filter web test:template-delete-flow
 
+      - name: Record method screen spec test
+        run: pnpm --filter web test:record-method-screen
+
       - name: MSW foundation spec test
         run: pnpm --filter web test:msw-foundation
 

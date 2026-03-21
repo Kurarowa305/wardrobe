@@ -115,6 +115,11 @@ function containsAll(relPath, expectedList) {
   return expectedList.every((item) => source.includes(item));
 }
 
+function includesAny(relPath, expectedList) {
+  const source = read(relPath);
+  return expectedList.some((item) => source.includes(item));
+}
+
 function findPageFiles() {
   return collectFiles(appRoot)
     .filter((file) => file.endsWith("/page.tsx"))
@@ -215,10 +220,10 @@ check("RT-09", "stack/detail pages have back button", () => {
 });
 
 check("RT-10", "record method back route is wardrobe home", () => {
-  const ok = includes(
-    "src/components/app/screens/RecordMethodScreen.tsx",
+  const ok = includesAny("src/components/app/screens/RecordMethodScreen.tsx", [
     "backHref: ROUTES.home(wardrobeId),",
-  );
+    "backHref={ROUTES.home(wardrobeId)}",
+  ]);
   return { ok, detail: "RecordMethodScreen must back to ROUTES.home(wardrobeId)" };
 });
 
@@ -227,7 +232,13 @@ check("RT-11", "record detail pages back to record method", () => {
     "src/components/app/screens/RecordByTemplateScreen.tsx",
     "src/components/app/screens/RecordByCombinationScreen.tsx",
   ];
-  const invalid = files.filter((file) => !includes(file, "backHref: ROUTES.recordMethod(wardrobeId),"));
+  const invalid = files.filter(
+    (file) =>
+      !includesAny(file, [
+        "backHref: ROUTES.recordMethod(wardrobeId),",
+        "backHref={ROUTES.recordMethod(wardrobeId)}",
+      ]),
+  );
   return {
     ok: invalid.length === 0,
     detail: `record child screens with wrong back route: ${invalid.join(", ") || "(none)"}`,
