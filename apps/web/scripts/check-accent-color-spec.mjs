@@ -19,9 +19,9 @@ const checks = [
     name: "Button の default variant が #687A88 ベースかつ白文字になっている",
     ok: includes(
       "src/components/ui/button.tsx",
-      'default: "bg-[var(--primary)] text-white hover:bg-[#5b6b78]"',
+      'default: "bg-[var(--primary)] text-white hover:bg-[#5b6b78] [&_a]:text-white"',
     ),
-    detail: "button.tsx の default variant が指定アクセントカラーになっていません",
+    detail: "button.tsx の default variant に白文字維持指定が不足しています",
   },
   {
     name: "対象3ボタンが白文字・太字・大きめで default Button を利用している",
