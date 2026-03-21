@@ -1,6 +1,8 @@
 export const WARDROBE_STRINGS = {
   create: {
     title: "ワードローブ作成",
+    heroTitle: "あなたのワードローブを作成しましょう",
+    description: "まずはワードローブ名を入力して、管理を始めましょう。",
     labels: {
       name: "ワードローブ名",
     },

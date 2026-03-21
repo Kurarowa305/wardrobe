@@ -9,7 +9,6 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { DEMO_IDS, ROUTES } from "@/constants/routes";
 import { WARDROBE_STRINGS } from "@/features/wardrobe/strings";
-import { ScreenCard } from "./ScreenPrimitives";
 
 export function WardrobeCreateScreen() {
   const router = useRouter();
@@ -32,8 +31,15 @@ export function WardrobeCreateScreen() {
   };
 
   return (
-    <AppLayout title={WARDROBE_STRINGS.create.title}>
-      <ScreenCard>
+    <AppLayout title={WARDROBE_STRINGS.create.title} showHeader={false}>
+      <section className="grid gap-8 px-1 py-8">
+        <div className="grid gap-3">
+          <p className="m-0 text-3xl font-bold leading-tight text-[var(--primary)]">
+            {WARDROBE_STRINGS.create.heroTitle}
+          </p>
+          <p className="m-0 text-sm text-slate-600">{WARDROBE_STRINGS.create.description}</p>
+        </div>
+
         <form className="grid gap-4" onSubmit={handleSubmit}>
           <div className="grid gap-2">
             <label htmlFor="wardrobe-name" className="text-sm font-medium text-slate-700">
@@ -50,7 +56,7 @@ export function WardrobeCreateScreen() {
             {WARDROBE_STRINGS.create.actions.create}
           </Button>
         </form>
-      </ScreenCard>
+      </section>
     </AppLayout>
   );
 }

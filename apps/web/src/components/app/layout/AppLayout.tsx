@@ -20,12 +20,21 @@ type AppLayoutProps = {
   tabKey?: TabKey;
   wardrobeId?: string;
   headerActions?: HeaderAction[];
+  showHeader?: boolean;
 };
 
-export function AppLayout({ title, children, backHref, tabKey, wardrobeId, headerActions }: AppLayoutProps) {
+export function AppLayout({
+  title,
+  children,
+  backHref,
+  tabKey,
+  wardrobeId,
+  headerActions,
+  showHeader = true,
+}: AppLayoutProps) {
   return (
     <div className="app-shell">
-      <Header title={title} backHref={backHref} actions={headerActions} />
+      {showHeader ? <Header title={title} backHref={backHref} actions={headerActions} /> : null}
       <main className="app-content">{children}</main>
       {tabKey && wardrobeId ? <TabBar activeTab={tabKey} wardrobeId={wardrobeId} /> : null}
     </div>
