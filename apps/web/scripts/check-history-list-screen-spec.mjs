@@ -70,7 +70,9 @@ check(
   "履歴カードが詳細遷移導線と文脈表示を持つ",
   includes(target, 'ROUTES.historyDetail(wardrobeId, item.historyId, "histories")') &&
     includes(target, "const contextLabel = HISTORY_STRINGS.labels.inputType[item.inputType];") &&
-    includes(target, "const contextText = item.name ?? HISTORY_STRINGS.list.messages.combinationSummary;"),
+    includes(target, 'className="text-[11px] font-medium text-slate-400">{contextLabel}</span>') &&
+    includes(target, 'item.inputType === "template"') &&
+    includes(target, 'combinationTitle || HISTORY_STRINGS.list.messages.combinationSummary'),
   "履歴詳細遷移または文脈表示の実装が不足しています",
 );
 

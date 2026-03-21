@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { COMMON_STRINGS } from "@/constants/commonStrings";
 import { ROUTES } from "@/constants/routes";
 import { resolveImageUrl } from "@/features/clothing/imageUrl";
+import { formatHistoryDate } from "@/features/history/date";
 import { HISTORY_STRINGS } from "@/features/history/strings";
 import type { HistoryListClothingItem, HistoryListItem } from "@/features/history/types";
 
@@ -23,6 +24,13 @@ type HistoryListPage = {
 
 const HISTORY_LIST_PAGE_SIZE = 20;
 const HISTORY_THUMBNAIL_LIMIT = 4;
+const HISTORY_CARD_TITLE_MAX_LENGTH = 15;
+
+function truncateHistoryCardTitle(title: string) {
+  return title.length > HISTORY_CARD_TITLE_MAX_LENGTH
+    ? `${title.slice(0, HISTORY_CARD_TITLE_MAX_LENGTH)}...`
+    : title;
+}
 
 function HistoryThumbnail({ item }: { item: HistoryListClothingItem }) {
   const imageUrl = resolveImageUrl(item.imageKey);
@@ -49,7 +57,12 @@ function HistoryCard({ wardrobeId, item }: { wardrobeId: string; item: HistoryLi
   const visibleThumbnails = item.clothingItems.slice(0, HISTORY_THUMBNAIL_LIMIT);
   const hiddenCount = Math.max(item.clothingItems.length - HISTORY_THUMBNAIL_LIMIT, 0);
   const contextLabel = HISTORY_STRINGS.labels.inputType[item.inputType];
-  const contextText = item.name ?? HISTORY_STRINGS.list.messages.combinationSummary;
+  const combinationTitle = item.clothingItems.map((clothingItem) => clothingItem.name).join("+");
+  const title = truncateHistoryCardTitle(
+    item.inputType === "template"
+      ? item.name ?? HISTORY_STRINGS.list.messages.combinationSummary
+      : combinationTitle || HISTORY_STRINGS.list.messages.combinationSummary,
+  );
 
   return (
     <li>
@@ -57,10 +70,12 @@ function HistoryCard({ wardrobeId, item }: { wardrobeId: string; item: HistoryLi
         href={ROUTES.historyDetail(wardrobeId, item.historyId, "histories")}
         className="grid gap-3 rounded-md border border-slate-300 bg-white p-3 text-left no-underline transition-colors hover:bg-slate-50"
       >
-        <span className="grid gap-1">
-          <span className="text-xs font-semibold text-slate-500">{item.date}</span>
-          <span className="text-sm font-semibold text-slate-900">{contextLabel}</span>
-          <span className="text-sm text-slate-700">{contextText}</span>
+        <span className="grid gap-2">
+          <span className="flex items-start justify-between gap-3">
+            <span className="text-xs font-semibold text-slate-500">{formatHistoryDate(item.date)}</span>
+            <span className="text-[11px] font-medium text-slate-400">{contextLabel}</span>
+          </span>
+          <span className="text-sm font-semibold text-slate-900">{title}</span>
         </span>
         <span className="flex flex-wrap gap-2">
           {visibleThumbnails.map((clothingItem) => (

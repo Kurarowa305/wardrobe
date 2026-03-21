@@ -20,6 +20,7 @@
     "test:history-msw-handlers": "node scripts/check-history-msw-handlers-spec.mjs",
     "test:history-query-mutation-hooks": "node scripts/check-history-query-mutation-hooks-spec.mjs",
     "test:history-list-screen": "node scripts/check-history-list-screen-spec.mjs",
+    "test:history-list-card-presentation": "node scripts/check-history-list-card-presentation-spec.mjs",
     "test:history-detail-screen": "node scripts/check-history-detail-screen-spec.mjs",
     "test:history-delete-flow": "node scripts/check-history-delete-flow-spec.mjs",
     "test:home-screen": "node scripts/check-home-screen-spec.mjs",
