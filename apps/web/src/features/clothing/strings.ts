@@ -63,6 +63,10 @@ export const CLOTHING_STRINGS = {
   },
   detail: {
     title: "服の詳細",
+    labels: {
+      wearCount: "着用回数",
+      lastWornAt: "最終着用日",
+    },
     menu: {
       edit: "編集",
       delete: "削除",
@@ -73,6 +77,7 @@ export const CLOTHING_STRINGS = {
       notFound: "服が見つかりませんでした。",
       deleted: "削除済み",
       deleteError: "服の削除に失敗しました。",
+      neverWorn: "未着用",
     },
   },
 } as const;

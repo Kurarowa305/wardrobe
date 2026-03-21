@@ -3,7 +3,7 @@
 ## 目的
 
 - MS1-T08（服詳細画面）の完了条件を継続的に検証する
-- 服詳細の最小表示（画像＋服名）とエラー/削除済み状態表示をCIで担保する
+- 服詳細の表示（画像＋服名＋着用回数＋最終着用日）とエラー/削除済み状態表示をCIで担保する
 
 ## 対象スクリプト
 
@@ -22,11 +22,13 @@
   - client component として実装される
   - `useClothing(wardrobeId, clothingId)` を利用する
 
-### CDS-03 詳細画面に画像と服名を表示し、画像未設定時は no image を表示する
-- 観点: 完了条件「服画像＋服名のみ（現方針）」
+### CDS-03 詳細画面に画像・服名・着用回数・最終着用日を表示し、画像未設定時は no image を表示する
+- 観点: 詳細画面で利用状況を把握できること
 - 期待結果:
   - 画像領域に `image` または `COMMON_STRINGS.placeholders.noImage` を表示する
   - `clothingQuery.data.name` を表示する
+  - `CLOTHING_STRINGS.detail.labels.wearCount` と `clothingQuery.data.wearCount` を表示する
+  - `CLOTHING_STRINGS.detail.labels.lastWornAt` と `formatLastWornAt(clothingQuery.data.lastWornAt)` を表示する
 
 ### CDS-04 詳細取得エラー時に 404 とそれ以外で表示を切り分ける
 - 観点: 完了条件「詳細取得エラー時の表示（404/500）」
@@ -42,7 +44,7 @@
 ### CDS-06 服詳細画面向け文言が strings に定義される
 - 観点: 文言設計ルール（文言の集約）
 - 期待結果:
-  - `src/features/clothing/strings.ts` に `loading` / `error` / `notFound` / `deleted` を定義する
+  - `src/features/clothing/strings.ts` に `wearCount` / `lastWornAt` / `loading` / `error` / `notFound` / `deleted` / `neverWorn` を定義する
 
 
 ### CDS-07 静的エクスポート向けに詳細/編集ルートのパスを fixture 全件で生成する
