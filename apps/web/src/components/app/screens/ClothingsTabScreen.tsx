@@ -76,9 +76,11 @@ export function ClothingsTabScreen({ wardrobeId }: ClothingsTabScreenProps) {
 
   const content = (
     <>
-      <Button asChild className="mb-4 w-full justify-start text-left text-base font-bold text-white">
-        <Link href={ROUTES.clothingNew(wardrobeId)}>{CLOTHING_STRINGS.list.actions.add}</Link>
-      </Button>
+      <div className="mb-4">
+        <Button asChild className="w-full justify-start text-left text-base font-bold text-white">
+          <Link href={ROUTES.clothingNew(wardrobeId)}>{CLOTHING_STRINGS.list.actions.add}</Link>
+        </Button>
+      </div>
 
       {isInitialLoading ? <p className="m-0 text-sm text-slate-600">{CLOTHING_STRINGS.list.messages.loading}</p> : null}
 
@@ -119,15 +121,17 @@ export function ClothingsTabScreen({ wardrobeId }: ClothingsTabScreenProps) {
       {showInlineError ? <p className="m-0 text-sm text-red-700">{CLOTHING_STRINGS.list.messages.error}</p> : null}
 
       {nextCursor !== null ? (
-        <Button
-          type="button"
-          variant="secondary"
-          className="mt-4 w-full text-sm font-medium"
-          disabled={!canLoadMore}
-          onClick={handleLoadMore}
-        >
-          {isFetching ? CLOTHING_STRINGS.list.messages.loading : CLOTHING_STRINGS.list.actions.loadMore}
-        </Button>
+        <div className="mt-4">
+          <Button
+            type="button"
+            variant="secondary"
+            className="w-full text-sm font-medium"
+            disabled={!canLoadMore}
+            onClick={handleLoadMore}
+          >
+            {isFetching ? CLOTHING_STRINGS.list.messages.loading : CLOTHING_STRINGS.list.actions.loadMore}
+          </Button>
+        </div>
       ) : null}
     </>
   );

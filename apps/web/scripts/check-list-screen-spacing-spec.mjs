@@ -37,36 +37,44 @@ const clothingTarget = "src/components/app/screens/ClothingsTabScreen.tsx";
 check(
   "LSS-01",
   "履歴一覧画面の『さらに読み込む』ボタンに上余白が設定されている",
-  includes(historyTarget, 'className="mt-4 w-full text-sm font-medium"'),
-  "HistoriesTabScreen の load more ボタンに mt-4 が設定されていません",
+  includes(historyTarget, '{nextCursor !== null ? (') &&
+    includes(historyTarget, '<div className="mt-4">') &&
+    includes(historyTarget, 'className="w-full text-sm font-medium"'),
+  "HistoriesTabScreen の load more ボタン直前に mt-4 の余白コンテナが設定されていません",
 );
 
 check(
   "LSS-02",
   "テンプレート一覧画面の『＋ テンプレートを追加』ボタンに下余白が設定されている",
-  includes(templateTarget, 'className="mb-4 w-full justify-start text-left text-base font-bold text-white"'),
-  "TemplatesTabScreen の add ボタンに mb-4 が設定されていません",
+  includes(templateTarget, '<div className="mb-4">') &&
+    includes(templateTarget, '<Button asChild className="w-full justify-start text-left text-base font-bold text-white">'),
+  "TemplatesTabScreen の add ボタン直後に mb-4 の余白コンテナが設定されていません",
 );
 
 check(
   "LSS-03",
   "テンプレート一覧画面の『さらに読み込む』ボタンに上余白が設定されている",
-  includes(templateTarget, 'className="mt-4 w-full text-sm font-medium"'),
-  "TemplatesTabScreen の load more ボタンに mt-4 が設定されていません",
+  includes(templateTarget, '{nextCursor !== null ? (') &&
+    includes(templateTarget, '<div className="mt-4">') &&
+    includes(templateTarget, 'className="w-full text-sm font-medium"'),
+  "TemplatesTabScreen の load more ボタン直前に mt-4 の余白コンテナが設定されていません",
 );
 
 check(
   "LSS-04",
   "服一覧画面の『＋ 服を追加』ボタンに下余白が設定されている",
-  includes(clothingTarget, 'className="mb-4 w-full justify-start text-left text-base font-bold text-white"'),
-  "ClothingsTabScreen の add ボタンに mb-4 が設定されていません",
+  includes(clothingTarget, '<div className="mb-4">') &&
+    includes(clothingTarget, '<Button asChild className="w-full justify-start text-left text-base font-bold text-white">'),
+  "ClothingsTabScreen の add ボタン直後に mb-4 の余白コンテナが設定されていません",
 );
 
 check(
   "LSS-05",
   "服一覧画面の『さらに読み込む』ボタンに上余白が設定されている",
-  includes(clothingTarget, 'className="mt-4 w-full text-sm font-medium"'),
-  "ClothingsTabScreen の load more ボタンに mt-4 が設定されていません",
+  includes(clothingTarget, '{nextCursor !== null ? (') &&
+    includes(clothingTarget, '<div className="mt-4">') &&
+    includes(clothingTarget, 'className="w-full text-sm font-medium"'),
+  "ClothingsTabScreen の load more ボタン直前に mt-4 の余白コンテナが設定されていません",
 );
 
 if (failures.length > 0) {
