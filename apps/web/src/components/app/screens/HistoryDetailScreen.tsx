@@ -100,11 +100,23 @@ ${COMMON_STRINGS.dialogs.confirmDelete.message}`,
               <p className="m-0 text-sm font-medium text-slate-900">
                 {HISTORY_STRINGS.labels.inputType[historyQuery.data.inputType]}
               </p>
-              <p className="m-0 text-sm text-slate-700">
-                {historyQuery.data.templateName ?? HISTORY_STRINGS.detail.messages.combinationSummary}
-              </p>
             </div>
           </div>
+
+          {historyQuery.data.template ? (
+            <div className="grid gap-2">
+              <p className="m-0 text-sm font-medium text-slate-900">{HISTORY_STRINGS.detail.labels.template}</p>
+              <div className="grid gap-1 rounded-md border border-slate-200 bg-white p-3">
+                <p className="m-0 text-sm font-medium text-slate-900">{historyQuery.data.template.name}</p>
+                <p className="m-0 text-xs text-slate-600">
+                  {HISTORY_STRINGS.detail.labels.templateWearCount}: {historyQuery.data.template.wearCount}
+                </p>
+                <p className="m-0 text-xs text-slate-600">
+                  {HISTORY_STRINGS.detail.labels.templateLastWornAt}: {formatLastWornAt(historyQuery.data.template.lastWornAt)}
+                </p>
+              </div>
+            </div>
+          ) : null}
 
           <div className="grid gap-2">
             <p className="m-0 text-sm font-medium text-slate-900">{HISTORY_STRINGS.detail.labels.clothingItems}</p>

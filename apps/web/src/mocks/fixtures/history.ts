@@ -111,6 +111,12 @@ export const historyDetailFixtures: HistoryDetailFixture[] = historyDetailFixtur
       historyId: seed.historyId,
       date: seed.date,
       templateName: templateFixture.name,
+      template: {
+        templateId: seed.templateId,
+        name: templateFixture.name,
+        wearCount: templateFixture.wearCount,
+        lastWornAt: templateFixture.lastWornAt,
+      },
       clothingItems: templateFixture.clothingItems.map((clothingItem) => ({ ...clothingItem })),
     };
   }
@@ -119,6 +125,7 @@ export const historyDetailFixtures: HistoryDetailFixture[] = historyDetailFixtur
     historyId: seed.historyId,
     date: seed.date,
     templateName: null,
+    template: null,
     clothingItems: seed.clothingIds.map(toHistoryDetailClothingItem),
   };
 });

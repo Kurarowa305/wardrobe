@@ -23,7 +23,10 @@ export const HISTORY_STRINGS = {
     labels: {
       date: "日付",
       inputType: "入力方法",
+      template: "着用したテンプレート",
       clothingItems: "着用した服",
+      templateWearCount: "着用回数",
+      templateLastWornAt: "最終着用日",
       clothingWearCount: "着用回数",
       clothingLastWornAt: "最終着用日",
     },

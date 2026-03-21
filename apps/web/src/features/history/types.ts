@@ -1,6 +1,7 @@
 import type {
   HistoryDetailClothingItemDto,
   HistoryDetailResponseDto,
+  HistoryDetailTemplateDto,
   HistoryListClothingItemDto,
   HistoryListItemDto,
 } from "@/api/schemas/history";
@@ -31,10 +32,18 @@ export type HistoryClothingItem = {
   deleted: boolean;
 };
 
+export type HistoryTemplate = {
+  templateId: string;
+  name: string;
+  wearCount: number;
+  lastWornAt: number | null;
+};
+
 export type History = {
   date: string;
   inputType: HistoryInputType;
   templateName: string | null;
+  template: HistoryTemplate | null;
   clothingItems: HistoryClothingItem[];
 };
 
@@ -61,6 +70,16 @@ export function toHistoryListItem(dto: HistoryListItemDto): HistoryListItem {
   };
 }
 
+
+export function toHistoryTemplate(dto: HistoryDetailTemplateDto): HistoryTemplate {
+  return {
+    templateId: dto.templateId,
+    name: dto.name,
+    wearCount: dto.wearCount,
+    lastWornAt: dto.lastWornAt > 0 ? dto.lastWornAt : null,
+  };
+}
+
 export function toHistoryClothingItem(dto: HistoryDetailClothingItemDto): HistoryClothingItem {
   return {
     clothingId: dto.clothingId,
@@ -77,6 +96,7 @@ export function toHistory(dto: HistoryDetailResponseDto): History {
     date: dto.date,
     inputType: resolveHistoryInputType(dto.templateName),
     templateName: dto.templateName,
+    template: dto.template ? toHistoryTemplate(dto.template) : null,
     clothingItems: dto.clothingItems.map(toHistoryClothingItem),
   };
 }

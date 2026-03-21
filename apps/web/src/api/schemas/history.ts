@@ -39,9 +39,17 @@ export type HistoryDetailClothingItemDto = Pick<
   "clothingId" | "name" | "imageKey" | "status" | "wearCount" | "lastWornAt"
 >;
 
+export type HistoryDetailTemplateDto = {
+  templateId: string;
+  name: string;
+  wearCount: number;
+  lastWornAt: number;
+};
+
 export type HistoryDto = {
   date: string;
   templateName: string | null;
+  template: HistoryDetailTemplateDto | null;
   clothingItems: HistoryDetailClothingItemDto[];
 };
 
