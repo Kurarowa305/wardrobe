@@ -72,7 +72,9 @@ check(
     includes(target, 'RECORD_STRINGS.byTemplate.labels.date') &&
     includes(target, 'RECORD_STRINGS.byTemplate.labels.template') &&
     includes(target, 'type="radio"') &&
-    includes(target, 'name="templateId"'),
+    includes(target, 'name="templateId"') &&
+    includes(target, 'function SelectableTemplateCard(') &&
+    includes(target, 'function TemplateThumbnail('),
   "日付入力またはテンプレート単一選択 UI が不足しています",
 );
 
@@ -99,15 +101,17 @@ check(
 
 check(
   "RBTS-07",
-  "テンプレート一覧の loading/error/empty/loadMore 状態を扱う",
+  "テンプレート一覧の loading/error/empty/loadMore 状態を扱い、選択用カードでサムネイルを表示する",
   includes(target, "RECORD_STRINGS.byTemplate.messages.loading") &&
     includes(target, "RECORD_STRINGS.byTemplate.messages.loadError") &&
     includes(target, "RECORD_STRINGS.byTemplate.messages.empty") &&
     includes(target, "const [nextCursor, setNextCursor] = useState<string | null>(null);") &&
     includes(target, "setNextCursor(templateListQuery.data.nextCursor);") &&
     includes(target, "RECORD_STRINGS.byTemplate.actions.loadMore") &&
-    includes(target, "onClick={handleLoadMore}"),
-  "一覧状態表示または追加読み込みが不足しています",
+    includes(target, "onClick={handleLoadMore}") &&
+    includes(target, "const TEMPLATE_THUMBNAIL_LIMIT = 4;") &&
+    includes(target, "item.clothingItems.slice(0, TEMPLATE_THUMBNAIL_LIMIT)"),
+  "一覧状態表示・追加読み込み・選択用カードUIのいずれかが不足しています",
 );
 
 check(

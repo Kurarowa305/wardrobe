@@ -7,9 +7,12 @@ import { useCreateHistoryMutation } from "@/api/hooks/history";
 import { useTemplateList } from "@/api/hooks/template";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { COMMON_STRINGS } from "@/constants/commonStrings";
 import { ROUTES } from "@/constants/routes";
+import { resolveImageUrl } from "@/features/clothing/imageUrl";
 import { RECORD_STRINGS } from "@/features/record/strings";
-import type { TemplateListItem } from "@/features/template/types";
+import { TEMPLATE_STRINGS } from "@/features/template/strings";
+import type { TemplateListClothingItem, TemplateListItem } from "@/features/template/types";
 import { ScreenCard } from "./ScreenPrimitives";
 import { AppLayout } from "../layout/AppLayout";
 
@@ -23,9 +26,79 @@ type TemplateListPage = {
 };
 
 const RECORD_TEMPLATE_PAGE_SIZE = 20;
+const TEMPLATE_THUMBNAIL_LIMIT = 4;
 
 function createTodayInputValue() {
-  return new Date().toLocaleDateString("sv-SE", { timeZone: "UTC" });
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
+function TemplateThumbnail({ item }: { item: TemplateListClothingItem }) {
+  const imageUrl = resolveImageUrl(item.imageKey);
+
+  return (
+    <span className="relative block h-14 w-14 overflow-hidden rounded-md border border-slate-200 bg-slate-100">
+      {imageUrl ? (
+        <img src={imageUrl} alt="テンプレート構成服のサムネイル" className="h-full w-full object-cover" />
+      ) : (
+        <span className="flex h-full w-full items-center justify-center px-1 text-center text-[10px] font-semibold leading-tight text-slate-600">
+          {COMMON_STRINGS.placeholders.noImage}
+        </span>
+      )}
+      {item.deleted ? (
+        <span className="absolute inset-0 flex items-center justify-center bg-slate-900/65 px-1 text-center text-[10px] font-semibold text-white">
+          {TEMPLATE_STRINGS.list.badges.deleted}
+        </span>
+      ) : null}
+    </span>
+  );
+}
+
+function SelectableTemplateCard({
+  item,
+  selected,
+  onSelect,
+}: {
+  item: TemplateListItem;
+  selected: boolean;
+  onSelect: (templateId: string) => void;
+}) {
+  const visibleThumbnails = item.clothingItems.slice(0, TEMPLATE_THUMBNAIL_LIMIT);
+  const hiddenCount = Math.max(item.clothingItems.length - TEMPLATE_THUMBNAIL_LIMIT, 0);
+
+  return (
+    <label
+      className={[
+        "grid cursor-pointer gap-3 rounded-md border bg-white p-3 text-left transition-colors",
+        selected ? "border-blue-400 bg-blue-50" : "border-slate-300 hover:bg-slate-50",
+      ].join(" ")}
+    >
+      <span className="flex items-center gap-3">
+        <input
+          type="radio"
+          name="templateId"
+          value={item.templateId}
+          checked={selected}
+          onChange={(event) => onSelect(event.target.value)}
+        />
+        <span className="truncate text-sm font-medium text-slate-900">{item.name}</span>
+      </span>
+      <span className="flex flex-wrap gap-2">
+        {visibleThumbnails.map((clothingItem) => (
+          <TemplateThumbnail key={clothingItem.clothingId} item={clothingItem} />
+        ))}
+        {hiddenCount > 0 ? (
+          <span className="flex h-14 w-14 items-center justify-center rounded-md border border-dashed border-slate-300 bg-slate-50 text-sm font-semibold text-slate-700">
+            +{hiddenCount}
+          </span>
+        ) : null}
+      </span>
+    </label>
+  );
 }
 
 export function RecordByTemplateScreen({ wardrobeId }: RecordByTemplateScreenProps) {
@@ -101,11 +174,15 @@ export function RecordByTemplateScreen({ wardrobeId }: RecordByTemplateScreenPro
       return;
     }
 
-    await createHistoryMutation.mutateAsync({
-      date: trimmedDate,
-      templateId: selectedTemplateId,
-    });
-    router.push(ROUTES.home(wardrobeId));
+    try {
+      await createHistoryMutation.mutateAsync({
+        date: trimmedDate,
+        templateId: selectedTemplateId,
+      });
+      router.push(ROUTES.home(wardrobeId));
+    } catch {
+      // mutation state で画面にエラー表示する
+    }
   };
 
   return (
@@ -141,25 +218,14 @@ export function RecordByTemplateScreen({ wardrobeId }: RecordByTemplateScreenPro
 
             {hasTemplateItems ? (
               <div className="grid gap-2">
-                {templateItems.map((item) => {
-                  const checked = selectedTemplateId === item.templateId;
-
-                  return (
-                    <label
-                      key={item.templateId}
-                      className="flex items-center gap-3 rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-900"
-                    >
-                      <input
-                        type="radio"
-                        name="templateId"
-                        value={item.templateId}
-                        checked={checked}
-                        onChange={(event) => setSelectedTemplateId(event.target.value)}
-                      />
-                      <span className="truncate">{item.name}</span>
-                    </label>
-                  );
-                })}
+                {templateItems.map((item) => (
+                  <SelectableTemplateCard
+                    key={item.templateId}
+                    item={item}
+                    selected={selectedTemplateId === item.templateId}
+                    onSelect={setSelectedTemplateId}
+                  />
+                ))}
               </div>
             ) : null}
 
@@ -172,7 +238,9 @@ export function RecordByTemplateScreen({ wardrobeId }: RecordByTemplateScreenPro
             ) : null}
           </fieldset>
 
-          {showTemplateError ? <p className="m-0 text-sm text-red-700">{RECORD_STRINGS.byTemplate.messages.templateRequired}</p> : null}
+          {showTemplateError ? (
+            <p className="m-0 text-sm text-red-700">{RECORD_STRINGS.byTemplate.messages.templateRequired}</p>
+          ) : null}
           {showInlineError ? <p className="m-0 text-sm text-red-700">{RECORD_STRINGS.byTemplate.messages.loadError}</p> : null}
           {createHistoryMutation.isError ? (
             <p className="m-0 text-sm text-red-700">{RECORD_STRINGS.byTemplate.messages.submitError}</p>
