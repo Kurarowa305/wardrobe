@@ -47,13 +47,13 @@ check(
 
 check(
   "HDT-02",
-  "テンプレート入力時のみ着用テンプレートカードを白背景で表示し、名称・着た回数・最後に着た日を服カード風の文言で描画する",
+  "テンプレート入力時のみ着用テンプレートカードを白背景で表示し、名称・着た回数・曜日付き最終着用日を描画する",
   includes(screenTarget, "historyQuery.data.template ? (") &&
     includes(screenTarget, "rounded-md border border-slate-200 bg-white p-3") &&
     includes(screenTarget, "historyQuery.data.template.name") &&
     includes(screenTarget, "HISTORY_STRINGS.detail.labels.templateWearCount}: {historyQuery.data.template.wearCount}") &&
-    includes(screenTarget, "HISTORY_STRINGS.detail.labels.templateLastWornAt}: {formatLastWornAt(historyQuery.data.template.lastWornAt)}"),
-  "着用テンプレートカードの見た目または表示文言の実装が不足しています",
+    includes(screenTarget, "formatLastWornDate(historyQuery.data.template.lastWornAt, HISTORY_STRINGS.detail.messages.neverWorn)"),
+  "着用テンプレートカードの見た目または曜日付き最終着用日表示の実装が不足しています",
 );
 
 check(
