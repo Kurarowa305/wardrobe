@@ -160,6 +160,9 @@ jobs:
       - name: Record method screen spec test
         run: pnpm --filter web test:record-method-screen
 
+      - name: Record by template screen spec test
+        run: pnpm --filter web test:record-by-template-screen
+
       - name: MSW foundation spec test
         run: pnpm --filter web test:msw-foundation
 
