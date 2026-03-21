@@ -58,7 +58,8 @@
     "test:record-combination-screen": "node scripts/check-record-combination-screen-spec.mjs",
     "test:tab-bar-fixed": "node scripts/check-tab-bar-fixed-spec.mjs",
     "test:copy-labels": "node scripts/check-copy-labels-spec.mjs",
-    "test:history-date-weekday": "node scripts/check-history-date-weekday-spec.mjs"
+    "test:history-date-weekday": "node scripts/check-history-date-weekday-spec.mjs",
+    "test:accent-color": "node scripts/check-accent-color-spec.mjs"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.4",

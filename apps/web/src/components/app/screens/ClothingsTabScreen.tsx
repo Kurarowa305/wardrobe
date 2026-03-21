@@ -76,7 +76,7 @@ export function ClothingsTabScreen({ wardrobeId }: ClothingsTabScreenProps) {
 
   const content = (
     <>
-      <Button asChild className="w-full justify-start text-left text-sm font-medium">
+      <Button asChild className="w-full justify-start text-left text-base font-bold text-white">
         <Link href={ROUTES.clothingNew(wardrobeId)}>{CLOTHING_STRINGS.list.actions.add}</Link>
       </Button>
 

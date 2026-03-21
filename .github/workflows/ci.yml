@@ -106,6 +106,9 @@ jobs:
       - name: Home history card presentation spec test
         run: pnpm --filter web test:home-history-card-presentation
 
+      - name: Accent color spec test
+        run: pnpm --filter web test:accent-color
+
       - name: Template fixtures spec test
         run: pnpm --filter web test:template-fixtures
 

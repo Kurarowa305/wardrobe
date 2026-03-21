@@ -42,7 +42,7 @@ export function HomeTabScreen({ wardrobeId }: HomeTabScreenProps) {
 
   const content = (
     <div className="grid gap-4">
-      <Button asChild className="w-full justify-start text-left text-sm font-medium">
+      <Button asChild className="w-full justify-start text-left text-base font-bold text-white">
         <Link href={ROUTES.recordMethod(wardrobeId)}>{HOME_STRINGS.actions.addRecord}</Link>
       </Button>
 
