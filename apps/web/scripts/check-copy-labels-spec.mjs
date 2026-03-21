@@ -40,8 +40,8 @@ check(
   "テンプレート詳細文言が『着た回数』『最後に着た日』へ更新されている",
   includes("src/features/template/strings.ts", 'wearCount: "着た回数"') &&
     includes("src/features/template/strings.ts", 'lastWornAt: "最後に着た日"') &&
-    includes("src/features/template/strings.ts", 'clothingWearCount: "服の着た回数"') &&
-    includes("src/features/template/strings.ts", 'clothingLastWornAt: "服の最後に着た日"'),
+    includes("src/features/template/strings.ts", 'clothingWearCount: "着た回数"') &&
+    includes("src/features/template/strings.ts", 'clothingLastWornAt: "最後に着た日"'),
   "テンプレート詳細画面の文言更新が不足しています",
 );
 

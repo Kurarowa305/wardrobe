@@ -71,8 +71,8 @@ export const TEMPLATE_STRINGS = {
       wearCount: "着た回数",
       lastWornAt: "最後に着た日",
       clothingItems: "構成アイテム",
-      clothingWearCount: "服の着た回数",
-      clothingLastWornAt: "服の最後に着た日",
+      clothingWearCount: "着た回数",
+      clothingLastWornAt: "最後に着た日",
     },
     messages: {
       loading: "読み込み中...",
