@@ -112,26 +112,15 @@ ${COMMON_STRINGS.dialogs.confirmDelete.message}`,
           {historyQuery.data.template ? (
             <div className="grid gap-2">
               <p className="m-0 text-sm font-medium text-slate-900">{HISTORY_STRINGS.detail.labels.template}</p>
-              <dl className="m-0 grid gap-2 rounded-md border border-slate-200 bg-slate-50 p-3 sm:grid-cols-3">
-                <div className="grid gap-1">
-                  <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">
-                    {HISTORY_STRINGS.detail.labels.template}
-                  </dt>
-                  <dd className="m-0 text-sm text-slate-900">{historyQuery.data.template.name}</dd>
-                </div>
-                <div className="grid gap-1">
-                  <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">
-                    {HISTORY_STRINGS.detail.labels.templateWearCount}
-                  </dt>
-                  <dd className="m-0 text-sm text-slate-900">{historyQuery.data.template.wearCount}</dd>
-                </div>
-                <div className="grid gap-1">
-                  <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">
-                    {HISTORY_STRINGS.detail.labels.templateLastWornAt}
-                  </dt>
-                  <dd className="m-0 text-sm text-slate-900">{formatLastWornAt(historyQuery.data.template.lastWornAt)}</dd>
-                </div>
-              </dl>
+              <div className="grid gap-1 rounded-md border border-slate-200 bg-white p-3">
+                <p className="m-0 text-sm font-medium text-slate-900">{historyQuery.data.template.name}</p>
+                <p className="m-0 text-xs text-slate-600">
+                  {HISTORY_STRINGS.detail.labels.templateWearCount}: {historyQuery.data.template.wearCount}
+                </p>
+                <p className="m-0 text-xs text-slate-600">
+                  {HISTORY_STRINGS.detail.labels.templateLastWornAt}: {formatLastWornAt(historyQuery.data.template.lastWornAt)}
+                </p>
+              </div>
             </div>
           ) : null}
 
