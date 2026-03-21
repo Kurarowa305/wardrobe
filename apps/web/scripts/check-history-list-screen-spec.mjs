@@ -36,6 +36,7 @@ function check(id, description, passed, detail) {
 
 const target = "src/components/app/screens/HistoriesTabScreen.tsx";
 const stringsTarget = "src/features/history/strings.ts";
+const cardTarget = "src/components/app/history/HistoryCard.tsx";
 
 check(
   "HLS-01",
@@ -68,29 +69,32 @@ check(
 check(
   "HLS-04",
   "履歴カードが詳細遷移導線と文脈表示を持つ",
-  includes(target, 'ROUTES.historyDetail(wardrobeId, item.historyId, "histories")') &&
-    includes(target, "const contextLabel = HISTORY_STRINGS.labels.inputType[item.inputType];") &&
-    includes(target, "const contextText = item.name ?? HISTORY_STRINGS.list.messages.combinationSummary;"),
+  includes(target, 'import { SharedHistoryCard } from "@/components/app/history/HistoryCard";') &&
+    includes(target, '<SharedHistoryCard key={item.historyId} wardrobeId={wardrobeId} item={item} from="histories" />') &&
+    includes(cardTarget, 'href={ROUTES.historyDetail(wardrobeId, item.historyId, from)}') &&
+    includes(cardTarget, 'const contextLabel = HISTORY_STRINGS.labels.inputType[item.inputType];') &&
+    includes(cardTarget, 'className="text-[11px] font-medium text-slate-400">{contextLabel}</span>') &&
+    includes(cardTarget, 'combinationTitle || HISTORY_STRINGS.list.messages.combinationSummary'),
   "履歴詳細遷移または文脈表示の実装が不足しています",
 );
 
 check(
   "HLS-05",
   "履歴カードがサムネ表示で resolveImageUrl/no image/削除済みオーバーレイに対応する",
-  includes(target, 'import { resolveImageUrl } from "@/features/clothing/imageUrl";') &&
-    includes(target, "const imageUrl = resolveImageUrl(item.imageKey);") &&
-    includes(target, "COMMON_STRINGS.placeholders.noImage") &&
-    includes(target, "HISTORY_STRINGS.list.badges.deleted"),
+  includes(cardTarget, 'import { resolveImageUrl } from "@/features/clothing/imageUrl";') &&
+    includes(cardTarget, 'const imageUrl = resolveImageUrl(item.imageKey);') &&
+    includes(cardTarget, 'COMMON_STRINGS.placeholders.noImage') &&
+    includes(cardTarget, 'HISTORY_STRINGS.list.badges.deleted'),
   "履歴カードのサムネ表示実装が不足しています",
 );
 
 check(
   "HLS-06",
   "履歴カードがサムネ最大4件と超過分 +x 表示を行う",
-  includes(target, "const HISTORY_THUMBNAIL_LIMIT = 4;") &&
-    includes(target, "item.clothingItems.slice(0, HISTORY_THUMBNAIL_LIMIT)") &&
-    includes(target, "const hiddenCount = Math.max(item.clothingItems.length - HISTORY_THUMBNAIL_LIMIT, 0);") &&
-    includes(target, "+{hiddenCount}"),
+  includes(cardTarget, 'const HISTORY_THUMBNAIL_LIMIT = 4;') &&
+    includes(cardTarget, 'item.clothingItems.slice(0, HISTORY_THUMBNAIL_LIMIT)') &&
+    includes(cardTarget, 'const hiddenCount = Math.max(item.clothingItems.length - HISTORY_THUMBNAIL_LIMIT, 0);') &&
+    includes(cardTarget, '+{hiddenCount}'),
   "サムネ上限4件または +x 表示実装が不足しています",
 );
 

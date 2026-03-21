@@ -85,11 +85,17 @@ jobs:
       - name: History list screen spec test
         run: pnpm --filter web test:history-list-screen
 
+      - name: History list card presentation spec test
+        run: pnpm --filter web test:history-list-card-presentation
+
       - name: History detail screen spec test
         run: pnpm --filter web test:history-detail-screen
 
       - name: Home screen spec test
         run: pnpm --filter web test:home-screen
+
+      - name: Home history card presentation spec test
+        run: pnpm --filter web test:home-history-card-presentation
 
       - name: Template fixtures spec test
         run: pnpm --filter web test:template-fixtures

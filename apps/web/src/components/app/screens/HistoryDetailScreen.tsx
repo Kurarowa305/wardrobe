@@ -10,6 +10,7 @@ import { COMMON_STRINGS } from "@/constants/commonStrings";
 import { ROUTES } from "@/constants/routes";
 import { resolveImageUrl } from "@/features/clothing/imageUrl";
 import { resolveHistoryDetailBackHref } from "@/features/history/routing";
+import { formatHistoryDate } from "@/features/history/date";
 import { HISTORY_STRINGS } from "@/features/history/strings";
 import { isAppError } from "@/lib/error/normalize";
 import { ScreenCard } from "./ScreenPrimitives";
@@ -33,13 +34,6 @@ function resolveErrorMessage(error: unknown): string {
   return HISTORY_STRINGS.detail.messages.error;
 }
 
-function formatHistoryDate(date: string) {
-  if (!/^\d{8}$/.test(date)) {
-    return date;
-  }
-
-  return `${date.slice(0, 4)}/${date.slice(4, 6)}/${date.slice(6, 8)}`;
-}
 
 function formatLastWornAt(lastWornAt: number | null) {
   if (lastWornAt === null) {

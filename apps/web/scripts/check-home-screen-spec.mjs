@@ -9,6 +9,7 @@ const webRoot = path.resolve(__dirname, "..");
 const failures = [];
 let checkCount = 0;
 const target = "src/components/app/screens/HomeTabScreen.tsx";
+const cardTarget = "src/components/app/history/HistoryCard.tsx";
 
 function abs(relPath) {
   return path.join(webRoot, relPath);
@@ -72,7 +73,9 @@ check(
 check(
   "HS-05",
   "ホーム画面の履歴カードが from=home 付きで履歴詳細に遷移する",
-  includes(target, 'href={ROUTES.historyDetail(wardrobeId, item.historyId, "home")}'),
+  includes(target, 'import { SharedHistoryCard } from "@/components/app/history/HistoryCard";') &&
+    includes(target, '<SharedHistoryCard key={item.historyId} wardrobeId={wardrobeId} item={item} from="home" />') &&
+    includes(cardTarget, 'href={ROUTES.historyDetail(wardrobeId, item.historyId, from)}'),
   "ホーム文脈の履歴詳細導線が不足しています",
 );
 
