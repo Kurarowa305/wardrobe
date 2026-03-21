@@ -1,10 +1,11 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Suspense, createElement } from "react";
 
-import { useHistory } from "@/api/hooks/history";
+import { useDeleteHistoryMutation, useHistory } from "@/api/hooks/history";
 import { AppLayout } from "@/components/app/layout/AppLayout";
+import { useToast } from "@/components/ui/use-toast";
 import { COMMON_STRINGS } from "@/constants/commonStrings";
 import { ROUTES } from "@/constants/routes";
 import { resolveImageUrl } from "@/features/clothing/imageUrl";
@@ -53,7 +54,29 @@ function formatLastWornAt(lastWornAt: number | null) {
 }
 
 function HistoryDetailScreenContent({ wardrobeId, historyId, backHref }: HistoryDetailScreenContentProps) {
+  const router = useRouter();
+  const { toast } = useToast();
   const historyQuery = useHistory(wardrobeId, historyId);
+  const deleteMutation = useDeleteHistoryMutation(wardrobeId, historyId);
+
+  const handleDelete = async () => {
+    const confirmed = window.confirm(
+      `${COMMON_STRINGS.dialogs.confirmDelete.title}\n${COMMON_STRINGS.dialogs.confirmDelete.message}`,
+    );
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await deleteMutation.mutateAsync();
+      router.push(backHref);
+    } catch {
+      toast({
+        variant: "destructive",
+        title: HISTORY_STRINGS.detail.messages.deleteError,
+      });
+    }
+  };
 
   const content = (
     <ScreenCard>
@@ -141,14 +164,14 @@ function HistoryDetailScreenContent({ wardrobeId, historyId, backHref }: History
       {
         key: "delete",
         label: HISTORY_STRINGS.detail.menu.delete,
-        disabled: true,
+        onSelect: handleDelete,
+        disabled: !historyQuery.data || deleteMutation.isPending,
       },
     ],
     children: content,
   });
 }
 
-// function HistoryDetailScreenSearchParams({ wardrobeId }: HistoryDetailScreenProps)
 function HistoryDetailScreenSearchParams({ wardrobeId, historyId }: HistoryDetailScreenProps) {
   const searchParams = useSearchParams();
   const backHref = resolveHistoryDetailBackHref(wardrobeId, searchParams.get("from"));
@@ -157,8 +180,6 @@ function HistoryDetailScreenSearchParams({ wardrobeId, historyId }: HistoryDetai
 }
 
 export function HistoryDetailScreen({ wardrobeId, historyId }: HistoryDetailScreenProps) {
-  // <Suspense fallback={<HistoryDetailScreenContent backHref={ROUTES.histories(wardrobeId)} />}>
-  // <HistoryDetailScreenSearchParams wardrobeId={wardrobeId} />
   return (
     <Suspense
       fallback={

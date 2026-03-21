@@ -31,6 +31,7 @@ export const HISTORY_STRINGS = {
       loading: "読み込み中...",
       error: "履歴詳細の読み込みに失敗しました。",
       notFound: "履歴が見つかりませんでした。",
+      deleteError: "履歴の削除に失敗しました。",
       combinationSummary: "選択した服の組み合わせ",
       clothingDeleted: "削除済みの服です",
       neverWorn: "未着用",
