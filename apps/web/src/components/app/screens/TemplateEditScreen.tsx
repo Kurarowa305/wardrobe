@@ -1,9 +1,9 @@
 import { createElement } from "react";
 
 import { AppLayout } from "@/components/app/layout/AppLayout";
+import { Card, CardContent } from "@/components/ui/card";
 import { ROUTES } from "@/constants/routes";
 import { TEMPLATE_STRINGS } from "@/features/template/strings";
-import { ScreenCard } from "./ScreenPrimitives";
 import { TemplateForm } from "./TemplateForm";
 
 type TemplateEditScreenProps = {
@@ -12,15 +12,13 @@ type TemplateEditScreenProps = {
 };
 
 export function TemplateEditScreen({ wardrobeId, templateId }: TemplateEditScreenProps) {
-  const content = createElement(ScreenCard, {
-    children: createElement(TemplateForm, {
-      wardrobeId,
-      mode: "edit",
-      templateId,
-      backHref: ROUTES.templateDetail(wardrobeId, templateId),
-      submitLabel: TEMPLATE_STRINGS.edit.actions.submit,
-    }),
-  });
+  const content = createElement(Card, null, createElement(CardContent, { className: "p-4" }, createElement(TemplateForm, {
+    wardrobeId,
+    mode: "edit",
+    templateId,
+    backHref: ROUTES.templateDetail(wardrobeId, templateId),
+    submitLabel: TEMPLATE_STRINGS.edit.actions.submit,
+  })));
 
   return createElement(AppLayout, {
     title: TEMPLATE_STRINGS.edit.title,

@@ -5,13 +5,13 @@ import { useRouter } from "next/navigation";
 
 import { useClothing, useDeleteClothingMutation } from "@/api/hooks/clothing";
 import { AppLayout } from "@/components/app/layout/AppLayout";
+import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { COMMON_STRINGS } from "@/constants/commonStrings";
 import { ROUTES } from "@/constants/routes";
 import { resolveImageUrl } from "@/features/clothing/imageUrl";
 import { CLOTHING_STRINGS } from "@/features/clothing/strings";
 import { isAppError } from "@/lib/error/normalize";
-import { ScreenCard } from "./ScreenPrimitives";
 
 type ClothingDetailScreenProps = {
   wardrobeId: string;
@@ -53,7 +53,8 @@ export function ClothingDetailScreen({ wardrobeId, clothingId }: ClothingDetailS
   };
 
   const content = (
-    <ScreenCard>
+    <Card>
+      <CardContent className="grid gap-3 p-4">
       {clothingQuery.isPending ? (
         <p className="m-0 text-sm text-slate-600">{CLOTHING_STRINGS.detail.messages.loading}</p>
       ) : null}
@@ -81,7 +82,8 @@ export function ClothingDetailScreen({ wardrobeId, clothingId }: ClothingDetailS
           ) : null}
         </>
       ) : null}
-    </ScreenCard>
+    </CardContent>
+    </Card>
   );
 
   return createElement(AppLayout, {

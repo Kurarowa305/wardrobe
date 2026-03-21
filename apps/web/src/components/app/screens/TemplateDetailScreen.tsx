@@ -4,13 +4,13 @@ import { createElement } from "react";
 import { useRouter } from "next/navigation";
 import { useDeleteTemplateMutation, useTemplate } from "@/api/hooks/template";
 import { AppLayout } from "@/components/app/layout/AppLayout";
+import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { COMMON_STRINGS } from "@/constants/commonStrings";
 import { ROUTES } from "@/constants/routes";
 import { resolveImageUrl } from "@/features/clothing/imageUrl";
 import { TEMPLATE_STRINGS } from "@/features/template/strings";
 import { isAppError } from "@/lib/error/normalize";
-import { ScreenCard } from "./ScreenPrimitives";
 
 type TemplateDetailScreenProps = {
   wardrobeId: string;
@@ -63,7 +63,8 @@ export function TemplateDetailScreen({ wardrobeId, templateId }: TemplateDetailS
   };
 
   const content = (
-    <ScreenCard>
+    <Card>
+      <CardContent className="grid gap-3 p-4">
       {templateQuery.isPending ? (
         <p className="m-0 text-sm text-slate-600">{TEMPLATE_STRINGS.detail.messages.loading}</p>
       ) : null}
@@ -139,7 +140,8 @@ export function TemplateDetailScreen({ wardrobeId, templateId }: TemplateDetailS
           </div>
         </>
       ) : null}
-    </ScreenCard>
+    </CardContent>
+    </Card>
   );
 
   return createElement(AppLayout, {

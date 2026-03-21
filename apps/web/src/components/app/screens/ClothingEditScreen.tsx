@@ -6,12 +6,12 @@ import { useRouter } from "next/navigation";
 import { uploadImageWithPresign } from "@/api/endpoints/image";
 import { useClothing, useUpdateClothingMutation } from "@/api/hooks/clothing";
 import { AppLayout } from "@/components/app/layout/AppLayout";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ROUTES } from "@/constants/routes";
 import { CLOTHING_STRINGS } from "@/features/clothing/strings";
 import { isAppError } from "@/lib/error/normalize";
-import { ScreenCard } from "./ScreenPrimitives";
 
 type ClothingEditScreenProps = {
   wardrobeId: string;
@@ -126,7 +126,8 @@ export function ClothingEditScreen({ wardrobeId, clothingId }: ClothingEditScree
   };
 
   const content = (
-    <ScreenCard>
+    <Card>
+      <CardContent className="grid gap-3 p-4">
       {clothingQuery.isPending ? (
         <p className="m-0 text-sm text-slate-600">{CLOTHING_STRINGS.edit.messages.loading}</p>
       ) : null}
@@ -218,7 +219,8 @@ export function ClothingEditScreen({ wardrobeId, clothingId }: ClothingEditScree
           </Button>
         </form>
       ) : null}
-    </ScreenCard>
+    </CardContent>
+    </Card>
   );
 
   return createElement(AppLayout, {

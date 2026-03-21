@@ -16,7 +16,6 @@
 - 観点: `Button` / `Input` / `Toast` 実装ファイルと `cn` ユーティリティの有無
 - 期待結果: 以下が存在する
   - `src/components/ui/button.tsx`
-  - `src/components/ui/card.tsx`
   - `src/components/ui/input.tsx`
   - `src/components/ui/toast.tsx`
   - `src/components/ui/toaster.tsx`
@@ -55,11 +54,12 @@
   - `HomeTabScreen.tsx` で `window.location.search` の `created` クエリを判定し、トースト表示する
   - 表示後に `window.history.replaceState(..., ROUTES.home(wardrobeId))` でクエリを除去する
 
-### UF-09 スクリーン実装は ScreenCard基盤または画面要件に沿った直接描画で構成される
-- 観点: UI基盤の適用方針と画面要件の両立
+### UF-09 スクリーン実装から ScreenCard 基盤が除去され、画面要件に沿って構成される
+- 観点: UI基盤刷新後も各画面が直接描画または `Card` ベースで構成されるか
 - 期待結果:
-  - `HistoriesTabScreen.tsx` / `ClothingsTabScreen.tsx` / `TemplatesTabScreen.tsx` は `ScreenCard` でラップせず、一覧要素を直接描画する
-  - それ以外の画面では `ScreenCard` または `ScreenTextCard` の利用が確認できる
+  - `components/app/screens/*.tsx` に `ScreenCard` / `ScreenTextCard` が残っていない
+  - 一覧タブ画面は直接描画を維持する
+  - それ以外の画面では `CardContent` または `AppLayout` を起点に構成される
 
 ### UF-10 旧 screen-* クラス依存が除去されている
 - 観点: 旧スタイル実装からの完全移行

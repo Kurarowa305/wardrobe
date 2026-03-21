@@ -4,6 +4,9 @@ export const HOME_STRINGS = {
     addRecord: "＋ 着た記録",
     viewAllHistories: "履歴を全て見る",
   },
+  messages: {
+    noRecentHistories: "直近1週間の履歴はまだ登録されていません。",
+  },
   toasts: {
     wardrobeCreated: {
       title: "ワードローブを作成しました",

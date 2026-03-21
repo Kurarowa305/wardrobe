@@ -16,11 +16,32 @@ import { toHistory, toHistoryListItem } from "@/features/history/types";
 
 const HISTORY_LIST_STALE_TIME_MS = 60_000;
 const RECENT_HISTORY_LIMIT = 5;
+const HOME_RECENT_WEEK_LIMIT = 20;
 
 type HistoryIdentity = {
   wardrobeId: string;
   historyId: string;
 };
+
+function formatDateValue(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}${month}${day}`;
+}
+
+function buildRecentWeekParams(now: Date): HistoryListParamsDto {
+  const to = new Date(now);
+  const from = new Date(now);
+  from.setDate(from.getDate() - 6);
+
+  return {
+    from: formatDateValue(from),
+    to: formatDateValue(to),
+    order: "desc",
+    limit: HOME_RECENT_WEEK_LIMIT,
+  };
+}
 
 async function invalidateHistoryQueries(queryClient: QueryClient, wardrobeId: string) {
   await Promise.all([
@@ -63,6 +84,10 @@ export function useRecentHistories(wardrobeId: string, limit = RECENT_HISTORY_LI
     order: "desc",
     limit,
   });
+}
+
+export function useRecentWeekHistories(wardrobeId: string, now = new Date()) {
+  return useHistoryList(wardrobeId, buildRecentWeekParams(now));
 }
 
 export function useHistory(wardrobeId: string, historyId: string) {

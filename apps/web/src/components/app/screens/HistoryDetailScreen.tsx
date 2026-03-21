@@ -5,13 +5,13 @@ import { Suspense, createElement } from "react";
 
 import { useHistory } from "@/api/hooks/history";
 import { AppLayout } from "@/components/app/layout/AppLayout";
+import { Card, CardContent } from "@/components/ui/card";
 import { COMMON_STRINGS } from "@/constants/commonStrings";
 import { ROUTES } from "@/constants/routes";
 import { resolveImageUrl } from "@/features/clothing/imageUrl";
 import { resolveHistoryDetailBackHref } from "@/features/history/routing";
 import { HISTORY_STRINGS } from "@/features/history/strings";
 import { isAppError } from "@/lib/error/normalize";
-import { ScreenCard } from "./ScreenPrimitives";
 
 type HistoryDetailScreenProps = {
   wardrobeId: string;
@@ -56,7 +56,8 @@ function HistoryDetailScreenContent({ wardrobeId, historyId, backHref }: History
   const historyQuery = useHistory(wardrobeId, historyId);
 
   const content = (
-    <ScreenCard>
+    <Card>
+      <CardContent className="grid gap-3 p-4">
       {historyQuery.isPending ? (
         <p className="m-0 text-sm text-slate-600">{HISTORY_STRINGS.detail.messages.loading}</p>
       ) : null}
@@ -131,7 +132,8 @@ function HistoryDetailScreenContent({ wardrobeId, historyId, backHref }: History
           </div>
         </>
       ) : null}
-    </ScreenCard>
+    </CardContent>
+    </Card>
   );
 
   return createElement(AppLayout, {

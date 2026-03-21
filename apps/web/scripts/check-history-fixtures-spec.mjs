@@ -111,10 +111,11 @@ check(
 
 check(
   "HF-09",
-  "historyDetailFixtures が合計27件（既存3件 + 追加24件）で構成される",
+  "historyDetailFixtures が合計32件（直近8件 + 追加24件）で構成される",
   includes(target, "const GENERATED_HISTORY_FIXTURE_COUNT = 24;") &&
+    includes(target, 'historyId: "hs_01HZZCCJ"') &&
     includes(target, "...Array.from({ length: GENERATED_HISTORY_FIXTURE_COUNT },"),
-  "27件構成（3件 + 24件追加）の定義が不足しています",
+  "32件構成（直近8件 + 24件追加）の定義が不足しています",
 );
 
 if (failures.length > 0) {

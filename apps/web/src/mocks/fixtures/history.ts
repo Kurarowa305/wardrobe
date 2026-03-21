@@ -27,21 +27,51 @@ type HistoryDetailFixtureSeed = {
 const historyDetailFixtureSeeds: HistoryDetailFixtureSeed[] = [
   {
     historyId: "hs_01HZZCCC",
-    date: "20260101",
+    date: "20260321",
     templateId: "tp_01HZZBBB",
     clothingIds: [],
   },
   {
     historyId: "hs_01HZZCCD",
-    date: "20251231",
+    date: "20260320",
     templateId: null,
     clothingIds: ["cl_01HZZAAB", "cl_auto_004", "cl_01HZZAAC"],
   },
   {
     historyId: "hs_01HZZCCE",
-    date: "20251230",
+    date: "20260319",
     templateId: "tp_01HZZBBD",
     clothingIds: [],
+  },
+  {
+    historyId: "hs_01HZZCCF",
+    date: "20260318",
+    templateId: null,
+    clothingIds: ["cl_auto_005", "cl_auto_016", "cl_auto_028"],
+  },
+  {
+    historyId: "hs_01HZZCCG",
+    date: "20260317",
+    templateId: "tp_auto_001",
+    clothingIds: [],
+  },
+  {
+    historyId: "hs_01HZZCCH",
+    date: "20260316",
+    templateId: null,
+    clothingIds: ["cl_auto_006", "cl_auto_017", "cl_auto_029"],
+  },
+  {
+    historyId: "hs_01HZZCCI",
+    date: "20260315",
+    templateId: "tp_auto_002",
+    clothingIds: [],
+  },
+  {
+    historyId: "hs_01HZZCCJ",
+    date: "20260314",
+    templateId: null,
+    clothingIds: ["cl_auto_007", "cl_auto_018", "cl_auto_030"],
   },
   ...Array.from({ length: GENERATED_HISTORY_FIXTURE_COUNT }, (_, index): HistoryDetailFixtureSeed => {
     const sequence = index + 1;

@@ -71,11 +71,12 @@ check(
 
 check(
   "RMS-05",
-  "選択肢が outline ボタンとしてカード内に並ぶ",
-  includes(target, '<ScreenCard>') &&
+  "選択肢が Card 内の outline ボタンとして並ぶ",
+  includes(target, '<Card>') &&
+    includes(target, '<CardContent className="grid gap-2 p-4">') &&
     includes(target, 'variant="outline"') &&
     includes(target, 'className="w-full justify-start text-left text-sm font-medium"'),
-  "ScreenCard 内の outline ボタン実装が不足しています",
+  "Card 内の outline ボタン実装が不足しています",
 );
 
 check(

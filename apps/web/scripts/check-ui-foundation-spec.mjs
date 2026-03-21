@@ -65,7 +65,6 @@ check(
   "shadcn/ui 基盤ファイル（Button/Input/Toast）が存在する",
   [
     "src/components/ui/button.tsx",
-    "src/components/ui/card.tsx",
     "src/components/ui/input.tsx",
     "src/components/ui/toast.tsx",
     "src/components/ui/toaster.tsx",
@@ -141,25 +140,20 @@ check(
 
 check(
   "UF-09",
-  "スクリーン実装は ScreenCard基盤または画面要件に沿った直接描画で構成される",
+  "スクリーン実装から ScreenCard 基盤が除去され、画面要件に沿って構成される",
   SCREEN_FILES.every((file) => {
     const source = read(file);
-    if (NO_SCREEN_CARD_FILES.has(file)) {
-      const directRenderingGuard = file.endsWith("HistoriesTabScreen.tsx")
-        ? source.includes("HISTORY_STRINGS.list.messages.loading")
-        : file.endsWith("ClothingsTabScreen.tsx")
-          ? source.includes("CLOTHING_STRINGS.list.actions.add")
-          : source.includes("TEMPLATE_STRINGS.list.actions.add");
+    const directRenderingGuard = file.endsWith("HistoriesTabScreen.tsx")
+      ? source.includes("HISTORY_STRINGS.list.messages.loading")
+      : file.endsWith("ClothingsTabScreen.tsx")
+        ? source.includes("CLOTHING_STRINGS.list.actions.add")
+        : file.endsWith("TemplatesTabScreen.tsx")
+          ? source.includes("TEMPLATE_STRINGS.list.actions.add")
+          : source.includes("CardContent") || source.includes("AppLayout");
 
-      return (
-        !source.includes("<ScreenCard") &&
-        !source.includes("ScreenTextCard") &&
-        directRenderingGuard
-      );
-    }
-    return source.includes("ScreenCard") || source.includes("ScreenTextCard");
+    return !source.includes("ScreenCard") && !source.includes("ScreenTextCard") && directRenderingGuard;
   }),
-  "スクリーンのUI基盤構成が期待値と一致しません",
+  "ScreenCard 削除後のスクリーン構成が期待値と一致しません",
 );
 
 check(

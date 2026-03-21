@@ -4,12 +4,12 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { AppLayout } from "@/components/app/layout/AppLayout";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { DEMO_IDS, ROUTES } from "@/constants/routes";
 import { WARDROBE_STRINGS } from "@/features/wardrobe/strings";
-import { ScreenCard } from "./ScreenPrimitives";
 
 export function WardrobeCreateScreen() {
   const router = useRouter();
@@ -33,7 +33,8 @@ export function WardrobeCreateScreen() {
 
   return (
     <AppLayout title={WARDROBE_STRINGS.create.title}>
-      <ScreenCard>
+      <Card>
+        <CardContent className="p-4">
         <form className="grid gap-4" onSubmit={handleSubmit}>
           <div className="grid gap-2">
             <label htmlFor="wardrobe-name" className="text-sm font-medium text-slate-700">
@@ -50,7 +51,8 @@ export function WardrobeCreateScreen() {
             {WARDROBE_STRINGS.create.actions.create}
           </Button>
         </form>
-      </ScreenCard>
+        </CardContent>
+      </Card>
     </AppLayout>
   );
 }
