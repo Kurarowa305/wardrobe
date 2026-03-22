@@ -10,6 +10,7 @@ import {
   useUpdateTemplateMutation,
 } from "@/api/hooks/template";
 import { Button } from "@/components/ui/button";
+import { TabBarIcon } from "@/components/ui/tab-bar-icon";
 import { Input } from "@/components/ui/input";
 import { ROUTES } from "@/constants/routes";
 import type { ClothingListItem } from "@/features/clothing/types";
@@ -62,6 +63,7 @@ export function TemplateForm({
 
   const [name, setName] = useState("");
   const [nameTouched, setNameTouched] = useState(false);
+  const [selectionTouched, setSelectionTouched] = useState(false);
   const [selectedClothingIds, setSelectedClothingIds] = useState<string[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
   const [pages, setPages] = useState<ClothingPage[]>([]);
@@ -124,7 +126,7 @@ export function TemplateForm({
   const isNameEmpty = trimmedName.length === 0;
   const isSelectionEmpty = selectedClothingIds.length === 0;
   const showNameError = nameTouched && isNameEmpty;
-  const showSelectionError = nameTouched && isSelectionEmpty;
+  const showSelectionError = selectionTouched && isSelectionEmpty;
   const isPending = createMutation.isPending || updateMutation.isPending;
   const showTemplateLoading = mode === "edit" && templateQuery.isPending;
   const showTemplateError = mode === "edit" && templateQuery.isError;
@@ -134,6 +136,8 @@ export function TemplateForm({
   const canLoadMore = nextCursor !== null && !clothingListQuery.isFetching;
 
   const toggleClothing = (clothingId: string) => {
+    setSelectionTouched(true);
+
     setSelectedClothingIds((previous) =>
       previous.includes(clothingId)
         ? previous.filter((currentId) => currentId !== clothingId)
@@ -153,6 +157,7 @@ export function TemplateForm({
     event.preventDefault();
 
     setNameTouched(true);
+    setSelectionTouched(true);
 
     if (
       isNameEmpty ||
@@ -184,7 +189,7 @@ export function TemplateForm({
   };
 
   return (
-    <form className="grid gap-3" onSubmit={handleSubmit} noValidate>
+    <form className="grid gap-3 pb-24" onSubmit={handleSubmit} noValidate>
       {showTemplateLoading ? (
         <p className="m-0 text-sm text-slate-600">
           {TEMPLATE_STRINGS.edit.messages.loading}
@@ -232,8 +237,8 @@ export function TemplateForm({
             </p>
           ) : null}
 
-          <fieldset className="grid gap-2 rounded-md border border-slate-200 p-3">
-            <legend className="px-1 text-sm font-medium text-slate-900">
+          <fieldset className="grid gap-3 border-0 p-0">
+            <legend className="px-0 text-sm font-medium text-slate-900">
               {mode === "create"
                 ? TEMPLATE_STRINGS.create.labels.selectClothing
                 : TEMPLATE_STRINGS.edit.labels.selectClothing}
@@ -263,14 +268,36 @@ export function TemplateForm({
                   return (
                     <label
                       key={item.clothingId}
-                      className="flex items-center gap-3 rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-900"
+                      className={[
+                        "grid w-full grid-cols-[28px_minmax(0,1fr)_40px] items-center gap-3 rounded-md border border-slate-300 bg-white p-3 text-left transition-colors",
+                        checked
+                          ? "border-[var(--primary)] bg-[color:color-mix(in_srgb,var(--primary)_10%,white)]"
+                          : "hover:bg-slate-50",
+                      ].join(" ")}
                     >
                       <input
                         type="checkbox"
                         checked={checked}
                         onChange={() => toggleClothing(item.clothingId)}
+                        className="sr-only"
                       />
-                      <span className="truncate">{item.name}</span>
+                      <span className="flex h-7 w-7 items-center justify-center rounded-full border border-slate-300 bg-slate-50">
+                        <TabBarIcon icon="clothings" active={false} strokeColor={checked ? "var(--primary)" : "#475569"} className="h-4 w-4" />
+                      </span>
+                      <span className="truncate text-sm font-medium text-slate-900">{item.name}</span>
+                      <span className="flex justify-end">
+                        <span
+                          aria-hidden="true"
+                          className={[
+                            "flex h-7 w-7 items-center justify-center rounded-full border text-sm font-bold transition-colors",
+                            checked
+                              ? "border-[var(--primary)] bg-[var(--primary)] text-white"
+                              : "border-slate-300 bg-white text-transparent",
+                          ].join(" ")}
+                        >
+                          ✓
+                        </span>
+                      </span>
                     </label>
                   );
                 })}
@@ -308,17 +335,19 @@ export function TemplateForm({
             </p>
           ) : null}
 
-          <Button
-            type="submit"
-            className="w-full text-sm font-medium"
-            disabled={isNameEmpty || isSelectionEmpty || isPending}
-          >
-            {isPending
-              ? mode === "create"
-                ? TEMPLATE_STRINGS.create.messages.submitting
-                : TEMPLATE_STRINGS.edit.messages.submitting
-              : submitLabel}
-          </Button>
+          <div className="fixed bottom-0 left-1/2 z-10 w-full max-w-[420px] -translate-x-1/2 border-t border-slate-200 bg-white/95 px-4 py-3 backdrop-blur">
+            <Button
+              type="submit"
+              className="w-full text-sm font-medium"
+              disabled={isNameEmpty || isSelectionEmpty || isPending}
+            >
+              {isPending
+                ? mode === "create"
+                  ? TEMPLATE_STRINGS.create.messages.submitting
+                  : TEMPLATE_STRINGS.edit.messages.submitting
+                : submitLabel}
+            </Button>
+          </div>
         </>
       ) : null}
     </form>

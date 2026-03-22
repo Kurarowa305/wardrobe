@@ -205,6 +205,9 @@ jobs:
       - name: Template form screen spec test
         run: pnpm --filter web test:template-form-screen
 
+      - name: Template form selection layout spec test
+        run: pnpm --filter web test:template-form-selection-layout
+
       - name: Template detail screen spec test
         run: pnpm --filter web test:template-detail-screen
 
