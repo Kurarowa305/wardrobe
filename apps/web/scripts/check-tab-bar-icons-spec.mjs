@@ -7,6 +7,8 @@ const read = (relativePath) =>
 const includes = (relativePath, text) => read(relativePath).includes(text);
 const includesAll = (relativePath, texts) => texts.every((text) => includes(relativePath, text));
 const notExists = (relativePath) => !fs.existsSync(path.join(repoRoot, relativePath));
+const tabBarIconSource = read("src/components/app/navigation/TabBarIcon.tsx");
+
 
 const checks = [
   {
@@ -30,6 +32,20 @@ const checks = [
       'return <ClothingsIcon active={active} {...props} />;',
     ]),
     detail: "TabBarIcon.tsx に4タブ分の SVG 定義が不足しています",
+  },
+  {
+    name: "ホーム / テンプレート / 履歴アイコンが最新仕様の輪郭線に更新されている",
+    ok:
+      includesAll("src/components/app/navigation/TabBarIcon.tsx", [
+        '      <path d="M4.5 10.5 12 4l7.5 6.5" fill="none" />',
+        '      <path d="M6.5 9.5V20h11V9.5" fill="none" />',
+        '      <rect x="6" y="7" width="10.5" height="10.5" rx="1.8" fill="none" />',
+        '      <rect x="9" y="4.5" width="9" height="9" rx="1.6" fill="none" />',
+        '      <path d="M4.7 4.8v4.1h3.5" fill="none" />',
+      ]) &&
+      !tabBarIconSource.includes('      <rect x="9.1" y="11.2" width="2.8" height="6.8" rx="0.6" stroke="none" />') &&
+      !tabBarIconSource.includes('      <rect x="12.9" y="11.2" width="2.8" height="6.8" rx="0.6" stroke="none" />'),
+    detail: "ホーム / テンプレート / 履歴アイコンの SVG パスが最新仕様に更新されていません",
   },
   {
     name: "旧 PNG アイコン画像が削除されている",
