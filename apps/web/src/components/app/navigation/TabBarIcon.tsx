@@ -24,7 +24,7 @@ function IconBase({ active, children, className, ...props }: IconBaseProps) {
       className={className}
       {...props}
     >
-      <g stroke={color} fill={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <g stroke={color} fill="none" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         {children}
       </g>
     </svg>
@@ -34,10 +34,9 @@ function IconBase({ active, children, className, ...props }: IconBaseProps) {
 function HomeIcon(props: Omit<IconBaseProps, "children">) {
   return (
     <IconBase {...props}>
-      <path d="M4.5 10.5 12 4l7.5 6.5" fill="none" />
-      <path d="M6.5 9.5V20h11V9.5" fill="none" />
-      <rect x="9.1" y="11.2" width="2.8" height="6.8" rx="0.6" stroke="none" />
-      <rect x="12.9" y="11.2" width="2.8" height="6.8" rx="0.6" stroke="none" />
+      <path d="M5 10.5 12 4.5l7 6" />
+      <path d="M7 8.8V19.5H17V8.8" />
+      <path d="M10.2 19.5V13h3.6v6.5" />
     </IconBase>
   );
 }
@@ -55,11 +54,8 @@ function HistoriesIcon(props: Omit<IconBaseProps, "children">) {
 function TemplatesIcon(props: Omit<IconBaseProps, "children">) {
   return (
     <IconBase {...props}>
-      <rect x="5" y="4" width="11" height="14" rx="1.8" fill="none" />
-      <path d="M9 7.5h4.5" fill="none" />
-      <path d="M9 11h4.5" fill="none" />
-      <path d="M9 14.5h4.5" fill="none" />
-      <path d="M16 8.5 19 6v14H8.2V18" fill="none" />
+      <rect x="5" y="5" width="10" height="10" rx="1.8" />
+      <path d="M15 9h4v10H9v-4" />
     </IconBase>
   );
 }

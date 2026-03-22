@@ -64,7 +64,8 @@
     "test:accent-color": "node scripts/check-accent-color-spec.mjs",
     "test:wardrobe-create-screen": "node scripts/check-wardrobe-create-screen-spec.mjs",
     "test:wardrobe-create-validation": "node scripts/check-wardrobe-create-validation-spec.mjs",
-    "test:list-screen-spacing": "node scripts/check-list-screen-spacing-spec.mjs"
+    "test:list-screen-spacing": "node scripts/check-list-screen-spacing-spec.mjs",
+    "test:tab-bar-icon-shapes": "node scripts/check-tab-bar-icon-shapes-spec.mjs"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.4",

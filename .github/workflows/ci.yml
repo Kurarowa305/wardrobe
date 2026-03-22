@@ -67,6 +67,9 @@ jobs:
       - name: Tab bar icons spec test
         run: pnpm --filter web test:tab-bar-icons
 
+      - name: Tab bar icon shapes spec test
+        run: pnpm --filter web test:tab-bar-icon-shapes
+
       - name: Query foundation spec test
         run: pnpm --filter web test:query-foundation
 
