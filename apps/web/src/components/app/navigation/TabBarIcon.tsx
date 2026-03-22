@@ -21,12 +21,14 @@ function IconBase({ active, children, className, ...props }: IconBaseProps) {
       aria-hidden="true"
       focusable="false"
       fill="none"
+      stroke={color}
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
       className={className}
       {...props}
     >
-      <g stroke={color} fill={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        {children}
-      </g>
+      {children}
     </svg>
   );
 }
@@ -34,10 +36,8 @@ function IconBase({ active, children, className, ...props }: IconBaseProps) {
 function HomeIcon(props: Omit<IconBaseProps, "children">) {
   return (
     <IconBase {...props}>
-      <path d="M4.5 10.5 12 4l7.5 6.5" fill="none" />
-      <path d="M6.5 9.5V20h11V9.5" fill="none" />
-      <rect x="9.1" y="11.2" width="2.8" height="6.8" rx="0.6" stroke="none" />
-      <rect x="12.9" y="11.2" width="2.8" height="6.8" rx="0.6" stroke="none" />
+      <path d="M3 10L12 3l9 7" />
+      <path d="M5 10v11h5v-6h4v6h5V10" />
     </IconBase>
   );
 }
@@ -45,9 +45,9 @@ function HomeIcon(props: Omit<IconBaseProps, "children">) {
 function HistoriesIcon(props: Omit<IconBaseProps, "children">) {
   return (
     <IconBase {...props}>
-      <path d="M7 6.7A8 8 0 1 1 5.1 9.5" fill="none" />
-      <path d="M4.7 4.8v4.1h4.1" fill="none" />
-      <path d="M12 8.3v4.2l3 1.8" fill="none" />
+      <path d="M12 4a8 8 0 1 1-7 3" />
+      <path d="M5 3v4h4" />
+      <path d="M12 7v5l3 3" />
     </IconBase>
   );
 }
@@ -55,11 +55,8 @@ function HistoriesIcon(props: Omit<IconBaseProps, "children">) {
 function TemplatesIcon(props: Omit<IconBaseProps, "children">) {
   return (
     <IconBase {...props}>
-      <rect x="5" y="4" width="11" height="14" rx="1.8" fill="none" />
-      <path d="M9 7.5h4.5" fill="none" />
-      <path d="M9 11h4.5" fill="none" />
-      <path d="M9 14.5h4.5" fill="none" />
-      <path d="M16 8.5 19 6v14H8.2V18" fill="none" />
+      <path d="M8 8V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2" />
+      <rect x="4" y="8" width="12" height="12" rx="2" />
     </IconBase>
   );
 }
@@ -67,11 +64,7 @@ function TemplatesIcon(props: Omit<IconBaseProps, "children">) {
 function ClothingsIcon(props: Omit<IconBaseProps, "children">) {
   return (
     <IconBase {...props}>
-      <path
-        d="M8.2 5.5 6 7.2 3.8 8.3l1.6 3.3 2-.9V20h9.2v-9.3l2 .9 1.6-3.3L18 7.2l-2.2-1.7-1.8 2H10l-1.8-2Z"
-        fill="none"
-      />
-      <path d="M10.1 7.5c.3.8 1 1.3 1.9 1.3s1.6-.5 1.9-1.3" fill="none" />
+      <path d="M9 3q3 3 6 0l4 1 2 5-4 2v10H7V11l-4-2 2-5 4-1z" />
     </IconBase>
   );
 }
