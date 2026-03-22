@@ -61,6 +61,9 @@ jobs:
       - name: Tab bar fixed spec test
         run: pnpm --filter web test:tab-bar-fixed
 
+      - name: Tab bar icon spec test
+        run: pnpm --filter web test:tab-bar-icon
+
       - name: Query foundation spec test
         run: pnpm --filter web test:query-foundation
 
