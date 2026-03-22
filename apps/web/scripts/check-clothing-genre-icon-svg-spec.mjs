@@ -17,7 +17,8 @@ const checks = [
     name: "ボトムスアイコンが長ズボンのSVGを持つ",
     patterns: [
       'if (genre === "bottoms") {',
-      '<path d="M8 3.5h8l1 6.5-2.5 1.5-1.5 8H11.5L10 12l-1.5 8H7l-1.5-8L3 10l1-6.5Z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />',
+      '<path d="M7 3h10l1.5 18h-4.5L12 11l-2 10H5.5L7 3z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />',
+      '<path d="M12 3v5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />',
     ],
   },
   {

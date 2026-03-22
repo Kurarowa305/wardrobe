@@ -19,7 +19,7 @@
 ### CGI-02 ボトムスアイコンが長ズボンSVGである
 - 観点: デザイン要件反映
 - 期待結果:
-  - `ClothingGenreIcon` の `bottoms` 分岐が長ズボン形状の `path` を持つ
+  - `ClothingGenreIcon` の `bottoms` 分岐が指定された長ズボンSVGの2本の `path` を持つ
   - 線スタイルとして `strokeLinecap="round"` と `strokeLinejoin="round"` を持つ
 
 ### CGI-03 その他アイコンが既存仕様を維持する
