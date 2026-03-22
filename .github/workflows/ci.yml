@@ -124,6 +124,9 @@ jobs:
       - name: Copy labels spec test
         run: pnpm --filter web test:copy-labels
 
+      - name: Clothing create image optional label spec test
+        run: pnpm --filter web test:clothing-create-image-optional-label
+
       - name: History date weekday spec test
         run: pnpm --filter web test:history-date-weekday
 

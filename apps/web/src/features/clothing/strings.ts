@@ -24,7 +24,7 @@ export const CLOTHING_STRINGS = {
   create: {
     title: "服の追加",
     labels: {
-      imageFile: "画像ファイル",
+      imageFile: "画像ファイル（任意）",
       name: "服の名前",
       genre: "服のジャンル",
     },
