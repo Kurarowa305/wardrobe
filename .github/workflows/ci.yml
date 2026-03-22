@@ -214,6 +214,9 @@ jobs:
       - name: Card thumbnail layout spec test
         run: pnpm --filter web test:card-thumbnail-layout
 
+      - name: Clothing list card genre icon removal spec test
+        run: pnpm --filter web test:clothing-list-card-genre-icon-removal
+
       - name: History delete flow spec test
         run: pnpm --filter web test:history-delete-flow
 
