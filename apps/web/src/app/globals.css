@@ -243,3 +243,11 @@ body {
 .overflow-menu-item-danger {
   color: #b91c1c;
 }
+
+.date-input::-webkit-calendar-picker-indicator {
+  margin-right: 12px;
+}
+
+.date-input::-webkit-datetime-edit {
+  padding-inline-end: 12px;
+}

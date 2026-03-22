@@ -220,6 +220,9 @@ jobs:
       - name: Record combination screen spec test
         run: pnpm --filter web test:record-combination-screen
 
+      - name: Record date input spacing spec test
+        run: pnpm --filter web test:record-date-input-spacing
+
       - name: MSW foundation spec test
         run: pnpm --filter web test:msw-foundation
 
