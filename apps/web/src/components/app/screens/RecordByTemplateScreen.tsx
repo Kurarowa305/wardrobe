@@ -157,6 +157,7 @@ export function RecordByTemplateScreen({ wardrobeId }: RecordByTemplateScreenPro
               onChange={(event) => setDate(event.target.value)}
               aria-invalid={showDateError}
               aria-describedby={showDateError ? "record-template-date-error" : undefined}
+              className="date-input-balanced pr-3 [&::-webkit-calendar-picker-indicator]:ml-3"
             />
           </label>
 

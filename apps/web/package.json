@@ -59,6 +59,7 @@
     "test:record-method-card-icons": "node scripts/check-record-method-card-icons-spec.mjs",
     "test:record-template-screen": "node scripts/check-record-template-screen-spec.mjs",
     "test:record-combination-screen": "node scripts/check-record-combination-screen-spec.mjs",
+    "test:record-date-input-spacing": "node scripts/check-record-date-input-spacing-spec.mjs",
     "test:tab-bar-fixed": "node scripts/check-tab-bar-fixed-spec.mjs",
     "test:tab-bar-icons": "node scripts/check-tab-bar-icons-spec.mjs",
     "test:tab-bar-icon-svg": "node scripts/check-tab-bar-icon-svg-spec.mjs",

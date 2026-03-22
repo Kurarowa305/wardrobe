@@ -158,6 +158,7 @@ export function RecordByCombinationScreen({ wardrobeId }: RecordByCombinationScr
             onChange={(event) => setDate(event.target.value)}
             aria-invalid={showDateError}
             aria-describedby={showDateError ? "record-combination-date-error" : undefined}
+            className="date-input-balanced pr-3 [&::-webkit-calendar-picker-indicator]:ml-3"
           />
         </label>
 
