@@ -193,6 +193,9 @@ jobs:
       - name: Clothing delete flow spec test
         run: pnpm --filter web test:clothing-delete-flow
 
+      - name: Custom delete dialog spec test
+        run: pnpm --filter web test:custom-delete-dialog
+
       - name: History delete flow spec test
         run: pnpm --filter web test:history-delete-flow
 

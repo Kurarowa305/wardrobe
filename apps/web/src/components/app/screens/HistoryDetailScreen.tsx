@@ -1,9 +1,10 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, createElement } from "react";
+import { Suspense, createElement, useState } from "react";
 
 import { useDeleteHistoryMutation, useHistory } from "@/api/hooks/history";
+import { ConfirmDialog } from "@/components/app/dialogs/ConfirmDialog";
 import { AppLayout } from "@/components/app/layout/AppLayout";
 import { useToast } from "@/components/ui/use-toast";
 import { COMMON_STRINGS } from "@/constants/commonStrings";
@@ -39,18 +40,16 @@ function HistoryDetailScreenContent({ wardrobeId, historyId, backHref }: History
   const { toast } = useToast();
   const historyQuery = useHistory(wardrobeId, historyId);
   const deleteMutation = useDeleteHistoryMutation(wardrobeId, historyId);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  const openDeleteDialog = () => {
+    setIsDeleteDialogOpen(true);
+  };
 
   const handleDelete = async () => {
-    const confirmed = window.confirm(
-      `${COMMON_STRINGS.dialogs.confirmDelete.title}
-${COMMON_STRINGS.dialogs.confirmDelete.message}`,
-    );
-    if (!confirmed) {
-      return;
-    }
-
     try {
       await deleteMutation.mutateAsync();
+      setIsDeleteDialogOpen(false);
       router.push(appendOperationToast(backHref, OPERATION_TOAST_IDS.historyDeleted));
     } catch {
       toast({
@@ -58,6 +57,14 @@ ${COMMON_STRINGS.dialogs.confirmDelete.message}`,
         title: HISTORY_STRINGS.detail.messages.deleteError,
       });
     }
+  };
+
+  const closeDeleteDialog = () => {
+    if (deleteMutation.isPending) {
+      return;
+    }
+
+    setIsDeleteDialogOpen(false);
   };
 
   const content = (
@@ -152,13 +159,27 @@ ${COMMON_STRINGS.dialogs.confirmDelete.message}`,
       {
         key: "delete",
         label: HISTORY_STRINGS.detail.menu.delete,
-        onSelect: handleDelete,
+        onSelect: openDeleteDialog,
         disabled: !historyQuery.data || deleteMutation.isPending,
         icon: "delete",
         tone: "danger",
       },
     ],
-    children: content,
+    children: (
+      <>
+        {content}
+        <ConfirmDialog
+          open={isDeleteDialogOpen}
+          title={COMMON_STRINGS.dialogs.confirmDelete.title}
+          message={COMMON_STRINGS.dialogs.confirmDelete.message}
+          confirmLabel={COMMON_STRINGS.dialogs.confirmDelete.primary}
+          cancelLabel={COMMON_STRINGS.dialogs.confirmDelete.secondary}
+          onConfirm={handleDelete}
+          onCancel={closeDeleteDialog}
+          isConfirming={deleteMutation.isPending}
+        />
+      </>
+    ),
   });
 }
 

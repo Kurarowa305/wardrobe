@@ -1,9 +1,10 @@
 "use client";
 
-import { createElement, useEffect, useRef } from "react";
+import { createElement, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { useClothing, useDeleteClothingMutation } from "@/api/hooks/clothing";
+import { ConfirmDialog } from "@/components/app/dialogs/ConfirmDialog";
 import { AppLayout } from "@/components/app/layout/AppLayout";
 import { useToast } from "@/components/ui/use-toast";
 import { COMMON_STRINGS } from "@/constants/commonStrings";
@@ -33,6 +34,7 @@ export function ClothingDetailScreen({ wardrobeId, clothingId }: ClothingDetailS
   const clothingQuery = useClothing(wardrobeId, clothingId);
   const deleteMutation = useDeleteClothingMutation(wardrobeId, clothingId);
   const hasShownToastRef = useRef(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
     if (hasShownToastRef.current || typeof window === "undefined") {
@@ -50,16 +52,14 @@ export function ClothingDetailScreen({ wardrobeId, clothingId }: ClothingDetailS
   }, [toast]);
   const imageUrl = resolveImageUrl(clothingQuery.data?.imageKey);
 
-  const handleDelete = async () => {
-    const confirmed = window.confirm(
-      `${COMMON_STRINGS.dialogs.confirmDelete.title}\n${COMMON_STRINGS.dialogs.confirmDelete.message}`,
-    );
-    if (!confirmed) {
-      return;
-    }
+  const openDeleteDialog = () => {
+    setIsDeleteDialogOpen(true);
+  };
 
+  const handleDelete = async () => {
     try {
       await deleteMutation.mutateAsync();
+      setIsDeleteDialogOpen(false);
       router.push(appendOperationToast(ROUTES.clothings(wardrobeId), OPERATION_TOAST_IDS.clothingDeleted));
     } catch {
       toast({
@@ -67,6 +67,14 @@ export function ClothingDetailScreen({ wardrobeId, clothingId }: ClothingDetailS
         title: CLOTHING_STRINGS.detail.messages.deleteError,
       });
     }
+  };
+
+  const closeDeleteDialog = () => {
+    if (deleteMutation.isPending) {
+      return;
+    }
+
+    setIsDeleteDialogOpen(false);
   };
 
   const content = (
@@ -132,12 +140,26 @@ export function ClothingDetailScreen({ wardrobeId, clothingId }: ClothingDetailS
       {
         key: "delete",
         label: CLOTHING_STRINGS.detail.menu.delete,
-        onSelect: handleDelete,
+        onSelect: openDeleteDialog,
         disabled: !clothingQuery.data || clothingQuery.data.deleted || deleteMutation.isPending,
         icon: "delete",
         tone: "danger",
       },
     ],
-    children: content,
+    children: (
+      <>
+        {content}
+        <ConfirmDialog
+          open={isDeleteDialogOpen}
+          title={COMMON_STRINGS.dialogs.confirmDelete.title}
+          message={COMMON_STRINGS.dialogs.confirmDelete.message}
+          confirmLabel={COMMON_STRINGS.dialogs.confirmDelete.primary}
+          cancelLabel={COMMON_STRINGS.dialogs.confirmDelete.secondary}
+          onConfirm={handleDelete}
+          onCancel={closeDeleteDialog}
+          isConfirming={deleteMutation.isPending}
+        />
+      </>
+    ),
   });
 }
