@@ -66,7 +66,8 @@ export function ClothingGenreSection({
               const imageUrl = resolveImageUrl(item.imageKey);
               const checked = selectedIds.includes(item.clothingId);
               const baseClassName = [
-                "grid w-full grid-cols-[56px_minmax(0,1fr)_40px] items-center gap-3 rounded-md border border-slate-300 bg-white p-3 text-left transition-colors",
+                "grid w-full items-center gap-3 rounded-md border border-slate-300 bg-white p-3 text-left transition-colors",
+                selectable ? "grid-cols-[56px_minmax(0,1fr)_40px]" : "grid-cols-[56px_minmax(0,1fr)]",
                 selectable && checked
                   ? "border-[var(--primary)] bg-[color:color-mix(in_srgb,var(--primary)_10%,white)]"
                   : "hover:bg-slate-50",
@@ -82,8 +83,8 @@ export function ClothingGenreSection({
                     </span>
                   )}
                   <span className="truncate text-sm font-medium text-slate-900">{item.name}</span>
-                  <span className="flex justify-end">
-                    {selectable ? (
+                  {selectable ? (
+                    <span className="flex justify-end">
                       <span
                         aria-hidden="true"
                         className={[
@@ -95,10 +96,8 @@ export function ClothingGenreSection({
                       >
                         ✓
                       </span>
-                    ) : (
-                      <ClothingGenreIcon genre={genre} className="h-5 w-5 text-slate-400" />
-                    )}
-                  </span>
+                    </span>
+                  ) : null}
                 </>
               );
 

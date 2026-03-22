@@ -184,6 +184,9 @@ jobs:
       - name: Clothing list screen spec test
         run: pnpm --filter web test:clothing-list-screen
 
+      - name: Clothing list right icon removal spec test
+        run: pnpm --filter web test:clothing-list-right-icon-removal
+
       - name: Clothing detail screen spec test
         run: pnpm --filter web test:clothing-detail-screen
 
