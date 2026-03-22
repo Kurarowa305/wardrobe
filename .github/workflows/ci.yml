@@ -226,6 +226,7 @@ jobs:
       - name: Record combination screen spec test
         run: pnpm --filter web test:record-combination-screen
 
+
       - name: MSW foundation spec test
         run: pnpm --filter web test:msw-foundation
 
