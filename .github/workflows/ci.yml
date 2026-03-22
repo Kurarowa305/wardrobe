@@ -55,6 +55,9 @@ jobs:
       - name: Wardrobe create screen spec test
         run: pnpm --filter web test:wardrobe-create-screen
 
+      - name: Wardrobe create validation spec test
+        run: pnpm --filter web test:wardrobe-create-validation
+
       - name: List screen spacing spec test
         run: pnpm --filter web test:list-screen-spacing
 

@@ -1,0 +1,67 @@
+import fs from "node:fs";
+import path from "node:path";
+
+const repoRoot = process.cwd();
+const read = (relativePath) => fs.readFileSync(path.join(repoRoot, relativePath), "utf8");
+const includes = (relativePath, text) => read(relativePath).includes(text);
+const noIncludes = (relativePath, text) => !read(relativePath).includes(text);
+
+const screenPath = "src/components/app/screens/WardrobeCreateScreen.tsx";
+const stringsPath = "src/features/wardrobe/strings.ts";
+
+const checks = [
+  {
+    id: "WCV-01",
+    name: "入力値を trim した結果で送信可否を判定している",
+    ok:
+      includes(screenPath, "const trimmedName = name.trim();") &&
+      includes(screenPath, "const isSubmitDisabled = trimmedName.length === 0;"),
+    detail: "trim 済みの入力値で送信可否を判定する実装が不足しています",
+  },
+  {
+    id: "WCV-02",
+    name: "ワードローブ名未入力時は作成ボタンを非活性にしている",
+    ok: includes(screenPath, '<Button type="submit" className="w-full" disabled={isSubmitDisabled}>'),
+    detail: "作成ボタンの disabled 制御が不足しています",
+  },
+  {
+    id: "WCV-03",
+    name: "未入力時のトースト導線を削除している",
+    ok:
+      noIncludes(screenPath, 'import { useToast } from "@/components/ui/use-toast";') &&
+      noIncludes(screenPath, "toast(") &&
+      noIncludes(screenPath, 'variant: "destructive"') &&
+      noIncludes(screenPath, "WARDROBE_STRINGS.create.errors"),
+    detail: "ワードローブ作成画面に入力エラートーストの実装が残っています",
+  },
+  {
+    id: "WCV-04",
+    name: "文言定義から未使用の入力エラー文言を削除している",
+    ok: noIncludes(stringsPath, "errors") && noIncludes(stringsPath, "nameRequired"),
+    detail: "ワードローブ文言定義に未使用の入力エラー文言が残っています",
+  },
+  {
+    id: "WCV-05",
+    name: "入力済みの場合のみ作成成功導線を維持している",
+    ok:
+      includes(screenPath, "if (isSubmitDisabled) {") &&
+      includes(screenPath, "router.push(`${ROUTES.home(DEMO_IDS.wardrobe)}?created=1`);") &&
+      includes(screenPath, "?created=1"),
+    detail: "入力済み時の作成成功導線が期待どおりではありません",
+  },
+];
+
+let hasFailure = false;
+for (const check of checks) {
+  if (check.ok) {
+    console.log(`PASS ${check.id}: ${check.name}`);
+  } else {
+    hasFailure = true;
+    console.error(`FAIL ${check.id}: ${check.name}`);
+    console.error(`  ${check.detail}`);
+  }
+}
+
+if (hasFailure) {
+  process.exit(1);
+}

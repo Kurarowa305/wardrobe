@@ -12,11 +12,5 @@ export const WARDROBE_STRINGS = {
     actions: {
       create: "作成",
     },
-    errors: {
-      nameRequired: {
-        title: "入力エラー",
-        message: "ワードローブ名を入力してください。",
-      },
-    },
   },
 } as const;

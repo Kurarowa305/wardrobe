@@ -62,6 +62,7 @@
     "test:history-date-weekday": "node scripts/check-history-date-weekday-spec.mjs",
     "test:accent-color": "node scripts/check-accent-color-spec.mjs",
     "test:wardrobe-create-screen": "node scripts/check-wardrobe-create-screen-spec.mjs",
+    "test:wardrobe-create-validation": "node scripts/check-wardrobe-create-validation-spec.mjs",
     "test:list-screen-spacing": "node scripts/check-list-screen-spacing-spec.mjs"
   },
   "dependencies": {
