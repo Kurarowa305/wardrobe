@@ -33,8 +33,9 @@ const checks = [
       includes("src/app/globals.css", "justify-content: flex-start;") &&
       includes("src/app/globals.css", "padding: 0;") &&
       includes("src/app/globals.css", "border: 0;") &&
-      includes("src/app/globals.css", "background: transparent;"),
-    detail: "globals.css に戻るボタンの新スタイルが不足しています",
+      includes("src/app/globals.css", "background: transparent;") &&
+      includes("src/app/globals.css", "font-size: 15px;"),
+    detail: "globals.css に戻るボタンの新スタイル（外枠なし・文字サイズ拡大）が不足しています",
   },
   {
     id: "BB-04",
