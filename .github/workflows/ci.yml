@@ -52,6 +52,9 @@ jobs:
       - name: UI foundation spec test
         run: pnpm --filter web test:ui-foundation
 
+      - name: Input focus zoom spec test
+        run: pnpm --filter web test:input-focus-zoom
+
       - name: ScreenCard removal spec test
         run: pnpm --filter web test:screen-card-removal
 
