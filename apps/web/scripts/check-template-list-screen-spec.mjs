@@ -48,7 +48,10 @@ check(
   "TLS-02",
   "テンプレート一覧画面が useTemplateList を利用し、cursorページングでデータ取得する",
   includes(target, '"use client";') &&
-    includes(target, 'import { useTemplateList } from "@/api/hooks/template";') &&
+    includes(
+      target,
+      'import { useTemplateList } from "@/api/hooks/template";',
+    ) &&
     includes(target, "const TEMPLATE_LIST_PAGE_SIZE = 20;") &&
     includes(target, "useTemplateList(wardrobeId, {") &&
     includes(target, "limit: TEMPLATE_LIST_PAGE_SIZE,") &&
@@ -59,7 +62,8 @@ check(
 check(
   "TLS-03",
   "一覧画面に「＋ テンプレートを追加」導線があり、テンプレート追加画面へ遷移できる",
-  includes(target, "ROUTES.templateNew(wardrobeId)") && includes(target, "TEMPLATE_STRINGS.list.actions.add"),
+  includes(target, "ROUTES.templateNew(wardrobeId)") &&
+    includes(target, "TEMPLATE_STRINGS.list.actions.add"),
   "テンプレート追加導線（ROUTES.templateNew / actions.add）の実装が不足しています",
 );
 
@@ -74,29 +78,41 @@ check(
 
 check(
   "TLS-05",
-  "テンプレートカードが詳細遷移導線を持ち、サムネ表示で resolveImageUrl/no image/削除済みオーバーレイに対応する",
+  "テンプレートカードが詳細遷移導線を持ち、共通サムネイルレールで no image/削除済み表示に対応する",
   includes(target, "ROUTES.templateDetail(wardrobeId, item.templateId)") &&
-    includes(target, 'import { resolveImageUrl } from "@/features/clothing/imageUrl";') &&
-    includes(target, "const imageUrl = resolveImageUrl(item.imageKey);") &&
-    includes(target, "COMMON_STRINGS.placeholders.noImage") &&
-    includes(target, "TEMPLATE_STRINGS.list.badges.deleted"),
-  "テンプレートカードの詳細遷移またはサムネ表示実装が不足しています",
+    includes(
+      target,
+      'import { ThumbnailRail } from "@/components/app/shared/ThumbnailRail";',
+    ) &&
+    includes(target, "<ThumbnailRail") &&
+    includes(target, "TEMPLATE_STRINGS.list.badges.deleted") &&
+    includes(
+      "src/components/app/shared/ThumbnailRail.tsx",
+      "COMMON_STRINGS.placeholders.noImage",
+    ),
+  "テンプレートカードの詳細遷移または共通サムネイルレール利用が不足しています",
 );
 
 check(
   "TLS-06",
   "テンプレートカードがサムネ最大4件と超過分 +x 表示を行う",
   includes(target, "const TEMPLATE_THUMBNAIL_LIMIT = 4;") &&
-    includes(target, "item.clothingItems.slice(0, TEMPLATE_THUMBNAIL_LIMIT)") &&
-    includes(target, "const hiddenCount = Math.max(item.clothingItems.length - TEMPLATE_THUMBNAIL_LIMIT, 0);") &&
-    includes(target, "+{hiddenCount}"),
+    includes(target, "limit={TEMPLATE_THUMBNAIL_LIMIT}") &&
+    includes(
+      "src/components/app/shared/ThumbnailRail.tsx",
+      "const DEFAULT_THUMBNAIL_LIMIT = 4;",
+    ) &&
+    includes("src/components/app/shared/ThumbnailRail.tsx", "+{hiddenCount}"),
   "サムネ上限4件または +x 表示実装が不足しています",
 );
 
 check(
   "TLS-07",
   "nextCursor がある場合に『さらに読み込む』で追加取得できる",
-  includes(target, "const [nextCursor, setNextCursor] = useState<string | null>(null);") &&
+  includes(
+    target,
+    "const [nextCursor, setNextCursor] = useState<string | null>(null);",
+  ) &&
     includes(target, "setNextCursor(data.nextCursor);") &&
     includes(target, "setCursor(nextCursor);") &&
     includes(target, "TEMPLATE_STRINGS.list.actions.loadMore") &&
@@ -109,8 +125,14 @@ check(
   "テンプレート一覧画面向けの文言（loadMore/messages/badges）が template strings に定義される",
   includes(stringsTarget, 'loadMore: "さらに読み込む"') &&
     includes(stringsTarget, 'loading: "読み込み中..."') &&
-    includes(stringsTarget, 'empty: "テンプレートがまだ登録されていません。"') &&
-    includes(stringsTarget, 'error: "テンプレート一覧の読み込みに失敗しました。"') &&
+    includes(
+      stringsTarget,
+      'empty: "テンプレートがまだ登録されていません。"',
+    ) &&
+    includes(
+      stringsTarget,
+      'error: "テンプレート一覧の読み込みに失敗しました。"',
+    ) &&
     includes(stringsTarget, 'deleted: "削除済み"'),
   "features/template/strings.ts に一覧状態文言の定義が不足しています",
 );

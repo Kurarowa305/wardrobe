@@ -6,14 +6,16 @@ import { useRouter } from "next/navigation";
 import { useCreateHistoryMutation } from "@/api/hooks/history";
 import { useTemplateList } from "@/api/hooks/template";
 import { AppLayout } from "@/components/app/layout/AppLayout";
+import { ThumbnailRail } from "@/components/app/shared/ThumbnailRail";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { COMMON_STRINGS } from "@/constants/commonStrings";
 import { ROUTES } from "@/constants/routes";
-import { resolveImageUrl } from "@/features/clothing/imageUrl";
 import { RECORD_STRINGS } from "@/features/record/strings";
-import { OPERATION_TOAST_IDS, appendOperationToast } from "@/features/toast/operationToast";
-import type { TemplateListClothingItem, TemplateListItem } from "@/features/template/types";
+import {
+  OPERATION_TOAST_IDS,
+  appendOperationToast,
+} from "@/features/toast/operationToast";
+import type { TemplateListItem } from "@/features/template/types";
 
 type RecordByTemplateScreenProps = {
   wardrobeId: string;
@@ -35,28 +37,9 @@ function toHistoryApiDate(dateInputValue: string) {
   return dateInputValue.replaceAll("-", "");
 }
 
-function TemplateThumbnail({ item }: { item: TemplateListClothingItem }) {
-  const imageUrl = resolveImageUrl(item.imageKey);
-
-  return (
-    <span className="relative block h-14 w-14 overflow-hidden rounded-md border border-slate-200 bg-slate-100">
-      {imageUrl ? (
-        <img src={imageUrl} alt="テンプレート構成服のサムネイル" className="h-full w-full object-cover" />
-      ) : (
-        <span className="flex h-full w-full items-center justify-center px-1 text-center text-[10px] font-semibold leading-tight text-slate-600">
-          {COMMON_STRINGS.placeholders.noImage}
-        </span>
-      )}
-      {item.deleted ? (
-        <span className="absolute inset-0 flex items-center justify-center bg-slate-900/65 px-1 text-center text-[10px] font-semibold text-white">
-          {RECORD_STRINGS.common.deleted}
-        </span>
-      ) : null}
-    </span>
-  );
-}
-
-export function RecordByTemplateScreen({ wardrobeId }: RecordByTemplateScreenProps) {
+export function RecordByTemplateScreen({
+  wardrobeId,
+}: RecordByTemplateScreenProps) {
   const router = useRouter();
   const createHistoryMutation = useCreateHistoryMutation(wardrobeId);
 
@@ -102,7 +85,10 @@ export function RecordByTemplateScreen({ wardrobeId }: RecordByTemplateScreenPro
     setNextCursor(templateListQuery.data.nextCursor);
   }, [templateListQuery.data, cursor]);
 
-  const templateItems = useMemo(() => pages.flatMap((page) => page.items), [pages]);
+  const templateItems = useMemo(
+    () => pages.flatMap((page) => page.items),
+    [pages],
+  );
 
   const trimmedDate = date.trim();
   const historyApiDate = toHistoryApiDate(trimmedDate);
@@ -113,7 +99,8 @@ export function RecordByTemplateScreen({ wardrobeId }: RecordByTemplateScreenPro
   const showTemplateError = templateTouched && isTemplateEmpty;
   const showTemplateLoading = templateListQuery.isPending && !hasTemplateItems;
   const showTemplateLoadError = templateListQuery.isError && !hasTemplateItems;
-  const showTemplateEmpty = !showTemplateLoading && !showTemplateLoadError && !hasTemplateItems;
+  const showTemplateEmpty =
+    !showTemplateLoading && !showTemplateLoadError && !hasTemplateItems;
   const canLoadMore = nextCursor !== null && !templateListQuery.isFetching;
   const isSubmitting = createHistoryMutation.isPending;
 
@@ -139,14 +126,25 @@ export function RecordByTemplateScreen({ wardrobeId }: RecordByTemplateScreenPro
       date: historyApiDate,
       templateId: selectedTemplateId,
     });
-    router.push(appendOperationToast(ROUTES.home(wardrobeId), OPERATION_TOAST_IDS.historyCreated));
+    router.push(
+      appendOperationToast(
+        ROUTES.home(wardrobeId),
+        OPERATION_TOAST_IDS.historyCreated,
+      ),
+    );
   };
 
   return (
-    <AppLayout title={RECORD_STRINGS.byTemplate.title} backHref={ROUTES.recordMethod(wardrobeId)}>
+    <AppLayout
+      title={RECORD_STRINGS.byTemplate.title}
+      backHref={ROUTES.recordMethod(wardrobeId)}
+    >
       <div className="grid gap-4">
         <form className="grid gap-3 pb-24" onSubmit={handleSubmit} noValidate>
-          <label className="grid gap-1 text-sm font-medium text-slate-900" htmlFor="record-template-date">
+          <label
+            className="grid gap-1 text-sm font-medium text-slate-900"
+            htmlFor="record-template-date"
+          >
             <span>{RECORD_STRINGS.byTemplate.labels.date}</span>
             <Input
               id="record-template-date"
@@ -156,12 +154,17 @@ export function RecordByTemplateScreen({ wardrobeId }: RecordByTemplateScreenPro
               onBlur={() => setDateTouched(true)}
               onChange={(event) => setDate(event.target.value)}
               aria-invalid={showDateError}
-              aria-describedby={showDateError ? "record-template-date-error" : undefined}
+              aria-describedby={
+                showDateError ? "record-template-date-error" : undefined
+              }
             />
           </label>
 
           {showDateError ? (
-            <p id="record-template-date-error" className="m-0 text-sm text-red-700">
+            <p
+              id="record-template-date-error"
+              className="m-0 text-sm text-red-700"
+            >
               {RECORD_STRINGS.byTemplate.messages.dateRequired}
             </p>
           ) : null}
@@ -172,23 +175,27 @@ export function RecordByTemplateScreen({ wardrobeId }: RecordByTemplateScreenPro
             </legend>
 
             {showTemplateLoading ? (
-              <p className="m-0 text-sm text-slate-600">{RECORD_STRINGS.byTemplate.messages.loading}</p>
+              <p className="m-0 text-sm text-slate-600">
+                {RECORD_STRINGS.byTemplate.messages.loading}
+              </p>
             ) : null}
 
             {showTemplateLoadError ? (
-              <p className="m-0 text-sm text-red-700">{RECORD_STRINGS.byTemplate.messages.loadError}</p>
+              <p className="m-0 text-sm text-red-700">
+                {RECORD_STRINGS.byTemplate.messages.loadError}
+              </p>
             ) : null}
 
             {showTemplateEmpty ? (
-              <p className="m-0 text-sm text-slate-600">{RECORD_STRINGS.byTemplate.messages.empty}</p>
+              <p className="m-0 text-sm text-slate-600">
+                {RECORD_STRINGS.byTemplate.messages.empty}
+              </p>
             ) : null}
 
             {hasTemplateItems ? (
               <div className="grid gap-2">
                 {templateItems.map((item) => {
                   const checked = selectedTemplateId === item.templateId;
-                  const visibleThumbnails = item.clothingItems.slice(0, TEMPLATE_THUMBNAIL_LIMIT);
-                  const hiddenCount = Math.max(item.clothingItems.length - TEMPLATE_THUMBNAIL_LIMIT, 0);
 
                   return (
                     <label
@@ -211,17 +218,19 @@ export function RecordByTemplateScreen({ wardrobeId }: RecordByTemplateScreenPro
                         className="sr-only"
                       />
                       <span className="grid gap-3">
-                        <span className="truncate text-sm font-medium text-slate-900">{item.name}</span>
-                        <span className="flex flex-wrap gap-2">
-                          {visibleThumbnails.map((clothingItem) => (
-                            <TemplateThumbnail key={clothingItem.clothingId} item={clothingItem} />
-                          ))}
-                          {hiddenCount > 0 ? (
-                            <span className="flex h-14 w-14 items-center justify-center rounded-md border border-dashed border-slate-300 bg-slate-50 text-sm font-semibold text-slate-700">
-                              +{hiddenCount}
-                            </span>
-                          ) : null}
+                        <span className="truncate text-sm font-medium text-slate-900">
+                          {item.name}
                         </span>
+                        <ThumbnailRail
+                          items={item.clothingItems.map((clothingItem) => ({
+                            id: clothingItem.clothingId,
+                            imageKey: clothingItem.imageKey,
+                            deleted: clothingItem.deleted,
+                          }))}
+                          deletedLabel={RECORD_STRINGS.common.deleted}
+                          thumbnailAltSuffix="のサムネイル"
+                          limit={TEMPLATE_THUMBNAIL_LIMIT}
+                        />
                       </span>
                       <span className="flex items-start justify-end pt-0.5">
                         <span
@@ -243,7 +252,12 @@ export function RecordByTemplateScreen({ wardrobeId }: RecordByTemplateScreenPro
             ) : null}
 
             {nextCursor !== null ? (
-              <Button type="button" variant="secondary" onClick={handleLoadMore} disabled={!canLoadMore}>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={handleLoadMore}
+                disabled={!canLoadMore}
+              >
                 {templateListQuery.isFetching
                   ? RECORD_STRINGS.byTemplate.messages.loading
                   : RECORD_STRINGS.byTemplate.actions.loadMore}
@@ -258,7 +272,9 @@ export function RecordByTemplateScreen({ wardrobeId }: RecordByTemplateScreenPro
           ) : null}
 
           {createHistoryMutation.isError ? (
-            <p className="m-0 text-sm text-red-700">{RECORD_STRINGS.byTemplate.messages.submitError}</p>
+            <p className="m-0 text-sm text-red-700">
+              {RECORD_STRINGS.byTemplate.messages.submitError}
+            </p>
           ) : null}
 
           <div className="fixed bottom-0 left-1/2 z-10 w-full max-w-[420px] -translate-x-1/2 border-t border-slate-200 bg-white/95 px-4 py-3 backdrop-blur">

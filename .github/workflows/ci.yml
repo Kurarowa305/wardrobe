@@ -223,6 +223,9 @@ jobs:
       - name: Record template screen spec test
         run: pnpm --filter web test:record-template-screen
 
+      - name: Card thumbnail layout spec test
+        run: pnpm --filter web test:card-thumbnail-layout
+
       - name: Record combination screen spec test
         run: pnpm --filter web test:record-combination-screen
 
