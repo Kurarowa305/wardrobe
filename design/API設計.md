@@ -5,12 +5,12 @@
 | ------ | ------ | ------------------------------------------------ | ----------- | ------------------------------------------------------------ | -------------------------------------------------------------- | ---------------------------------------------- |
 | API-01 | POST   | `/wardrobes`                                     | ワードローブ新規作成  | `name`                                                       | `wardrobeId`                                                              |  |
 | API-02 | GET    | `/wardrobes/{wardrobeId}`                        | ワードローブ取得    | —                                                            | `name`                                                         |                                    |
-| API-03 | GET    | `/wardrobes/{wardrobeId}/clothing`               | 服一覧（登録順）    | `order`(asc/desc), `limit`, `cursor`                         | `items[]`, `nextCursor`                                        | ACTIVEのみ / レスポンス詳細は以下                                       |
-| API-04 | POST   | `/wardrobes/{wardrobeId}/clothing`               | 服の追加        | `name`, `imageKey?`                                          | —                                                              |                                    |
-| API-05 | GET    | `/wardrobes/{wardrobeId}/clothing/{clothingId}`  | 服詳細取得       | —                                                            | `clothingId`, `name`, `imageKey?`, `status`, `wearCount`, `lastWornAt`       | レスポンス詳細は以下                                          |
-| API-06 | PATCH  | `/wardrobes/{wardrobeId}/clothing/{clothingId}`  | 服の編集        | `name?`, `imageKey?`                                         | —                                                              |                                         |
+| API-03 | GET    | `/wardrobes/{wardrobeId}/clothing`               | 服一覧（登録順）    | `order`(asc/desc), `genre`(tops/bottoms/others), `limit`, `cursor`                         | `items[]`, `nextCursor`                                        | ACTIVEのみ / レスポンス詳細は以下                                       |
+| API-04 | POST   | `/wardrobes/{wardrobeId}/clothing`               | 服の追加        | `name`, `genre`, `imageKey?`                                          | —                                                              |                                    |
+| API-05 | GET    | `/wardrobes/{wardrobeId}/clothing/{clothingId}`  | 服詳細取得       | —                                                            | `clothingId`, `name`, `genre`, `imageKey?`, `status`, `wearCount`, `lastWornAt`       | レスポンス詳細は以下                                          |
+| API-06 | PATCH  | `/wardrobes/{wardrobeId}/clothing/{clothingId}`  | 服の編集        | `name?`, `genre?`, `imageKey?`                                         | —                                                              |                                         |
 | API-07 | DELETE | `/wardrobes/{wardrobeId}/clothing/{clothingId}`  | 服の削除（論理）    | —                                                            | —                                                              | 内部で `status=DELETED`                           |
-| API-08 | GET    | `/wardrobes/{wardrobeId}/templates`              | テンプレ一覧（登録順） | `order`(asc/desc), `limit`, `cursor`                         | `items[]`, `nextCursor`                                        | ACTIVEのみ / レスポンス詳細は以下                                       |
+| API-08 | GET    | `/wardrobes/{wardrobeId}/templates`              | テンプレ一覧（登録順） | `order`(asc/desc), `genre`(tops/bottoms/others), `limit`, `cursor`                         | `items[]`, `nextCursor`                                        | ACTIVEのみ / レスポンス詳細は以下                                       |
 | API-09 | POST   | `/wardrobes/{wardrobeId}/templates`              | テンプレ追加      | `name`, `clothingIds[]`                                      | —                                                              |                           |
 | API-10 | GET    | `/wardrobes/{wardrobeId}/templates/{templateId}` | テンプレ詳細取得    | —                                                            | `name`, `status`, `wearCount`, `lastWornAt`, `clothingItems[]` |     |
 | API-11 | PATCH  | `/wardrobes/{wardrobeId}/templates/{templateId}` | テンプレ編集      | `name?`, `clothingIds?[]`                                    | —                                                              |                                            |
@@ -116,6 +116,7 @@
 | ---------- | ------- | -------------- |
 | clothingId | string  | 服ID            |
 | name       | string  | 服名             |
+| genre      | string  | `tops` / `bottoms` / `others` |
 | imageKey   | string? | 画像キー           |
 
 ```json
@@ -152,6 +153,7 @@
 | フィールド    | 型       | 説明   |
 | -------- | ------- | ---- |
 | name     | string  | 服名 / 上限40字   |
+| genre    | string  | `tops` / `bottoms` / `others` |
 | imageKey | string? | 画像キー |
 
 ```json
@@ -183,6 +185,7 @@
 | ---------- | ------- | -------------------- |
 | clothingId | string  | 服ID                  |
 | name       | string  | 服名                   |
+| genre      | string  | `tops` / `bottoms` / `others` |
 | imageKey   | string? | 画像キー                 |
 | status     | string  | `ACTIVE` / `DELETED`　※削除済みでも取得可能 |
 | wearCount  | number  | 着用回数                 |
@@ -384,6 +387,7 @@
 | ---------- | ------- | -------------- |
 | clothingId | string  | 服ID            |
 | name       | string  | 服名             |
+| genre      | string  | `tops` / `bottoms` / `others` |
 | imageKey   | string? | 画像キー           |
 | status     | string  | `ACTIVE` / `DELETED`　※服削除済みでも取得可能 |
 | wearCount  | number  | 着用回数           |
@@ -503,6 +507,7 @@
 | ---------- | ------- | -------------- |
 | clothingId | string  | 服ID            |
 | name       | string  | 服名             |
+| genre      | string  | `tops` / `bottoms` / `others` |
 | imageKey   | string? | 画像キー           |
 | status     | string  | `ACTIVE` / `DELETED` |
 
@@ -604,6 +609,7 @@
 | ---------- | ------- | -------------- |
 | clothingId | string  | 服ID            |
 | name       | string  | 服名             |
+| genre      | string  | `tops` / `bottoms` / `others` |
 | imageKey   | string? | 画像キー           |
 | status     | string  | `ACTIVE` / `DELETED` |
 | wearCount  | number  | 着用回数           |

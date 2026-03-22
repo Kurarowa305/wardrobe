@@ -1,31 +1,23 @@
 export const TEMPLATE_STRINGS = {
-  placeholders: {
-    name: "例: 通勤コーデ",
-  },
-  actions: {
-    loadMoreClothings: "服をさらに読み込む",
-  },
+  placeholders: { name: "例: 通勤コーデ" },
+  actions: { loadMoreClothings: "服をさらに読み込む" },
   messages: {
     clothingLoading: "服一覧を読み込み中...",
     clothingLoadError: "服一覧の読み込みに失敗しました。",
     clothingEmpty: "選択できる服がまだ登録されていません。",
+    clothingSectionEmpty: "このジャンルで選択できる服はまだ登録されていません。",
     clothingRequired: "テンプレートに含める服を1つ以上選択してください。",
     templateNotFound: "テンプレートが見つかりませんでした。",
   },
   list: {
     title: "テンプレート",
-    actions: {
-      add: "＋ テンプレートを追加",
-      loadMore: "さらに読み込む",
-    },
+    actions: { add: "＋ テンプレートを追加", loadMore: "さらに読み込む" },
     messages: {
       loading: "読み込み中...",
       empty: "テンプレートがまだ登録されていません。",
       error: "テンプレート一覧の読み込みに失敗しました。",
     },
-    badges: {
-      deleted: "削除済み",
-    },
+    badges: { deleted: "削除済み" },
   },
   create: {
     title: "テンプレートの追加",
@@ -36,13 +28,8 @@ export const TEMPLATE_STRINGS = {
       submitSuccess: "テンプレートを追加しました",
       submitError: "テンプレートの追加に失敗しました。",
     },
-    labels: {
-      name: "テンプレート名",
-      selectClothing: "服を選択",
-    },
-    actions: {
-      submit: "追加",
-    },
+    labels: { name: "テンプレート名", selectClothing: "服を選択" },
+    actions: { submit: "追加" },
   },
   edit: {
     title: "テンプレートの編集",
@@ -54,20 +41,12 @@ export const TEMPLATE_STRINGS = {
       submitSuccess: "テンプレートを更新しました",
       submitError: "テンプレートの更新に失敗しました。",
     },
-    labels: {
-      name: "テンプレート名",
-      selectClothing: "服を選択",
-    },
-    actions: {
-      submit: "保存",
-    },
+    labels: { name: "テンプレート名", selectClothing: "服を選択" },
+    actions: { submit: "保存" },
   },
   detail: {
     title: "テンプレートの詳細",
-    menu: {
-      edit: "編集",
-      delete: "削除",
-    },
+    menu: { edit: "編集", delete: "削除" },
     labels: {
       wearCount: "着た回数",
       lastWornAt: "最後に着た日",

@@ -10,9 +10,7 @@ export const TEMPLATE_FIXTURE_WARDROBE_ID = CLOTHING_FIXTURE_WARDROBE_ID;
 const GENERATED_TEMPLATE_FIXTURE_COUNT = 27;
 const GENERATED_TEMPLATE_FIXTURE_BASE_TIMESTAMP = 1735620000000;
 
-export type TemplateDetailFixture = TemplateDetailResponseDto & {
-  templateId: string;
-};
+export type TemplateDetailFixture = TemplateDetailResponseDto & { templateId: string };
 
 type TemplateDetailFixtureSeed = {
   templateId: string;
@@ -23,6 +21,10 @@ type TemplateDetailFixtureSeed = {
   clothingIds: string[];
 };
 
+function createGeneratedClothingId(prefix: "top" | "bottom" | "other", sequence: number) {
+  return `cl_${prefix}_auto_${String(sequence).padStart(3, "0")}`;
+}
+
 const templateDetailFixtureSeeds: TemplateDetailFixtureSeed[] = [
   {
     templateId: "tp_01HZZBBB",
@@ -30,13 +32,7 @@ const templateDetailFixtureSeeds: TemplateDetailFixtureSeed[] = [
     status: "ACTIVE",
     wearCount: 8,
     lastWornAt: 1735600000000,
-    clothingIds: [
-      "cl_01HZZAAA",
-      "cl_01HZZAAB",
-      "cl_auto_001",
-      "cl_auto_002",
-      "cl_auto_003",
-    ],
+    clothingIds: ["cl_top_001", "cl_bottom_001", "cl_other_001", createGeneratedClothingId("top", 1), createGeneratedClothingId("bottom", 1)],
   },
   {
     templateId: "tp_01HZZBBC",
@@ -44,7 +40,7 @@ const templateDetailFixtureSeeds: TemplateDetailFixtureSeed[] = [
     status: "ACTIVE",
     wearCount: 3,
     lastWornAt: 1735610000000,
-    clothingIds: ["cl_01HZZAAB", "cl_01HZZAAC"],
+    clothingIds: ["cl_top_002", "cl_bottom_002", createGeneratedClothingId("other", 2)],
   },
   {
     templateId: "tp_01HZZBBD",
@@ -52,32 +48,24 @@ const templateDetailFixtureSeeds: TemplateDetailFixtureSeed[] = [
     status: "DELETED",
     wearCount: 1,
     lastWornAt: 1735500000000,
-    clothingIds: ["cl_01HZZAAA", "cl_01HZZAAC"],
+    clothingIds: ["cl_top_003", "cl_bottom_003", "cl_other_003"],
   },
   ...Array.from({ length: GENERATED_TEMPLATE_FIXTURE_COUNT }, (_, index): TemplateDetailFixtureSeed => {
     const sequence = index + 1;
     const padded = String(sequence).padStart(3, "0");
     const wearCount = (sequence * 2) % 15;
     const status: TemplateStatusDto = sequence % 10 === 0 ? "DELETED" : "ACTIVE";
-    const firstClothingIndex = ((sequence - 1) % 47) + 1;
-    const secondClothingIndex = ((sequence + 7 - 1) % 47) + 1;
-    const thirdClothingIndex = ((sequence + 19 - 1) % 47) + 1;
 
     return {
       templateId: `tp_auto_${padded}`,
       name: `fixtureテンプレ${padded}`,
       status,
       wearCount,
-      lastWornAt:
-        wearCount === 0 ? 0 : GENERATED_TEMPLATE_FIXTURE_BASE_TIMESTAMP + sequence * 10_000,
+      lastWornAt: wearCount === 0 ? 0 : GENERATED_TEMPLATE_FIXTURE_BASE_TIMESTAMP + sequence * 10_000,
       clothingIds: [
-        `cl_auto_${String(firstClothingIndex).padStart(3, "0")}`,
-        sequence % 4 === 0
-          ? "cl_01HZZAAC"
-          : `cl_auto_${String(secondClothingIndex).padStart(3, "0")}`,
-        sequence % 5 === 0
-          ? "cl_01HZZAAB"
-          : `cl_auto_${String(thirdClothingIndex).padStart(3, "0")}`,
+        createGeneratedClothingId("top", ((sequence - 1) % 12) + 1),
+        createGeneratedClothingId("bottom", ((sequence + 3 - 1) % 12) + 1),
+        createGeneratedClothingId("other", ((sequence + 6 - 1) % 12) + 1),
       ],
     };
   }),
@@ -88,7 +76,6 @@ function toTemplateClothingItem(clothingId: string): TemplateDetailClothingItemD
   if (!clothingFixture) {
     throw new Error(`Missing clothing fixture for template fixture: ${clothingId}`);
   }
-
   return { ...clothingFixture };
 }
 

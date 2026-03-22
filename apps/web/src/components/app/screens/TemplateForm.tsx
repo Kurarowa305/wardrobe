@@ -4,140 +4,72 @@ import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 
 import { useClothingList } from "@/api/hooks/clothing";
-import {
-  useCreateTemplateMutation,
-  useTemplate,
-  useUpdateTemplateMutation,
-} from "@/api/hooks/template";
+import { useCreateTemplateMutation, useTemplate, useUpdateTemplateMutation } from "@/api/hooks/template";
+import type { ClothingGenreDto } from "@/api/schemas/clothing";
+import { ClothingGenreSection } from "@/components/app/screens/ClothingGenreSection";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { COMMON_STRINGS } from "@/constants/commonStrings";
 import { ROUTES } from "@/constants/routes";
-import { resolveImageUrl } from "@/features/clothing/imageUrl";
-import type { ClothingListItem } from "@/features/clothing/types";
+import { CLOTHING_GENRES } from "@/features/clothing/genre";
 import { TEMPLATE_STRINGS } from "@/features/template/strings";
 import { OPERATION_TOAST_IDS, appendOperationToast } from "@/features/toast/operationToast";
 import { isAppError } from "@/lib/error/normalize";
 
 type TemplateFormMode = "create" | "edit";
 
-type TemplateFormProps = {
-  wardrobeId: string;
-  mode: TemplateFormMode;
-  templateId?: string;
-  submitLabel: string;
-};
-
-type ClothingPage = {
-  cursor: string | null;
-  items: ClothingListItem[];
-};
-
+type TemplateFormProps = { wardrobeId: string; mode: TemplateFormMode; templateId?: string; submitLabel: string };
+type GenreState = { cursor: string | null; nextCursor: string | null; collapsed: boolean };
 const TEMPLATE_FORM_CLOTHING_LIMIT = 50;
 
-function ClothingThumbnail({ item }: { item: ClothingListItem }) {
-  const imageUrl = resolveImageUrl(item.imageKey);
-
-  return imageUrl ? (
-    <img
-      src={imageUrl}
-      alt={`${item.name}の画像`}
-      className="h-14 w-14 rounded-md border border-slate-200 bg-slate-100 object-cover"
-    />
-  ) : (
-    <span className="flex h-14 w-14 items-center justify-center rounded-md border border-slate-200 bg-slate-100 px-1 text-center text-[10px] font-semibold leading-tight text-slate-600">
-      {COMMON_STRINGS.placeholders.noImage}
-    </span>
-  );
+function createInitialGenreState(): Record<ClothingGenreDto, GenreState> {
+  return {
+    tops: { cursor: null, nextCursor: null, collapsed: false },
+    bottoms: { cursor: null, nextCursor: null, collapsed: false },
+    others: { cursor: null, nextCursor: null, collapsed: false },
+  };
 }
 
-function resolveLoadErrorMessage(
-  error: unknown,
-  mode: TemplateFormMode,
-): string {
-  if (isAppError(error) && error.status === 404) {
-    return TEMPLATE_STRINGS.messages.templateNotFound;
-  }
-
-  return mode === "edit"
-    ? TEMPLATE_STRINGS.edit.messages.loadError
-    : TEMPLATE_STRINGS.create.messages.loadError;
+function resolveLoadErrorMessage(error: unknown, mode: TemplateFormMode): string {
+  if (isAppError(error) && error.status === 404) return TEMPLATE_STRINGS.messages.templateNotFound;
+  return mode === "edit" ? TEMPLATE_STRINGS.edit.messages.loadError : TEMPLATE_STRINGS.create.messages.loadError;
 }
 
-export function TemplateForm({
-  wardrobeId,
-  mode,
-  templateId,
-  submitLabel,
-}: TemplateFormProps) {
+export function TemplateForm({ wardrobeId, mode, templateId, submitLabel }: TemplateFormProps) {
   const router = useRouter();
   const templateQuery = useTemplate(wardrobeId, templateId ?? "");
   const createMutation = useCreateTemplateMutation(wardrobeId);
-  const updateMutation = useUpdateTemplateMutation(
-    wardrobeId,
-    templateId ?? "",
-  );
+  const updateMutation = useUpdateTemplateMutation(wardrobeId, templateId ?? "");
 
   const [name, setName] = useState("");
   const [nameTouched, setNameTouched] = useState(false);
   const [selectedClothingIds, setSelectedClothingIds] = useState<string[]>([]);
-  const [cursor, setCursor] = useState<string | null>(null);
-  const [pages, setPages] = useState<ClothingPage[]>([]);
-  const [nextCursor, setNextCursor] = useState<string | null>(null);
-  const [hasInitializedEditValues, setHasInitializedEditValues] = useState(
-    mode === "create",
-  );
+  const [genreStates, setGenreStates] = useState<Record<ClothingGenreDto, GenreState>>(createInitialGenreState);
+  const [hasInitializedEditValues, setHasInitializedEditValues] = useState(mode === "create");
 
-  const clothingListQuery = useClothingList(wardrobeId, {
-    limit: TEMPLATE_FORM_CLOTHING_LIMIT,
-    cursor,
-  });
+  const topsQuery = useClothingList(wardrobeId, { genre: "tops", limit: TEMPLATE_FORM_CLOTHING_LIMIT, cursor: genreStates.tops.cursor });
+  const bottomsQuery = useClothingList(wardrobeId, { genre: "bottoms", limit: TEMPLATE_FORM_CLOTHING_LIMIT, cursor: genreStates.bottoms.cursor });
+  const othersQuery = useClothingList(wardrobeId, { genre: "others", limit: TEMPLATE_FORM_CLOTHING_LIMIT, cursor: genreStates.others.cursor });
+  const genreQueries = { tops: topsQuery, bottoms: bottomsQuery, others: othersQuery } as const;
 
   useEffect(() => {
-    setCursor(null);
-    setPages([]);
-    setNextCursor(null);
+    setGenreStates(createInitialGenreState());
   }, [wardrobeId]);
 
   useEffect(() => {
-    if (!clothingListQuery.data) {
-      return;
+    for (const genre of CLOTHING_GENRES) {
+      const query = genreQueries[genre];
+      if (!query.data) continue;
+      setGenreStates((previous) => ({ ...previous, [genre]: { ...previous[genre], nextCursor: query.data.nextCursor } }));
     }
-
-    setPages((previous) => {
-      const pageIndex = previous.findIndex((page) => page.cursor === cursor);
-      if (pageIndex >= 0) {
-        const nextPages = [...previous];
-        nextPages[pageIndex] = { cursor, items: clothingListQuery.data.items };
-        return nextPages;
-      }
-
-      return [...previous, { cursor, items: clothingListQuery.data.items }];
-    });
-
-    setNextCursor(clothingListQuery.data.nextCursor);
-  }, [clothingListQuery.data, cursor]);
+  }, [topsQuery.data, bottomsQuery.data, othersQuery.data]);
 
   useEffect(() => {
-    if (mode !== "edit") {
-      return;
-    }
-
-    if (!templateQuery.data || hasInitializedEditValues) {
-      return;
-    }
-
+    if (mode !== "edit" || !templateQuery.data || hasInitializedEditValues) return;
     setName(templateQuery.data.name);
-    setSelectedClothingIds(
-      templateQuery.data.clothingItems.map((item) => item.clothingId),
-    );
+    setSelectedClothingIds(templateQuery.data.clothingItems.map((item) => item.clothingId));
     setHasInitializedEditValues(true);
   }, [hasInitializedEditValues, mode, templateQuery.data]);
 
-  const clothingItems = useMemo(
-    () => pages.flatMap((page) => page.items),
-    [pages],
-  );
   const trimmedName = useMemo(() => name.trim(), [name]);
   const isNameEmpty = trimmedName.length === 0;
   const isSelectionEmpty = selectedClothingIds.length === 0;
@@ -146,217 +78,90 @@ export function TemplateForm({
   const isPending = createMutation.isPending || updateMutation.isPending;
   const showTemplateLoading = mode === "edit" && templateQuery.isPending;
   const showTemplateError = mode === "edit" && templateQuery.isError;
-  const hasClothingItems = clothingItems.length > 0;
-  const showClothingLoading = clothingListQuery.isPending && !hasClothingItems;
-  const showClothingError = clothingListQuery.isError && !hasClothingItems;
-  const canLoadMore = nextCursor !== null && !clothingListQuery.isFetching;
+  const hasClothingItems = CLOTHING_GENRES.some((genre) => (genreQueries[genre].data?.items.length ?? 0) > 0);
+  const showClothingLoading = CLOTHING_GENRES.every((genre) => genreQueries[genre].isPending);
+  const showClothingError = CLOTHING_GENRES.every((genre) => genreQueries[genre].isError);
 
   const toggleClothing = (clothingId: string) => {
-    setSelectedClothingIds((previous) =>
-      previous.includes(clothingId)
-        ? previous.filter((currentId) => currentId !== clothingId)
-        : [...previous, clothingId],
-    );
+    setSelectedClothingIds((previous) => previous.includes(clothingId) ? previous.filter((currentId) => currentId !== clothingId) : [...previous, clothingId]);
   };
 
-  const handleLoadMore = () => {
-    if (nextCursor === null || clothingListQuery.isFetching) {
-      return;
-    }
-
-    setCursor(nextCursor);
+  const handleLoadMore = (genre: ClothingGenreDto) => {
+    const nextCursor = genreStates[genre].nextCursor;
+    if (nextCursor === null || genreQueries[genre].isFetching) return;
+    setGenreStates((previous) => ({ ...previous, [genre]: { ...previous[genre], cursor: nextCursor } }));
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
     setNameTouched(true);
+    if (isNameEmpty || isSelectionEmpty || isPending || showTemplateLoading || showTemplateError) return;
 
-    if (
-      isNameEmpty ||
-      isSelectionEmpty ||
-      isPending ||
-      showTemplateLoading ||
-      showTemplateError
-    ) {
-      return;
-    }
-
-    const payload = {
-      name: trimmedName,
-      clothingIds: selectedClothingIds,
-    };
-
+    const payload = { name: trimmedName, clothingIds: selectedClothingIds };
     if (mode === "create") {
       await createMutation.mutateAsync(payload);
       router.push(appendOperationToast(ROUTES.templates(wardrobeId), OPERATION_TOAST_IDS.templateCreated));
       return;
     }
-
-    if (!templateId) {
-      return;
-    }
-
+    if (!templateId) return;
     await updateMutation.mutateAsync(payload);
     router.push(appendOperationToast(ROUTES.templateDetail(wardrobeId, templateId), OPERATION_TOAST_IDS.templateUpdated));
   };
 
   return (
     <form className="grid gap-3 pb-24" onSubmit={handleSubmit} noValidate>
-      {showTemplateLoading ? (
-        <p className="m-0 text-sm text-slate-600">
-          {TEMPLATE_STRINGS.edit.messages.loading}
-        </p>
-      ) : null}
-
-      {showTemplateError ? (
-        <p className="m-0 text-sm text-red-700">
-          {resolveLoadErrorMessage(templateQuery.error, mode)}
-        </p>
-      ) : null}
+      {showTemplateLoading ? <p className="m-0 text-sm text-slate-600">{TEMPLATE_STRINGS.edit.messages.loading}</p> : null}
+      {showTemplateError ? <p className="m-0 text-sm text-red-700">{resolveLoadErrorMessage(templateQuery.error, mode)}</p> : null}
 
       {mode === "create" || templateQuery.data ? (
         <>
-          <label
-            className="grid gap-1 text-sm font-medium text-slate-900"
-            htmlFor="template-name"
-          >
-            <span>
-              {mode === "create"
-                ? TEMPLATE_STRINGS.create.labels.name
-                : TEMPLATE_STRINGS.edit.labels.name}
-            </span>
-            <Input
-              id="template-name"
-              name="name"
-              type="text"
-              value={name}
-              onBlur={() => setNameTouched(true)}
-              onChange={(event) => setName(event.target.value)}
-              placeholder={TEMPLATE_STRINGS.placeholders.name}
-              autoComplete="off"
-              aria-invalid={showNameError}
-              aria-describedby={
-                showNameError ? "template-name-error" : undefined
-              }
-            />
+          <label className="grid gap-1 text-sm font-medium text-slate-900" htmlFor="template-name">
+            <span>{mode === "create" ? TEMPLATE_STRINGS.create.labels.name : TEMPLATE_STRINGS.edit.labels.name}</span>
+            <Input id="template-name" name="name" type="text" value={name} onBlur={() => setNameTouched(true)} onChange={(event) => setName(event.target.value)} placeholder={TEMPLATE_STRINGS.placeholders.name} autoComplete="off" aria-invalid={showNameError} aria-describedby={showNameError ? "template-name-error" : undefined} />
           </label>
 
-          {showNameError ? (
-            <p id="template-name-error" className="m-0 text-sm text-red-700">
-              {mode === "create"
-                ? TEMPLATE_STRINGS.create.messages.nameRequired
-                : TEMPLATE_STRINGS.edit.messages.nameRequired}
-            </p>
-          ) : null}
+          {showNameError ? <p id="template-name-error" className="m-0 text-sm text-red-700">{mode === "create" ? TEMPLATE_STRINGS.create.messages.nameRequired : TEMPLATE_STRINGS.edit.messages.nameRequired}</p> : null}
 
           <fieldset className="grid gap-3 border-0 p-0">
-            <legend className="px-0 text-sm font-medium text-slate-900">
-              {mode === "create"
-                ? TEMPLATE_STRINGS.create.labels.selectClothing
-                : TEMPLATE_STRINGS.edit.labels.selectClothing}
-            </legend>
+            <legend className="px-0 text-sm font-medium text-slate-900">{mode === "create" ? TEMPLATE_STRINGS.create.labels.selectClothing : TEMPLATE_STRINGS.edit.labels.selectClothing}</legend>
+            {showClothingLoading ? <p className="m-0 text-sm text-slate-600">{TEMPLATE_STRINGS.messages.clothingLoading}</p> : null}
+            {showClothingError ? <p className="m-0 text-sm text-red-700">{TEMPLATE_STRINGS.messages.clothingLoadError}</p> : null}
+            {!showClothingLoading && !showClothingError && !hasClothingItems ? <p className="m-0 text-sm text-slate-600">{TEMPLATE_STRINGS.messages.clothingEmpty}</p> : null}
 
-            {showClothingLoading ? (
-              <p className="m-0 text-sm text-slate-600">
-                {TEMPLATE_STRINGS.messages.clothingLoading}
-              </p>
-            ) : null}
-            {showClothingError ? (
-              <p className="m-0 text-sm text-red-700">
-                {TEMPLATE_STRINGS.messages.clothingLoadError}
-              </p>
-            ) : null}
-            {!showClothingLoading && !showClothingError && !hasClothingItems ? (
-              <p className="m-0 text-sm text-slate-600">
-                {TEMPLATE_STRINGS.messages.clothingEmpty}
-              </p>
-            ) : null}
-
-            {hasClothingItems ? (
-              <div className="grid gap-2">
-                {clothingItems.map((item) => {
-                  const checked = selectedClothingIds.includes(item.clothingId);
-
-                  return (
-                    <label
-                      key={item.clothingId}
-                      className={[
-                        "grid w-full grid-cols-[56px_minmax(0,1fr)_40px] items-center gap-3 rounded-md border border-slate-300 bg-white p-3 text-left transition-colors",
-                        checked
-                          ? "border-[var(--primary)] bg-[color:color-mix(in_srgb,var(--primary)_10%,white)]"
-                          : "hover:bg-slate-50",
-                      ].join(" ")}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={checked}
-                        onChange={() => toggleClothing(item.clothingId)}
-                        className="sr-only"
-                      />
-                      <ClothingThumbnail item={item} />
-                      <span className="truncate text-sm font-medium text-slate-900">{item.name}</span>
-                      <span className="flex justify-end">
-                        <span
-                          aria-hidden="true"
-                          className={[
-                            "flex h-7 w-7 items-center justify-center rounded-full border text-sm font-bold transition-colors",
-                            checked
-                              ? "border-[var(--primary)] bg-[var(--primary)] text-white"
-                              : "border-slate-300 bg-white text-transparent",
-                          ].join(" ")}
-                        >
-                          ✓
-                        </span>
-                      </span>
-                    </label>
-                  );
-                })}
-              </div>
-            ) : null}
-
-            {nextCursor !== null ? (
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={handleLoadMore}
-                disabled={!canLoadMore}
-              >
-                {clothingListQuery.isFetching
-                  ? TEMPLATE_STRINGS.messages.clothingLoading
-                  : TEMPLATE_STRINGS.actions.loadMoreClothings}
-              </Button>
-            ) : null}
+            <div className="grid gap-4">
+              {CLOTHING_GENRES.map((genre) => {
+                const query = genreQueries[genre];
+                const state = genreStates[genre];
+                return (
+                  <ClothingGenreSection
+                    key={genre}
+                    genre={genre}
+                    items={query.data?.items ?? []}
+                    collapsed={state.collapsed}
+                    onToggle={() => setGenreStates((previous) => ({ ...previous, [genre]: { ...previous[genre], collapsed: !previous[genre].collapsed } }))}
+                    toggleLabel={state.collapsed ? "展開" : "折りたたむ"}
+                    selectable
+                    selectedIds={selectedClothingIds}
+                    onSelectToggle={toggleClothing}
+                    emptyMessage={TEMPLATE_STRINGS.messages.clothingSectionEmpty}
+                    onLoadMore={state.nextCursor !== null ? () => handleLoadMore(genre) : undefined}
+                    canLoadMore={state.nextCursor !== null && !query.isFetching}
+                    isLoadingMore={query.isFetching}
+                    loadingLabel={TEMPLATE_STRINGS.messages.clothingLoading}
+                    loadMoreLabel={TEMPLATE_STRINGS.actions.loadMoreClothings}
+                  />
+                );
+              })}
+            </div>
           </fieldset>
 
-          {showSelectionError ? (
-            <p className="m-0 text-sm text-red-700">
-              {TEMPLATE_STRINGS.messages.clothingRequired}
-            </p>
-          ) : null}
-
-          {createMutation.isError && mode === "create" ? (
-            <p className="m-0 text-sm text-red-700">
-              {TEMPLATE_STRINGS.create.messages.submitError}
-            </p>
-          ) : null}
-          {updateMutation.isError && mode === "edit" ? (
-            <p className="m-0 text-sm text-red-700">
-              {TEMPLATE_STRINGS.edit.messages.submitError}
-            </p>
-          ) : null}
+          {showSelectionError ? <p className="m-0 text-sm text-red-700">{TEMPLATE_STRINGS.messages.clothingRequired}</p> : null}
+          {createMutation.isError && mode === "create" ? <p className="m-0 text-sm text-red-700">{TEMPLATE_STRINGS.create.messages.submitError}</p> : null}
+          {updateMutation.isError && mode === "edit" ? <p className="m-0 text-sm text-red-700">{TEMPLATE_STRINGS.edit.messages.submitError}</p> : null}
 
           <div className="fixed bottom-0 left-1/2 z-10 w-full max-w-[420px] -translate-x-1/2 border-t border-slate-200 bg-white/95 px-4 py-3 backdrop-blur">
-            <Button
-              type="submit"
-              className="w-full text-sm font-medium"
-              disabled={isNameEmpty || isSelectionEmpty || isPending}
-            >
-              {isPending
-                ? mode === "create"
-                  ? TEMPLATE_STRINGS.create.messages.submitting
-                  : TEMPLATE_STRINGS.edit.messages.submitting
-                : submitLabel}
+            <Button type="submit" className="w-full text-sm font-medium" disabled={isNameEmpty || isSelectionEmpty || isPending}>
+              {isPending ? (mode === "create" ? TEMPLATE_STRINGS.create.messages.submitting : TEMPLATE_STRINGS.edit.messages.submitting) : submitLabel}
             </Button>
           </div>
         </>
