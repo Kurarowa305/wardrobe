@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { AppLayout } from "@/components/app/layout/AppLayout";
+import { TabBarIcon } from "@/components/app/navigation/TabBarIcon";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
 import { RECORD_STRINGS } from "@/features/record/strings";
@@ -19,9 +20,12 @@ export function RecordMethodScreen({ wardrobeId }: RecordMethodScreenProps) {
           variant="outline"
           className="h-auto w-full justify-start rounded-2xl px-4 py-5 text-left"
         >
-          <Link href={ROUTES.recordByTemplate(wardrobeId)} className="flex flex-col items-start gap-1">
-            <span className="text-sm font-medium">{RECORD_STRINGS.method.actions.byTemplate}</span>
-            <span className="text-xs font-normal text-slate-600">{RECORD_STRINGS.method.descriptions.byTemplate}</span>
+          <Link href={ROUTES.recordByTemplate(wardrobeId)} className="record-method-card">
+            <span className="record-method-card-copy">
+              <span className="text-sm font-medium">{RECORD_STRINGS.method.actions.byTemplate}</span>
+              <span className="text-xs font-normal text-slate-600">{RECORD_STRINGS.method.descriptions.byTemplate}</span>
+            </span>
+            <TabBarIcon icon="templates" active={false} strokeColor="#000000" className="record-method-card-icon" />
           </Link>
         </Button>
         <Button
@@ -29,11 +33,14 @@ export function RecordMethodScreen({ wardrobeId }: RecordMethodScreenProps) {
           variant="outline"
           className="h-auto w-full justify-start rounded-2xl px-4 py-5 text-left"
         >
-          <Link href={ROUTES.recordByCombination(wardrobeId)} className="flex flex-col items-start gap-1">
-            <span className="text-sm font-medium">{RECORD_STRINGS.method.actions.byCombination}</span>
-            <span className="text-xs font-normal text-slate-600">
-              {RECORD_STRINGS.method.descriptions.byCombination}
+          <Link href={ROUTES.recordByCombination(wardrobeId)} className="record-method-card">
+            <span className="record-method-card-copy">
+              <span className="text-sm font-medium">{RECORD_STRINGS.method.actions.byCombination}</span>
+              <span className="text-xs font-normal text-slate-600">
+                {RECORD_STRINGS.method.descriptions.byCombination}
+              </span>
             </span>
+            <TabBarIcon icon="clothings" active={false} strokeColor="#000000" className="record-method-card-icon" />
           </Link>
         </Button>
       </div>
