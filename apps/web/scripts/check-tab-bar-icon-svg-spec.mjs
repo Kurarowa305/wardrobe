@@ -23,8 +23,8 @@ const checks = [
   {
     name: "履歴アイコンが指定SVGパスを持つ",
     patterns: [
-      '<path d="M12 4 A 8 8 0 1 1 6.34 6.34" />',
-      '<path d="M6.34 2.34 v4 h4" />',
+      '<circle cx="12" cy="12" r="8" />',
+      '<path d="M6.34 2.34v4h4" />',
       '<path d="M12 7v5l3 3" />',
     ],
   },
