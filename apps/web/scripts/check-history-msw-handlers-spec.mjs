@@ -99,6 +99,14 @@ check(
 );
 
 check(
+  "HM-06a",
+  "作成 handler が clothingIds 件数を 4 件以下に制限しない",
+  includes(target, "if (!Array.isArray(value) || value.length === 0) {") &&
+    !includes(target, "value.length > 4"),
+  "clothingIds の件数制限が残っています",
+);
+
+check(
   "HM-07",
   "History handler が共通シナリオ（delay/forceError）を適用する",
   includes(target, 'import { applyMockScenario } from "./scenario";') &&

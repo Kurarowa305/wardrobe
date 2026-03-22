@@ -3,6 +3,7 @@
 ## 目的
 - MS4-T04（History MSW handlers）の完了条件を継続的に検証する
 - 履歴一覧・詳細・作成・削除のモック API が API 設計どおりの条件解釈とエラー再現を提供することを CI で担保する
+- 履歴作成の `clothingIds` が 1 件以上であれば受理され、件数上限で不正に弾かれないことを担保する
 - 履歴削除が論理削除ではなく物理削除として実装されていることを確認する
 
 ## 対象
@@ -53,6 +54,12 @@
   - `templateId` 指定時は template fixture から `templateName` / `clothingItems` を解決する
   - `clothingIds` 指定時は clothing fixture から `clothingItems` を解決する
 
+### HM-06a 作成 handler が `clothingIds` 件数で 4 件以下に制限しない
+- 観点: API-14 の作成入力は `clothingIds` の件数で 1〜4 件に制限されず、1 件以上であれば受理されるか
+- 期待結果:
+  - `normalizeClothingIds` は空配列のみを不正として扱う
+  - `value.length > 4` のような件数上限チェックが存在しない
+
 ### HM-07 共通シナリオ（delay/forceError）を適用する
 - 観点: MS0-T09 の再利用で遅延・強制エラーを履歴 API でも再現できるか
 - 期待結果: 各 handler の先頭で `applyMockScenario(request)` を評価し、レスポンスを優先返却する
@@ -65,7 +72,7 @@
 
 ## テストスクリプト
 - `pnpm --filter web test:history-msw-handlers`
-  - `apps/web/scripts/check-history-msw-handlers-spec.mjs` を実行し、上記 HM-01〜HM-08 を静的検査する
+  - `apps/web/scripts/check-history-msw-handlers-spec.mjs` を実行し、上記 HM-01〜HM-08 および HM-06a を静的検査する
 
 ## CI 適用
 - `.github/workflows/ci.yml` に `History MSW handlers spec test` ステップを追加する
