@@ -8,6 +8,7 @@
     "start": "next start",
     "test:routing": "node scripts/check-routing-spec.mjs",
     "test:overflow-menu": "node scripts/check-overflow-menu-spec.mjs",
+    "test:overflow-menu-icons": "node scripts/check-overflow-menu-icon-spec.mjs",
     "test:ui-foundation": "node scripts/check-ui-foundation-spec.mjs",
     "test:screen-card-removal": "node scripts/check-screen-card-removal-spec.mjs",
     "test:query-foundation": "node scripts/check-query-foundation-spec.mjs",

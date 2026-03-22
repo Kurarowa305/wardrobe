@@ -46,6 +46,9 @@ jobs:
       - name: Overflow menu spec test
         run: pnpm --filter web test:overflow-menu
 
+      - name: Overflow menu icon spec test
+        run: pnpm --filter web test:overflow-menu-icons
+
       - name: UI foundation spec test
         run: pnpm --filter web test:ui-foundation
 
