@@ -125,7 +125,7 @@ export function TemplatesTabScreen({ wardrobeId }: TemplatesTabScreenProps) {
   const content = (
     <>
       <div className="mb-4">
-        <Button asChild className="w-full justify-start text-left text-base font-bold text-white">
+        <Button asChild className="w-full justify-start text-left text-base text-white">
           <Link href={ROUTES.templateNew(wardrobeId)}>{TEMPLATE_STRINGS.list.actions.add}</Link>
         </Button>
       </div>

@@ -47,7 +47,7 @@ check(
   "LSS-02",
   "テンプレート一覧画面の『＋ テンプレートを追加』ボタンに下余白が設定されている",
   includes(templateTarget, '<div className="mb-4">') &&
-    includes(templateTarget, '<Button asChild className="w-full justify-start text-left text-base font-bold text-white">'),
+    includes(templateTarget, '<Button asChild className="w-full justify-start text-left text-base text-white">'),
   "TemplatesTabScreen の add ボタン直後に mb-4 の余白コンテナが設定されていません",
 );
 
@@ -64,7 +64,7 @@ check(
   "LSS-04",
   "服一覧画面の『＋ 服を追加』ボタンに下余白が設定されている",
   includes(clothingTarget, '<div className="mb-4">') &&
-    includes(clothingTarget, '<Button asChild className="w-full justify-start text-left text-base font-bold text-white">'),
+    includes(clothingTarget, '<Button asChild className="w-full justify-start text-left text-base text-white">'),
   "ClothingsTabScreen の add ボタン直後に mb-4 の余白コンテナが設定されていません",
 );
 
