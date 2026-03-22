@@ -77,20 +77,19 @@ check(
   "テンプレートカードが詳細遷移導線を持ち、サムネ表示で resolveImageUrl/no image/削除済みオーバーレイに対応する",
   includes(target, "ROUTES.templateDetail(wardrobeId, item.templateId)") &&
     includes(target, 'import { resolveImageUrl } from "@/features/clothing/imageUrl";') &&
-    includes(target, "const imageUrl = resolveImageUrl(item.imageKey);") &&
-    includes(target, "COMMON_STRINGS.placeholders.noImage") &&
+    includes(target, 'import { ThumbnailStrip } from "@/components/app/shared/ThumbnailStrip";') &&
+    includes(target, '<ThumbnailStrip') &&
     includes(target, "TEMPLATE_STRINGS.list.badges.deleted"),
   "テンプレートカードの詳細遷移またはサムネ表示実装が不足しています",
 );
 
 check(
   "TLS-06",
-  "テンプレートカードがサムネ最大4件と超過分 +x 表示を行う",
-  includes(target, "const TEMPLATE_THUMBNAIL_LIMIT = 4;") &&
-    includes(target, "item.clothingItems.slice(0, TEMPLATE_THUMBNAIL_LIMIT)") &&
-    includes(target, "const hiddenCount = Math.max(item.clothingItems.length - TEMPLATE_THUMBNAIL_LIMIT, 0);") &&
-    includes(target, "+{hiddenCount}"),
-  "サムネ上限4件または +x 表示実装が不足しています",
+  "テンプレートカードがサムネ5列レイアウトの共通コンポーネントを利用する",
+  includes(target, 'import { ThumbnailStrip } from "@/components/app/shared/ThumbnailStrip";') &&
+    includes(target, '<ThumbnailStrip') &&
+    includes(target, 'deletedLabel={TEMPLATE_STRINGS.list.badges.deleted}'),
+  "テンプレートカードで共通サムネイルレイアウトの利用が不足しています",
 );
 
 check(

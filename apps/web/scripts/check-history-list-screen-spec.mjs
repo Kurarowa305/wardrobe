@@ -82,20 +82,19 @@ check(
   "HLS-05",
   "履歴カードがサムネ表示で resolveImageUrl/no image/削除済みオーバーレイに対応する",
   includes(cardTarget, 'import { resolveImageUrl } from "@/features/clothing/imageUrl";') &&
-    includes(cardTarget, 'const imageUrl = resolveImageUrl(item.imageKey);') &&
-    includes(cardTarget, 'COMMON_STRINGS.placeholders.noImage') &&
+    includes(cardTarget, 'import { resolveImageUrl } from "@/features/clothing/imageUrl";') &&
+    includes(cardTarget, '<ThumbnailStrip') &&
     includes(cardTarget, 'HISTORY_STRINGS.list.badges.deleted'),
   "履歴カードのサムネ表示実装が不足しています",
 );
 
 check(
   "HLS-06",
-  "履歴カードがサムネ最大4件と超過分 +x 表示を行う",
-  includes(cardTarget, 'const HISTORY_THUMBNAIL_LIMIT = 4;') &&
-    includes(cardTarget, 'item.clothingItems.slice(0, HISTORY_THUMBNAIL_LIMIT)') &&
-    includes(cardTarget, 'const hiddenCount = Math.max(item.clothingItems.length - HISTORY_THUMBNAIL_LIMIT, 0);') &&
-    includes(cardTarget, '+{hiddenCount}'),
-  "サムネ上限4件または +x 表示実装が不足しています",
+  "履歴カードがサムネ5列レイアウトの共通コンポーネントを利用する",
+  includes(cardTarget, 'import { ThumbnailStrip } from "@/components/app/shared/ThumbnailStrip";') &&
+    includes(cardTarget, '<ThumbnailStrip') &&
+    includes(cardTarget, 'deletedLabel={HISTORY_STRINGS.list.badges.deleted}'),
+  "履歴カードで共通サムネイルレイアウトの利用が不足しています",
 );
 
 check(

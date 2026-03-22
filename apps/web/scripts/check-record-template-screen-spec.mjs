@@ -54,7 +54,7 @@ check(
 check(
   "RTS-05",
   "テンプレート一覧がサムネイル付き選択リストとして描画される",
-  () => includes(target, 'function TemplateThumbnail') && includes(target, 'item.clothingItems.slice(0, TEMPLATE_THUMBNAIL_LIMIT)') && includes(target, 'className="flex flex-wrap gap-2"') && includes(target, 'grid-cols-[minmax(0,1fr)_40px]') && includes(target, 'type="radio"'),
+  () => includes(target, 'import { ThumbnailStrip } from "@/components/app/shared/ThumbnailStrip";') && includes(target, '<ThumbnailStrip') && includes(target, 'grid-cols-[minmax(0,1fr)_40px]') && includes(target, 'type="radio"'),
   "テンプレート一覧のサムネイル付き選択リスト実装が不足しています",
 );
 check(

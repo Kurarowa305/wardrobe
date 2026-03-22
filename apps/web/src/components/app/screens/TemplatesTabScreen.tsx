@@ -5,14 +5,14 @@ import { createElement, useEffect, useMemo, useRef, useState } from "react";
 
 import { useTemplateList } from "@/api/hooks/template";
 import { AppLayout } from "@/components/app/layout/AppLayout";
+import { ThumbnailStrip } from "@/components/app/shared/ThumbnailStrip";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { COMMON_STRINGS } from "@/constants/commonStrings";
 import { ROUTES } from "@/constants/routes";
 import { resolveImageUrl } from "@/features/clothing/imageUrl";
 import { TEMPLATE_STRINGS } from "@/features/template/strings";
 import { OPERATION_TOAST_IDS, consumeOperationToast } from "@/features/toast/operationToast";
-import type { TemplateListClothingItem, TemplateListItem } from "@/features/template/types";
+import type { TemplateListItem } from "@/features/template/types";
 
 type TemplatesTabScreenProps = {
   wardrobeId: string;
@@ -24,33 +24,8 @@ type TemplateListPage = {
 };
 
 const TEMPLATE_LIST_PAGE_SIZE = 20;
-const TEMPLATE_THUMBNAIL_LIMIT = 4;
-
-function TemplateThumbnail({ item }: { item: TemplateListClothingItem }) {
-  const imageUrl = resolveImageUrl(item.imageKey);
-
-  return (
-    <span className="relative block h-14 w-14 overflow-hidden rounded-md border border-slate-200 bg-slate-100">
-      {imageUrl ? (
-        <img src={imageUrl} alt="テンプレート構成服のサムネイル" className="h-full w-full object-cover" />
-      ) : (
-        <span className="flex h-full w-full items-center justify-center px-1 text-center text-[10px] font-semibold leading-tight text-slate-600">
-          {COMMON_STRINGS.placeholders.noImage}
-        </span>
-      )}
-      {item.deleted ? (
-        <span className="absolute inset-0 flex items-center justify-center bg-slate-900/65 px-1 text-center text-[10px] font-semibold text-white">
-          {TEMPLATE_STRINGS.list.badges.deleted}
-        </span>
-      ) : null}
-    </span>
-  );
-}
 
 function TemplateCard({ wardrobeId, item }: { wardrobeId: string; item: TemplateListItem }) {
-  const visibleThumbnails = item.clothingItems.slice(0, TEMPLATE_THUMBNAIL_LIMIT);
-  const hiddenCount = Math.max(item.clothingItems.length - TEMPLATE_THUMBNAIL_LIMIT, 0);
-
   return (
     <li>
       <Link
@@ -58,16 +33,15 @@ function TemplateCard({ wardrobeId, item }: { wardrobeId: string; item: Template
         className="grid w-full gap-3 rounded-md border border-slate-300 bg-white p-3 text-left no-underline transition-colors hover:bg-slate-50"
       >
         <span className="truncate text-sm font-medium text-slate-900">{item.name}</span>
-        <span className="flex flex-wrap gap-2">
-          {visibleThumbnails.map((clothingItem) => (
-            <TemplateThumbnail key={clothingItem.clothingId} item={clothingItem} />
-          ))}
-          {hiddenCount > 0 ? (
-            <span className="flex h-14 w-14 items-center justify-center rounded-md border border-dashed border-slate-300 bg-slate-50 text-sm font-semibold text-slate-700">
-              +{hiddenCount}
-            </span>
-          ) : null}
-        </span>
+        <ThumbnailStrip
+          items={item.clothingItems.map((clothingItem) => ({
+            key: clothingItem.clothingId,
+            imageUrl: resolveImageUrl(clothingItem.imageKey),
+            alt: "テンプレート構成服のサムネイル",
+            deleted: clothingItem.deleted,
+          }))}
+          deletedLabel={TEMPLATE_STRINGS.list.badges.deleted}
+        />
       </Link>
     </li>
   );
