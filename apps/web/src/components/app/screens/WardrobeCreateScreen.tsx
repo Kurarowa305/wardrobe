@@ -6,24 +6,19 @@ import { useRouter } from "next/navigation";
 import { AppLayout } from "@/components/app/layout/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
 import { DEMO_IDS, ROUTES } from "@/constants/routes";
 import { WARDROBE_STRINGS } from "@/features/wardrobe/strings";
 
 export function WardrobeCreateScreen() {
   const router = useRouter();
-  const { toast } = useToast();
   const [name, setName] = useState("");
+  const trimmedName = name.trim();
+  const isSubmitDisabled = trimmedName.length === 0;
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (name.trim().length === 0) {
-      toast({
-        variant: "destructive",
-        title: WARDROBE_STRINGS.create.errors.nameRequired.title,
-        description: WARDROBE_STRINGS.create.errors.nameRequired.message,
-      });
+    if (isSubmitDisabled) {
       return;
     }
 
@@ -52,7 +47,7 @@ export function WardrobeCreateScreen() {
               onChange={(event) => setName(event.target.value)}
             />
           </div>
-          <Button type="submit" className="w-full">
+          <Button type="submit" className="w-full" disabled={isSubmitDisabled}>
             {WARDROBE_STRINGS.create.actions.create}
           </Button>
         </form>

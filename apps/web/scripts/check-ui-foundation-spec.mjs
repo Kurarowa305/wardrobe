@@ -90,11 +90,13 @@ check(
 
 check(
   "UF-04",
-  "入力未設定時に destructive トーストでエラー通知する",
-  includes("src/components/app/screens/WardrobeCreateScreen.tsx", "if (name.trim().length === 0)") &&
-    includes("src/components/app/screens/WardrobeCreateScreen.tsx", 'variant: "destructive"') &&
-    includes("src/components/app/screens/WardrobeCreateScreen.tsx", "WARDROBE_STRINGS.create.errors.nameRequired"),
-  "入力エラー時のトースト通知実装が不足しています",
+  "入力未設定時は作成ボタンを非活性にして送信を防止する",
+  includes("src/components/app/screens/WardrobeCreateScreen.tsx", "const trimmedName = name.trim();") &&
+    includes("src/components/app/screens/WardrobeCreateScreen.tsx", "const isSubmitDisabled = trimmedName.length === 0;") &&
+    includes("src/components/app/screens/WardrobeCreateScreen.tsx", 'disabled={isSubmitDisabled}') &&
+    noIncludes("src/components/app/screens/WardrobeCreateScreen.tsx", 'variant: "destructive"') &&
+    noIncludes("src/components/app/screens/WardrobeCreateScreen.tsx", "WARDROBE_STRINGS.create.errors"),
+  "入力未設定時の非活性制御またはトースト除去が不足しています",
 );
 
 check(
@@ -107,10 +109,10 @@ check(
 
 check(
   "UF-06",
-  "ワードローブ文言に入力エラー文言が定義されている",
-  includes("src/features/wardrobe/strings.ts", "nameRequired") &&
-    includes("src/features/wardrobe/strings.ts", "ワードローブ名を入力してください。"),
-  "features/wardrobe/strings.ts に入力エラー文言が見つかりません",
+  "ワードローブ文言定義に未使用の入力エラー文言が残っていない",
+  noIncludes("src/features/wardrobe/strings.ts", "errors") &&
+    noIncludes("src/features/wardrobe/strings.ts", "nameRequired"),
+  "features/wardrobe/strings.ts に未使用の入力エラー文言が残っています",
 );
 
 check(
