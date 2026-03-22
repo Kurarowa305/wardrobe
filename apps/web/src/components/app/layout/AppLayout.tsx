@@ -11,6 +11,8 @@ type HeaderAction = {
   href?: string;
   onSelect?: () => void;
   disabled?: boolean;
+  icon: "edit" | "delete";
+  tone?: "default" | "danger";
 };
 
 type AppLayoutProps = {
