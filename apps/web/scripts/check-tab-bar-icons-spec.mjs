@@ -12,7 +12,7 @@ const checks = [
   {
     name: "TabBar が SVG アイコンコンポーネントを利用する",
     ok: includesAll("src/components/app/navigation/TabBar.tsx", [
-      'import { TabBarIcon } from "./TabBarIcon";',
+      'import { TabBarIcon } from "@/components/ui/tab-bar-icon";',
       'const isActive = activeTab === item.key;',
       '<TabBarIcon icon={item.key} active={isActive} className="tab-item-icon" />',
       '<span>{item.label}</span>',
@@ -21,15 +21,15 @@ const checks = [
   },
   {
     name: "TabBarIcon が4タブ分の再利用可能な SVG 定義を持つ",
-    ok: includesAll("src/components/app/navigation/TabBarIcon.tsx", [
+    ok: includesAll("src/components/ui/tab-bar-icon.tsx", [
       'export type TabIconKey = "home" | "histories" | "templates" | "clothings";',
       'function HomeIcon(',
       'function HistoriesIcon(',
       'function TemplatesIcon(',
       'function ClothingsIcon(',
-      'return <ClothingsIcon active={active} {...props} />;',
+      'return <ClothingsIcon active={active} strokeColor={strokeColor} {...props} />;',
     ]),
-    detail: "TabBarIcon.tsx に4タブ分の SVG 定義が不足しています",
+    detail: "components/ui/tab-bar-icon.tsx に4タブ分の SVG 定義が不足しています",
   },
   {
     name: "旧 PNG アイコン画像が削除されている",

@@ -7,7 +7,7 @@
 
 ## 2. 対象
 
-* `apps/web/src/components/app/navigation/TabBarIcon.tsx`
+* `apps/web/src/components/ui/tab-bar-icon.tsx`
 * `apps/web/scripts/check-tab-bar-icon-svg-spec.mjs`
 * `apps/web/package.json`
 * `.github/workflows/ci.yml`
@@ -36,11 +36,11 @@
 
 | ケースID | 観点 | 条件 | 期待結果 |
 | --- | --- | --- | --- |
-| TBS-01 | ホームSVG | `TabBarIcon.tsx` を確認する | ホームアイコンの2本の `path` が指定コードと一致する |
-| TBS-02 | 履歴SVG | `TabBarIcon.tsx` を確認する | 履歴アイコンの `circle` と1本の `path` が指定コードと一致する |
-| TBS-03 | テンプレートSVG | `TabBarIcon.tsx` を確認する | テンプレートアイコンの `path` / `rect` が指定コードと一致する |
-| TBS-04 | 服SVG | `TabBarIcon.tsx` を確認する | 服アイコンの `path` が指定コードと一致する |
-| TBS-05 | 共通線スタイル | `TabBarIcon.tsx` を確認する | `fill="none"`、`strokeWidth="1.5"`、`strokeLinecap="round"`、`strokeLinejoin="round"` が設定される |
+| TBS-01 | ホームSVG | `components/ui/tab-bar-icon.tsx` を確認する | ホームアイコンの2本の `path` が指定コードと一致する |
+| TBS-02 | 履歴SVG | `components/ui/tab-bar-icon.tsx` を確認する | 履歴アイコンの `circle` と1本の `path` が指定コードと一致する |
+| TBS-03 | テンプレートSVG | `components/ui/tab-bar-icon.tsx` を確認する | テンプレートアイコンの `path` / `rect` が指定コードと一致する |
+| TBS-04 | 服SVG | `components/ui/tab-bar-icon.tsx` を確認する | 服アイコンの `path` が指定コードと一致する |
+| TBS-05 | 共通線スタイル | `components/ui/tab-bar-icon.tsx` を確認する | `fill="none"`、`strokeWidth="1.5"`、`strokeLinecap="round"`、`strokeLinejoin="round"` が設定される |
 | TBS-06 | CI組み込み | `package.json` と `ci.yml` を確認する | SVG検証スクリプトが npm script と CI に登録されている |
 
 ## 5. 実装方針

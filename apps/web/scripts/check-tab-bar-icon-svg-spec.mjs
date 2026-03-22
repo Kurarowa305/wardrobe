@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 const repoRoot = process.cwd();
-const target = path.join(repoRoot, "src/components/app/navigation/TabBarIcon.tsx");
+const target = path.join(repoRoot, "src/components/ui/tab-bar-icon.tsx");
 const source = fs.readFileSync(target, "utf8");
 
 const checks = [

@@ -3,7 +3,7 @@ import path from "node:path";
 
 const repoRoot = process.cwd();
 const screenTarget = path.join(repoRoot, "src/components/app/screens/RecordMethodScreen.tsx");
-const iconTarget = path.join(repoRoot, "src/components/app/navigation/TabBarIcon.tsx");
+const iconTarget = path.join(repoRoot, "src/components/ui/tab-bar-icon.tsx");
 const cssTarget = path.join(repoRoot, "src/app/globals.css");
 const packageTarget = path.join(repoRoot, "package.json");
 const ciTarget = path.join(repoRoot, "../../.github/workflows/ci.yml");
@@ -19,16 +19,16 @@ const checks = [
     id: "RMI-01",
     name: "記録方法選択画面がタブバーと同一のアイコンコンポーネントを利用する",
     passed:
-      screenSource.includes('import { TabBarIcon } from "@/components/app/navigation/TabBarIcon";') &&
+      screenSource.includes('import { TabBarIcon } from "@/components/ui/tab-bar-icon";') &&
       screenSource.includes('<TabBarIcon icon="templates"') &&
       screenSource.includes('<TabBarIcon icon="clothings"'),
   },
   {
     id: "RMI-02",
-    name: "各カードの右側に黒線アイコンを配置する",
+    name: "各カードの左上に黒線アイコンを配置する",
     passed:
       screenSource.includes('strokeColor="#000000" className="record-method-card-icon"') &&
-      screenSource.includes('className="record-method-card"'),
+      screenSource.includes('className="record-method-card">\n            <TabBarIcon'),
   },
   {
     id: "RMI-03",
@@ -39,12 +39,13 @@ const checks = [
   },
   {
     id: "RMI-04",
-    name: "記録方法選択カードの左右配置スタイルが定義される",
+    name: "記録方法選択カードの縦並びスタイルが定義される",
     passed:
       cssSource.includes(".record-method-card {") &&
-      cssSource.includes("justify-content: space-between;") &&
+      cssSource.includes("flex-direction: column;") &&
+      cssSource.includes("align-items: flex-start;") &&
       cssSource.includes(".record-method-card-icon {") &&
-      cssSource.includes("flex-shrink: 0;"),
+      cssSource.includes("width: 24px;"),
   },
   {
     id: "RMI-05",

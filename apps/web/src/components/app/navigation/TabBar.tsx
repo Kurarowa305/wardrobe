@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { ROUTES, type TabKey } from "@/constants/routes";
 
-import { TabBarIcon } from "./TabBarIcon";
+import { TabBarIcon } from "@/components/ui/tab-bar-icon";
 
 type TabBarProps = {
   activeTab: TabKey;
