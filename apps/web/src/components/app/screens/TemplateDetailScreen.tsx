@@ -116,7 +116,7 @@ export function TemplateDetailScreen({ wardrobeId, templateId }: TemplateDetailS
                           {TEMPLATE_STRINGS.detail.labels.clothingWearCount}: {item.wearCount}
                         </p>
                         <p className="m-0 text-xs text-slate-600">
-                          {formatLastWornDate(item.lastWornAt, TEMPLATE_STRINGS.detail.messages.neverWorn)}
+                          {TEMPLATE_STRINGS.detail.labels.clothingLastWornAt}: {formatLastWornDate(item.lastWornAt, TEMPLATE_STRINGS.detail.messages.neverWorn)}
                         </p>
                       </div>
                     </div>
