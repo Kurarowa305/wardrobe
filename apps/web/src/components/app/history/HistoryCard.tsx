@@ -9,6 +9,7 @@ import type { HistoryListClothingItem, HistoryListItem } from "@/features/histor
 
 const HISTORY_THUMBNAIL_LIMIT = 4;
 const HISTORY_CARD_TITLE_MAX_LENGTH = 15;
+const HISTORY_THUMBNAIL_GRID_CLASS = "grid grid-cols-5 gap-2";
 
 function truncateHistoryCardTitle(title: string) {
   return title.length > HISTORY_CARD_TITLE_MAX_LENGTH
@@ -20,7 +21,7 @@ function HistoryThumbnail({ item }: { item: HistoryListClothingItem }) {
   const imageUrl = resolveImageUrl(item.imageKey);
 
   return (
-    <span className="relative block h-12 w-12 overflow-hidden rounded-md border border-slate-200 bg-slate-100">
+    <span className="relative block aspect-square w-full overflow-hidden rounded-md border border-slate-200 bg-slate-100">
       {imageUrl ? (
         <img src={imageUrl} alt={`${item.name}のサムネイル`} className="h-full w-full object-cover" />
       ) : (
@@ -63,12 +64,12 @@ export function SharedHistoryCard({ wardrobeId, item, from }: SharedHistoryCardP
           <span className="text-xs font-semibold text-slate-500">{formatHistoryDate(item.date)}</span>
           <span className="text-sm font-semibold text-slate-900">{title}</span>
         </span>
-        <span className="flex flex-wrap gap-2">
+        <span className={HISTORY_THUMBNAIL_GRID_CLASS}>
           {visibleThumbnails.map((clothingItem) => (
             <HistoryThumbnail key={clothingItem.clothingId} item={clothingItem} />
           ))}
           {hiddenCount > 0 ? (
-            <span className="flex h-12 w-12 items-center justify-center rounded-md border border-dashed border-slate-300 bg-slate-50 text-sm font-semibold text-slate-700">
+            <span className="flex aspect-square w-full items-center justify-center rounded-md border border-dashed border-slate-300 bg-slate-50 text-sm font-semibold text-slate-700">
               +{hiddenCount}
             </span>
           ) : null}
