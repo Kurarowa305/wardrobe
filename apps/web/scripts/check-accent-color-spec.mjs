@@ -8,6 +8,8 @@ const normalizeWhitespace = (value) => value.replace(/\s+/g, " ").trim();
 const includes = (relativePath, text) => read(relativePath).includes(text);
 const includesNormalized = (relativePath, text) =>
   normalizeWhitespace(read(relativePath)).includes(normalizeWhitespace(text));
+const excludesNormalized = (relativePath, text) =>
+  !normalizeWhitespace(read(relativePath)).includes(normalizeWhitespace(text));
 
 const checks = [
   {
@@ -22,12 +24,21 @@ const checks = [
   },
   {
     name: "Button の default variant が #687A88 ベースかつ白文字になっている",
-    ok: includes(
-      "src/components/ui/button.tsx",
-      'default: "bg-[var(--primary)] text-white hover:bg-[#5b6b78]"',
-    ),
+    ok:
+      includes(
+        "src/components/ui/button.tsx",
+        'default: "bg-[var(--primary)] text-white hover:bg-[#5b6b78]"',
+      ) &&
+      includes("src/app/globals.css", '[data-slot="button"].text-white {') &&
+      includes("src/app/globals.css", "color: #fff;"),
     detail:
-      "button.tsx の default variant が指定アクセントカラーになっていません",
+      "button.tsx の default variant または text-white 補強スタイルが不足しています",
+  },
+  {
+    name: "global の a 色上書きが Button 文字色を打ち消さない",
+    ok: excludesNormalized("src/app/globals.css", "a { color: inherit; }"),
+    detail:
+      "globals.css に a の color 上書きが残っており、text-white を打ち消す可能性があります",
   },
   {
     name: "対象導線が現行仕様の default Button を利用している",
