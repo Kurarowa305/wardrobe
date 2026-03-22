@@ -50,7 +50,7 @@ check(
 check(
   "TDL-03",
   "削除成功時にテンプレート一覧へ遷移する",
-  includes(screenTarget, "router.push(ROUTES.templates(wardrobeId));"),
+  includes(screenTarget, "router.push(appendOperationToast(ROUTES.templates(wardrobeId), OPERATION_TOAST_IDS.templateDeleted));"),
   "削除成功後のテンプレート一覧遷移が不足しています",
 );
 

@@ -95,11 +95,11 @@ check(
     ) &&
     includes(
       "src/components/app/screens/TemplateForm.tsx",
-      "router.push(ROUTES.templates(wardrobeId));",
+      "router.push(appendOperationToast(ROUTES.templates(wardrobeId), OPERATION_TOAST_IDS.templateCreated));",
     ) &&
     includes(
       "src/components/app/screens/TemplateForm.tsx",
-      "router.push(ROUTES.templateDetail(wardrobeId, templateId));",
+      "router.push(appendOperationToast(ROUTES.templateDetail(wardrobeId, templateId), OPERATION_TOAST_IDS.templateUpdated));",
     ),
   "TemplateForm の送信処理または遷移処理が不足しています",
 );

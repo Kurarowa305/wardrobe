@@ -7,15 +7,12 @@ export const HOME_STRINGS = {
   toasts: {
     wardrobeCreated: {
       title: "ワードローブを作成しました",
-      description: "ホーム画面に移動しました。",
     },
     historyCreated: {
       title: "記録を追加しました",
-      description: "ホーム画面に移動しました。",
     },
     historyDeleted: {
       title: "履歴を削除しました",
-      description: "一覧を更新しました。",
     },
   },
   sections: {

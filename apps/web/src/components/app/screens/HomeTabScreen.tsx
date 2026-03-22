@@ -30,30 +30,21 @@ export function HomeTabScreen({ wardrobeId }: HomeTabScreenProps) {
 
     if (toastId === OPERATION_TOAST_IDS.wardrobeCreated) {
       hasShownToastRef.current = true;
-      toast({
-        title: HOME_STRINGS.toasts.wardrobeCreated.title,
-        description: HOME_STRINGS.toasts.wardrobeCreated.description,
-      });
+      toast({ title: HOME_STRINGS.toasts.wardrobeCreated.title });
       window.history.replaceState(window.history.state, "", `${window.location.pathname}${nextSearch}`);
       return;
     }
 
     if (toastId === OPERATION_TOAST_IDS.historyCreated) {
       hasShownToastRef.current = true;
-      toast({
-        title: HOME_STRINGS.toasts.historyCreated.title,
-        description: HOME_STRINGS.toasts.historyCreated.description,
-      });
+      toast({ title: HOME_STRINGS.toasts.historyCreated.title });
       window.history.replaceState(window.history.state, "", `${window.location.pathname}${nextSearch}`);
       return;
     }
 
     if (toastId === OPERATION_TOAST_IDS.historyDeleted) {
       hasShownToastRef.current = true;
-      toast({
-        title: HOME_STRINGS.toasts.historyDeleted.title,
-        description: HOME_STRINGS.toasts.historyDeleted.description,
-      });
+      toast({ title: HOME_STRINGS.toasts.historyDeleted.title });
       window.history.replaceState(window.history.state, "", `${window.location.pathname}${nextSearch}`);
     }
   }, [toast, wardrobeId]);

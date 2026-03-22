@@ -51,7 +51,7 @@ check(
 check(
   "CDL-03",
   "削除成功時に服一覧へ遷移する",
-  includes(screenTarget, "router.push(ROUTES.clothings(wardrobeId));"),
+  includes(screenTarget, "router.push(appendOperationToast(ROUTES.clothings(wardrobeId), OPERATION_TOAST_IDS.clothingDeleted));"),
   "削除成功後の一覧遷移が不足しています",
 );
 

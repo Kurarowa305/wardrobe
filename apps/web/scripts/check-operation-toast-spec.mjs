@@ -100,6 +100,14 @@ check(
   "成功トースト文言の定義が不足しています",
 );
 
+check(
+  "OTS-08",
+  "ホーム画面の成功トーストはタイトルのみを表示する",
+  !includes("src/features/home/strings.ts", "description:") &&
+    !includes("src/components/app/screens/HomeTabScreen.tsx", "description:"),
+  "ホーム画面の成功トーストに不要な2行目文言が残っています",
+);
+
 if (failures.length > 0) {
   console.error(`\n${failures.length}件の失敗 / ${checkCount}件中`);
   console.error(failures.join("\n\n"));

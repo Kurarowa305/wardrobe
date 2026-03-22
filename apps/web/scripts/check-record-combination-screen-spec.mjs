@@ -90,7 +90,7 @@ check(
 check(
   "RCS-07",
   "記録成功後にホームへ戻る",
-  includes(target, 'router.push(ROUTES.home(wardrobeId));'),
+  includes(target, 'router.push(appendOperationToast(ROUTES.home(wardrobeId), OPERATION_TOAST_IDS.historyCreated));'),
   "記録成功後のホーム遷移が不足しています",
 );
 

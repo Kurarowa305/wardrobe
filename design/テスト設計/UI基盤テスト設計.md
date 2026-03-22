@@ -43,9 +43,9 @@
 - 観点: 文言定義の集約ルール準拠
 - 期待結果: `features/wardrobe/strings.ts` に `nameRequired` メッセージが存在する
 
-### UF-07 ToastViewport が画面最下部中央に配置される
+### UF-07 ToastViewport が画面最上部中央に配置される
 - 観点: スマホ表示時のトースト配置崩れ防止
-- 期待結果: `src/components/ui/toast.tsx` で `ToastViewport` が `bottom + center` 配置になっている
+- 期待結果: `src/components/ui/toast.tsx` で `ToastViewport` が `top + center` 配置になっている
 
 ### UF-08 ホーム画面遷移後に作成完了トーストを表示し、クエリを除去する
 - 観点: ワードローブ作成完了フィードバックの一回表示

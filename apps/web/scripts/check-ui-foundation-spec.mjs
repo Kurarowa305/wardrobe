@@ -118,11 +118,11 @@ check(
 
 check(
   "UF-07",
-  "ToastViewport が画面最下部中央に配置される",
-  includes("src/components/ui/toast.tsx", "fixed bottom-4 left-1/2") &&
+  "ToastViewport が画面最上部中央に配置される",
+  includes("src/components/ui/toast.tsx", "fixed left-1/2 top-4") &&
     includes("src/components/ui/toast.tsx", "-translate-x-1/2") &&
-    includes("src/components/ui/toast.tsx", "slide-in-from-bottom-full"),
-  "toast.tsx の Viewport 配置またはアニメーションが下部中央仕様と一致しません",
+    includes("src/components/ui/toast.tsx", "slide-in-from-top-full"),
+  "toast.tsx の Viewport 配置またはアニメーションが上部中央仕様と一致しません",
 );
 
 check(
