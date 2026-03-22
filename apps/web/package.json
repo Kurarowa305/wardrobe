@@ -67,6 +67,7 @@
     "test:tab-bar-icons": "node scripts/check-tab-bar-icons-spec.mjs",
     "test:tab-bar-icon-svg": "node scripts/check-tab-bar-icon-svg-spec.mjs",
     "test:copy-labels": "node scripts/check-copy-labels-spec.mjs",
+    "test:clothing-create-image-optional-label": "node scripts/check-clothing-create-image-optional-label-spec.mjs",
     "test:history-date-weekday": "node scripts/check-history-date-weekday-spec.mjs",
     "test:accent-color": "node scripts/check-accent-color-spec.mjs",
     "test:wardrobe-create-screen": "node scripts/check-wardrobe-create-screen-spec.mjs",
