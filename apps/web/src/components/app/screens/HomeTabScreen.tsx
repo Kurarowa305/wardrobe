@@ -5,6 +5,7 @@ import { createElement, useEffect, useRef } from "react";
 
 import { useRecentHistories } from "@/api/hooks/history";
 import { SharedHistoryCard } from "@/components/app/history/HistoryCard";
+import { TabBarIcon } from "@/components/ui/tab-bar-icon";
 import { AppLayout } from "@/components/app/layout/AppLayout";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
@@ -56,8 +57,12 @@ export function HomeTabScreen({ wardrobeId }: HomeTabScreenProps) {
       </Button>
 
       <section className="grid gap-2" aria-labelledby="home-recent-histories-heading">
-        <h2 id="home-recent-histories-heading" className="m-0 text-sm font-semibold text-slate-900">
-          {HOME_STRINGS.sections.recentWeekHistories}
+        <h2
+          id="home-recent-histories-heading"
+          className="m-0 flex items-center gap-2 text-sm font-semibold text-slate-900"
+        >
+          <TabBarIcon icon="histories" active={false} strokeColor="#000000" className="h-5 w-5" />
+          <span>{HOME_STRINGS.sections.recentWeekHistories}</span>
         </h2>
 
         {recentHistoriesQuery.isPending ? (

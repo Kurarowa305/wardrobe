@@ -130,6 +130,9 @@ jobs:
       - name: Home history card presentation spec test
         run: pnpm --filter web test:home-history-card-presentation
 
+      - name: Home recent history heading icon spec test
+        run: pnpm --filter web test:home-recent-history-heading-icon
+
       - name: Accent color spec test
         run: pnpm --filter web test:accent-color
 
