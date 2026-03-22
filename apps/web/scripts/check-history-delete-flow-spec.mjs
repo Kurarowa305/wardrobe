@@ -49,10 +49,11 @@ check(
 
 check(
   "HDL-03",
-  "削除成功時に from 解決済み backHref へ戻る",
-  includes(screenTarget, "router.push(backHref);") &&
-    includes(screenTarget, 'const backHref = resolveHistoryDetailBackHref(wardrobeId, searchParams.get("from"));'),
-  "削除成功後の戻り先遷移、または from クエリ反映が不足しています",
+  "削除成功時に from 解決済み backHref へ成功トースト付きで戻る",
+  includes(screenTarget, "appendOperationToast(backHref, OPERATION_TOAST_IDS.historyDeleted)") &&
+    includes(screenTarget, 'const backHref = resolveHistoryDetailBackHref(wardrobeId, searchParams.get("from"));') &&
+    includes(screenTarget, "router.push(appendOperationToast(backHref, OPERATION_TOAST_IDS.historyDeleted));"),
+  "削除成功後の成功トースト付き戻り先遷移、または from クエリ反映が不足しています",
 );
 
 check(

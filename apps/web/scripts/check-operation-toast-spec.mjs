@@ -91,12 +91,12 @@ check(
 check(
   "OTS-07",
   "成功トースト文言が各 feature strings に定義されている",
-  includes("src/features/clothing/strings.ts", 'submitSuccess: "服を追加しました。"') &&
-    includes("src/features/clothing/strings.ts", 'deleteSuccess: "服を削除しました。"') &&
-    includes("src/features/template/strings.ts", 'submitSuccess: "テンプレートを追加しました。"') &&
-    includes("src/features/template/strings.ts", 'deleteSuccess: "テンプレートを削除しました。"') &&
-    includes("src/features/history/strings.ts", 'deleteSuccess: "履歴を削除しました。"') &&
-    includes("src/features/record/strings.ts", 'submitSuccess: "記録を追加しました。"'),
+  includes("src/features/clothing/strings.ts", 'submitSuccess: "服を追加しました"') &&
+    includes("src/features/clothing/strings.ts", 'deleteSuccess: "服を削除しました"') &&
+    includes("src/features/template/strings.ts", 'submitSuccess: "テンプレートを追加しました"') &&
+    includes("src/features/template/strings.ts", 'deleteSuccess: "テンプレートを削除しました"') &&
+    includes("src/features/history/strings.ts", 'deleteSuccess: "履歴を削除しました"') &&
+    includes("src/features/record/strings.ts", 'submitSuccess: "記録を追加しました"'),
   "成功トースト文言の定義が不足しています",
 );
 

@@ -33,7 +33,7 @@ export const TEMPLATE_STRINGS = {
       loadError: "テンプレート追加画面の読み込みに失敗しました。",
       nameRequired: "テンプレート名を入力してください。",
       submitting: "追加中...",
-      submitSuccess: "テンプレートを追加しました。",
+      submitSuccess: "テンプレートを追加しました",
       submitError: "テンプレートの追加に失敗しました。",
     },
     labels: {
@@ -51,7 +51,7 @@ export const TEMPLATE_STRINGS = {
       loadError: "テンプレート編集画面の読み込みに失敗しました。",
       nameRequired: "テンプレート名を入力してください。",
       submitting: "保存中...",
-      submitSuccess: "テンプレートを更新しました。",
+      submitSuccess: "テンプレートを更新しました",
       submitError: "テンプレートの更新に失敗しました。",
     },
     labels: {
@@ -78,7 +78,7 @@ export const TEMPLATE_STRINGS = {
     messages: {
       loading: "読み込み中...",
       error: "テンプレート詳細の読み込みに失敗しました。",
-      deleteSuccess: "テンプレートを削除しました。",
+      deleteSuccess: "テンプレートを削除しました",
       deleteError: "テンプレートの削除に失敗しました。",
       deleted: "削除済みのテンプレートです。",
       clothingDeleted: "削除済みの服です",
