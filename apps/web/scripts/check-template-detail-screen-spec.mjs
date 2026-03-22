@@ -52,6 +52,7 @@ check(
     includes(target, "TEMPLATE_STRINGS.detail.labels.clothingItems") &&
     includes(target, "templateQuery.data.clothingItems.map((item) => {") &&
     includes(target, "item.wearCount") &&
+    includes(target, "TEMPLATE_STRINGS.detail.labels.clothingLastWornAt") &&
     includes(target, "formatLastWornDate(item.lastWornAt, TEMPLATE_STRINGS.detail.messages.neverWorn)"),
   "テンプレ詳細の主要表示項目または曜日付き構成アイテム一覧が不足しています",
 );
