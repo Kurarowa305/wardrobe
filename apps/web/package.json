@@ -9,6 +9,7 @@
     "test:routing": "node scripts/check-routing-spec.mjs",
     "test:overflow-menu": "node scripts/check-overflow-menu-spec.mjs",
     "test:overflow-menu-icons": "node scripts/check-overflow-menu-icon-spec.mjs",
+    "test:overflow-menu-trigger": "node scripts/check-overflow-menu-trigger-spec.mjs",
     "test:ui-foundation": "node scripts/check-ui-foundation-spec.mjs",
     "test:input-focus-zoom": "node scripts/check-input-focus-zoom-spec.mjs",
     "test:screen-card-removal": "node scripts/check-screen-card-removal-spec.mjs",
