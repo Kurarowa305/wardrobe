@@ -127,6 +127,9 @@ jobs:
       - name: Copy labels spec test
         run: pnpm --filter web test:copy-labels
 
+      - name: Back button spec test
+        run: pnpm --filter web test:back-button
+
       - name: Clothing create image optional label spec test
         run: pnpm --filter web test:clothing-create-image-optional-label
 
