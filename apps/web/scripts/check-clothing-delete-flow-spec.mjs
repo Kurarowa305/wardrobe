@@ -44,8 +44,9 @@ check(
   "削除確認ダイアログの文言に共通文言（削除しますか？）を使用する",
   includes(screenTarget, "COMMON_STRINGS.dialogs.confirmDelete.title") &&
     includes(screenTarget, "COMMON_STRINGS.dialogs.confirmDelete.message") &&
-    includes(screenTarget, "window.confirm("),
-  "削除確認の実装または共通文言参照が不足しています",
+    includes(screenTarget, "<ConfirmDialog") &&
+    !includes(screenTarget, "window.confirm("),
+  "削除確認ダイアログの自前実装または共通文言参照が不足しています",
 );
 
 check(

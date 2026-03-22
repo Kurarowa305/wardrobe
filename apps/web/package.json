@@ -68,7 +68,8 @@
     "test:wardrobe-create-screen": "node scripts/check-wardrobe-create-screen-spec.mjs",
     "test:wardrobe-create-validation": "node scripts/check-wardrobe-create-validation-spec.mjs",
     "test:list-screen-spacing": "node scripts/check-list-screen-spacing-spec.mjs",
-    "test:operation-toast": "node scripts/check-operation-toast-spec.mjs"
+    "test:operation-toast": "node scripts/check-operation-toast-spec.mjs",
+    "test:custom-delete-dialog": "node scripts/check-custom-delete-dialog-spec.mjs"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.4",
