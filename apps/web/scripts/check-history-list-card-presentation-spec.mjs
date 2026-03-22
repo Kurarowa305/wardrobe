@@ -47,10 +47,11 @@ check(
 
 check(
   "HLCP-02",
-  "入力方法ラベルがカード右上に控えめなスタイルで表示される",
-  includes(sharedTarget, 'className="flex items-start justify-between gap-3"') &&
-    includes(sharedTarget, 'className="text-[11px] font-medium text-slate-400">{contextLabel}</span>'),
-  "入力方法ラベルの右上配置または控えめなスタイル指定が不足しています",
+  "履歴カードに入力方法ラベルを表示しない",
+  !includes(sharedTarget, "HISTORY_STRINGS.labels.inputType[item.inputType]") &&
+    !includes(sharedTarget, "contextLabel") &&
+    !includes(sharedTarget, "justify-between"),
+  "履歴カードに入力方法ラベルまたは右上レイアウトが残っています",
 );
 
 check(

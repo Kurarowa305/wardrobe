@@ -46,7 +46,6 @@ type SharedHistoryCardProps = {
 export function SharedHistoryCard({ wardrobeId, item, from }: SharedHistoryCardProps) {
   const visibleThumbnails = item.clothingItems.slice(0, HISTORY_THUMBNAIL_LIMIT);
   const hiddenCount = Math.max(item.clothingItems.length - HISTORY_THUMBNAIL_LIMIT, 0);
-  const contextLabel = HISTORY_STRINGS.labels.inputType[item.inputType];
   const combinationTitle = item.clothingItems.map((clothingItem) => clothingItem.name).join("+");
   const title = truncateHistoryCardTitle(
     item.inputType === "template"
@@ -61,10 +60,7 @@ export function SharedHistoryCard({ wardrobeId, item, from }: SharedHistoryCardP
         className="grid gap-3 rounded-md border border-slate-300 bg-white p-3 text-left no-underline transition-colors hover:bg-slate-50"
       >
         <span className="grid gap-2">
-          <span className="flex items-start justify-between gap-3">
-            <span className="text-xs font-semibold text-slate-500">{formatHistoryDate(item.date)}</span>
-            <span className="text-[11px] font-medium text-slate-400">{contextLabel}</span>
-          </span>
+          <span className="text-xs font-semibold text-slate-500">{formatHistoryDate(item.date)}</span>
           <span className="text-sm font-semibold text-slate-900">{title}</span>
         </span>
         <span className="flex flex-wrap gap-2">
