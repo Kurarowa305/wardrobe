@@ -68,14 +68,14 @@ check(
 
 check(
   "HLS-04",
-  "履歴カードが詳細遷移導線と文脈表示を持つ",
+  "履歴カードが詳細遷移導線を持ち、入力方法ラベルを表示しない",
   includes(target, 'import { SharedHistoryCard } from "@/components/app/history/HistoryCard";') &&
     includes(target, '<SharedHistoryCard key={item.historyId} wardrobeId={wardrobeId} item={item} from="histories" />') &&
     includes(cardTarget, 'href={ROUTES.historyDetail(wardrobeId, item.historyId, from)}') &&
-    includes(cardTarget, 'const contextLabel = HISTORY_STRINGS.labels.inputType[item.inputType];') &&
-    includes(cardTarget, 'className="text-[11px] font-medium text-slate-400">{contextLabel}</span>') &&
+    !includes(cardTarget, 'HISTORY_STRINGS.labels.inputType[item.inputType]') &&
+    !includes(cardTarget, 'contextLabel') &&
     includes(cardTarget, 'combinationTitle || HISTORY_STRINGS.list.messages.combinationSummary'),
-  "履歴詳細遷移または文脈表示の実装が不足しています",
+  "履歴詳細遷移導線または入力方法ラベル非表示の実装が不足しています",
 );
 
 check(
