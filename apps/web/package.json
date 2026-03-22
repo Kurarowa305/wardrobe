@@ -74,7 +74,8 @@
     "test:list-screen-spacing": "node scripts/check-list-screen-spacing-spec.mjs",
     "test:operation-toast": "node scripts/check-operation-toast-spec.mjs",
     "test:custom-delete-dialog": "node scripts/check-custom-delete-dialog-spec.mjs",
-    "test:card-thumbnail-layout": "node scripts/check-card-thumbnail-layout-spec.mjs"
+    "test:card-thumbnail-layout": "node scripts/check-card-thumbnail-layout-spec.mjs",
+    "test:clothing-list-card-genre-icon-removal": "node scripts/check-clothing-list-card-genre-icon-removal-spec.mjs"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.4",
