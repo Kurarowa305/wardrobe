@@ -43,12 +43,13 @@ check(
 
 check(
   "HHCP-02",
-  "共通履歴カードが日付・右上ラベル・タイトル省略の表示仕様を持つ",
+  "共通履歴カードが日付表示・入力方法ラベル非表示・タイトル省略の表示仕様を持つ",
   includes(sharedTarget, 'const HISTORY_CARD_TITLE_MAX_LENGTH = 15;') &&
     includes(sharedTarget, '{formatHistoryDate(item.date)}') &&
-    includes(sharedTarget, 'className="text-[11px] font-medium text-slate-400">{contextLabel}</span>') &&
+    !includes(sharedTarget, "HISTORY_STRINGS.labels.inputType[item.inputType]") &&
+    !includes(sharedTarget, "contextLabel") &&
     includes(sharedTarget, 'title.slice(0, HISTORY_CARD_TITLE_MAX_LENGTH)}...'),
-  "共通履歴カードに必要な表示仕様が不足しています",
+  "共通履歴カードに不要な入力方法ラベルが残っているか、必要な表示仕様が不足しています",
 );
 
 check(
