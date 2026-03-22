@@ -47,6 +47,7 @@
     "test:clothing-detail-screen": "node scripts/check-clothing-detail-screen-spec.mjs",
     "test:clothing-create-screen": "node scripts/check-clothing-create-screen-spec.mjs",
     "test:clothing-edit-screen": "node scripts/check-clothing-edit-screen-spec.mjs",
+    "test:clothing-genre-icon-svg": "node scripts/check-clothing-genre-icon-svg-spec.mjs",
     "test:clothing-image-selection-ui": "node scripts/check-clothing-image-selection-ui-spec.mjs",
     "test:msw-foundation": "node scripts/check-msw-foundation-spec.mjs",
     "test:msw-scenarios": "node scripts/check-msw-scenarios-spec.mjs",
