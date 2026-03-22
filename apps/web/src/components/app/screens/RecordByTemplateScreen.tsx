@@ -114,6 +114,7 @@ export function RecordByTemplateScreen({ wardrobeId }: RecordByTemplateScreenPro
   const showTemplateError = templateTouched && isTemplateEmpty;
   const showTemplateLoading = templateListQuery.isPending && !hasTemplateItems;
   const showTemplateLoadError = templateListQuery.isError && !hasTemplateItems;
+  const showTemplateInlineError = templateListQuery.isError && hasTemplateItems;
   const showTemplateEmpty = !showTemplateLoading && !showTemplateLoadError && !hasTemplateItems;
   const canLoadMore = nextCursor !== null && !templateListQuery.isFetching;
   const isSubmitting = createHistoryMutation.isPending;
@@ -243,12 +244,24 @@ export function RecordByTemplateScreen({ wardrobeId }: RecordByTemplateScreenPro
               </div>
             ) : null}
 
+            {showTemplateInlineError ? (
+              <p className="m-0 text-sm text-red-700">{RECORD_STRINGS.byTemplate.messages.loadError}</p>
+            ) : null}
+
             {nextCursor !== null ? (
-              <Button type="button" variant="secondary" onClick={handleLoadMore} disabled={!canLoadMore}>
-                {templateListQuery.isFetching
-                  ? RECORD_STRINGS.byTemplate.messages.loading
-                  : RECORD_STRINGS.byTemplate.actions.loadMore}
-              </Button>
+              <div className="mt-4">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="w-full text-sm font-medium"
+                  onClick={handleLoadMore}
+                  disabled={!canLoadMore}
+                >
+                  {templateListQuery.isFetching
+                    ? RECORD_STRINGS.byTemplate.messages.loading
+                    : RECORD_STRINGS.byTemplate.actions.loadMore}
+                </Button>
+              </div>
             ) : null}
           </fieldset>
 

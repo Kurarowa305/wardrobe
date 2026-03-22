@@ -71,12 +71,25 @@ check(
 );
 check(
   "RTS-07",
+  "nextCursor がある場合に『さらに読み込む』で追加取得でき、追加取得失敗時もエラー表示できる",
+  () =>
+    includes(target, 'const [nextCursor, setNextCursor] = useState<string | null>(null);') &&
+    includes(target, 'setNextCursor(templateListQuery.data.nextCursor);') &&
+    includes(target, 'setCursor(nextCursor);') &&
+    includes(target, 'const showTemplateInlineError = templateListQuery.isError && hasTemplateItems;') &&
+    includes(target, 'RECORD_STRINGS.byTemplate.actions.loadMore') &&
+    includes(target, 'RECORD_STRINGS.byTemplate.messages.loadError') &&
+    includes(target, 'onClick={handleLoadMore}'),
+  "追加読み込み導線または追加取得失敗時のエラー表示が不足しています",
+);
+check(
+  "RTS-08",
   "記録成功後にホームへ戻る",
   () => includes(target, 'router.push(appendOperationToast(ROUTES.home(wardrobeId), OPERATION_TOAST_IDS.historyCreated))'),
   "記録完了後のホーム遷移実装が不足しています",
 );
 check(
-  "RTS-08",
+  "RTS-09",
   "テンプレート記録向け文言が record strings に定義される",
   () => !includes(stringsTarget, 'selected: "選択中のテンプレート"') && includes(stringsTarget, 'dateRequired: "日付を入力してください。"') && includes(stringsTarget, 'templateRequired: "テンプレートを選択してください。"') && includes(stringsTarget, 'loading: "テンプレートを読み込んでいます…"') && includes(stringsTarget, 'submitError: "記録に失敗しました。時間をおいて再度お試しください。"'),
   "features/record/strings.ts にテンプレート記録向け文言の定義が不足しています",
