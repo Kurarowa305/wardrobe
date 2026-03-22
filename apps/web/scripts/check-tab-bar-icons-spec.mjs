@@ -6,31 +6,43 @@ const read = (relativePath) =>
   fs.readFileSync(path.join(repoRoot, relativePath), "utf8");
 const includes = (relativePath, text) => read(relativePath).includes(text);
 const includesAll = (relativePath, texts) => texts.every((text) => includes(relativePath, text));
+const notExists = (relativePath) => !fs.existsSync(path.join(repoRoot, relativePath));
 
 const checks = [
   {
-    name: "TabBar が各タブの active / inactive アイコン定義を持つ",
+    name: "TabBar が SVG アイコンコンポーネントを利用する",
     ok: includesAll("src/components/app/navigation/TabBar.tsx", [
-      'activeIconSrc: "/icons/home_active.png"',
-      'inactiveIconSrc: "/icons/home_inactive.png"',
-      'activeIconSrc: "/icons/history_active.png"',
-      'inactiveIconSrc: "/icons/history_inactive.png"',
-      'activeIconSrc: "/icons/template_active.png"',
-      'inactiveIconSrc: "/icons/template_inactive.png"',
-      'activeIconSrc: "/icons/cloth_active.png"',
-      'inactiveIconSrc: "/icons/cloth_inactive.png"',
-    ]),
-    detail: "TabBar.tsx に各タブ用アイコン定義が不足しています",
-  },
-  {
-    name: "TabBar がアクティブ状態に応じてアイコン画像を切り替える",
-    ok: includesAll("src/components/app/navigation/TabBar.tsx", [
+      'import { TabBarIcon } from "./TabBarIcon";',
       'const isActive = activeTab === item.key;',
-      'src={isActive ? item.activeIconSrc : item.inactiveIconSrc}',
-      'className="tab-item-icon"',
+      '<TabBarIcon icon={item.key} active={isActive} className="tab-item-icon" />',
       '<span>{item.label}</span>',
     ]),
-    detail: "TabBar.tsx の active / inactive 切り替え、または文言上部アイコン配置が不足しています",
+    detail: "TabBar.tsx の SVG アイコン利用または文言上部配置が不足しています",
+  },
+  {
+    name: "TabBarIcon が4タブ分の再利用可能な SVG 定義を持つ",
+    ok: includesAll("src/components/app/navigation/TabBarIcon.tsx", [
+      'export type TabIconKey = "home" | "histories" | "templates" | "clothings";',
+      'function HomeIcon(',
+      'function HistoriesIcon(',
+      'function TemplatesIcon(',
+      'function ClothingsIcon(',
+      'return <ClothingsIcon active={active} {...props} />;',
+    ]),
+    detail: "TabBarIcon.tsx に4タブ分の SVG 定義が不足しています",
+  },
+  {
+    name: "旧 PNG アイコン画像が削除されている",
+    ok:
+      notExists("public/icons/home_active.png") &&
+      notExists("public/icons/home_inactive.png") &&
+      notExists("public/icons/history_active.png") &&
+      notExists("public/icons/history_inactive.png") &&
+      notExists("public/icons/template_active.png") &&
+      notExists("public/icons/template_inactive.png") &&
+      notExists("public/icons/cloth_active.png") &&
+      notExists("public/icons/cloth_inactive.png"),
+    detail: "public/icons 配下に旧 PNG アイコン画像が残っています",
   },
   {
     name: "TabBar のスタイルが縦並びアイコン付きレイアウトに更新されている",
