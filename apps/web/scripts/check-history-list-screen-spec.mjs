@@ -90,7 +90,7 @@ check(
 
 check(
   "HLS-06",
-  "履歴カードがサムネ5列レイアウトの共通コンポーネントを利用する",
+  "履歴カードがサムネ共通レイアウトコンポーネントを利用する",
   includes(cardTarget, 'import { ThumbnailStrip } from "@/components/app/shared/ThumbnailStrip";') &&
     includes(cardTarget, '<ThumbnailStrip') &&
     includes(cardTarget, 'deletedLabel={HISTORY_STRINGS.list.badges.deleted}'),

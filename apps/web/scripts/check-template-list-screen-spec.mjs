@@ -85,7 +85,7 @@ check(
 
 check(
   "TLS-06",
-  "テンプレートカードがサムネ5列レイアウトの共通コンポーネントを利用する",
+  "テンプレートカードがサムネ共通レイアウトコンポーネントを利用する",
   includes(target, 'import { ThumbnailStrip } from "@/components/app/shared/ThumbnailStrip";') &&
     includes(target, '<ThumbnailStrip') &&
     includes(target, 'deletedLabel={TEMPLATE_STRINGS.list.badges.deleted}'),
