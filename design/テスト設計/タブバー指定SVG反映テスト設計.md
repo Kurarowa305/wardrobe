@@ -17,7 +17,7 @@
 ### 3.1 各タブのSVG定義
 
 * ホームアイコンが 2 本の `path` を持ち、指定コードと一致すること
-* 履歴アイコンが 3 本の `path` を持ち、指定コードと一致すること
+* 履歴アイコンが 1 つの `circle` と 1 本の `path` を持ち、指定コードと一致すること
 * テンプレートアイコンが 1 本の `path` と 1 つの `rect` を持ち、指定コードと一致すること
 * 服アイコンが 1 本の `path` を持ち、指定コードと一致すること
 
@@ -37,7 +37,7 @@
 | ケースID | 観点 | 条件 | 期待結果 |
 | --- | --- | --- | --- |
 | TBS-01 | ホームSVG | `TabBarIcon.tsx` を確認する | ホームアイコンの2本の `path` が指定コードと一致する |
-| TBS-02 | 履歴SVG | `TabBarIcon.tsx` を確認する | 履歴アイコンの3本の `path` が指定コードと一致する |
+| TBS-02 | 履歴SVG | `TabBarIcon.tsx` を確認する | 履歴アイコンの `circle` と1本の `path` が指定コードと一致する |
 | TBS-03 | テンプレートSVG | `TabBarIcon.tsx` を確認する | テンプレートアイコンの `path` / `rect` が指定コードと一致する |
 | TBS-04 | 服SVG | `TabBarIcon.tsx` を確認する | 服アイコンの `path` が指定コードと一致する |
 | TBS-05 | 共通線スタイル | `TabBarIcon.tsx` を確認する | `fill="none"`、`strokeWidth="1.5"`、`strokeLinecap="round"`、`strokeLinejoin="round"` が設定される |
