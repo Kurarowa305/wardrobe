@@ -44,6 +44,7 @@
     "test:clothing-query-hooks": "node scripts/check-clothing-query-hooks-spec.mjs",
     "test:clothing-mutation-hooks": "node scripts/check-clothing-mutation-hooks-spec.mjs",
     "test:clothing-list-screen": "node scripts/check-clothing-list-screen-spec.mjs",
+    "test:clothing-list-limit": "node scripts/check-clothing-list-limit-spec.mjs",
     "test:clothing-detail-screen": "node scripts/check-clothing-detail-screen-spec.mjs",
     "test:clothing-create-screen": "node scripts/check-clothing-create-screen-spec.mjs",
     "test:clothing-edit-screen": "node scripts/check-clothing-edit-screen-spec.mjs",

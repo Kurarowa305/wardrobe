@@ -6,7 +6,6 @@ export type ClothingListParamsDto = {
   order?: ClothingListOrderDto;
   genre?: ClothingGenreDto;
   limit?: number;
-  cursor?: string | null;
 };
 
 export type CreateClothingRequestDto = {
@@ -35,7 +34,6 @@ export type ClothingListItemDto = Pick<ClothingDto, "clothingId" | "name" | "gen
 
 export type ClothingListResponseDto = {
   items: ClothingListItemDto[];
-  nextCursor: string | null;
 };
 
 export type ClothingDetailResponseDto = ClothingDto;

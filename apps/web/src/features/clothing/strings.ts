@@ -3,13 +3,13 @@ export const CLOTHING_STRINGS = {
     title: "服",
     actions: {
       add: "＋ 服を追加",
-      loadMore: "さらに読み込む",
     },
     messages: {
       loading: "読み込み中...",
       empty: "服がまだ登録されていません。",
       error: "服一覧の読み込みに失敗しました。",
       sectionEmpty: "このジャンルの服はまだ登録されていません。",
+      limitNotice: "服の登録上限は100件です。一覧はジャンルごとに最大100件まで取得します。",
     },
   },
   common: {

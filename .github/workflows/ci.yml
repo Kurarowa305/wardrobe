@@ -184,6 +184,9 @@ jobs:
       - name: Clothing list screen spec test
         run: pnpm --filter web test:clothing-list-screen
 
+      - name: Clothing list limit spec test
+        run: pnpm --filter web test:clothing-list-limit
+
       - name: Clothing detail screen spec test
         run: pnpm --filter web test:clothing-detail-screen
 

@@ -1,62 +1,43 @@
-# Clothing MSW handlersテスト設計（MS1-T04）
+# Clothing MSW handlersテスト設計
 
 ## 目的
-
-- MS1-T04（Clothing MSW handlers）の完了条件を継続的に検証する
-- 服一覧のページング（`limit` / `cursor` / `nextCursor`）とCRUDハンドラの存在をCIで担保する
-- 詳細取得で存在しないIDを指定した際に404を返せることを固定化する
+- 服一覧の `genre` / `limit` 処理、CRUDハンドラ、登録上限100件制御をCIで担保する
+- cursor / nextCursor を廃止した一覧仕様をMSWに反映できているか検証する
 
 ## 対象スクリプト
-
 - `apps/web/scripts/check-clothing-msw-handlers-spec.mjs`
 - 実行コマンド: `pnpm --filter web test:clothing-msw-handlers`
 
 ## テストケース
-
-### CM-01 Clothing MSW handler が src/mocks/handlers/clothing.ts に存在する
-- 観点: 実装ファイル配置の固定化
+### CM-01 Clothing handler が存在する
 - 期待結果: `apps/web/src/mocks/handlers/clothing.ts` が存在する
 
-### CM-02 Clothing handler が GET/POST/PATCH/DELETE の CRUD と一覧取得を公開する
-- 観点: タスク内容「CRUD＋一覧」の担保
-- 期待結果:
-  - `GET /wardrobes/:wardrobeId/clothing`
-  - `GET /wardrobes/:wardrobeId/clothing/:clothingId`
-  - `POST /wardrobes/:wardrobeId/clothing`
-  - `PATCH /wardrobes/:wardrobeId/clothing/:clothingId`
-  - `DELETE /wardrobes/:wardrobeId/clothing/:clothingId`
-  が定義される
+### CM-02 GET/POST/PATCH/DELETE の CRUD と一覧取得を公開する
+- 期待結果: 一覧/詳細/作成/更新/削除の各handlerが定義される
 
-### CM-03 一覧 handler が limit/cursor を受け取り nextCursor を返す
-- 観点: 完了条件「一覧：limit/cursorを受け、nextCursor を返せる」の担保
+### CM-03 一覧 handler が genre/limit を受け取り cursor を使わず items を返す
 - 期待結果:
-  - `limit` をクエリから読み取る
-  - `cursor` をクエリから読み取る
-  - `nextCursor` をレスポンスに含める
+  - `genre` と `limit` をクエリから読み取る
+  - `cursor` / `nextCursor` を扱わない
+  - 最大 `limit` 件の `items` を返す
 
 ### CM-04 詳細 handler が存在しない clothingId で 404 を返せる
-- 観点: 完了条件「詳細：存在しないIDで404を返せる」の担保
-- 期待結果:
-  - `clothingId` で検索し、未存在時に404応答を返す
+- 期待結果: `NOT_FOUND` 相当の応答を返す
 
-### CM-05 Clothing handler が共通シナリオ（delay/forceError）を適用する
-- 観点: MS0-T09で作成したシナリオ共通化との整合
-- 期待結果:
-  - `applyMockScenario` をimportする
-  - 各handlerで `await applyMockScenario(request)` を実行し、シナリオ応答を優先返却できる
+### CM-05 共通シナリオを適用する
+- 期待結果: `applyMockScenario` を各handler冒頭で利用する
 
 ### CM-06 handlers 集約に clothingHandlers が追加される
-- 観点: mock worker 起動時に clothing handler が有効になることの担保
-- 期待結果:
-  - `src/mocks/handlers/index.ts` が `clothingHandlers` をimportする
-  - `handlers` 配列に `clothingHandlers` を追加する
+- 期待結果: `src/mocks/handlers/index.ts` から集約される
 
-### CM-07 Clothing handler がデモ遷移用 wardrobeId（DEMO_IDS.wardrobe）を許可する
-- 観点: 画面遷移で利用する `wardrobeId`（`/wardrobes/1/...`）とMSW判定条件の整合
+### CM-07 create/update handler が genre を保存し、登録上限100件を超えない
 - 期待結果:
-  - `src/mocks/handlers/clothing.ts` が `DEMO_IDS` をimportする
-  - `isSupportedWardrobeId` が fixture用IDに加えて `DEMO_IDS.wardrobe` も許可する
+  - create/update で genre を反映する
+  - `MAX_CLOTHING_COUNT = 100` を定義する
+  - 上限超過時に `CLOTHING_LIMIT_EXCEEDED` を返す
+
+### CM-08 デモ遷移用 wardrobeId を許可する
+- 期待結果: `DEMO_IDS.wardrobe` を許可する
 
 ## CI適用
-
-- `.github/workflows/ci.yml` に `Clothing MSW handlers spec test` を追加し、PR時に自動検証する
+- `.github/workflows/ci.yml` の `Clothing MSW handlers spec test` で自動検証する

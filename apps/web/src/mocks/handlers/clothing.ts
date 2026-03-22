@@ -13,9 +13,8 @@ import { HttpResponse, http } from "msw";
 
 import { applyMockScenario } from "./scenario";
 
-const DEFAULT_PAGE_SIZE = 20;
-const MAX_PAGE_SIZE = 50;
-const CURSOR_PREFIX = "offset:";
+const DEFAULT_LIST_LIMIT = 100;
+const MAX_CLOTHING_COUNT = 100;
 const CLOTHING_ID_PREFIX = "cl_mock_";
 
 let mockClothingIdSequence = 1;
@@ -59,32 +58,15 @@ function normalizeGenre(value: unknown): ClothingGenreDto | undefined {
 
 function parseLimit(value: string | null): number | null {
   if (value === null || value.length === 0) {
-    return DEFAULT_PAGE_SIZE;
+    return DEFAULT_LIST_LIMIT;
   }
   const parsed = Number.parseInt(value, 10);
-  if (!Number.isFinite(parsed) || parsed <= 0 || parsed > MAX_PAGE_SIZE) {
+  if (!Number.isFinite(parsed) || parsed <= 0 || parsed > DEFAULT_LIST_LIMIT) {
     return null;
   }
   return parsed;
 }
 
-function parseCursor(value: string | null): number | null {
-  if (value === null || value.length === 0) {
-    return 0;
-  }
-  if (!value.startsWith(CURSOR_PREFIX)) {
-    return null;
-  }
-  const parsed = Number.parseInt(value.slice(CURSOR_PREFIX.length), 10);
-  if (!Number.isFinite(parsed) || parsed < 0) {
-    return null;
-  }
-  return parsed;
-}
-
-function encodeCursor(offset: number) {
-  return `${CURSOR_PREFIX}${offset}`;
-}
 
 function parseBody<TBody>(request: Request): Promise<TBody | null> {
   return request.json().then((body) => body as TBody).catch(() => null);
@@ -183,19 +165,11 @@ export const clothingHandlers = [
     if (genreParam && !genre) return createErrorResponse(400, "VALIDATION_ERROR", "genre must be tops, bottoms or others");
 
     const limit = parseLimit(url.searchParams.get("limit"));
-    if (limit === null) return createErrorResponse(400, "VALIDATION_ERROR", "limit must be 1..50");
-
-    const cursor = parseCursor(url.searchParams.get("cursor"));
-    if (cursor === null) return createErrorResponse(400, "INVALID_CURSOR", "cursor is invalid");
+    if (limit === null) return createErrorResponse(400, "VALIDATION_ERROR", "limit must be 1..100");
 
     const items = buildListItems(order, genre);
-    if (cursor > items.length) return createErrorResponse(400, "INVALID_CURSOR", "cursor is out of range");
 
-    const pagedItems = items.slice(cursor, cursor + limit);
-    const nextOffset = cursor + pagedItems.length;
-    const nextCursor = nextOffset < items.length ? encodeCursor(nextOffset) : null;
-
-    return HttpResponse.json<ClothingListResponseDto>({ items: pagedItems, nextCursor });
+    return HttpResponse.json<ClothingListResponseDto>({ items: items.slice(0, limit) });
   }),
 
   http.get("*/wardrobes/:wardrobeId/clothing/:clothingId", async ({ params, request }) => {
@@ -222,6 +196,10 @@ export const clothingHandlers = [
     const body = await parseBody<unknown>(request);
     const payload = parseCreateRequest(body);
     if (!payload) return createErrorResponse(400, "VALIDATION_ERROR", "request body is invalid");
+
+    if (buildListItems("asc").length >= MAX_CLOTHING_COUNT) {
+      return createErrorResponse(400, "CLOTHING_LIMIT_EXCEEDED", "clothing count must be 100 or fewer");
+    }
 
     clothingStore.push({
       clothingId: createMockClothingId(),

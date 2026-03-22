@@ -14,27 +14,27 @@ import { CLOTHING_GENRES } from "@/features/clothing/genre";
 import { CLOTHING_STRINGS } from "@/features/clothing/strings";
 import { OPERATION_TOAST_IDS, consumeOperationToast } from "@/features/toast/operationToast";
 
-const CLOTHING_LIST_PAGE_SIZE = 20;
+const CLOTHING_LIST_LIMIT = 100;
 
 type ClothingsTabScreenProps = { wardrobeId: string };
-type GenrePageState = { cursor: string | null; nextCursor: string | null; collapsed: boolean };
+type GenreSectionState = { collapsed: boolean };
 
-function createInitialGenreState(): Record<ClothingGenreDto, GenrePageState> {
+function createInitialGenreState(): Record<ClothingGenreDto, GenreSectionState> {
   return {
-    tops: { cursor: null, nextCursor: null, collapsed: false },
-    bottoms: { cursor: null, nextCursor: null, collapsed: false },
-    others: { cursor: null, nextCursor: null, collapsed: false },
+    tops: { collapsed: false },
+    bottoms: { collapsed: false },
+    others: { collapsed: false },
   };
 }
 
 export function ClothingsTabScreen({ wardrobeId }: ClothingsTabScreenProps) {
   const { toast } = useToast();
   const hasShownToastRef = useRef(false);
-  const [genreStates, setGenreStates] = useState<Record<ClothingGenreDto, GenrePageState>>(createInitialGenreState);
+  const [genreStates, setGenreStates] = useState<Record<ClothingGenreDto, GenreSectionState>>(createInitialGenreState);
 
-  const topsQuery = useClothingList(wardrobeId, { genre: "tops", limit: CLOTHING_LIST_PAGE_SIZE, cursor: genreStates.tops.cursor });
-  const bottomsQuery = useClothingList(wardrobeId, { genre: "bottoms", limit: CLOTHING_LIST_PAGE_SIZE, cursor: genreStates.bottoms.cursor });
-  const othersQuery = useClothingList(wardrobeId, { genre: "others", limit: CLOTHING_LIST_PAGE_SIZE, cursor: genreStates.others.cursor });
+  const topsQuery = useClothingList(wardrobeId, { genre: "tops", limit: CLOTHING_LIST_LIMIT });
+  const bottomsQuery = useClothingList(wardrobeId, { genre: "bottoms", limit: CLOTHING_LIST_LIMIT });
+  const othersQuery = useClothingList(wardrobeId, { genre: "others", limit: CLOTHING_LIST_LIMIT });
 
   const genreQueries = { tops: topsQuery, bottoms: bottomsQuery, others: othersQuery } as const;
 
@@ -58,33 +58,13 @@ export function ClothingsTabScreen({ wardrobeId }: ClothingsTabScreenProps) {
     setGenreStates(createInitialGenreState());
   }, [wardrobeId]);
 
-  useEffect(() => {
-    for (const genre of CLOTHING_GENRES) {
-      const query = genreQueries[genre];
-      if (!query.data) continue;
-      setGenreStates((previous) => ({
-        ...previous,
-        [genre]: {
-          ...previous[genre],
-          nextCursor: query.data.nextCursor,
-        },
-      }));
-    }
-  }, [topsQuery.data, bottomsQuery.data, othersQuery.data]);
-
   const isInitialLoading = CLOTHING_GENRES.every((genre) => genreQueries[genre].isPending);
   const isInitialError = CLOTHING_GENRES.every((genre) => genreQueries[genre].isError);
   const hasAnyItems = CLOTHING_GENRES.some((genre) => (genreQueries[genre].data?.items.length ?? 0) > 0);
   const showEmptyState = !isInitialLoading && !isInitialError && !hasAnyItems;
 
-  const handleLoadMore = (genre: ClothingGenreDto) => {
-    const nextCursor = genreStates[genre].nextCursor;
-    if (nextCursor === null || genreQueries[genre].isFetching) return;
-    setGenreStates((previous) => ({ ...previous, [genre]: { ...previous[genre], cursor: nextCursor } }));
-  };
-
   const toggleSection = (genre: ClothingGenreDto) => {
-    setGenreStates((previous) => ({ ...previous, [genre]: { ...previous[genre], collapsed: !previous[genre].collapsed } }));
+    setGenreStates((previous) => ({ ...previous, [genre]: { collapsed: !previous[genre].collapsed } }));
   };
 
   const content = (
@@ -94,6 +74,8 @@ export function ClothingsTabScreen({ wardrobeId }: ClothingsTabScreenProps) {
           <Link href={ROUTES.clothingNew(wardrobeId)}>{CLOTHING_STRINGS.list.actions.add}</Link>
         </Button>
       </div>
+
+      <p className="m-0 text-xs text-slate-500">{CLOTHING_STRINGS.list.messages.limitNotice}</p>
 
       {isInitialLoading ? <p className="m-0 text-sm text-slate-600">{CLOTHING_STRINGS.list.messages.loading}</p> : null}
       {isInitialError ? <p className="m-0 text-sm text-red-700">{CLOTHING_STRINGS.list.messages.error}</p> : null}
@@ -113,11 +95,6 @@ export function ClothingsTabScreen({ wardrobeId }: ClothingsTabScreenProps) {
               toggleLabel={state.collapsed ? CLOTHING_STRINGS.common.expand : CLOTHING_STRINGS.common.collapse}
               hrefResolver={(item) => ROUTES.clothingDetail(wardrobeId, item.clothingId)}
               emptyMessage={CLOTHING_STRINGS.list.messages.sectionEmpty}
-              onLoadMore={state.nextCursor !== null ? () => handleLoadMore(genre) : undefined}
-              canLoadMore={state.nextCursor !== null && !query.isFetching}
-              isLoadingMore={query.isFetching}
-              loadingLabel={CLOTHING_STRINGS.list.messages.loading}
-              loadMoreLabel={CLOTHING_STRINGS.list.actions.loadMore}
             />
           );
         })}

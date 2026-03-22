@@ -4,7 +4,6 @@ export type CursorListParams = {
   order?: ListOrder;
   genre?: string | null;
   limit?: number;
-  cursor?: string | null;
 };
 
 export type HistoryListParams = CursorListParams & {
@@ -16,7 +15,6 @@ type NormalizedCursorListParams = {
   order: ListOrder | null;
   genre: string | null;
   limit: number | null;
-  cursor: string | null;
 };
 
 type NormalizedHistoryListParams = NormalizedCursorListParams & {
@@ -31,7 +29,6 @@ function normalizeCursorListParams(params: CursorListParams = {}): NormalizedCur
     order: params.order ?? null,
     genre: params.genre ?? null,
     limit: params.limit ?? null,
-    cursor: params.cursor ?? null,
   };
 }
 

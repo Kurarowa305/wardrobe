@@ -57,7 +57,6 @@ export function useClothingList(wardrobeId: string, params: ClothingListParamsDt
     enabled: wardrobeId.length > 0,
     select: (response) => ({
       items: response.items.map(toClothingListItem),
-      nextCursor: response.nextCursor,
     }),
   });
 }

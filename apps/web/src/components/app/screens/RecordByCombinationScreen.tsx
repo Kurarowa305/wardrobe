@@ -16,14 +16,14 @@ import { RECORD_STRINGS } from "@/features/record/strings";
 import { OPERATION_TOAST_IDS, appendOperationToast } from "@/features/toast/operationToast";
 
 type RecordByCombinationScreenProps = { wardrobeId: string };
-type GenreState = { cursor: string | null; nextCursor: string | null; collapsed: boolean };
-const RECORD_COMBINATION_CLOTHING_LIMIT = 50;
+type GenreState = { collapsed: boolean };
+const RECORD_COMBINATION_CLOTHING_LIMIT = 100;
 
 function createInitialGenreState(): Record<ClothingGenreDto, GenreState> {
   return {
-    tops: { cursor: null, nextCursor: null, collapsed: false },
-    bottoms: { cursor: null, nextCursor: null, collapsed: false },
-    others: { cursor: null, nextCursor: null, collapsed: false },
+    tops: { collapsed: false },
+    bottoms: { collapsed: false },
+    others: { collapsed: false },
   };
 }
 
@@ -45,9 +45,9 @@ export function RecordByCombinationScreen({ wardrobeId }: RecordByCombinationScr
   const [selectedClothingIds, setSelectedClothingIds] = useState<string[]>([]);
   const [genreStates, setGenreStates] = useState<Record<ClothingGenreDto, GenreState>>(createInitialGenreState);
 
-  const topsQuery = useClothingList(wardrobeId, { genre: "tops", limit: RECORD_COMBINATION_CLOTHING_LIMIT, cursor: genreStates.tops.cursor });
-  const bottomsQuery = useClothingList(wardrobeId, { genre: "bottoms", limit: RECORD_COMBINATION_CLOTHING_LIMIT, cursor: genreStates.bottoms.cursor });
-  const othersQuery = useClothingList(wardrobeId, { genre: "others", limit: RECORD_COMBINATION_CLOTHING_LIMIT, cursor: genreStates.others.cursor });
+  const topsQuery = useClothingList(wardrobeId, { genre: "tops", limit: RECORD_COMBINATION_CLOTHING_LIMIT });
+  const bottomsQuery = useClothingList(wardrobeId, { genre: "bottoms", limit: RECORD_COMBINATION_CLOTHING_LIMIT });
+  const othersQuery = useClothingList(wardrobeId, { genre: "others", limit: RECORD_COMBINATION_CLOTHING_LIMIT });
   const genreQueries = { tops: topsQuery, bottoms: bottomsQuery, others: othersQuery } as const;
 
   useEffect(() => {
@@ -58,13 +58,6 @@ export function RecordByCombinationScreen({ wardrobeId }: RecordByCombinationScr
     setSelectionTouched(false);
   }, [wardrobeId]);
 
-  useEffect(() => {
-    for (const genre of CLOTHING_GENRES) {
-      const query = genreQueries[genre];
-      if (!query.data) continue;
-      setGenreStates((previous) => ({ ...previous, [genre]: { ...previous[genre], nextCursor: query.data.nextCursor } }));
-    }
-  }, [topsQuery.data, bottomsQuery.data, othersQuery.data]);
 
   const trimmedDate = useMemo(() => date.trim(), [date]);
   const historyApiDate = toHistoryApiDate(trimmedDate);
@@ -83,11 +76,6 @@ export function RecordByCombinationScreen({ wardrobeId }: RecordByCombinationScr
     setSelectedClothingIds((previous) => previous.includes(clothingId) ? previous.filter((currentId) => currentId !== clothingId) : [...previous, clothingId]);
   };
 
-  const handleLoadMore = (genre: ClothingGenreDto) => {
-    const nextCursor = genreStates[genre].nextCursor;
-    if (nextCursor === null || genreQueries[genre].isFetching) return;
-    setGenreStates((previous) => ({ ...previous, [genre]: { ...previous[genre], cursor: nextCursor } }));
-  };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -131,11 +119,6 @@ export function RecordByCombinationScreen({ wardrobeId }: RecordByCombinationScr
                   selectedIds={selectedClothingIds}
                   onSelectToggle={toggleClothing}
                   emptyMessage={RECORD_STRINGS.byCombination.messages.sectionEmpty}
-                  onLoadMore={state.nextCursor !== null ? () => handleLoadMore(genre) : undefined}
-                  canLoadMore={state.nextCursor !== null && !query.isFetching}
-                  isLoadingMore={query.isFetching}
-                  loadingLabel={RECORD_STRINGS.byCombination.messages.loading}
-                  loadMoreLabel={RECORD_STRINGS.byCombination.actions.loadMore}
                 />
               );
             })}

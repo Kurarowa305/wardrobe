@@ -71,11 +71,11 @@ check(
 
 check(
   "CQ-05",
-  "一覧 hook が DTO を ClothingListItem VM に変換し nextCursor を返す",
+  "一覧 hook が DTO を ClothingListItem VM に変換し nextCursor を返さない",
   includes(target, "select: (response) => ({") &&
     includes(target, "items: response.items.map(toClothingListItem),") &&
-    includes(target, "nextCursor: response.nextCursor,"),
-  "一覧 hook の VM 変換または nextCursor 引き継ぎが不足しています",
+    !includes(target, "nextCursor"),
+  "一覧 hook の VM 変換または nextCursor 削除が不足しています",
 );
 
 check(

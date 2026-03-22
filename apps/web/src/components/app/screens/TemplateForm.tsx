@@ -18,14 +18,14 @@ import { isAppError } from "@/lib/error/normalize";
 type TemplateFormMode = "create" | "edit";
 
 type TemplateFormProps = { wardrobeId: string; mode: TemplateFormMode; templateId?: string; submitLabel: string };
-type GenreState = { cursor: string | null; nextCursor: string | null; collapsed: boolean };
-const TEMPLATE_FORM_CLOTHING_LIMIT = 50;
+type GenreState = { collapsed: boolean };
+const TEMPLATE_FORM_CLOTHING_LIMIT = 100;
 
 function createInitialGenreState(): Record<ClothingGenreDto, GenreState> {
   return {
-    tops: { cursor: null, nextCursor: null, collapsed: false },
-    bottoms: { cursor: null, nextCursor: null, collapsed: false },
-    others: { cursor: null, nextCursor: null, collapsed: false },
+    tops: { collapsed: false },
+    bottoms: { collapsed: false },
+    others: { collapsed: false },
   };
 }
 
@@ -46,22 +46,15 @@ export function TemplateForm({ wardrobeId, mode, templateId, submitLabel }: Temp
   const [genreStates, setGenreStates] = useState<Record<ClothingGenreDto, GenreState>>(createInitialGenreState);
   const [hasInitializedEditValues, setHasInitializedEditValues] = useState(mode === "create");
 
-  const topsQuery = useClothingList(wardrobeId, { genre: "tops", limit: TEMPLATE_FORM_CLOTHING_LIMIT, cursor: genreStates.tops.cursor });
-  const bottomsQuery = useClothingList(wardrobeId, { genre: "bottoms", limit: TEMPLATE_FORM_CLOTHING_LIMIT, cursor: genreStates.bottoms.cursor });
-  const othersQuery = useClothingList(wardrobeId, { genre: "others", limit: TEMPLATE_FORM_CLOTHING_LIMIT, cursor: genreStates.others.cursor });
+  const topsQuery = useClothingList(wardrobeId, { genre: "tops", limit: TEMPLATE_FORM_CLOTHING_LIMIT });
+  const bottomsQuery = useClothingList(wardrobeId, { genre: "bottoms", limit: TEMPLATE_FORM_CLOTHING_LIMIT });
+  const othersQuery = useClothingList(wardrobeId, { genre: "others", limit: TEMPLATE_FORM_CLOTHING_LIMIT });
   const genreQueries = { tops: topsQuery, bottoms: bottomsQuery, others: othersQuery } as const;
 
   useEffect(() => {
     setGenreStates(createInitialGenreState());
   }, [wardrobeId]);
 
-  useEffect(() => {
-    for (const genre of CLOTHING_GENRES) {
-      const query = genreQueries[genre];
-      if (!query.data) continue;
-      setGenreStates((previous) => ({ ...previous, [genre]: { ...previous[genre], nextCursor: query.data.nextCursor } }));
-    }
-  }, [topsQuery.data, bottomsQuery.data, othersQuery.data]);
 
   useEffect(() => {
     if (mode !== "edit" || !templateQuery.data || hasInitializedEditValues) return;
@@ -86,11 +79,6 @@ export function TemplateForm({ wardrobeId, mode, templateId, submitLabel }: Temp
     setSelectedClothingIds((previous) => previous.includes(clothingId) ? previous.filter((currentId) => currentId !== clothingId) : [...previous, clothingId]);
   };
 
-  const handleLoadMore = (genre: ClothingGenreDto) => {
-    const nextCursor = genreStates[genre].nextCursor;
-    if (nextCursor === null || genreQueries[genre].isFetching) return;
-    setGenreStates((previous) => ({ ...previous, [genre]: { ...previous[genre], cursor: nextCursor } }));
-  };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -144,11 +132,6 @@ export function TemplateForm({ wardrobeId, mode, templateId, submitLabel }: Temp
                     selectedIds={selectedClothingIds}
                     onSelectToggle={toggleClothing}
                     emptyMessage={TEMPLATE_STRINGS.messages.clothingSectionEmpty}
-                    onLoadMore={state.nextCursor !== null ? () => handleLoadMore(genre) : undefined}
-                    canLoadMore={state.nextCursor !== null && !query.isFetching}
-                    isLoadingMore={query.isFetching}
-                    loadingLabel={TEMPLATE_STRINGS.messages.clothingLoading}
-                    loadMoreLabel={TEMPLATE_STRINGS.actions.loadMoreClothings}
                   />
                 );
               })}

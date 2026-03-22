@@ -1,62 +1,37 @@
-# Clothing APIクライアントテスト設計（MS1-T03）
+# Clothing APIクライアントテスト設計
 
 ## 目的
-
-- MS1-T03（Clothing APIクライアント）の完了条件を継続的に検証する
-- fetch wrapper 利用、CRUD+一覧APIの公開、DTO型での入出力をCIで担保する
+- 服APIクライアントが一覧・詳細・作成・更新・削除を正しいDTO/パスで扱うことをCIで担保する
+- 服一覧取得から cursor を除去した仕様変更を固定化する
 
 ## 対象スクリプト
-
 - `apps/web/scripts/check-clothing-api-client-spec.mjs`
 - 実行コマンド: `pnpm --filter web test:clothing-api-client`
 
 ## テストケース
-
-### CA-01 Clothing APIクライアントが src/api/endpoints/clothing.ts に存在する
-- 観点: API通信処理の配置統一
+### CA-01 Clothing APIクライアントが存在する
 - 期待結果: `apps/web/src/api/endpoints/clothing.ts` が存在する
 
-### CA-02 Clothing APIクライアントは fetch wrapper（apiClient）経由で実装される
-- 観点: エラー形式の統一（`apiClient` の正規化処理を利用）
-- 期待結果:
-  - `apiClient` を import している
-  - `get` / `post` / `patch` / `delete` で通信している
+### CA-02 apiClient 経由で実装される
+- 期待結果: `get/post/patch/delete` が `apiClient` 経由で定義される
 
-### CA-03 MS1-T03で定義された list/get/create/update/delete が公開される
-- 観点: タスク完了条件「CRUD＋一覧」の関数提供
-- 期待結果:
-  - `listClothings`
-  - `getClothing`
-  - `createClothing`
-  - `updateClothing`
-  - `deleteClothing`
-    が export されている
+### CA-03 list/get/create/update/delete を公開する
+- 期待結果: 各関数が export される
 
-### CA-04 一覧/詳細取得の戻り値がDTO型（ClothingListResponseDto / ClothingDetailResponseDto）で返る
-- 観点: APIレスポンスをDTO型で受ける統一
-- 期待結果:
-  - 一覧取得が `Promise<ClothingListResponseDto>` を返す
-  - 詳細取得が `Promise<ClothingDetailResponseDto>` を返す
+### CA-04 一覧/詳細取得の戻り値が DTO 型で返る
+- 期待結果: `Promise<ClothingListResponseDto>` と `Promise<ClothingDetailResponseDto>` を返す
 
-### CA-05 一覧APIは order/limit/cursor を query として渡せる
-- 観点: API-03（一覧）のページング・並び替え要件への準拠
+### CA-05 一覧APIは genre/order/limit を query として渡せる
 - 期待結果:
-  - `ClothingListParamsDto` に `order` / `limit` / `cursor` が定義される
-  - `listClothings` が `query: params` で渡す
+  - `ClothingListParamsDto` に `genre` / `order` / `limit` が定義される
+  - `cursor` は定義されない
+  - `query: params` でAPIへ渡す
 
-### CA-06 作成/更新APIはリクエストDTO（Create/UpdateClothingRequestDto）をbodyで送る
-- 観点: API-04/API-06 の入力型安全性
-- 期待結果:
-  - `CreateClothingRequestDto` / `UpdateClothingRequestDto` が定義される
-  - `createClothing` は `post` で body に DTO を渡す
-  - `updateClothing` は `patch` で body に DTO を渡す
+### CA-06 作成/更新APIは genre を含む DTO を body で送る
+- 期待結果: 作成・更新DTOに genre が含まれる
 
-### CA-07 服APIパスが /wardrobes/{wardrobeId}/clothing(/:clothingId) 形式で統一される
-- 観点: API-03〜API-07 のエンドポイント整合
-- 期待結果:
-  - 一覧/作成: `/wardrobes/${wardrobeId}/clothing`
-  - 詳細/更新/削除: `/wardrobes/${wardrobeId}/clothing/${clothingId}`
+### CA-07 服APIパスが `/wardrobes/{wardrobeId}/clothing(/:clothingId)` 形式で統一される
+- 期待結果: 一覧/詳細パス生成関数が共通利用される
 
 ## CI適用
-
-- `.github/workflows/ci.yml` に `Clothing API client spec test` を追加し、PR時に自動検証する
+- `.github/workflows/ci.yml` の `Clothing API client spec test` で自動検証する

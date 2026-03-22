@@ -5,12 +5,12 @@
 | ------ | ------ | ------------------------------------------------ | ----------- | ------------------------------------------------------------ | -------------------------------------------------------------- | ---------------------------------------------- |
 | API-01 | POST   | `/wardrobes`                                     | ワードローブ新規作成  | `name`                                                       | `wardrobeId`                                                              |  |
 | API-02 | GET    | `/wardrobes/{wardrobeId}`                        | ワードローブ取得    | —                                                            | `name`                                                         |                                    |
-| API-03 | GET    | `/wardrobes/{wardrobeId}/clothing`               | 服一覧（登録順）    | `order`(asc/desc), `genre`(tops/bottoms/others), `limit`, `cursor`                         | `items[]`, `nextCursor`                                        | ACTIVEのみ / レスポンス詳細は以下                                       |
+| API-03 | GET    | `/wardrobes/{wardrobeId}/clothing`               | 服一覧（登録順）    | `order`(asc/desc), `genre`(tops/bottoms/others), `limit`                                  | `items[]`                                        | ACTIVEのみ / レスポンス詳細は以下                                       |
 | API-04 | POST   | `/wardrobes/{wardrobeId}/clothing`               | 服の追加        | `name`, `genre`, `imageKey?`                                          | —                                                              |                                    |
 | API-05 | GET    | `/wardrobes/{wardrobeId}/clothing/{clothingId}`  | 服詳細取得       | —                                                            | `clothingId`, `name`, `genre`, `imageKey?`, `status`, `wearCount`, `lastWornAt`       | レスポンス詳細は以下                                          |
 | API-06 | PATCH  | `/wardrobes/{wardrobeId}/clothing/{clothingId}`  | 服の編集        | `name?`, `genre?`, `imageKey?`                                         | —                                                              |                                         |
 | API-07 | DELETE | `/wardrobes/{wardrobeId}/clothing/{clothingId}`  | 服の削除（論理）    | —                                                            | —                                                              | 内部で `status=DELETED`                           |
-| API-08 | GET    | `/wardrobes/{wardrobeId}/templates`              | テンプレ一覧（登録順） | `order`(asc/desc), `genre`(tops/bottoms/others), `limit`, `cursor`                         | `items[]`, `nextCursor`                                        | ACTIVEのみ / レスポンス詳細は以下                                       |
+| API-08 | GET    | `/wardrobes/{wardrobeId}/templates`              | テンプレ一覧（登録順） | `order`(asc/desc), `genre`(tops/bottoms/others), `limit`                                  | `items[]`                                        | ACTIVEのみ / レスポンス詳細は以下                                       |
 | API-09 | POST   | `/wardrobes/{wardrobeId}/templates`              | テンプレ追加      | `name`, `clothingIds[]`                                      | —                                                              |                           |
 | API-10 | GET    | `/wardrobes/{wardrobeId}/templates/{templateId}` | テンプレ詳細取得    | —                                                            | `name`, `status`, `wearCount`, `lastWornAt`, `clothingItems[]` |     |
 | API-11 | PATCH  | `/wardrobes/{wardrobeId}/templates/{templateId}` | テンプレ編集      | `name?`, `clothingIds?[]`                                    | —                                                              |                                            |
@@ -98,17 +98,15 @@
 | フィールド  | 型       | 説明             |
 | ------ | ------- | -------------- |
 | order  | string  | `asc` / `desc` |
-| limit  | number  | 取得件数 / 上限50件          |
-| cursor | string? | ページング時の開始位置(ResponseのnextCursorを渡す)          |
+| genre  | string? | `tops` / `bottoms` / `others` |
+| limit  | number  | 取得件数 / 上限100件 |
 
-※本APIの cursor は、当該APIにおける並び順および取得条件を前提としたページング位置を示す。
-並び順または取得条件を変更した場合、cursor は使用できない。
+※服の登録上限は1ワードローブあたり100件とし、本APIは cursor を使わずジャンルごとに最大100件まで返却する。
 
 ## Response
 | フィールド      | 型       | 説明             |
 | ---------- | ------- | -------------- |
 | items | []?  | 服概要 / 返却対象：status=ACTIVE のみ           |
-| nextCursor       | string?  | ページング時の次回開始位置             |
 
 ### items[]
 
@@ -127,16 +125,14 @@
       "name": "黒Tシャツ",
       "imageKey": "clothing/black_t.png"
     }
-  ],
-  "nextCursor": "CREATED#1735600000000#cl_01HZZAAA"
+  ]
 }
 ```
 
 ## Error
 | HTTP | error.code       | 発生条件                     |
 | ---: | ---------------- | ------------------------ |
-|  400 | VALIDATION_ERROR | `order` 不正 / `limit` 範囲外 |
-|  400 | INVALID_CURSOR   | `cursor` が不正、または並び条件と不一致 |
+|  400 | VALIDATION_ERROR | `order` 不正 / `genre` 不正 / `limit` 範囲外 |
 |  404 | NOT_FOUND        | `wardrobeId` が存在しない      |
 |  429 | RATE_LIMITED     | 過剰リクエスト                  |
 |  500 | INTERNAL_ERROR   | 内部エラー                    |
@@ -170,6 +166,7 @@
 |  404 | NOT_FOUND              | `wardrobeId` が存在しない               |
 |  413 | PAYLOAD_TOO_LARGE      | リクエストサイズ超過                        |
 |  415 | UNSUPPORTED_MEDIA_TYPE | Content-Type 不正                   |
+|  400 | CLOTHING_LIMIT_EXCEEDED | 登録済み服数が100件に達している |
 |  500 | INTERNAL_ERROR         | 内部エラー                             |
 
 
@@ -270,7 +267,6 @@
 | フィールド      | 型       | 説明             |
 | ---------- | ------- | -------------- |
 | items | []?  | テンプレ概要  / 返却対象：status=ACTIVE のみ          |
-| nextCursor       | string?  | ページング時の次回開始位置             |
 ### items[]
 
 | フィールド         | 型              | 説明             |
@@ -483,7 +479,6 @@
 | フィールド      | 型       | 説明             |
 | ---------- | ------- | -------------- |
 | items | []?  | 服概要            |
-| nextCursor       | string?  | ページング時の次回開始位置             |
 
 ### items[]
 

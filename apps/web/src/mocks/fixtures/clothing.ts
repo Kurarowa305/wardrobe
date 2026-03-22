@@ -66,7 +66,6 @@ export const clothingListFixture: ClothingListResponseDto = {
       genre: fixture.genre,
       imageKey: fixture.imageKey,
     })),
-  nextCursor: null,
 };
 
 export const clothingDetailFixtureById = clothingDetailFixtures.reduce<Record<string, ClothingDetailResponseDto>>(
