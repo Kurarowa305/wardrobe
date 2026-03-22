@@ -44,7 +44,7 @@
 ### CES-06 更新成功時に詳細画面へ遷移する
 - 観点: 完了条件「更新成功で詳細に反映される」
 - 期待結果:
-  - `updateMutation.mutateAsync` 実行後に `router.push(ROUTES.clothingDetail(wardrobeId, clothingId))` で詳細へ戻る
+  - `updateMutation.mutateAsync` 実行後に `appendOperationToast(ROUTES.clothingDetail(wardrobeId, clothingId), OPERATION_TOAST_IDS.clothingUpdated)` 付きで詳細へ戻る
 
 ### CES-07 服編集画面向け文言が strings に定義される
 - 観点: 文言設計ルール（文言の集約）

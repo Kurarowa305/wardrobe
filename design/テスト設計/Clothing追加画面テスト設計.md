@@ -32,7 +32,7 @@
 ### CCS-04 保存成功時に服一覧へ遷移する
 - 観点: 完了条件「保存成功で詳細 or 一覧へ遷移」
 - 期待結果:
-  - `createMutation.mutateAsync` 実行後に `router.push(ROUTES.clothings(wardrobeId))` で遷移する
+  - `createMutation.mutateAsync` 実行後に `appendOperationToast(ROUTES.clothings(wardrobeId), OPERATION_TOAST_IDS.clothingCreated)` 付きで一覧へ遷移する
 
 ### CCS-05 服追加画面が画像任意・服名必須の入力UIを持つ
 - 観点: 画面仕様（画像任意、服名必須）

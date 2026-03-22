@@ -85,7 +85,7 @@ check(
   "CES-06",
   "更新成功時に詳細画面へ遷移する",
   includes(target, "await updateMutation.mutateAsync({") &&
-    includes(target, "router.push(ROUTES.clothingDetail(wardrobeId, clothingId));"),
+    includes(target, "router.push(appendOperationToast(ROUTES.clothingDetail(wardrobeId, clothingId), OPERATION_TOAST_IDS.clothingUpdated));"),
   "更新成功後の詳細遷移（router.push）が不足しています",
 );
 

@@ -12,6 +12,7 @@ import { resolveImageUrl } from "@/features/clothing/imageUrl";
 import { formatHistoryDate } from "@/features/history/date";
 import { resolveHistoryDetailBackHref } from "@/features/history/routing";
 import { HISTORY_STRINGS } from "@/features/history/strings";
+import { OPERATION_TOAST_IDS, appendOperationToast } from "@/features/toast/operationToast";
 import { isAppError } from "@/lib/error/normalize";
 
 type HistoryDetailScreenProps = {
@@ -50,7 +51,7 @@ ${COMMON_STRINGS.dialogs.confirmDelete.message}`,
 
     try {
       await deleteMutation.mutateAsync();
-      router.push(backHref);
+      router.push(appendOperationToast(backHref, OPERATION_TOAST_IDS.historyDeleted));
     } catch {
       toast({
         variant: "destructive",

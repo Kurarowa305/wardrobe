@@ -1,15 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { createElement, useEffect, useMemo, useState } from "react";
+import { createElement, useEffect, useMemo, useRef, useState } from "react";
 
 import { useTemplateList } from "@/api/hooks/template";
 import { AppLayout } from "@/components/app/layout/AppLayout";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
 import { COMMON_STRINGS } from "@/constants/commonStrings";
 import { ROUTES } from "@/constants/routes";
 import { resolveImageUrl } from "@/features/clothing/imageUrl";
 import { TEMPLATE_STRINGS } from "@/features/template/strings";
+import { OPERATION_TOAST_IDS, consumeOperationToast } from "@/features/toast/operationToast";
 import type { TemplateListClothingItem, TemplateListItem } from "@/features/template/types";
 
 type TemplatesTabScreenProps = {
@@ -72,6 +74,8 @@ function TemplateCard({ wardrobeId, item }: { wardrobeId: string; item: Template
 }
 
 export function TemplatesTabScreen({ wardrobeId }: TemplatesTabScreenProps) {
+  const { toast } = useToast();
+  const hasShownToastRef = useRef(false);
   const [cursor, setCursor] = useState<string | null>(null);
   const [pages, setPages] = useState<TemplateListPage[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
@@ -80,6 +84,26 @@ export function TemplatesTabScreen({ wardrobeId }: TemplatesTabScreenProps) {
     limit: TEMPLATE_LIST_PAGE_SIZE,
     cursor,
   });
+
+  useEffect(() => {
+    if (hasShownToastRef.current || typeof window === "undefined") {
+      return;
+    }
+
+    const { toastId, nextSearch } = consumeOperationToast(window.location.search);
+    if (toastId === OPERATION_TOAST_IDS.templateCreated) {
+      hasShownToastRef.current = true;
+      toast({ title: TEMPLATE_STRINGS.create.messages.submitSuccess });
+      window.history.replaceState(window.history.state, "", `${window.location.pathname}${nextSearch}`);
+      return;
+    }
+
+    if (toastId === OPERATION_TOAST_IDS.templateDeleted) {
+      hasShownToastRef.current = true;
+      toast({ title: TEMPLATE_STRINGS.detail.messages.deleteSuccess });
+      window.history.replaceState(window.history.state, "", `${window.location.pathname}${nextSearch}`);
+    }
+  }, [toast]);
 
   useEffect(() => {
     setCursor(null);

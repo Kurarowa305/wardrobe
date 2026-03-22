@@ -12,6 +12,7 @@ import { COMMON_STRINGS } from "@/constants/commonStrings";
 import { ROUTES } from "@/constants/routes";
 import { resolveImageUrl } from "@/features/clothing/imageUrl";
 import { RECORD_STRINGS } from "@/features/record/strings";
+import { OPERATION_TOAST_IDS, appendOperationToast } from "@/features/toast/operationToast";
 import type { ClothingListItem } from "@/features/clothing/types";
 
 type RecordByCombinationScreenProps = {
@@ -140,7 +141,7 @@ export function RecordByCombinationScreen({ wardrobeId }: RecordByCombinationScr
       date: historyApiDate,
       clothingIds: selectedClothingIds,
     });
-    router.push(ROUTES.home(wardrobeId));
+    router.push(appendOperationToast(ROUTES.home(wardrobeId), OPERATION_TOAST_IDS.historyCreated));
   };
 
   return (

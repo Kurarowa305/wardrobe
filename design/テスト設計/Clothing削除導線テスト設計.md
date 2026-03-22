@@ -28,7 +28,7 @@
 ### CDL-03 削除成功時に服一覧へ遷移する
 - 観点: 完了条件「削除後：一覧に消える」へ繋がる導線保証
 - 期待結果:
-  - 削除成功後に `router.push(ROUTES.clothings(wardrobeId))` を実行する
+  - 削除成功後に `appendOperationToast(ROUTES.clothings(wardrobeId), OPERATION_TOAST_IDS.clothingDeleted)` 付きで一覧へ遷移する
 
 ### CDL-04 削除失敗時にエラー文言でトースト通知する
 - 観点: 操作失敗時のユーザー通知

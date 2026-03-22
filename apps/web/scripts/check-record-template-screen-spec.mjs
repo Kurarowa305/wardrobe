@@ -66,7 +66,7 @@ check(
 check(
   "RTS-07",
   "記録成功後にホームへ戻る",
-  () => includes(target, 'router.push(ROUTES.home(wardrobeId))'),
+  () => includes(target, 'router.push(appendOperationToast(ROUTES.home(wardrobeId), OPERATION_TOAST_IDS.historyCreated))'),
   "記録完了後のホーム遷移実装が不足しています",
 );
 check(

@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { ROUTES } from "@/constants/routes";
 import { HOME_STRINGS } from "@/features/home/strings";
+import { OPERATION_TOAST_IDS, consumeOperationToast } from "@/features/toast/operationToast";
 
 type HomeTabScreenProps = {
   wardrobeId: string;
@@ -17,27 +18,35 @@ type HomeTabScreenProps = {
 
 export function HomeTabScreen({ wardrobeId }: HomeTabScreenProps) {
   const { toast } = useToast();
-  const hasShownCreatedToastRef = useRef(false);
+  const hasShownToastRef = useRef(false);
   const recentHistoriesQuery = useRecentHistories(wardrobeId, 7);
 
   useEffect(() => {
-    if (hasShownCreatedToastRef.current || typeof window === "undefined") {
+    if (hasShownToastRef.current || typeof window === "undefined") {
       return;
     }
 
-    const searchParams = new URLSearchParams(window.location.search);
-    if (searchParams.get("created") !== "1") {
+    const { toastId, nextSearch } = consumeOperationToast(window.location.search);
+
+    if (toastId === OPERATION_TOAST_IDS.wardrobeCreated) {
+      hasShownToastRef.current = true;
+      toast({ title: HOME_STRINGS.toasts.wardrobeCreated.title });
+      window.history.replaceState(window.history.state, "", `${window.location.pathname}${nextSearch}`);
       return;
     }
 
-    hasShownCreatedToastRef.current = true;
+    if (toastId === OPERATION_TOAST_IDS.historyCreated) {
+      hasShownToastRef.current = true;
+      toast({ title: HOME_STRINGS.toasts.historyCreated.title });
+      window.history.replaceState(window.history.state, "", `${window.location.pathname}${nextSearch}`);
+      return;
+    }
 
-    toast({
-      title: HOME_STRINGS.toasts.wardrobeCreated.title,
-      description: HOME_STRINGS.toasts.wardrobeCreated.description,
-    });
-
-    window.history.replaceState(window.history.state, "", ROUTES.home(wardrobeId));
+    if (toastId === OPERATION_TOAST_IDS.historyDeleted) {
+      hasShownToastRef.current = true;
+      toast({ title: HOME_STRINGS.toasts.historyDeleted.title });
+      window.history.replaceState(window.history.state, "", `${window.location.pathname}${nextSearch}`);
+    }
   }, [toast, wardrobeId]);
 
   const content = (

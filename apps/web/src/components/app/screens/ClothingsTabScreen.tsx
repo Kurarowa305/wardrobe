@@ -1,15 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { createElement, useEffect, useMemo, useState } from "react";
+import { createElement, useEffect, useMemo, useRef, useState } from "react";
 
 import { useClothingList } from "@/api/hooks/clothing";
 import { AppLayout } from "@/components/app/layout/AppLayout";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
 import { COMMON_STRINGS } from "@/constants/commonStrings";
 import { ROUTES } from "@/constants/routes";
 import { resolveImageUrl } from "@/features/clothing/imageUrl";
 import { CLOTHING_STRINGS } from "@/features/clothing/strings";
+import { OPERATION_TOAST_IDS, consumeOperationToast } from "@/features/toast/operationToast";
 import type { ClothingListItem } from "@/features/clothing/types";
 
 type ClothingsTabScreenProps = {
@@ -24,6 +26,8 @@ type ClothingListPage = {
 const CLOTHING_LIST_PAGE_SIZE = 20;
 
 export function ClothingsTabScreen({ wardrobeId }: ClothingsTabScreenProps) {
+  const { toast } = useToast();
+  const hasShownToastRef = useRef(false);
   const [cursor, setCursor] = useState<string | null>(null);
   const [pages, setPages] = useState<ClothingListPage[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
@@ -32,6 +36,26 @@ export function ClothingsTabScreen({ wardrobeId }: ClothingsTabScreenProps) {
     limit: CLOTHING_LIST_PAGE_SIZE,
     cursor,
   });
+
+  useEffect(() => {
+    if (hasShownToastRef.current || typeof window === "undefined") {
+      return;
+    }
+
+    const { toastId, nextSearch } = consumeOperationToast(window.location.search);
+    if (toastId === OPERATION_TOAST_IDS.clothingCreated) {
+      hasShownToastRef.current = true;
+      toast({ title: CLOTHING_STRINGS.create.messages.submitSuccess });
+      window.history.replaceState(window.history.state, "", `${window.location.pathname}${nextSearch}`);
+      return;
+    }
+
+    if (toastId === OPERATION_TOAST_IDS.clothingDeleted) {
+      hasShownToastRef.current = true;
+      toast({ title: CLOTHING_STRINGS.detail.messages.deleteSuccess });
+      window.history.replaceState(window.history.state, "", `${window.location.pathname}${nextSearch}`);
+    }
+  }, [toast]);
 
   useEffect(() => {
     setCursor(null);

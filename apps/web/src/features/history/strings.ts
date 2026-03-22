@@ -34,6 +34,7 @@ export const HISTORY_STRINGS = {
       notFound: "履歴が見つかりませんでした。",
       combinationSummary: "選択した服の組み合わせ",
       clothingDeleted: "削除済みの服です",
+      deleteSuccess: "履歴を削除しました。",
       deleteError: "履歴の削除に失敗しました。",
     },
   },

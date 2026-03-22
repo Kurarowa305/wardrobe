@@ -69,7 +69,7 @@ check(
   "保存成功時に服一覧へ遷移する",
   includes(target, "const router = useRouter();") &&
     includes(target, "await createMutation.mutateAsync({") &&
-    includes(target, "router.push(ROUTES.clothings(wardrobeId));"),
+    includes(target, "router.push(appendOperationToast(ROUTES.clothings(wardrobeId), OPERATION_TOAST_IDS.clothingCreated));"),
   "保存成功後の一覧遷移（router.push）が不足しています",
 );
 
