@@ -28,6 +28,7 @@
     "test:history-delete-flow": "node scripts/check-history-delete-flow-spec.mjs",
     "test:home-screen": "node scripts/check-home-screen-spec.mjs",
     "test:home-history-card-presentation": "node scripts/check-home-history-card-presentation-spec.mjs",
+    "test:home-recent-history-heading-icon": "node scripts/check-home-recent-history-heading-icon-spec.mjs",
     "test:template-fixtures": "node scripts/check-template-fixtures-spec.mjs",
     "test:template-api-client": "node scripts/check-template-api-client-spec.mjs",
     "test:template-msw-handlers": "node scripts/check-template-msw-handlers-spec.mjs",
