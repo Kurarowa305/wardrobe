@@ -9,6 +9,16 @@ export const CLOTHING_STRINGS = {
       loading: "読み込み中...",
       empty: "服がまだ登録されていません。",
       error: "服一覧の読み込みに失敗しました。",
+      sectionEmpty: "このジャンルの服はまだ登録されていません。",
+    },
+  },
+  common: {
+    collapse: "折りたたむ",
+    expand: "展開",
+  },
+  form: {
+    labels: {
+      genre: "服のジャンル",
     },
   },
   create: {
@@ -16,6 +26,7 @@ export const CLOTHING_STRINGS = {
     labels: {
       imageFile: "画像ファイル",
       name: "服の名前",
+      genre: "服のジャンル",
     },
     placeholders: {
       name: "例: 白シャツ",
@@ -27,6 +38,7 @@ export const CLOTHING_STRINGS = {
     },
     messages: {
       nameRequired: "服の名前を入力してください。",
+      genreRequired: "服のジャンルを選択してください。",
       submitting: "追加中...",
       submitSuccess: "服を追加しました",
       submitError: "服の追加に失敗しました。",
@@ -41,6 +53,7 @@ export const CLOTHING_STRINGS = {
     labels: {
       imageFile: "画像ファイル",
       name: "服の名前",
+      genre: "服のジャンル",
     },
     placeholders: {
       name: "例: 白シャツ",
@@ -54,6 +67,7 @@ export const CLOTHING_STRINGS = {
       loading: "読み込み中...",
       loadError: "服編集画面の読み込みに失敗しました。",
       nameRequired: "服の名前を入力してください。",
+      genreRequired: "服のジャンルを選択してください。",
       submitting: "保存中...",
       submitSuccess: "服を更新しました",
       submitError: "服の更新に失敗しました。",
@@ -68,6 +82,7 @@ export const CLOTHING_STRINGS = {
     labels: {
       wearCount: "着た回数",
       lastWornAt: "最後に着た日",
+      genre: "ジャンル",
     },
     menu: {
       edit: "編集",

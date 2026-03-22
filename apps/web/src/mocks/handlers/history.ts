@@ -148,8 +148,15 @@ function normalizeClothingIds(value: unknown): string[] | null {
 function resolveClothingItems(clothingIds: string[]): HistoryDetailClothingItemDto[] | null {
   const clothingItems = clothingIds
     .map((clothingId) => clothingDetailFixtureById[clothingId])
-    .filter((clothing): clothing is HistoryDetailClothingItemDto => clothing !== undefined)
-    .map((clothing) => ({ ...clothing }));
+    .filter((clothing): clothing is NonNullable<typeof clothing> => clothing !== undefined)
+    .map((clothing) => ({
+      clothingId: clothing.clothingId,
+      name: clothing.name,
+      imageKey: clothing.imageKey,
+      status: clothing.status,
+      wearCount: clothing.wearCount,
+      lastWornAt: clothing.lastWornAt,
+    }));
 
   if (clothingItems.length !== clothingIds.length) {
     return null;
