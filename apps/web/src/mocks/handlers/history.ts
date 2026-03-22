@@ -126,7 +126,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function normalizeClothingIds(value: unknown): string[] | null {
-  if (!Array.isArray(value) || value.length === 0 || value.length > 4) {
+  if (!Array.isArray(value) || value.length === 0) {
     return null;
   }
 
