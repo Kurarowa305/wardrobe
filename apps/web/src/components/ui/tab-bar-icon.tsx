@@ -5,15 +5,17 @@ export type TabIconKey = "home" | "histories" | "templates" | "clothings";
 type TabBarIconProps = {
   icon: TabIconKey;
   active: boolean;
+  strokeColor?: string;
 } & Omit<SVGProps<SVGSVGElement>, "children">;
 
 type IconBaseProps = {
   active: boolean;
+  strokeColor?: string;
   children: ReactNode;
 } & SVGProps<SVGSVGElement>;
 
-function IconBase({ active, children, className, ...props }: IconBaseProps) {
-  const color = active ? "#FFFFFF" : "#6B7987";
+function IconBase({ active, strokeColor, children, className, ...props }: IconBaseProps) {
+  const color = strokeColor ?? (active ? "#FFFFFF" : "#6B7987");
 
   return (
     <svg
@@ -68,18 +70,18 @@ function ClothingsIcon(props: Omit<IconBaseProps, "children">) {
   );
 }
 
-export function TabBarIcon({ icon, active, ...props }: TabBarIconProps) {
+export function TabBarIcon({ icon, active, strokeColor, ...props }: TabBarIconProps) {
   if (icon === "home") {
-    return <HomeIcon active={active} {...props} />;
+    return <HomeIcon active={active} strokeColor={strokeColor} {...props} />;
   }
 
   if (icon === "histories") {
-    return <HistoriesIcon active={active} {...props} />;
+    return <HistoriesIcon active={active} strokeColor={strokeColor} {...props} />;
   }
 
   if (icon === "templates") {
-    return <TemplatesIcon active={active} {...props} />;
+    return <TemplatesIcon active={active} strokeColor={strokeColor} {...props} />;
   }
 
-  return <ClothingsIcon active={active} {...props} />;
+  return <ClothingsIcon active={active} strokeColor={strokeColor} {...props} />;
 }

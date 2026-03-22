@@ -55,6 +55,7 @@
     "test:template-delete-flow": "node scripts/check-template-delete-flow-spec.mjs",
     "test:template-tab-navigation": "node scripts/check-template-tab-navigation-spec.mjs",
     "test:record-method-screen": "node scripts/check-record-method-screen-spec.mjs",
+    "test:record-method-card-icons": "node scripts/check-record-method-card-icons-spec.mjs",
     "test:record-template-screen": "node scripts/check-record-template-screen-spec.mjs",
     "test:record-combination-screen": "node scripts/check-record-combination-screen-spec.mjs",
     "test:tab-bar-fixed": "node scripts/check-tab-bar-fixed-spec.mjs",

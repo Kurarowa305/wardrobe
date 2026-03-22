@@ -146,6 +146,26 @@ body {
   font-size: 14px;
 }
 
+.record-method-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  gap: 12px;
+}
+
+.record-method-card-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.record-method-card-icon {
+  width: 24px;
+  height: 24px;
+}
+
 @media (max-width: 460px) {
   .app-shell {
     max-width: 100%;

@@ -205,6 +205,9 @@ jobs:
       - name: Record method screen spec test
         run: pnpm --filter web test:record-method-screen
 
+      - name: Record method card icons spec test
+        run: pnpm --filter web test:record-method-card-icons
+
       - name: Record template screen spec test
         run: pnpm --filter web test:record-template-screen
 
