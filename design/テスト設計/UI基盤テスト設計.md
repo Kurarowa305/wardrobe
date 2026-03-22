@@ -35,9 +35,9 @@
 - 観点: エラー通知がトースト経由で実行されるか
 - 期待結果: 空入力判定時に `variant: "destructive"` の toast 呼び出しがある
 
-### UF-05 作成成功時は作成完了クエリ付きでホームへ遷移する
+### UF-05 作成成功時は共通トーストクエリ付きでホームへ遷移する
 - 観点: 作成完了トースト表示トリガー連携
-- 期待結果: `WardrobeCreateScreen.tsx` で `ROUTES.home(DEMO_IDS.wardrobe)` に `?created=1` を付与して遷移する
+- 期待結果: `WardrobeCreateScreen.tsx` で `appendOperationToast(ROUTES.home(DEMO_IDS.wardrobe), OPERATION_TOAST_IDS.wardrobeCreated)` を利用して遷移する
 
 ### UF-06 入力エラー文言が strings に定義されている
 - 観点: 文言定義の集約ルール準拠

@@ -1,6 +1,6 @@
 "use client";
 
-import { createElement } from "react";
+import { createElement, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useDeleteTemplateMutation, useTemplate } from "@/api/hooks/template";
 import { AppLayout } from "@/components/app/layout/AppLayout";
@@ -10,6 +10,7 @@ import { ROUTES } from "@/constants/routes";
 import { resolveImageUrl } from "@/features/clothing/imageUrl";
 import { formatLastWornDate } from "@/features/history/date";
 import { TEMPLATE_STRINGS } from "@/features/template/strings";
+import { OPERATION_TOAST_IDS, appendOperationToast, consumeOperationToast } from "@/features/toast/operationToast";
 import { isAppError } from "@/lib/error/normalize";
 
 type TemplateDetailScreenProps = {
@@ -30,6 +31,22 @@ export function TemplateDetailScreen({ wardrobeId, templateId }: TemplateDetailS
   const { toast } = useToast();
   const templateQuery = useTemplate(wardrobeId, templateId);
   const deleteMutation = useDeleteTemplateMutation(wardrobeId, templateId);
+  const hasShownToastRef = useRef(false);
+
+  useEffect(() => {
+    if (hasShownToastRef.current || typeof window === "undefined") {
+      return;
+    }
+
+    const { toastId, nextSearch } = consumeOperationToast(window.location.search);
+    if (toastId !== OPERATION_TOAST_IDS.templateUpdated) {
+      return;
+    }
+
+    hasShownToastRef.current = true;
+    toast({ title: TEMPLATE_STRINGS.edit.messages.submitSuccess });
+    window.history.replaceState(window.history.state, "", `${window.location.pathname}${nextSearch}`);
+  }, [toast]);
 
   const handleDelete = async () => {
     const confirmed = window.confirm(
@@ -41,7 +58,7 @@ export function TemplateDetailScreen({ wardrobeId, templateId }: TemplateDetailS
 
     try {
       await deleteMutation.mutateAsync();
-      router.push(ROUTES.templates(wardrobeId));
+      router.push(appendOperationToast(ROUTES.templates(wardrobeId), OPERATION_TOAST_IDS.templateDeleted));
     } catch {
       toast({
         variant: "destructive",

@@ -1,12 +1,14 @@
 "use client";
 
-import { createElement, useEffect, useMemo, useState } from "react";
+import { createElement, useEffect, useMemo, useRef, useState } from "react";
 
 import { useHistoryList } from "@/api/hooks/history";
 import { SharedHistoryCard } from "@/components/app/history/HistoryCard";
 import { AppLayout } from "@/components/app/layout/AppLayout";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
 import { HISTORY_STRINGS } from "@/features/history/strings";
+import { OPERATION_TOAST_IDS, consumeOperationToast } from "@/features/toast/operationToast";
 import type { HistoryListItem } from "@/features/history/types";
 
 type HistoriesTabScreenProps = {
@@ -21,6 +23,8 @@ type HistoryListPage = {
 const HISTORY_LIST_PAGE_SIZE = 20;
 
 export function HistoriesTabScreen({ wardrobeId }: HistoriesTabScreenProps) {
+  const { toast } = useToast();
+  const hasShownToastRef = useRef(false);
   const [cursor, setCursor] = useState<string | null>(null);
   const [pages, setPages] = useState<HistoryListPage[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
@@ -29,6 +33,21 @@ export function HistoriesTabScreen({ wardrobeId }: HistoriesTabScreenProps) {
     limit: HISTORY_LIST_PAGE_SIZE,
     cursor,
   });
+
+  useEffect(() => {
+    if (hasShownToastRef.current || typeof window === "undefined") {
+      return;
+    }
+
+    const { toastId, nextSearch } = consumeOperationToast(window.location.search);
+    if (toastId !== OPERATION_TOAST_IDS.historyDeleted) {
+      return;
+    }
+
+    hasShownToastRef.current = true;
+    toast({ title: HISTORY_STRINGS.detail.messages.deleteSuccess });
+    window.history.replaceState(window.history.state, "", `${window.location.pathname}${nextSearch}`);
+  }, [toast]);
 
   useEffect(() => {
     setCursor(null);

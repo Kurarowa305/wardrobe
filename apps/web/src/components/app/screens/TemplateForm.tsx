@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { ROUTES } from "@/constants/routes";
 import type { ClothingListItem } from "@/features/clothing/types";
 import { TEMPLATE_STRINGS } from "@/features/template/strings";
+import { OPERATION_TOAST_IDS, appendOperationToast } from "@/features/toast/operationToast";
 import { isAppError } from "@/lib/error/normalize";
 
 type TemplateFormMode = "create" | "edit";
@@ -170,7 +171,7 @@ export function TemplateForm({
 
     if (mode === "create") {
       await createMutation.mutateAsync(payload);
-      router.push(ROUTES.templates(wardrobeId));
+      router.push(appendOperationToast(ROUTES.templates(wardrobeId), OPERATION_TOAST_IDS.templateCreated));
       return;
     }
 
@@ -179,7 +180,7 @@ export function TemplateForm({
     }
 
     await updateMutation.mutateAsync(payload);
-    router.push(ROUTES.templateDetail(wardrobeId, templateId));
+    router.push(appendOperationToast(ROUTES.templateDetail(wardrobeId, templateId), OPERATION_TOAST_IDS.templateUpdated));
   };
 
   return (

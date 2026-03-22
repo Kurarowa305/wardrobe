@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ROUTES } from "@/constants/routes";
 import { CLOTHING_STRINGS } from "@/features/clothing/strings";
+import { OPERATION_TOAST_IDS, appendOperationToast } from "@/features/toast/operationToast";
 import { isAppError } from "@/lib/error/normalize";
 
 type ClothingEditScreenProps = {
@@ -104,7 +105,7 @@ export function ClothingEditScreen({ wardrobeId, clothingId }: ClothingEditScree
       imageKey: nextImageKey,
     });
 
-    router.push(ROUTES.clothingDetail(wardrobeId, clothingId));
+    router.push(appendOperationToast(ROUTES.clothingDetail(wardrobeId, clothingId), OPERATION_TOAST_IDS.clothingUpdated));
   };
 
   const clearSelectedImage = () => {

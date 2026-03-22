@@ -42,12 +42,12 @@ const checks = [
   },
   {
     id: "WCV-05",
-    name: "入力済みの場合のみ作成成功導線を維持している",
+    name: "入力済みの場合のみ共通成功トースト導線でホームに遷移する",
     ok:
       includes(screenPath, "if (isSubmitDisabled) {") &&
-      includes(screenPath, "router.push(`${ROUTES.home(DEMO_IDS.wardrobe)}?created=1`);") &&
-      includes(screenPath, "?created=1"),
-    detail: "入力済み時の作成成功導線が期待どおりではありません",
+      includes(screenPath, "appendOperationToast(ROUTES.home(DEMO_IDS.wardrobe), OPERATION_TOAST_IDS.wardrobeCreated)") &&
+      includes(screenPath, "router.push(appendOperationToast(ROUTES.home(DEMO_IDS.wardrobe), OPERATION_TOAST_IDS.wardrobeCreated));"),
+    detail: "入力済み時の作成成功トースト導線が期待どおりではありません",
   },
 ];
 

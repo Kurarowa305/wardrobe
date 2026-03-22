@@ -64,6 +64,9 @@ jobs:
       - name: List screen spacing spec test
         run: pnpm --filter web test:list-screen-spacing
 
+      - name: Operation toast spec test
+        run: pnpm --filter web test:operation-toast
+
       - name: Tab bar fixed spec test
         run: pnpm --filter web test:tab-bar-fixed
 

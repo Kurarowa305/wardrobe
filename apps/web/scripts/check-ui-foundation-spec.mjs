@@ -101,10 +101,11 @@ check(
 
 check(
   "UF-05",
-  "作成成功時はホーム遷移に作成完了クエリを付与する",
+  "作成成功時はホーム遷移に共通トーストクエリを付与する",
   includes("src/components/app/screens/WardrobeCreateScreen.tsx", "ROUTES.home(DEMO_IDS.wardrobe)") &&
-    includes("src/components/app/screens/WardrobeCreateScreen.tsx", "?created=1"),
-  "WardrobeCreateScreen.tsx で作成完了クエリ付き遷移が設定されていません",
+    includes("src/components/app/screens/WardrobeCreateScreen.tsx", "appendOperationToast") &&
+    includes("src/components/app/screens/WardrobeCreateScreen.tsx", "OPERATION_TOAST_IDS.wardrobeCreated"),
+  "WardrobeCreateScreen.tsx で作成完了トースト付き遷移が設定されていません",
 );
 
 check(
@@ -126,12 +127,12 @@ check(
 
 check(
   "UF-08",
-  "ホーム画面で created クエリをクライアント判定し、表示後にURLを正規化する",
+  "ホーム画面で共通トーストクエリを判定し、表示後にURLを正規化する",
   noIncludes("src/app/wardrobes/[wardrobeId]/(tabs)/home/page.tsx", "searchParams") &&
-    includes("src/components/app/screens/HomeTabScreen.tsx", "new URLSearchParams(window.location.search)") &&
-    includes("src/components/app/screens/HomeTabScreen.tsx", 'searchParams.get("created") !== "1"') &&
+    includes("src/components/app/screens/HomeTabScreen.tsx", "consumeOperationToast(window.location.search)") &&
+    includes("src/components/app/screens/HomeTabScreen.tsx", "OPERATION_TOAST_IDS.wardrobeCreated") &&
     includes("src/components/app/screens/HomeTabScreen.tsx", "HOME_STRINGS.toasts.wardrobeCreated") &&
-    includes("src/components/app/screens/HomeTabScreen.tsx", 'window.history.replaceState(window.history.state, "", ROUTES.home(wardrobeId));'),
+    includes("src/components/app/screens/HomeTabScreen.tsx", "window.history.replaceState"),
   "作成完了トーストの表示連携（home/page.tsx / HomeTabScreen.tsx）が不足しています",
 );
 

@@ -7,6 +7,7 @@ import { AppLayout } from "@/components/app/layout/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DEMO_IDS, ROUTES } from "@/constants/routes";
+import { OPERATION_TOAST_IDS, appendOperationToast } from "@/features/toast/operationToast";
 import { WARDROBE_STRINGS } from "@/features/wardrobe/strings";
 
 export function WardrobeCreateScreen() {
@@ -22,7 +23,7 @@ export function WardrobeCreateScreen() {
       return;
     }
 
-    router.push(`${ROUTES.home(DEMO_IDS.wardrobe)}?created=1`);
+    router.push(appendOperationToast(ROUTES.home(DEMO_IDS.wardrobe), OPERATION_TOAST_IDS.wardrobeCreated));
   };
 
   return (

@@ -1,6 +1,6 @@
 "use client";
 
-import { createElement } from "react";
+import { createElement, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 
 import { useClothing, useDeleteClothingMutation } from "@/api/hooks/clothing";
@@ -11,6 +11,7 @@ import { ROUTES } from "@/constants/routes";
 import { resolveImageUrl } from "@/features/clothing/imageUrl";
 import { CLOTHING_STRINGS } from "@/features/clothing/strings";
 import { formatLastWornDate } from "@/features/history/date";
+import { OPERATION_TOAST_IDS, appendOperationToast, consumeOperationToast } from "@/features/toast/operationToast";
 import { isAppError } from "@/lib/error/normalize";
 
 type ClothingDetailScreenProps = {
@@ -31,6 +32,22 @@ export function ClothingDetailScreen({ wardrobeId, clothingId }: ClothingDetailS
   const { toast } = useToast();
   const clothingQuery = useClothing(wardrobeId, clothingId);
   const deleteMutation = useDeleteClothingMutation(wardrobeId, clothingId);
+  const hasShownToastRef = useRef(false);
+
+  useEffect(() => {
+    if (hasShownToastRef.current || typeof window === "undefined") {
+      return;
+    }
+
+    const { toastId, nextSearch } = consumeOperationToast(window.location.search);
+    if (toastId !== OPERATION_TOAST_IDS.clothingUpdated) {
+      return;
+    }
+
+    hasShownToastRef.current = true;
+    toast({ title: CLOTHING_STRINGS.edit.messages.submitSuccess });
+    window.history.replaceState(window.history.state, "", `${window.location.pathname}${nextSearch}`);
+  }, [toast]);
   const imageUrl = resolveImageUrl(clothingQuery.data?.imageKey);
 
   const handleDelete = async () => {
@@ -43,7 +60,7 @@ export function ClothingDetailScreen({ wardrobeId, clothingId }: ClothingDetailS
 
     try {
       await deleteMutation.mutateAsync();
-      router.push(ROUTES.clothings(wardrobeId));
+      router.push(appendOperationToast(ROUTES.clothings(wardrobeId), OPERATION_TOAST_IDS.clothingDeleted));
     } catch {
       toast({
         variant: "destructive",
