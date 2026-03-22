@@ -23,7 +23,7 @@ export function ClothingGenreIcon({ genre, className = "h-5 w-5", title }: { gen
   if (genre === "tops") {
     return (
       <svg {...commonProps}>
-        <path d="M8 5.5 10.5 4h3L16 5.5l2.5 1.5-1.5 3-2-1V20H9V9l-2 1-1.5-3L8 5.5Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+        <path d="M9 3q3 3 6 0l4 1 2 5-4 2v10H7V11l-4-2 2-5 4-1z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     );
   }
@@ -31,7 +31,7 @@ export function ClothingGenreIcon({ genre, className = "h-5 w-5", title }: { gen
   if (genre === "bottoms") {
     return (
       <svg {...commonProps}>
-        <path d="M8 4h8l1 6h-3l-1.5 10h-1L10 10H7l1-6Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+        <path d="M8 3.5h8l1 6.5-2.5 1.5-1.5 8H11.5L10 12l-1.5 8H7l-1.5-8L3 10l1-6.5Z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     );
   }
