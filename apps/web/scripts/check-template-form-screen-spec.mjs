@@ -69,6 +69,14 @@ check(
     ) &&
     includes(
       "src/components/app/screens/TemplateForm.tsx",
+      "ClothingThumbnail",
+    ) &&
+    includes(
+      "src/components/app/screens/TemplateForm.tsx",
+      'className="sr-only"',
+    ) &&
+    includes(
+      "src/components/app/screens/TemplateForm.tsx",
       "TEMPLATE_STRINGS.messages.clothingRequired",
     ),
   "TemplateForm の入力UIまたは複数選択UIが不足しています",
@@ -138,7 +146,7 @@ check(
 
 check(
   "TF-06",
-  "TemplateForm はキャンセルボタンを描画しない",
+  "TemplateForm はキャンセルボタンを描画せず、画面下部に固定した保存ボタンを表示する",
   !includes(
     "src/components/app/screens/TemplateForm.tsx",
     "TEMPLATE_STRINGS.actions.cancel",
@@ -150,8 +158,38 @@ check(
     !includes(
       "src/components/app/screens/TemplateForm.tsx",
       "router.push(backHref)",
+    ) &&
+    includes(
+      "src/components/app/screens/TemplateForm.tsx",
+      "fixed bottom-0 left-1/2",
+    ) &&
+    includes(
+      "src/components/app/screens/TemplateForm.tsx",
+      "pb-24",
     ),
-  "TemplateForm にキャンセルボタンの実装が残っています",
+  "TemplateForm に不要なキャンセル導線が残っているか、固定保存ボタンの実装が不足しています",
+);
+
+check(
+  "TF-07",
+  "TemplateForm の服選択カードが記録画面と同じカードデザインを採用している",
+  includes(
+    "src/components/app/screens/TemplateForm.tsx",
+    "grid-cols-[56px_minmax(0,1fr)_40px]",
+  ) &&
+    includes(
+      "src/components/app/screens/TemplateForm.tsx",
+      "border-[var(--primary)] bg-[color:color-mix(in_srgb,var(--primary)_10%,white)]",
+    ) &&
+    includes(
+      "src/components/app/screens/TemplateForm.tsx",
+      'aria-hidden="true"',
+    ) &&
+    includes(
+      "src/components/app/screens/TemplateForm.tsx",
+      "✓",
+    ),
+  "TemplateForm の服選択カードが記録画面相当のサムネイル・チェック領域付きデザインになっていません",
 );
 
 if (failures.length > 0) {
