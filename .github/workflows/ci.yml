@@ -79,6 +79,9 @@ jobs:
       - name: Tab bar icon SVG spec test
         run: pnpm --filter web test:tab-bar-icon-svg
 
+      - name: Back button spec test
+        run: pnpm --filter web test:back-button
+
       - name: Query foundation spec test
         run: pnpm --filter web test:query-foundation
 

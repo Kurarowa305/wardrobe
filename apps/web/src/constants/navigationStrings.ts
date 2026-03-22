@@ -1,5 +1,5 @@
 export const NAVIGATION_STRINGS = {
-  back: "戻る",
+  back: "< 戻る",
   aria: {
     mainTab: "メインタブ",
     openOverflowMenu: "メニューを開く",
