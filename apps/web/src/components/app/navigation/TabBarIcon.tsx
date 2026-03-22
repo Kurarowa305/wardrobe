@@ -46,7 +46,6 @@ function HistoriesIcon(props: Omit<IconBaseProps, "children">) {
   return (
     <IconBase {...props}>
       <circle cx="12" cy="12" r="8" />
-      <path d="M6.34 2.34v4h4" />
       <path d="M12 7v5l3 3" />
     </IconBase>
   );
