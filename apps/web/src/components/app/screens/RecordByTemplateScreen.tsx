@@ -26,6 +26,7 @@ type TemplatePage = {
 
 const RECORD_TEMPLATE_LIMIT = 30;
 const TEMPLATE_THUMBNAIL_LIMIT = 4;
+const TEMPLATE_THUMBNAIL_GRID_CLASS = "grid grid-cols-5 gap-2";
 
 function createTodayDateString() {
   return new Date().toISOString().slice(0, 10);
@@ -39,7 +40,7 @@ function TemplateThumbnail({ item }: { item: TemplateListClothingItem }) {
   const imageUrl = resolveImageUrl(item.imageKey);
 
   return (
-    <span className="relative block h-14 w-14 overflow-hidden rounded-md border border-slate-200 bg-slate-100">
+    <span className="relative block aspect-square w-full overflow-hidden rounded-md border border-slate-200 bg-slate-100">
       {imageUrl ? (
         <img src={imageUrl} alt="テンプレート構成服のサムネイル" className="h-full w-full object-cover" />
       ) : (
@@ -212,12 +213,12 @@ export function RecordByTemplateScreen({ wardrobeId }: RecordByTemplateScreenPro
                       />
                       <span className="grid gap-3">
                         <span className="truncate text-sm font-medium text-slate-900">{item.name}</span>
-                        <span className="flex flex-wrap gap-2">
+                        <span className={TEMPLATE_THUMBNAIL_GRID_CLASS}>
                           {visibleThumbnails.map((clothingItem) => (
                             <TemplateThumbnail key={clothingItem.clothingId} item={clothingItem} />
                           ))}
                           {hiddenCount > 0 ? (
-                            <span className="flex h-14 w-14 items-center justify-center rounded-md border border-dashed border-slate-300 bg-slate-50 text-sm font-semibold text-slate-700">
+                            <span className="flex aspect-square w-full items-center justify-center rounded-md border border-dashed border-slate-300 bg-slate-50 text-sm font-semibold text-slate-700">
                               +{hiddenCount}
                             </span>
                           ) : null}

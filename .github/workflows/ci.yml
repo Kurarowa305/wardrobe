@@ -199,6 +199,9 @@ jobs:
       - name: Custom delete dialog spec test
         run: pnpm --filter web test:custom-delete-dialog
 
+      - name: Card thumbnail layout spec test
+        run: pnpm --filter web test:card-thumbnail-layout
+
       - name: History delete flow spec test
         run: pnpm --filter web test:history-delete-flow
 

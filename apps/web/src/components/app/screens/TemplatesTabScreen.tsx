@@ -25,12 +25,13 @@ type TemplateListPage = {
 
 const TEMPLATE_LIST_PAGE_SIZE = 20;
 const TEMPLATE_THUMBNAIL_LIMIT = 4;
+const TEMPLATE_THUMBNAIL_GRID_CLASS = "grid grid-cols-5 gap-2";
 
 function TemplateThumbnail({ item }: { item: TemplateListClothingItem }) {
   const imageUrl = resolveImageUrl(item.imageKey);
 
   return (
-    <span className="relative block h-14 w-14 overflow-hidden rounded-md border border-slate-200 bg-slate-100">
+    <span className="relative block aspect-square w-full overflow-hidden rounded-md border border-slate-200 bg-slate-100">
       {imageUrl ? (
         <img src={imageUrl} alt="テンプレート構成服のサムネイル" className="h-full w-full object-cover" />
       ) : (
@@ -58,12 +59,12 @@ function TemplateCard({ wardrobeId, item }: { wardrobeId: string; item: Template
         className="grid w-full gap-3 rounded-md border border-slate-300 bg-white p-3 text-left no-underline transition-colors hover:bg-slate-50"
       >
         <span className="truncate text-sm font-medium text-slate-900">{item.name}</span>
-        <span className="flex flex-wrap gap-2">
+        <span className={TEMPLATE_THUMBNAIL_GRID_CLASS}>
           {visibleThumbnails.map((clothingItem) => (
             <TemplateThumbnail key={clothingItem.clothingId} item={clothingItem} />
           ))}
           {hiddenCount > 0 ? (
-            <span className="flex h-14 w-14 items-center justify-center rounded-md border border-dashed border-slate-300 bg-slate-50 text-sm font-semibold text-slate-700">
+            <span className="flex aspect-square w-full items-center justify-center rounded-md border border-dashed border-slate-300 bg-slate-50 text-sm font-semibold text-slate-700">
               +{hiddenCount}
             </span>
           ) : null}
