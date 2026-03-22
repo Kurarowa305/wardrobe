@@ -21,8 +21,8 @@ body {
   font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
 }
 
-a {
-  color: inherit;
+[data-slot="button"].text-white {
+  color: #fff;
 }
 
 .app-shell {
