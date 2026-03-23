@@ -10,7 +10,8 @@
     "start": "node dist/index.js",
     "build": "tsc --outDir dist",
     "typecheck": "tsc --noEmit",
-    "test:bootstrap": "node scripts/check-bootstrap-spec.mjs"
+    "test:bootstrap": "node scripts/check-bootstrap-spec.mjs",
+    "test:directory-structure": "node scripts/check-directory-structure-spec.mjs"
   },
   "keywords": [],
   "author": "",

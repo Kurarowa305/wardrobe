@@ -1,0 +1,1 @@
+export const HISTORY_STATS_WRITE_LIMIT = 25;
