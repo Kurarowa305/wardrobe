@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
-    "test": "pnpm run test:bootstrap && pnpm run test:env && pnpm run test:dynamodb",
+    "test": "pnpm run test:bootstrap && pnpm run test:env && pnpm run test:dynamodb && pnpm run test:s3",
     "dev": "tsx watch src/index.ts",
     "start": "node dist/index.js",
     "build": "tsc --outDir dist",
@@ -13,7 +13,8 @@
     "test:bootstrap": "node scripts/check-bootstrap-spec.mjs",
     "test:directory-structure": "node scripts/check-directory-structure-spec.mjs",
     "test:env": "node --import tsx/esm scripts/check-env-spec.mjs",
-    "test:dynamodb": "node --import tsx/esm scripts/check-dynamodb-client-spec.mjs"
+    "test:dynamodb": "node --import tsx/esm scripts/check-dynamodb-client-spec.mjs",
+    "test:s3": "node --import tsx/esm scripts/check-s3-client-spec.mjs"
   },
   "keywords": [],
   "author": "",
