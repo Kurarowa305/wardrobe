@@ -4,6 +4,7 @@ import type { LocalDomain, LocalRouteHandler, LocalRouteQuery } from "../local/r
 import { createHistoryHandler } from "../../domains/history/handlers/createHistoryHandler.js";
 import { deleteHistoryHandler } from "../../domains/history/handlers/deleteHistoryHandler.js";
 import { createWardrobeHandler } from "../../domains/wardrobe/handlers/createWardrobeHandler.js";
+import { getWardrobeHandler } from "../../domains/wardrobe/handlers/getWardrobeHandler.js";
 
 export type LambdaEvent = {
   version?: string;
@@ -45,6 +46,13 @@ export const sharedDomainHandlers: Record<LocalDomain, LocalRouteHandler> = {
       return createWardrobeHandler({
         body: request.body,
         headers: request.headers,
+        requestId: request.requestId,
+      });
+    }
+
+    if (request.method === "GET" && request.path.wardrobeId) {
+      return getWardrobeHandler({
+        path: request.path,
         requestId: request.requestId,
       });
     }

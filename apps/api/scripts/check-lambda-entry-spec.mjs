@@ -25,14 +25,19 @@ const wardrobeResponse = await wardrobeHandler({
   requestContext: { http: { method: "GET", path: "/wardrobes/wd_001" }, requestId: "ctx_wardrobe" },
   headers: { "x-request-id": "req_wardrobe" },
 });
-assert.equal(wardrobeResponse.statusCode, 200);
+assert.equal(wardrobeResponse.statusCode, 404);
 assert.deepEqual(JSON.parse(wardrobeResponse.body), {
-  ok: true,
-  domain: "wardrobe",
-  method: "GET",
-  path: { wardrobeId: "wd_001" },
+  error: {
+    code: "NOT_FOUND",
+    message: "Wardrobe was not found.",
+    details: {
+      resource: "wardrobe",
+      wardrobeId: "wd_001",
+    },
+    requestId: "req_wardrobe",
+  },
 });
-console.log("- wardrobe Lambda entry は local と同じ wardrobe usecase へ変換して応答できる");
+console.log("- wardrobe Lambda entry は GET /wardrobes/{wardrobeId} を wardrobe handler へ委譲し、NOT_FOUND を共通形式で返せる");
 
 const clothingResponse = await clothingHandler({
   rawPath: "/wardrobes/wd_010/clothing/cl_001",
