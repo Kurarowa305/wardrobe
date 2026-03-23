@@ -70,6 +70,9 @@ jobs:
       - name: API wardrobe repo spec test
         run: pnpm --filter api test:wardrobe-repo
 
+      - name: API wardrobe usecase spec test
+        run: pnpm --filter api test:wardrobe-usecase
+
       - name: Typecheck api
         run: pnpm --filter api exec tsc --noEmit
 
