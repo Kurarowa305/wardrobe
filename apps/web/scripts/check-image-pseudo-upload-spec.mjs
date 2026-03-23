@@ -96,7 +96,7 @@ check(
     includes(editScreen, "CLOTHING_STRINGS.edit.messages.uploadError") &&
     includes(editScreen, "CLOTHING_STRINGS.edit.actions.retryUpload") &&
     includes(editScreen, "setUploadError(CLOTHING_STRINGS.edit.messages.uploadError);") &&
-    includes(editScreen, "disabled={isNameEmpty || isPending}"),
+    includes(editScreen, "disabled={isNameEmpty || isGenreEmpty || isPending}"),
   "服編集画面のアップロード失敗リトライ導線が不足しています",
 );
 
