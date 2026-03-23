@@ -46,6 +46,9 @@ jobs:
       - name: API s3 client spec test
         run: pnpm --filter api test:s3
 
+      - name: API errors spec test
+        run: pnpm --filter api test:errors
+
       - name: Typecheck api
         run: pnpm --filter api exec tsc --noEmit
 
