@@ -1,13 +1,46 @@
-import dotenv from "dotenv";
+import { createServer } from "node:http";
 
-dotenv.config({ path: ".env.local" });
+import { env } from "./env.js";
 
-console.log("API starting...");
-console.log({
-  region: process.env.AWS_REGION,
-  ddb: process.env.DDB_ENDPOINT,
-  bucket: process.env.S3_BUCKET,
+const server = createServer((request, response) => {
+  if (request.url === "/health") {
+    response.writeHead(200, { "content-type": "application/json; charset=utf-8" });
+    response.end(
+      JSON.stringify({
+        status: "ok",
+        service: "api",
+        runtime: "node",
+      }),
+    );
+    return;
+  }
+
+  response.writeHead(200, { "content-type": "application/json; charset=utf-8" });
+  response.end(
+    JSON.stringify({
+      status: "starting",
+      message: "Wardrobe API bootstrap is ready.",
+      config: {
+        region: env.awsRegion,
+        ddbEndpoint: env.ddbEndpoint,
+        s3Bucket: env.s3Bucket,
+      },
+    }),
+  );
 });
 
-// 仮：起動確認用にプロセスを止めない
-setInterval(() => {}, 1000);
+server.listen(env.port, env.host, () => {
+  console.log(`API starting on http://${env.host}:${env.port}`);
+  console.log(
+    JSON.stringify(
+      {
+        envFilePath: env.envFilePath,
+        region: env.awsRegion,
+        ddbEndpoint: env.ddbEndpoint,
+        s3Bucket: env.s3Bucket,
+      },
+      null,
+      2,
+    ),
+  );
+});
