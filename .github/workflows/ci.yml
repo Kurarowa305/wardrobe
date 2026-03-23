@@ -82,6 +82,9 @@ jobs:
       - name: API wardrobe MS1 aggregate spec test
         run: pnpm --filter api test:wardrobe-ms1
 
+      - name: API clothing schema spec test
+        run: pnpm --filter api test:clothing-schema
+
       - name: Typecheck api
         run: pnpm --filter api exec tsc --noEmit
 
