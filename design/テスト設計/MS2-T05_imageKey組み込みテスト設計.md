@@ -11,9 +11,11 @@
 - `apps/web/src/api/schemas/clothing.ts`
 - `apps/web/src/api/hooks/clothing.ts`
 - `apps/web/src/mocks/handlers/clothing.ts`
-- `apps/web/src/components/app/screens/ClothingsTabScreen.tsx`
+- `apps/web/src/components/app/screens/ClothingGenreSection.tsx`
 - `apps/web/src/components/app/screens/ClothingDetailScreen.tsx`
 - `apps/web/scripts/check-image-key-payload-spec.mjs`
+  - 実装追従: 一覧側の確認対象を `ClothingsTabScreen.tsx` ではなく、実際に `resolveImageUrl` と `no image` フォールバックを担う `ClothingGenreSection.tsx` とする
+  - 実装追従: create/update payload と MSW update handler の検査は、末尾カンマや波括弧有無に依存しない部分一致で判定する
 
 ## テスト観点
 
