@@ -4,10 +4,14 @@
 
 `imageKey` から表示URLを組み立てる責務を `resolveImageUrl` に集約し、一覧/詳細の画像表示で同じ解決ロジックを利用していることを静的検査で担保する。あわせて、`IMAGE_PUBLIC_BASE_URL` の差し替え（CloudFront化）に向けたベースURL設定点が1箇所であることを確認する。
 
+## 実装追従メモ
+
+- 実装実態に合わせ、一覧側の検査対象は `ClothingsTabScreen.tsx` ではなく、サムネ描画と `resolveImageUrl` / `no image` フォールバックを担う `ClothingGenreSection.tsx` とする。
+
 ## 対象
 
 - `apps/web/src/features/clothing/imageUrl.ts`
-- `apps/web/src/components/app/screens/ClothingsTabScreen.tsx`
+- `apps/web/src/components/app/screens/ClothingGenreSection.tsx`
 - `apps/web/src/components/app/screens/ClothingDetailScreen.tsx`
 - `apps/web/scripts/check-image-url-resolution-spec.mjs`
 
@@ -16,7 +20,7 @@
 1. `resolveImageUrl` 共通関数が存在し、`imageKey` から表示URLを返せること
 2. ベースURLが `NEXT_PUBLIC_IMAGE_PUBLIC_BASE_URL` で切り替え可能で、既定値を持つこと
 3. `imageKey` の空値処理とURLエンコード処理があること
-4. 一覧画面（サムネ）が `resolveImageUrl` を利用し、`no image` フォールバックを持つこと
+4. 一覧画面（サムネ）の実装担当コンポーネントが `resolveImageUrl` を利用し、`no image` フォールバックを持つこと
 5. 詳細画面が `resolveImageUrl` を利用し、`no image` フォールバックを持つこと
 
 ## テストケース
@@ -49,11 +53,11 @@
 ### IUR-04: 服一覧画面のサムネ表示が resolveImageUrl を使い、no image フォールバックを持つ
 
 - チェック内容
-  - 一覧画面が `resolveImageUrl` を import している
+  - 一覧サムネの実装担当コンポーネント `ClothingGenreSection.tsx` が `resolveImageUrl` を import している
   - `item.imageKey` から `imageUrl` を解決している
   - `img` 表示と `COMMON_STRINGS.placeholders.noImage` のフォールバックがある
 - 期待結果
-  - 一覧サムネ表示が共通解決関数で統一される
+  - 一覧サムネ表示が実装実態に即したコンポーネントで共通解決関数へ統一される
 
 ### IUR-05: 服詳細画面の画像表示が resolveImageUrl を使い、no image フォールバックを持つ
 
