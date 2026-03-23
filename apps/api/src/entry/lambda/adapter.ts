@@ -3,6 +3,7 @@ import { createErrorResponse, createSuccessResponse, type JsonResponse } from ".
 import type { LocalDomain, LocalRouteHandler, LocalRouteQuery } from "../local/router.js";
 import { createHistoryHandler } from "../../domains/history/handlers/createHistoryHandler.js";
 import { deleteHistoryHandler } from "../../domains/history/handlers/deleteHistoryHandler.js";
+import { createWardrobeHandler } from "../../domains/wardrobe/handlers/createWardrobeHandler.js";
 
 export type LambdaEvent = {
   version?: string;
@@ -39,7 +40,17 @@ function createDefaultDomainHandler(domain: LocalDomain): LocalRouteHandler {
 }
 
 export const sharedDomainHandlers: Record<LocalDomain, LocalRouteHandler> = {
-  wardrobe: createDefaultDomainHandler("wardrobe"),
+  wardrobe(request) {
+    if (request.method === "POST" && request.pathname === "/wardrobes") {
+      return createWardrobeHandler({
+        body: request.body,
+        headers: request.headers,
+        requestId: request.requestId,
+      });
+    }
+
+    return createDefaultDomainHandler("wardrobe")(request);
+  },
   clothing: createDefaultDomainHandler("clothing"),
   template: createDefaultDomainHandler("template"),
   history(request) {

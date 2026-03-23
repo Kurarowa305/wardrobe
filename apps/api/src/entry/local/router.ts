@@ -43,7 +43,12 @@ export type LocalRouteRequest = {
   headers: IncomingMessage["headers"];
 };
 
-export type LocalRouteHandler = (request: LocalRouteRequest) => JsonResponse<unknown> | { statusCode: number; headers: Record<string, string>; body: string };
+export type LocalRouteHandler = (
+  request: LocalRouteRequest,
+) =>
+  | Promise<JsonResponse<unknown> | { statusCode: number; headers: Record<string, string>; body: string }>
+  | JsonResponse<unknown>
+  | { statusCode: number; headers: Record<string, string>; body: string };
 
 export const localRoutes: readonly LocalRouteDefinition[] = [
   { method: "POST", pattern: "/wardrobes", domain: "wardrobe" },
