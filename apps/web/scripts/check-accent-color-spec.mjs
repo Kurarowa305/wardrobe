@@ -77,11 +77,11 @@ const checks = [
       ) &&
       includesNormalized(
         "src/components/app/screens/ClothingCreateScreen.tsx",
-        '<Button type="submit" className="w-full text-sm font-medium" disabled={isNameEmpty || isPending}>',
+        '<Button type="submit" className="w-full text-sm font-medium" disabled={isNameEmpty || isGenreEmpty || isPending}>',
       ) &&
       includesNormalized(
         "src/components/app/screens/ClothingEditScreen.tsx",
-        '<Button type="submit" className="w-full text-sm font-medium" disabled={isNameEmpty || isPending}>',
+        '<Button type="submit" className="w-full text-sm font-medium" disabled={isNameEmpty || isGenreEmpty || isPending}>',
       ) &&
       includesNormalized(
         "src/components/app/screens/RecordByTemplateScreen.tsx",
