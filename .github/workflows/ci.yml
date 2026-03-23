@@ -61,6 +61,9 @@ jobs:
       - name: API logging spec test
         run: pnpm --filter api test:logging
 
+      - name: API local router spec test
+        run: pnpm --filter api test:local-router
+
       - name: Typecheck api
         run: pnpm --filter api exec tsc --noEmit
 

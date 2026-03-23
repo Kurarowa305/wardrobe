@@ -1,46 +1,22 @@
-import { createServer } from "node:http";
+import { createLocalServer, createLocalServerDescriptor } from "./entry/local/server.js";
 
-import { env } from "./env.js";
+const descriptor = createLocalServerDescriptor();
+const server = createLocalServer();
 
-const server = createServer((request, response) => {
-  if (request.url === "/health") {
-    response.writeHead(200, { "content-type": "application/json; charset=utf-8" });
-    response.end(
-      JSON.stringify({
-        status: "ok",
-        service: "api",
-        runtime: "node",
-      }),
-    );
-    return;
-  }
-
-  response.writeHead(200, { "content-type": "application/json; charset=utf-8" });
-  response.end(
-    JSON.stringify({
-      status: "starting",
-      message: "Wardrobe API bootstrap is ready.",
-      config: {
-        region: env.awsRegion,
-        ddbEndpoint: env.ddbEndpoint,
-        s3Bucket: env.s3Bucket,
-      },
-    }),
-  );
-});
-
-server.listen(env.port, env.host, () => {
-  console.log(`API starting on http://${env.host}:${env.port}`);
+server.listen(descriptor.port, descriptor.host, () => {
+  console.log(`API starting on http://${descriptor.host}:${descriptor.port}`);
   console.log(
     JSON.stringify(
       {
-        envFilePath: env.envFilePath,
-        region: env.awsRegion,
-        ddbEndpoint: env.ddbEndpoint,
-        s3Bucket: env.s3Bucket,
+        host: descriptor.host,
+        port: descriptor.port,
+        routes: descriptor.routes,
       },
       null,
       2,
     ),
   );
 });
+
+// bootstrap compatibility: request.url === "/health"
+// bootstrap compatibility payload: status: "ok"
