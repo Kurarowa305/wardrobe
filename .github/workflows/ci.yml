@@ -148,6 +148,9 @@ jobs:
       - name: Home recent history heading icon spec test
         run: pnpm --filter web test:home-recent-history-heading-icon
 
+      - name: Home recent histories hook spec test
+        run: pnpm --filter web test:home-recent-histories-hook
+
       - name: Accent color spec test
         run: pnpm --filter web test:accent-color
 

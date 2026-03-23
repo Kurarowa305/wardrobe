@@ -32,6 +32,7 @@
     "test:cursor-auto-load": "node scripts/check-cursor-auto-load-spec.mjs",
     "test:home-history-card-presentation": "node scripts/check-home-history-card-presentation-spec.mjs",
     "test:home-recent-history-heading-icon": "node scripts/check-home-recent-history-heading-icon-spec.mjs",
+    "test:home-recent-histories-hook": "node scripts/check-home-recent-histories-hook-spec.mjs",
     "test:template-fixtures": "node scripts/check-template-fixtures-spec.mjs",
     "test:template-api-client": "node scripts/check-template-api-client-spec.mjs",
     "test:template-msw-handlers": "node scripts/check-template-msw-handlers-spec.mjs",

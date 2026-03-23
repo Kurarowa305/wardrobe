@@ -1,42 +1,27 @@
 "use client";
 
 import Link from "next/link";
-import { createElement, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createElement, useEffect, useRef } from "react";
 
-import { useHistoryList } from "@/api/hooks/history";
+import { useRecentHistories } from "@/api/hooks/history";
 import { SharedHistoryCard } from "@/components/app/history/HistoryCard";
 import { TabBarIcon } from "@/components/ui/tab-bar-icon";
 import { AppLayout } from "@/components/app/layout/AppLayout";
-import { AutoLoadTrigger } from "@/components/app/screens/AutoLoadTrigger";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { ROUTES } from "@/constants/routes";
 import { HOME_STRINGS } from "@/features/home/strings";
 import { OPERATION_TOAST_IDS, consumeOperationToast } from "@/features/toast/operationToast";
-import type { HistoryListItem } from "@/features/history/types";
-
 type HomeTabScreenProps = {
   wardrobeId: string;
 };
 
-type RecentHistoryPage = {
-  cursor: string | null;
-  items: HistoryListItem[];
-};
-
-const HOME_RECENT_HISTORY_LIMIT = 30;
+const HOME_RECENT_HISTORY_LIMIT = 7;
 
 export function HomeTabScreen({ wardrobeId }: HomeTabScreenProps) {
   const { toast } = useToast();
   const hasShownToastRef = useRef(false);
-  const [cursor, setCursor] = useState<string | null>(null);
-  const [pages, setPages] = useState<RecentHistoryPage[]>([]);
-  const [nextCursor, setNextCursor] = useState<string | null>(null);
-  const recentHistoriesQuery = useHistoryList(wardrobeId, {
-    order: "desc",
-    limit: HOME_RECENT_HISTORY_LIMIT,
-    cursor,
-  });
+  const recentHistoriesQuery = useRecentHistories(wardrobeId, HOME_RECENT_HISTORY_LIMIT);
 
   useEffect(() => {
     if (hasShownToastRef.current || typeof window === "undefined") {
@@ -66,41 +51,6 @@ export function HomeTabScreen({ wardrobeId }: HomeTabScreenProps) {
     }
   }, [toast, wardrobeId]);
 
-  useEffect(() => {
-    setCursor(null);
-    setPages([]);
-    setNextCursor(null);
-  }, [wardrobeId]);
-
-  useEffect(() => {
-    if (!recentHistoriesQuery.data) {
-      return;
-    }
-
-    setPages((previous) => {
-      const pageIndex = previous.findIndex((page) => page.cursor === cursor);
-      if (pageIndex >= 0) {
-        const nextPages = [...previous];
-        nextPages[pageIndex] = { cursor, items: recentHistoriesQuery.data.items };
-        return nextPages;
-      }
-
-      return [...previous, { cursor, items: recentHistoriesQuery.data.items }];
-    });
-
-    setNextCursor(recentHistoriesQuery.data.nextCursor);
-  }, [cursor, recentHistoriesQuery.data]);
-
-  const recentHistoryItems = useMemo(() => pages.flatMap((page) => page.items), [pages]);
-
-  const handleLoadMore = useCallback(() => {
-    if (nextCursor === null || recentHistoriesQuery.isFetching) {
-      return;
-    }
-
-    setCursor(nextCursor);
-  }, [nextCursor, recentHistoriesQuery.isFetching]);
-
   const content = (
     <div className="grid gap-4">
       <Button asChild className="w-full justify-start text-left text-base text-white">
@@ -116,31 +66,25 @@ export function HomeTabScreen({ wardrobeId }: HomeTabScreenProps) {
           <span>{HOME_STRINGS.sections.recentWeekHistories}</span>
         </h2>
 
-        {recentHistoriesQuery.isPending && recentHistoryItems.length === 0 ? (
+        {recentHistoriesQuery.isPending ? (
           <p className="m-0 text-sm text-slate-600">{HOME_STRINGS.messages.loadingRecentHistories}</p>
         ) : null}
 
-        {recentHistoriesQuery.isError && recentHistoryItems.length === 0 ? (
+        {recentHistoriesQuery.isError ? (
           <p className="m-0 text-sm text-red-700">{HOME_STRINGS.messages.errorRecentHistories}</p>
         ) : null}
 
-        {recentHistoriesQuery.data && recentHistoryItems.length === 0 ? (
+        {recentHistoriesQuery.data && recentHistoriesQuery.data.items.length === 0 ? (
           <p className="m-0 text-sm text-slate-600">{HOME_STRINGS.messages.emptyRecentHistories}</p>
         ) : null}
 
-        {recentHistoryItems.length > 0 ? (
+        {recentHistoriesQuery.data && recentHistoriesQuery.data.items.length > 0 ? (
           <>
             <ul className="m-0 grid list-none gap-2 p-0">
-              {recentHistoryItems.map((item) => (
+              {recentHistoriesQuery.data.items.map((item) => (
                 <SharedHistoryCard key={item.historyId} wardrobeId={wardrobeId} item={item} from="home" />
               ))}
             </ul>
-            <AutoLoadTrigger
-              enabled={nextCursor !== null}
-              isLoading={recentHistoriesQuery.isFetching}
-              onLoadMore={handleLoadMore}
-              loadingLabel={HOME_STRINGS.messages.loadingRecentHistories}
-            />
           </>
         ) : null}
       </section>
