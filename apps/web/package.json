@@ -29,6 +29,7 @@
     "test:history-detail-template-card": "node scripts/check-history-detail-template-card-spec.mjs",
     "test:history-delete-flow": "node scripts/check-history-delete-flow-spec.mjs",
     "test:home-screen": "node scripts/check-home-screen-spec.mjs",
+    "test:cursor-auto-load": "node scripts/check-cursor-auto-load-spec.mjs",
     "test:home-history-card-presentation": "node scripts/check-home-history-card-presentation-spec.mjs",
     "test:home-recent-history-heading-icon": "node scripts/check-home-recent-history-heading-icon-spec.mjs",
     "test:template-fixtures": "node scripts/check-template-fixtures-spec.mjs",

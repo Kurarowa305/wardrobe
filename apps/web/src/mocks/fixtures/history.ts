@@ -8,7 +8,7 @@ import { clothingDetailFixtureById } from "@/mocks/fixtures/clothing";
 import { TEMPLATE_FIXTURE_WARDROBE_ID, templateDetailFixtureById } from "@/mocks/fixtures/template";
 
 export const HISTORY_FIXTURE_WARDROBE_ID = TEMPLATE_FIXTURE_WARDROBE_ID;
-const GENERATED_HISTORY_FIXTURE_COUNT = 17;
+const GENERATED_HISTORY_FIXTURE_COUNT = 31;
 
 type HistoryDetailFixture = HistoryDetailResponseDto & { historyId: string };
 type HistoryDetailFixtureSeed = { historyId: string; date: string; templateId: string | null; clothingIds: string[] };

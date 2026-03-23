@@ -1,7 +1,7 @@
 import type { ClothingDetailResponseDto, ClothingGenreDto, ClothingListResponseDto } from "@/api/schemas/clothing";
 
 export const CLOTHING_FIXTURE_WARDROBE_ID = "wd_01HZZ8ABCDEF1234567890";
-const GENERATED_FIXTURES_PER_GENRE = 12;
+const GENERATED_FIXTURES_PER_GENRE = 49;
 const GENERATED_CLOTHING_FIXTURE_BASE_TIMESTAMP = 1735590000000;
 const FIXTURE_GENRE_ORDER = ["tops", "bottoms", "others"] as const satisfies readonly ClothingGenreDto[];
 

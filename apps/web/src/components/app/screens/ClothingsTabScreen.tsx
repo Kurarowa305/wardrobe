@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { createElement, useEffect, useRef, useState } from "react";
+import { createElement, useCallback, useEffect, useRef, useState } from "react";
 
 import { useClothingList } from "@/api/hooks/clothing";
 import type { ClothingGenreDto } from "@/api/schemas/clothing";
@@ -14,7 +14,7 @@ import { CLOTHING_GENRES } from "@/features/clothing/genre";
 import { CLOTHING_STRINGS } from "@/features/clothing/strings";
 import { OPERATION_TOAST_IDS, consumeOperationToast } from "@/features/toast/operationToast";
 
-const CLOTHING_LIST_PAGE_SIZE = 20;
+const CLOTHING_LIST_PAGE_SIZE = 50;
 
 type ClothingsTabScreenProps = { wardrobeId: string };
 type GenrePageState = { cursor: string | null; nextCursor: string | null; collapsed: boolean };
@@ -77,11 +77,11 @@ export function ClothingsTabScreen({ wardrobeId }: ClothingsTabScreenProps) {
   const hasAnyItems = CLOTHING_GENRES.some((genre) => (genreQueries[genre].data?.items.length ?? 0) > 0);
   const showEmptyState = !isInitialLoading && !isInitialError && !hasAnyItems;
 
-  const handleLoadMore = (genre: ClothingGenreDto) => {
+  const handleLoadMore = useCallback((genre: ClothingGenreDto) => {
     const nextCursor = genreStates[genre].nextCursor;
     if (nextCursor === null || genreQueries[genre].isFetching) return;
     setGenreStates((previous) => ({ ...previous, [genre]: { ...previous[genre], cursor: nextCursor } }));
-  };
+  }, [genreQueries, genreStates]);
 
   const toggleSection = (genre: ClothingGenreDto) => {
     setGenreStates((previous) => ({ ...previous, [genre]: { ...previous[genre], collapsed: !previous[genre].collapsed } }));
@@ -113,11 +113,9 @@ export function ClothingsTabScreen({ wardrobeId }: ClothingsTabScreenProps) {
               toggleLabel={state.collapsed ? CLOTHING_STRINGS.common.expand : CLOTHING_STRINGS.common.collapse}
               hrefResolver={(item) => ROUTES.clothingDetail(wardrobeId, item.clothingId)}
               emptyMessage={CLOTHING_STRINGS.list.messages.sectionEmpty}
-              onLoadMore={state.nextCursor !== null ? () => handleLoadMore(genre) : undefined}
-              canLoadMore={state.nextCursor !== null && !query.isFetching}
+              onLoadMore={state.nextCursor !== null && !query.isFetching ? () => handleLoadMore(genre) : undefined}
               isLoadingMore={query.isFetching}
               loadingLabel={CLOTHING_STRINGS.list.messages.loading}
-              loadMoreLabel={CLOTHING_STRINGS.list.actions.loadMore}
             />
           );
         })}

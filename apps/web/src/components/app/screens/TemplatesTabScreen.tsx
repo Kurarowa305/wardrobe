@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { createElement, useEffect, useMemo, useRef, useState } from "react";
+import { createElement, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useTemplateList } from "@/api/hooks/template";
 import { AppLayout } from "@/components/app/layout/AppLayout";
+import { AutoLoadTrigger } from "@/components/app/screens/AutoLoadTrigger";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { COMMON_STRINGS } from "@/constants/commonStrings";
@@ -23,7 +24,7 @@ type TemplateListPage = {
   items: TemplateListItem[];
 };
 
-const TEMPLATE_LIST_PAGE_SIZE = 20;
+const TEMPLATE_LIST_PAGE_SIZE = 30;
 const TEMPLATE_THUMBNAIL_LIMIT = 4;
 const TEMPLATE_THUMBNAIL_GRID_CLASS = "grid grid-cols-5 gap-2";
 
@@ -137,15 +138,14 @@ export function TemplatesTabScreen({ wardrobeId }: TemplatesTabScreenProps) {
   const showInitialError = isError && !hasTemplateItems;
   const showInlineError = isError && hasTemplateItems;
   const showEmptyState = !isInitialLoading && !showInitialError && !hasTemplateItems;
-  const canLoadMore = nextCursor !== null && !isFetching;
 
-  const handleLoadMore = () => {
+  const handleLoadMore = useCallback(() => {
     if (nextCursor === null || isFetching) {
       return;
     }
 
     setCursor(nextCursor);
-  };
+  }, [isFetching, nextCursor]);
 
   const content = (
     <>
@@ -171,19 +171,12 @@ export function TemplatesTabScreen({ wardrobeId }: TemplatesTabScreenProps) {
 
       {showInlineError ? <p className="m-0 text-sm text-red-700">{TEMPLATE_STRINGS.list.messages.error}</p> : null}
 
-      {nextCursor !== null ? (
-        <div className="mt-4">
-          <Button
-            type="button"
-            variant="secondary"
-            className="w-full text-sm font-medium"
-            disabled={!canLoadMore}
-            onClick={handleLoadMore}
-          >
-            {isFetching ? TEMPLATE_STRINGS.list.messages.loading : TEMPLATE_STRINGS.list.actions.loadMore}
-          </Button>
-        </div>
-      ) : null}
+      <AutoLoadTrigger
+        enabled={nextCursor !== null}
+        isLoading={isFetching}
+        onLoadMore={handleLoadMore}
+        loadingLabel={TEMPLATE_STRINGS.list.messages.loading}
+      />
     </>
   );
 

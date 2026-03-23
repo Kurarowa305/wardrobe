@@ -139,6 +139,9 @@ jobs:
       - name: Home screen spec test
         run: pnpm --filter web test:home-screen
 
+      - name: Cursor auto load spec test
+        run: pnpm --filter web test:cursor-auto-load
+
       - name: Home history card presentation spec test
         run: pnpm --filter web test:home-history-card-presentation
 
