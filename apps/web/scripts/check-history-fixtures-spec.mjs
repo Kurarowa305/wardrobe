@@ -21,6 +21,6 @@ check("HF-06", "一覧 fixture は詳細 fixture から射影して作られる"
 check("HF-07", "fixture がテンプレ入力・組み合わせ入力・削除済み服を含む", includes(target, 'historyId: "hs_01HZZCCC"') && includes(target, 'templateId: "tp_01HZZBBB"') && includes(target, 'historyId: "hs_01HZZCCD"') && includes(target, 'clothingIds: ["cl_top_002", createGeneratedClothingId("bottom", 4), "cl_other_003"]') && includes(target, 'templateId: "tp_01HZZBBD"'), "テンプレ入力/組み合わせ入力/削除済みケースが不足しています");
 check("HF-08", "詳細 fixture の ID 引き辞書が定義される", includes(target, 'export const historyDetailFixtureById =') && includes(target, 'accumulator[fixture.historyId] = fixture;'), "ID 辞書が不足しています");
 check("HF-09", "history fixture にホーム用の直近1週間分データが含まれる", includes(target, 'date: "20260321"') && includes(target, 'date: "20260315"'), "直近1週間データが不足しています");
-check("HF-10", "historyDetailFixtures が合計24件（既存7件 + 追加17件）で構成される", includes(target, 'const GENERATED_HISTORY_FIXTURE_COUNT = 17;') && includes(target, '...Array.from({ length: GENERATED_HISTORY_FIXTURE_COUNT },'), "件数定義が不足しています");
+check("HF-10", "history fixture が自動読み込み検証用に30件超で構成される", includes(target, 'const GENERATED_HISTORY_FIXTURE_COUNT = 31;') && includes(target, '...Array.from({ length: GENERATED_HISTORY_FIXTURE_COUNT },'), "件数定義が不足しています");
 if (failures.length > 0) { console.error(`\n${failures.length}件の失敗 / ${checkCount}件中`); console.error(failures.join("\n\n")); process.exit(1); }
 console.log(`\nAll checks passed (${checkCount}件)`);

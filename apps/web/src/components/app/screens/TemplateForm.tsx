@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 
 import { useClothingList } from "@/api/hooks/clothing";
@@ -86,11 +86,11 @@ export function TemplateForm({ wardrobeId, mode, templateId, submitLabel }: Temp
     setSelectedClothingIds((previous) => previous.includes(clothingId) ? previous.filter((currentId) => currentId !== clothingId) : [...previous, clothingId]);
   };
 
-  const handleLoadMore = (genre: ClothingGenreDto) => {
+  const handleLoadMore = useCallback((genre: ClothingGenreDto) => {
     const nextCursor = genreStates[genre].nextCursor;
     if (nextCursor === null || genreQueries[genre].isFetching) return;
     setGenreStates((previous) => ({ ...previous, [genre]: { ...previous[genre], cursor: nextCursor } }));
-  };
+  }, [genreQueries, genreStates]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -144,11 +144,9 @@ export function TemplateForm({ wardrobeId, mode, templateId, submitLabel }: Temp
                     selectedIds={selectedClothingIds}
                     onSelectToggle={toggleClothing}
                     emptyMessage={TEMPLATE_STRINGS.messages.clothingSectionEmpty}
-                    onLoadMore={state.nextCursor !== null ? () => handleLoadMore(genre) : undefined}
-                    canLoadMore={state.nextCursor !== null && !query.isFetching}
+                    onLoadMore={state.nextCursor !== null && !query.isFetching ? () => handleLoadMore(genre) : undefined}
                     isLoadingMore={query.isFetching}
                     loadingLabel={TEMPLATE_STRINGS.messages.clothingLoading}
-                    loadMoreLabel={TEMPLATE_STRINGS.actions.loadMoreClothings}
                   />
                 );
               })}

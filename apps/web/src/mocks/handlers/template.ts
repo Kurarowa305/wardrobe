@@ -18,7 +18,7 @@ import { HttpResponse, http, passthrough } from "msw";
 import { applyMockScenario } from "./scenario";
 
 const DEFAULT_PAGE_SIZE = 20;
-const MAX_PAGE_SIZE = 50;
+const MAX_PAGE_SIZE = 30;
 const CURSOR_PREFIX = "offset:";
 const TEMPLATE_ID_PREFIX = "tp_mock_";
 
@@ -274,7 +274,7 @@ export const templateHandlers = [
 
     const limit = parseLimit(url.searchParams.get("limit"));
     if (limit === null) {
-      return createErrorResponse(400, "VALIDATION_ERROR", "limit must be 1..50");
+      return createErrorResponse(400, "VALIDATION_ERROR", "limit must be 1..30");
     }
 
     const cursor = parseCursor(url.searchParams.get("cursor"));

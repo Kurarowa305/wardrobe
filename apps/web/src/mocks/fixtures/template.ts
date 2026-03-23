@@ -7,7 +7,7 @@ import type {
 import { CLOTHING_FIXTURE_WARDROBE_ID, clothingDetailFixtureById } from "@/mocks/fixtures/clothing";
 
 export const TEMPLATE_FIXTURE_WARDROBE_ID = CLOTHING_FIXTURE_WARDROBE_ID;
-const GENERATED_TEMPLATE_FIXTURE_COUNT = 27;
+const GENERATED_TEMPLATE_FIXTURE_COUNT = 31;
 const GENERATED_TEMPLATE_FIXTURE_BASE_TIMESTAMP = 1735620000000;
 
 export type TemplateDetailFixture = TemplateDetailResponseDto & { templateId: string };

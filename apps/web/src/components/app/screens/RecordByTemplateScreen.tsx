@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 
 import { useCreateHistoryMutation } from "@/api/hooks/history";
 import { useTemplateList } from "@/api/hooks/template";
 import { AppLayout } from "@/components/app/layout/AppLayout";
+import { AutoLoadTrigger } from "@/components/app/screens/AutoLoadTrigger";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { COMMON_STRINGS } from "@/constants/commonStrings";
@@ -115,16 +116,15 @@ export function RecordByTemplateScreen({ wardrobeId }: RecordByTemplateScreenPro
   const showTemplateLoading = templateListQuery.isPending && !hasTemplateItems;
   const showTemplateLoadError = templateListQuery.isError && !hasTemplateItems;
   const showTemplateEmpty = !showTemplateLoading && !showTemplateLoadError && !hasTemplateItems;
-  const canLoadMore = nextCursor !== null && !templateListQuery.isFetching;
   const isSubmitting = createHistoryMutation.isPending;
 
-  const handleLoadMore = () => {
+  const handleLoadMore = useCallback(() => {
     if (nextCursor === null || templateListQuery.isFetching) {
       return;
     }
 
     setCursor(nextCursor);
-  };
+  }, [nextCursor, templateListQuery.isFetching]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -243,13 +243,12 @@ export function RecordByTemplateScreen({ wardrobeId }: RecordByTemplateScreenPro
               </div>
             ) : null}
 
-            {nextCursor !== null ? (
-              <Button type="button" variant="secondary" onClick={handleLoadMore} disabled={!canLoadMore}>
-                {templateListQuery.isFetching
-                  ? RECORD_STRINGS.byTemplate.messages.loading
-                  : RECORD_STRINGS.byTemplate.actions.loadMore}
-              </Button>
-            ) : null}
+            <AutoLoadTrigger
+              enabled={nextCursor !== null}
+              isLoading={templateListQuery.isFetching}
+              onLoadMore={handleLoadMore}
+              loadingLabel={RECORD_STRINGS.byTemplate.messages.loading}
+            />
           </fieldset>
 
           {showTemplateError ? (

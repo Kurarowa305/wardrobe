@@ -1,11 +1,11 @@
 "use client";
 
-import { createElement, useEffect, useMemo, useRef, useState } from "react";
+import { createElement, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useHistoryList } from "@/api/hooks/history";
 import { SharedHistoryCard } from "@/components/app/history/HistoryCard";
 import { AppLayout } from "@/components/app/layout/AppLayout";
-import { Button } from "@/components/ui/button";
+import { AutoLoadTrigger } from "@/components/app/screens/AutoLoadTrigger";
 import { useToast } from "@/components/ui/use-toast";
 import { HISTORY_STRINGS } from "@/features/history/strings";
 import { OPERATION_TOAST_IDS, consumeOperationToast } from "@/features/toast/operationToast";
@@ -20,7 +20,7 @@ type HistoryListPage = {
   items: HistoryListItem[];
 };
 
-const HISTORY_LIST_PAGE_SIZE = 20;
+const HISTORY_LIST_PAGE_SIZE = 30;
 
 export function HistoriesTabScreen({ wardrobeId }: HistoriesTabScreenProps) {
   const { toast } = useToast();
@@ -80,15 +80,14 @@ export function HistoriesTabScreen({ wardrobeId }: HistoriesTabScreenProps) {
   const showInitialError = isError && !hasHistoryItems;
   const showInlineError = isError && hasHistoryItems;
   const showEmptyState = !isInitialLoading && !showInitialError && !hasHistoryItems;
-  const canLoadMore = nextCursor !== null && !isFetching;
 
-  const handleLoadMore = () => {
+  const handleLoadMore = useCallback(() => {
     if (nextCursor === null || isFetching) {
       return;
     }
 
     setCursor(nextCursor);
-  };
+  }, [isFetching, nextCursor]);
 
   const content = (
     <>
@@ -108,19 +107,12 @@ export function HistoriesTabScreen({ wardrobeId }: HistoriesTabScreenProps) {
 
       {showInlineError ? <p className="m-0 text-sm text-red-700">{HISTORY_STRINGS.list.messages.error}</p> : null}
 
-      {nextCursor !== null ? (
-        <div className="mt-4">
-          <Button
-            type="button"
-            variant="secondary"
-            className="w-full text-sm font-medium"
-            disabled={!canLoadMore}
-            onClick={handleLoadMore}
-          >
-            {isFetching ? HISTORY_STRINGS.list.messages.loading : HISTORY_STRINGS.list.actions.loadMore}
-          </Button>
-        </div>
-      ) : null}
+      <AutoLoadTrigger
+        enabled={nextCursor !== null}
+        isLoading={isFetching}
+        onLoadMore={handleLoadMore}
+        loadingLabel={HISTORY_STRINGS.list.messages.loading}
+      />
     </>
   );
 

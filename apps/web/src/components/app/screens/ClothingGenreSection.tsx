@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-import { Button } from "@/components/ui/button";
+import { AutoLoadTrigger } from "@/components/app/screens/AutoLoadTrigger";
 import { COMMON_STRINGS } from "@/constants/commonStrings";
 import { resolveImageUrl } from "@/features/clothing/imageUrl";
 import { CLOTHING_GENRE_LABELS, ClothingGenreIcon } from "@/features/clothing/genre";
@@ -19,10 +19,8 @@ type ClothingGenreSectionProps = {
   selectedIds?: string[];
   onSelectToggle?: (clothingId: string) => void;
   hrefResolver?: (item: ClothingListItem) => string;
-  loadMoreLabel?: string;
   loadingLabel?: string;
   onLoadMore?: () => void;
-  canLoadMore?: boolean;
   isLoadingMore?: boolean;
   emptyMessage?: string;
 };
@@ -37,10 +35,8 @@ export function ClothingGenreSection({
   selectedIds = [],
   onSelectToggle,
   hrefResolver,
-  loadMoreLabel,
   loadingLabel,
   onLoadMore,
-  canLoadMore = false,
   isLoadingMore = false,
   emptyMessage,
 }: ClothingGenreSectionProps) {
@@ -122,11 +118,12 @@ export function ClothingGenreSection({
               );
             })}
 
-            {onLoadMore ? (
-              <Button type="button" variant="secondary" onClick={onLoadMore} disabled={!canLoadMore} className="w-full text-sm font-medium">
-                {isLoadingMore ? loadingLabel : loadMoreLabel}
-              </Button>
-            ) : null}
+            <AutoLoadTrigger
+              enabled={onLoadMore !== undefined}
+              isLoading={isLoadingMore}
+              onLoadMore={onLoadMore ?? (() => undefined)}
+              loadingLabel={loadingLabel}
+            />
           </div>
         ) : (
           <p className="m-0 text-sm text-slate-600">{emptyMessage ?? `${CLOTHING_GENRE_LABELS[genre]}はまだありません。`}</p>
