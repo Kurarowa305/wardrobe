@@ -76,6 +76,9 @@ jobs:
       - name: API wardrobe create handler spec test
         run: pnpm --filter api test:wardrobe-create-handler
 
+      - name: API wardrobe get handler spec test
+        run: pnpm --filter api test:wardrobe-get-handler
+
       - name: Typecheck api
         run: pnpm --filter api exec tsc --noEmit
 
