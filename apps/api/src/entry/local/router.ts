@@ -2,7 +2,8 @@ import type { IncomingMessage } from "node:http";
 import { randomUUID } from "node:crypto";
 
 import { createAppError } from "../../core/errors/index.js";
-import { createErrorResponse, createSuccessResponse, type JsonResponse } from "../../core/response/index.js";
+import { createErrorResponse, type JsonResponse } from "../../core/response/index.js";
+import { sharedDomainHandlers } from "../lambda/adapter.js";
 
 export const localRoutePatterns = [
   "/wardrobes",
@@ -64,23 +65,7 @@ export const localRoutes: readonly LocalRouteDefinition[] = [
   { method: "POST", pattern: "/wardrobes/:wardrobeId/images/presign", domain: "presign" },
 ] as const;
 
-const defaultHandlers: Record<LocalDomain, LocalRouteHandler> = {
-  wardrobe(request) {
-    return createSuccessResponse({ ok: true, domain: "wardrobe", method: request.method, path: request.path });
-  },
-  clothing(request) {
-    return createSuccessResponse({ ok: true, domain: "clothing", method: request.method, path: request.path });
-  },
-  template(request) {
-    return createSuccessResponse({ ok: true, domain: "template", method: request.method, path: request.path });
-  },
-  history(request) {
-    return createSuccessResponse({ ok: true, domain: "history", method: request.method, path: request.path });
-  },
-  presign(request) {
-    return createSuccessResponse({ ok: true, domain: "presign", method: request.method, path: request.path });
-  },
-};
+const defaultHandlers: Record<LocalDomain, LocalRouteHandler> = sharedDomainHandlers;
 
 export function normalizePathname(pathname: string): string {
   if (!pathname) {

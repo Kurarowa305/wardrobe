@@ -64,6 +64,9 @@ jobs:
       - name: API local router spec test
         run: pnpm --filter api test:local-router
 
+      - name: API lambda entry spec test
+        run: pnpm --filter api test:lambda-entry
+
       - name: Typecheck api
         run: pnpm --filter api exec tsc --noEmit
 
