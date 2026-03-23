@@ -52,6 +52,9 @@ jobs:
       - name: API response spec test
         run: pnpm --filter api test:response
 
+      - name: API validation spec test
+        run: pnpm --filter api test:validation
+
       - name: Typecheck api
         run: pnpm --filter api exec tsc --noEmit
 
