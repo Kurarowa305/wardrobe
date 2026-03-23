@@ -40,6 +40,9 @@ jobs:
       - name: API env spec test
         run: pnpm --filter api test:env
 
+      - name: API dynamodb client spec test
+        run: pnpm --filter api test:dynamodb
+
       - name: Typecheck api
         run: pnpm --filter api exec tsc --noEmit
 
