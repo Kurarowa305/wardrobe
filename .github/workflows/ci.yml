@@ -85,6 +85,9 @@ jobs:
       - name: API clothing schema spec test
         run: pnpm --filter api test:clothing-schema
 
+      - name: API clothing key builder spec test
+        run: pnpm --filter api test:clothing-key-builder
+
       - name: Typecheck api
         run: pnpm --filter api exec tsc --noEmit
 
