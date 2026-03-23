@@ -55,6 +55,9 @@ jobs:
       - name: API validation spec test
         run: pnpm --filter api test:validation
 
+      - name: API cursor spec test
+        run: pnpm --filter api test:cursor
+
       - name: Typecheck api
         run: pnpm --filter api exec tsc --noEmit
 
