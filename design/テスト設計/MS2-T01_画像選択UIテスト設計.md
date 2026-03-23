@@ -61,7 +61,7 @@
 
 - チェック内容
   - `uploadImageWithPresign` の戻り値から `presigned.imageKey` を取得する
-  - `imageKey: uploadedImageKey` を create payload へ渡す
+  - `createMutation.mutateAsync({ name: trimmedName, genre: genre as ClothingGenreDto, imageKey: uploadedImageKey })` を呼び出す
 - 期待結果
   - presign成功後の `imageKey` が保存時に送信される
 
