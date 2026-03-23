@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
-    "test": "pnpm run test:bootstrap && pnpm run test:env && pnpm run test:dynamodb && pnpm run test:s3 && pnpm run test:errors && pnpm run test:response && pnpm run test:validation && pnpm run test:cursor && pnpm run test:logging && pnpm run test:local-router && pnpm run test:lambda-entry && pnpm run test:wardrobe-repo && pnpm run test:wardrobe-usecase && pnpm run test:wardrobe-create-handler && pnpm run test:wardrobe-get-handler",
+    "test": "pnpm run test:bootstrap && pnpm run test:env && pnpm run test:dynamodb && pnpm run test:s3 && pnpm run test:errors && pnpm run test:response && pnpm run test:validation && pnpm run test:cursor && pnpm run test:logging && pnpm run test:local-router && pnpm run test:lambda-entry && pnpm run test:wardrobe-repo && pnpm run test:wardrobe-usecase && pnpm run test:wardrobe-create-handler && pnpm run test:wardrobe-get-handler && pnpm run test:wardrobe-ms1",
     "dev": "tsx watch src/index.ts",
     "start": "node dist/index.js",
     "build": "tsc --outDir dist",
@@ -25,7 +25,8 @@
     "test:wardrobe-repo": "node --import tsx/esm scripts/check-wardrobe-repo-spec.mjs",
     "test:wardrobe-usecase": "node --import tsx/esm scripts/check-wardrobe-usecase-spec.mjs",
     "test:wardrobe-create-handler": "node --import tsx/esm scripts/check-wardrobe-create-handler-spec.mjs",
-    "test:wardrobe-get-handler": "node --import tsx/esm scripts/check-wardrobe-get-handler-spec.mjs"
+    "test:wardrobe-get-handler": "node --import tsx/esm scripts/check-wardrobe-get-handler-spec.mjs",
+    "test:wardrobe-ms1": "node --import tsx/esm scripts/check-wardrobe-ms1-spec.mjs"
   },
   "keywords": [],
   "author": "",
