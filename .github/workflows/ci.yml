@@ -67,6 +67,9 @@ jobs:
       - name: API lambda entry spec test
         run: pnpm --filter api test:lambda-entry
 
+      - name: API wardrobe repo spec test
+        run: pnpm --filter api test:wardrobe-repo
+
       - name: Typecheck api
         run: pnpm --filter api exec tsc --noEmit
 
