@@ -39,7 +39,7 @@ const editScreen = "src/components/app/screens/ClothingEditScreen.tsx";
 const clothingSchema = "src/api/schemas/clothing.ts";
 const mutationHooks = "src/api/hooks/clothing.ts";
 const clothingHandler = "src/mocks/handlers/clothing.ts";
-const listScreen = "src/components/app/screens/ClothingsTabScreen.tsx";
+const listScreen = "src/components/app/screens/ClothingGenreSection.tsx";
 const detailScreen = "src/components/app/screens/ClothingDetailScreen.tsx";
 
 check(
@@ -57,7 +57,7 @@ check(
   "服追加画面の保存payloadがアップロード成功後の imageKey を使う",
   includes(createScreen, "let uploadedImageKey: string | null = null;") &&
     includes(createScreen, "uploadedImageKey = await uploadImage(selectedImageFile);") &&
-    includes(createScreen, "imageKey: uploadedImageKey,"),
+    includes(createScreen, "imageKey: uploadedImageKey"),
   "服追加画面の create payload にアップロード後imageKeyが組み込まれていません",
 );
 
@@ -76,7 +76,7 @@ check(
   "服編集画面の保存payloadは既存imageKeyを保持しつつ、新規アップロード時は置き換える",
   includes(editScreen, "let nextImageKey = imageKey.trim().length > 0 ? imageKey.trim() : null;") &&
     includes(editScreen, "nextImageKey = await uploadImage(selectedImageFile);") &&
-    includes(editScreen, "imageKey: nextImageKey,"),
+    includes(editScreen, "imageKey: nextImageKey"),
   "服編集画面の update payload に imageKey 継承/置換ロジックが不足しています",
 );
 
@@ -93,7 +93,7 @@ check(
   "IKP-06",
   "MSW clothing handler が create/update で imageKey を保存する",
   includes(clothingHandler, "imageKey: payload.imageKey ?? null,") &&
-    includes(clothingHandler, "if (payload.imageKey !== undefined) {") &&
+    includes(clothingHandler, "if (payload.imageKey !== undefined)") &&
     includes(clothingHandler, "target.imageKey = payload.imageKey;"),
   "MSW clothing handler の imageKey 保存処理が不足しています",
 );
