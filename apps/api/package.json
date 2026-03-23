@@ -1,12 +1,16 @@
 {
   "name": "api",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Wardrobe backend bootstrap service",
+  "main": "dist/index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"No tests yet\"",
-    "dev": "tsx watch src/index.ts"
+    "test": "pnpm run test:bootstrap",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "build": "tsc --outDir dist",
+    "typecheck": "tsc --noEmit",
+    "test:bootstrap": "node scripts/check-bootstrap-spec.mjs"
   },
   "keywords": [],
   "author": "",
