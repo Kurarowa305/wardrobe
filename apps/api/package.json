@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
-    "test": "pnpm run test:bootstrap && pnpm run test:env && pnpm run test:dynamodb && pnpm run test:s3 && pnpm run test:errors && pnpm run test:response && pnpm run test:validation && pnpm run test:cursor",
+    "test": "pnpm run test:bootstrap && pnpm run test:env && pnpm run test:dynamodb && pnpm run test:s3 && pnpm run test:errors && pnpm run test:response && pnpm run test:validation && pnpm run test:cursor && pnpm run test:logging",
     "dev": "tsx watch src/index.ts",
     "start": "node dist/index.js",
     "build": "tsc --outDir dist",
@@ -18,7 +18,8 @@
     "test:errors": "node --import tsx/esm scripts/check-errors-spec.mjs",
     "test:response": "node --import tsx/esm scripts/check-response-spec.mjs",
     "test:validation": "node --import tsx/esm scripts/check-validation-spec.mjs",
-    "test:cursor": "node --import tsx/esm scripts/check-cursor-spec.mjs"
+    "test:cursor": "node --import tsx/esm scripts/check-cursor-spec.mjs",
+    "test:logging": "node --import tsx/esm scripts/check-logging-spec.mjs"
   },
   "keywords": [],
   "author": "",
