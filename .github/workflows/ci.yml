@@ -37,6 +37,9 @@ jobs:
       - name: API directory structure spec test
         run: pnpm --filter api test:directory-structure
 
+      - name: API env spec test
+        run: pnpm --filter api test:env
+
       - name: Typecheck api
         run: pnpm --filter api exec tsc --noEmit
 
