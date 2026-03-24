@@ -1,7 +1,10 @@
 import { decodeCursor, encodeCursor, type CursorPrimitive } from "../../../core/cursor/index.js";
+import { generateUuidV7 } from "../../wardrobe/usecases/wardrobeUsecase.js";
 import { createClothingRepo, clothingListIndexNames, type ClothingRepo } from "../repo/clothingRepo.js";
 import type { ClothingListItemDto, ClothingListOrderDto, ClothingListParamsDto } from "../dto/clothingDto.js";
 import type { ClothingItem } from "../repo/clothingRepo.js";
+import { createClothingEntity } from "../entities/clothing.js";
+import type { ClothingGenre } from "../schema/clothingSchema.js";
 
 const clothingListResource = "clothing-list";
 
@@ -25,10 +28,23 @@ export type ListClothingUsecaseOutput = {
   nextCursor: string | null;
 };
 
-export type ClothingUsecaseRepo = Pick<ClothingRepo, "list">;
+export type CreateClothingUsecaseInput = {
+  wardrobeId: string;
+  name: string;
+  genre: ClothingGenre;
+  imageKey?: string | null | undefined;
+};
+
+export type CreateClothingUsecaseOutput = {
+  clothingId: string;
+};
+
+export type ClothingUsecaseRepo = Pick<ClothingRepo, "list" | "create">;
 
 export type ClothingUsecaseDependencies = {
   repo?: ClothingUsecaseRepo | undefined;
+  now?: (() => number) | undefined;
+  generateClothingId?: (() => string) | undefined;
 };
 
 type RepoListResult = Awaited<ReturnType<ClothingUsecaseRepo["list"]>>;
@@ -150,8 +166,23 @@ function encodeListCursor(input: {
 
 export function createClothingUsecase(dependencies: ClothingUsecaseDependencies = {}) {
   const repo = dependencies.repo ?? createClothingRepo();
+  const now = dependencies.now ?? Date.now;
+  const generateClothingId = dependencies.generateClothingId ?? (() => `cl_${generateUuidV7()}`);
 
   return {
+    async create(input: CreateClothingUsecaseInput): Promise<CreateClothingUsecaseOutput> {
+      const clothingId = generateClothingId();
+      await repo.create(createClothingEntity({
+        wardrobeId: input.wardrobeId,
+        clothingId,
+        name: input.name,
+        genre: input.genre,
+        ...(input.imageKey !== undefined ? { imageKey: input.imageKey } : {}),
+        now: now(),
+      }));
+
+      return { clothingId };
+    },
     async list(input: ListClothingUsecaseInput): Promise<ListClothingUsecaseOutput> {
       const order = resolveOrder(input.params.order);
       const exclusiveStartKey = decodeListCursor({
