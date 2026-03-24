@@ -2,7 +2,12 @@ import { decodeCursor, encodeCursor, type CursorPrimitive } from "../../../core/
 import { createAppError } from "../../../core/errors/index.js";
 import { generateUuidV7 } from "../../wardrobe/usecases/wardrobeUsecase.js";
 import { createClothingRepo, clothingListIndexNames, type ClothingRepo } from "../repo/clothingRepo.js";
-import type { ClothingDetailResponseDto, ClothingListItemDto, ClothingListOrderDto, ClothingListParamsDto } from "../dto/clothingDto.js";
+import type {
+  ClothingDetailResponseDto,
+  ClothingListItemDto,
+  ClothingListOrderDto,
+  ClothingListParamsDto,
+} from "../dto/clothingDto.js";
 import type { ClothingItem } from "../repo/clothingRepo.js";
 import { createClothingEntity } from "../entities/clothing.js";
 import type { ClothingGenre } from "../schema/clothingSchema.js";
@@ -47,7 +52,18 @@ export type GetClothingUsecaseInput = {
 
 export type GetClothingUsecaseOutput = ClothingDetailResponseDto;
 
-export type ClothingUsecaseRepo = Pick<ClothingRepo, "list" | "create" | "get">;
+export type UpdateClothingUsecaseInput = {
+  wardrobeId: string;
+  clothingId: string;
+  name?: string | undefined;
+  imageKey?: string | null | undefined;
+};
+
+export type UpdateClothingUsecaseOutput = {
+  clothingId: string;
+};
+
+export type ClothingUsecaseRepo = Pick<ClothingRepo, "list" | "create" | "get" | "update">;
 
 export type ClothingUsecaseDependencies = {
   repo?: ClothingUsecaseRepo | undefined;
@@ -118,7 +134,7 @@ function extractItems(result: ClothingListQueryResult): ClothingItem[] {
     return [];
   }
 
-    return candidates.filter(isClothingListItem) as ClothingItem[];
+  return candidates.filter(isClothingListItem) as ClothingItem[];
 }
 
 function extractLastEvaluatedKey(result: ClothingListQueryResult): ClothingListCursorPosition | null {
@@ -277,6 +293,34 @@ export function createClothingUsecase(dependencies: ClothingUsecaseDependencies 
       }
 
       return toClothingDetail(item);
+    },
+    async update(input: UpdateClothingUsecaseInput): Promise<UpdateClothingUsecaseOutput> {
+      const found = await repo.get({
+        wardrobeId: input.wardrobeId,
+        clothingId: input.clothingId,
+      });
+      const current = extractClothingItem(found);
+
+      if (!current) {
+        throw createAppError("NOT_FOUND", {
+          message: "Clothing was not found.",
+          details: {
+            resource: "clothing",
+            wardrobeId: input.wardrobeId,
+            clothingId: input.clothingId,
+          },
+        });
+      }
+
+      await repo.update({
+        ...current,
+        ...(input.name !== undefined ? { name: input.name } : {}),
+        ...(input.imageKey !== undefined ? { imageKey: input.imageKey } : {}),
+      });
+
+      return {
+        clothingId: current.clothingId,
+      };
     },
   };
 }

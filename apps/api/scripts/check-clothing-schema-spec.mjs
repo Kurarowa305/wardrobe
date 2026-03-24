@@ -28,7 +28,7 @@ const createRequest = schemaModule.createClothingRequestSchema.parse({
 });
 
 const updateRequest = schemaModule.updateClothingRequestSchema.parse({
-  genre: "bottoms",
+  name: "白シャツ（新）",
   imageKey: null,
 });
 
@@ -97,12 +97,12 @@ const checks = [
     detail: schemaModule,
   },
   {
-    name: "request and query schemas parse API-03/API-04 payloads including genre and optional imageKey",
+    name: "request and query schemas parse API-03/API-04/API-06 payloads (update: name/imageKey partial)",
     ok:
       createRequest.name === "白シャツ" &&
       createRequest.genre === "tops" &&
       createRequest.imageKey === "clothing/white-shirt.png" &&
-      updateRequest.genre === "bottoms" &&
+      updateRequest.name === "白シャツ（新）" &&
       updateRequest.imageKey === null &&
       listParams.order === "desc" &&
       listParams.genre === "others" &&

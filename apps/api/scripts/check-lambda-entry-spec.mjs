@@ -43,15 +43,23 @@ const clothingResponse = await clothingHandler({
   rawPath: "/wardrobes/wd_010/clothing/cl_001",
   pathParameters: { wardrobeId: "wd_010", clothingId: "cl_001" },
   requestContext: { http: { method: "PATCH", path: "/wardrobes/wd_010/clothing/cl_001" }, requestId: "ctx_clothing" },
+  headers: { "content-type": "application/json", "x-request-id": "req_clothing" },
+  body: JSON.stringify({ name: "黒Tシャツ" }),
 });
-assert.equal(clothingResponse.statusCode, 200);
+assert.equal(clothingResponse.statusCode, 404);
 assert.deepEqual(JSON.parse(clothingResponse.body), {
-  ok: true,
-  domain: "clothing",
-  method: "PATCH",
-  path: { wardrobeId: "wd_010", clothingId: "cl_001" },
+  error: {
+    code: "NOT_FOUND",
+    message: "Clothing was not found.",
+    details: {
+      resource: "clothing",
+      wardrobeId: "wd_010",
+      clothingId: "cl_001",
+    },
+    requestId: "req_clothing",
+  },
 });
-console.log("- clothing Lambda entry は path parameter を保持したまま clothing usecase を呼び出せる");
+console.log("- clothing Lambda entry は PATCH /wardrobes/{wardrobeId}/clothing/{clothingId} を API-06 handler へ委譲できる");
 
 const templateResponse = await templateHandler({
   rawPath: "/wardrobes/wd_020/templates/tmp_001",

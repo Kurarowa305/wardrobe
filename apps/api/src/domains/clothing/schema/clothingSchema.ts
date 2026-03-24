@@ -34,7 +34,6 @@ export const createClothingRequestSchema = z.object({
 
 export const updateClothingRequestSchema = z.object({
   name: clothingNameSchema.optional(),
-  genre: clothingGenreSchema.optional(),
   imageKey: clothingImageKeySchema.nullable().optional(),
 }).strict();
 
