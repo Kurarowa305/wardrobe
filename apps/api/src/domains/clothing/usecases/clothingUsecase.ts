@@ -53,8 +53,12 @@ export type UpdateClothingUsecaseInput = {
   genre?: ClothingGenre | undefined;
   imageKey?: string | null | undefined;
 };
+export type DeleteClothingUsecaseInput = {
+  wardrobeId: string;
+  clothingId: string;
+};
 
-export type ClothingUsecaseRepo = Pick<ClothingRepo, "list" | "create" | "get" | "update">;
+export type ClothingUsecaseRepo = Pick<ClothingRepo, "list" | "create" | "get" | "update" | "delete">;
 
 export type ClothingUsecaseDependencies = {
   repo?: ClothingUsecaseRepo | undefined;
@@ -308,6 +312,30 @@ export function createClothingUsecase(dependencies: ClothingUsecaseDependencies 
         name: input.name ?? currentItem.name,
         genre: input.genre ?? currentItem.genre,
         imageKey: input.imageKey !== undefined ? input.imageKey : currentItem.imageKey,
+      });
+    },
+    async delete(input: DeleteClothingUsecaseInput): Promise<void> {
+      const currentResult = await repo.get({
+        wardrobeId: input.wardrobeId,
+        clothingId: input.clothingId,
+      });
+      const currentItem = extractClothingItem(currentResult);
+
+      if (!currentItem) {
+        throw createAppError("NOT_FOUND", {
+          message: "Clothing was not found.",
+          details: {
+            resource: "clothing",
+            wardrobeId: input.wardrobeId,
+            clothingId: input.clothingId,
+          },
+        });
+      }
+
+      await repo.delete({
+        wardrobeId: currentItem.wardrobeId,
+        clothingId: currentItem.clothingId,
+        deletedAt: now(),
       });
     },
   };
