@@ -121,6 +121,9 @@ jobs:
       - name: API clothing MS2 API-07 aggregate spec test
         run: pnpm --filter api test:clothing-ms2-api07
 
+      - name: API clothing MS2 unit spec test
+        run: pnpm --filter api test:clothing-ms2-unit
+
 
       - name: Typecheck api
         run: pnpm --filter api exec tsc --noEmit
