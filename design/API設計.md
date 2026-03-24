@@ -220,18 +220,20 @@
 | フィールド    | 型       | 説明   |
 | -------- | ------- | ---- |
 | name     | string? | 服名   |
+| genre    | string? | `tops` / `bottoms` / `others` |
 | imageKey | string? | 画像キー |
 
 ```json
 {
-  "name": "黒Tシャツ（夏用）"
+  "name": "黒Tシャツ（夏用）",
+  "genre": "tops"
 }
 ```
 
 ## Error
 | HTTP | error.code             | 発生条件                   |
 | ---: | ---------------------- | ---------------------- |
-|  400 | VALIDATION_ERROR       | `name` / `imageKey` 不正 |
+|  400 | VALIDATION_ERROR       | `name` / `genre` / `imageKey` 不正 |
 |  404 | NOT_FOUND              | 対象の服が存在しない             |
 |  415 | UNSUPPORTED_MEDIA_TYPE | Content-Type 不正        |
 |  500 | INTERNAL_ERROR         | 内部エラー                  |
