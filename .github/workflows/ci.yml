@@ -85,6 +85,9 @@ jobs:
       - name: API clothing schema spec test
         run: pnpm --filter api test:clothing-schema
 
+      - name: API template schema spec test
+        run: pnpm --filter api test:template-schema
+
       - name: API clothing key builder spec test
         run: pnpm --filter api test:clothing-key-builder
 
