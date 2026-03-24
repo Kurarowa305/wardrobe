@@ -9,6 +9,7 @@ import { listClothingHandler } from "../../domains/clothing/handlers/listClothin
 import { createClothingHandler } from "../../domains/clothing/handlers/createClothingHandler.js";
 import { getClothingHandler } from "../../domains/clothing/handlers/getClothingHandler.js";
 import { updateClothingHandler } from "../../domains/clothing/handlers/updateClothingHandler.js";
+import { deleteClothingHandler } from "../../domains/clothing/handlers/deleteClothingHandler.js";
 
 export type LambdaEvent = {
   version?: string;
@@ -93,6 +94,13 @@ export const sharedDomainHandlers: Record<LocalDomain, LocalRouteHandler> = {
         path: request.path,
         body: request.body,
         headers: request.headers,
+        requestId: request.requestId,
+      });
+    }
+
+    if (request.method === "DELETE" && request.path.clothingId) {
+      return deleteClothingHandler({
+        path: request.path,
         requestId: request.requestId,
       });
     }
