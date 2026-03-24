@@ -91,6 +91,15 @@ jobs:
       - name: API clothing repo spec test
         run: pnpm --filter api test:clothing-repo
 
+      - name: API clothing list usecase spec test
+        run: pnpm --filter api test:clothing-list-usecase
+
+      - name: API clothing list handler spec test
+        run: pnpm --filter api test:clothing-list-handler
+
+      - name: API clothing MS2 API-03 aggregate spec test
+        run: pnpm --filter api test:clothing-ms2-api03
+
       - name: Typecheck api
         run: pnpm --filter api exec tsc --noEmit
 

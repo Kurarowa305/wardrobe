@@ -5,6 +5,7 @@ import { createHistoryHandler } from "../../domains/history/handlers/createHisto
 import { deleteHistoryHandler } from "../../domains/history/handlers/deleteHistoryHandler.js";
 import { createWardrobeHandler } from "../../domains/wardrobe/handlers/createWardrobeHandler.js";
 import { getWardrobeHandler } from "../../domains/wardrobe/handlers/getWardrobeHandler.js";
+import { listClothingHandler } from "../../domains/clothing/handlers/listClothingHandler.js";
 
 export type LambdaEvent = {
   version?: string;
@@ -59,7 +60,17 @@ export const sharedDomainHandlers: Record<LocalDomain, LocalRouteHandler> = {
 
     return createDefaultDomainHandler("wardrobe")(request);
   },
-  clothing: createDefaultDomainHandler("clothing"),
+  clothing(request) {
+    if (request.method === "GET" && request.pathname === `/wardrobes/${request.path.wardrobeId}/clothing`) {
+      return listClothingHandler({
+        path: request.path,
+        query: request.query,
+        requestId: request.requestId,
+      });
+    }
+
+    return createDefaultDomainHandler("clothing")(request);
+  },
   template: createDefaultDomainHandler("template"),
   history(request) {
     if (request.method === "POST" && request.pathname === `/wardrobes/${request.path.wardrobeId}/histories`) {
