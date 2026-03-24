@@ -100,6 +100,12 @@ jobs:
       - name: API clothing MS2 API-03 aggregate spec test
         run: pnpm --filter api test:clothing-ms2-api03
 
+      - name: API clothing create handler spec test
+        run: pnpm --filter api test:clothing-create-handler
+
+      - name: API clothing MS2 API-04 aggregate spec test
+        run: pnpm --filter api test:clothing-ms2-api04
+
       - name: Typecheck api
         run: pnpm --filter api exec tsc --noEmit
 
