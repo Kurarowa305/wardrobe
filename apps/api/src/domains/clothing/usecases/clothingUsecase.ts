@@ -1,7 +1,8 @@
 import { decodeCursor, encodeCursor, type CursorPrimitive } from "../../../core/cursor/index.js";
+import { createAppError } from "../../../core/errors/index.js";
 import { generateUuidV7 } from "../../wardrobe/usecases/wardrobeUsecase.js";
 import { createClothingRepo, clothingListIndexNames, type ClothingRepo } from "../repo/clothingRepo.js";
-import type { ClothingListItemDto, ClothingListOrderDto, ClothingListParamsDto } from "../dto/clothingDto.js";
+import type { ClothingDetailResponseDto, ClothingListItemDto, ClothingListOrderDto, ClothingListParamsDto } from "../dto/clothingDto.js";
 import type { ClothingItem } from "../repo/clothingRepo.js";
 import { createClothingEntity } from "../entities/clothing.js";
 import type { ClothingGenre } from "../schema/clothingSchema.js";
@@ -39,7 +40,14 @@ export type CreateClothingUsecaseOutput = {
   clothingId: string;
 };
 
-export type ClothingUsecaseRepo = Pick<ClothingRepo, "list" | "create">;
+export type GetClothingUsecaseInput = {
+  wardrobeId: string;
+  clothingId: string;
+};
+
+export type GetClothingUsecaseOutput = ClothingDetailResponseDto;
+
+export type ClothingUsecaseRepo = Pick<ClothingRepo, "list" | "create" | "get">;
 
 export type ClothingUsecaseDependencies = {
   repo?: ClothingUsecaseRepo | undefined;
@@ -48,6 +56,7 @@ export type ClothingUsecaseDependencies = {
 };
 
 type RepoListResult = Awaited<ReturnType<ClothingUsecaseRepo["list"]>>;
+type RepoGetResult = Awaited<ReturnType<ClothingUsecaseRepo["get"]>>;
 
 type ClothingListQueryResult = {
   Items?: unknown;
@@ -84,12 +93,23 @@ function toClothingListItem(item: ClothingItem): ClothingListItemDto {
   };
 }
 
-function isClothingItem(value: unknown): value is ClothingItem {
+function isClothingListItem(value: unknown): value is Pick<ClothingItem, "clothingId" | "name" | "genre" | "imageKey"> {
   return isRecord(value)
     && typeof value.clothingId === "string"
     && typeof value.name === "string"
     && typeof value.genre === "string"
     && (value.imageKey === null || typeof value.imageKey === "string");
+}
+
+function isClothingDetailItem(value: unknown): value is ClothingItem {
+  if (!isClothingListItem(value)) {
+    return false;
+  }
+
+  const candidate = value as Record<string, unknown>;
+  return typeof candidate.status === "string"
+    && typeof candidate.wearCount === "number"
+    && typeof candidate.lastWornAt === "number";
 }
 
 function extractItems(result: ClothingListQueryResult): ClothingItem[] {
@@ -98,7 +118,7 @@ function extractItems(result: ClothingListQueryResult): ClothingItem[] {
     return [];
   }
 
-  return candidates.filter(isClothingItem);
+    return candidates.filter(isClothingListItem) as ClothingItem[];
 }
 
 function extractLastEvaluatedKey(result: ClothingListQueryResult): ClothingListCursorPosition | null {
@@ -164,6 +184,31 @@ function encodeListCursor(input: {
   });
 }
 
+function extractClothingItem(result: RepoGetResult): ClothingItem | null {
+  if (!isRecord(result)) {
+    return null;
+  }
+
+  const candidate = (result as { Item?: unknown; item?: unknown }).Item ?? (result as { item?: unknown }).item;
+  if (!isClothingDetailItem(candidate)) {
+    return null;
+  }
+
+  return candidate;
+}
+
+function toClothingDetail(item: ClothingItem): ClothingDetailResponseDto {
+  return {
+    clothingId: item.clothingId,
+    name: item.name,
+    genre: item.genre,
+    imageKey: item.imageKey,
+    status: item.status,
+    wearCount: item.wearCount,
+    lastWornAt: item.lastWornAt,
+  };
+}
+
 export function createClothingUsecase(dependencies: ClothingUsecaseDependencies = {}) {
   const repo = dependencies.repo ?? createClothingRepo();
   const now = dependencies.now ?? Date.now;
@@ -212,6 +257,26 @@ export function createClothingUsecase(dependencies: ClothingUsecaseDependencies 
           ? encodeListCursor({ order, genre: input.params.genre, position: nextPosition })
           : null,
       };
+    },
+    async get(input: GetClothingUsecaseInput): Promise<GetClothingUsecaseOutput> {
+      const result = await repo.get({
+        wardrobeId: input.wardrobeId,
+        clothingId: input.clothingId,
+      });
+      const item = extractClothingItem(result);
+
+      if (!item) {
+        throw createAppError("NOT_FOUND", {
+          message: "Clothing was not found.",
+          details: {
+            resource: "clothing",
+            wardrobeId: input.wardrobeId,
+            clothingId: input.clothingId,
+          },
+        });
+      }
+
+      return toClothingDetail(item);
     },
   };
 }
