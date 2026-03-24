@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
-    "test": "pnpm run test:bootstrap && pnpm run test:env && pnpm run test:dynamodb && pnpm run test:s3 && pnpm run test:errors && pnpm run test:response && pnpm run test:validation && pnpm run test:cursor && pnpm run test:logging && pnpm run test:local-router && pnpm run test:lambda-entry && pnpm run test:wardrobe-repo && pnpm run test:wardrobe-usecase && pnpm run test:wardrobe-create-handler && pnpm run test:wardrobe-get-handler && pnpm run test:wardrobe-ms1 && pnpm run test:clothing-schema && pnpm run test:clothing-key-builder && pnpm run test:clothing-repo && pnpm run test:clothing-list-usecase && pnpm run test:clothing-list-handler && pnpm run test:clothing-ms2-api03 && pnpm run test:clothing-create-handler && pnpm run test:clothing-ms2-api04",
+    "test": "pnpm run test:bootstrap && pnpm run test:env && pnpm run test:dynamodb && pnpm run test:s3 && pnpm run test:errors && pnpm run test:response && pnpm run test:validation && pnpm run test:cursor && pnpm run test:logging && pnpm run test:local-router && pnpm run test:lambda-entry && pnpm run test:wardrobe-repo && pnpm run test:wardrobe-usecase && pnpm run test:wardrobe-create-handler && pnpm run test:wardrobe-get-handler && pnpm run test:wardrobe-ms1 && pnpm run test:clothing-schema && pnpm run test:clothing-key-builder && pnpm run test:clothing-repo && pnpm run test:clothing-list-usecase && pnpm run test:clothing-list-handler && pnpm run test:clothing-ms2-api03 && pnpm run test:clothing-create-handler && pnpm run test:clothing-ms2-api04 && pnpm run test:clothing-get-usecase && pnpm run test:clothing-get-handler && pnpm run test:clothing-ms2-api05",
     "dev": "tsx watch src/index.ts",
     "start": "node dist/index.js",
     "build": "tsc --outDir dist",
@@ -34,7 +34,10 @@
     "test:clothing-list-handler": "node --import tsx/esm scripts/check-clothing-list-handler-spec.mjs",
     "test:clothing-ms2-api03": "node --import tsx/esm scripts/check-clothing-ms2-api03-spec.mjs",
     "test:clothing-create-handler": "node --import tsx/esm scripts/check-clothing-create-handler-spec.mjs",
-    "test:clothing-ms2-api04": "node --import tsx/esm scripts/check-clothing-ms2-api04-spec.mjs"
+    "test:clothing-ms2-api04": "node --import tsx/esm scripts/check-clothing-ms2-api04-spec.mjs",
+    "test:clothing-get-usecase": "node --import tsx/esm scripts/check-clothing-get-usecase-spec.mjs",
+    "test:clothing-get-handler": "node --import tsx/esm scripts/check-clothing-get-handler-spec.mjs",
+    "test:clothing-ms2-api05": "node --import tsx/esm scripts/check-clothing-ms2-api05-spec.mjs"
   },
   "keywords": [],
   "author": "",

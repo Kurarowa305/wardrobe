@@ -7,6 +7,7 @@ import { createWardrobeHandler } from "../../domains/wardrobe/handlers/createWar
 import { getWardrobeHandler } from "../../domains/wardrobe/handlers/getWardrobeHandler.js";
 import { listClothingHandler } from "../../domains/clothing/handlers/listClothingHandler.js";
 import { createClothingHandler } from "../../domains/clothing/handlers/createClothingHandler.js";
+import { getClothingHandler } from "../../domains/clothing/handlers/getClothingHandler.js";
 
 export type LambdaEvent = {
   version?: string;
@@ -67,6 +68,13 @@ export const sharedDomainHandlers: Record<LocalDomain, LocalRouteHandler> = {
         path: request.path,
         body: request.body,
         headers: request.headers,
+        requestId: request.requestId,
+      });
+    }
+
+    if (request.method === "GET" && request.path.clothingId) {
+      return getClothingHandler({
+        path: request.path,
         requestId: request.requestId,
       });
     }
