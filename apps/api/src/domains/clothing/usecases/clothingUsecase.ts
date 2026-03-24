@@ -46,8 +46,15 @@ export type GetClothingUsecaseInput = {
 };
 
 export type GetClothingUsecaseOutput = ClothingDetailResponseDto;
+export type UpdateClothingUsecaseInput = {
+  wardrobeId: string;
+  clothingId: string;
+  name?: string | undefined;
+  genre?: ClothingGenre | undefined;
+  imageKey?: string | null | undefined;
+};
 
-export type ClothingUsecaseRepo = Pick<ClothingRepo, "list" | "create" | "get">;
+export type ClothingUsecaseRepo = Pick<ClothingRepo, "list" | "create" | "get" | "update">;
 
 export type ClothingUsecaseDependencies = {
   repo?: ClothingUsecaseRepo | undefined;
@@ -277,6 +284,31 @@ export function createClothingUsecase(dependencies: ClothingUsecaseDependencies 
       }
 
       return toClothingDetail(item);
+    },
+    async update(input: UpdateClothingUsecaseInput): Promise<void> {
+      const currentResult = await repo.get({
+        wardrobeId: input.wardrobeId,
+        clothingId: input.clothingId,
+      });
+      const currentItem = extractClothingItem(currentResult);
+
+      if (!currentItem) {
+        throw createAppError("NOT_FOUND", {
+          message: "Clothing was not found.",
+          details: {
+            resource: "clothing",
+            wardrobeId: input.wardrobeId,
+            clothingId: input.clothingId,
+          },
+        });
+      }
+
+      await repo.update({
+        ...currentItem,
+        name: input.name ?? currentItem.name,
+        genre: input.genre ?? currentItem.genre,
+        imageKey: input.imageKey !== undefined ? input.imageKey : currentItem.imageKey,
+      });
     },
   };
 }
