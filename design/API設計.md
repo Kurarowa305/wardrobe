@@ -279,7 +279,7 @@
 | ------------- | -------------- | -------------- |
 | templateId    | string         | テンプレID         |
 | name          | string         | テンプレ名          |
-| clothingItems | [] | 構成服（順序付き・最大4件）   |
+| clothingItems | [] | 構成服（順序付き・全件）   |
 
 ### template
 | フィールド      | 型      | 説明 |
