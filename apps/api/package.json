@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
-    "test": "pnpm run test:bootstrap && pnpm run test:env && pnpm run test:dynamodb && pnpm run test:s3 && pnpm run test:errors && pnpm run test:response && pnpm run test:validation && pnpm run test:cursor && pnpm run test:logging && pnpm run test:local-router && pnpm run test:lambda-entry && pnpm run test:wardrobe-repo && pnpm run test:wardrobe-usecase && pnpm run test:wardrobe-create-handler && pnpm run test:wardrobe-get-handler && pnpm run test:wardrobe-ms1 && pnpm run test:clothing-schema && pnpm run test:template-schema && pnpm run test:clothing-key-builder && pnpm run test:template-key-builder && pnpm run test:template-repo && pnpm run test:clothing-batch-get-repo && pnpm run test:clothing-repo && pnpm run test:clothing-list-usecase && pnpm run test:clothing-list-handler && pnpm run test:clothing-ms2-api03 && pnpm run test:clothing-create-handler && pnpm run test:clothing-ms2-api04 && pnpm run test:clothing-get-usecase && pnpm run test:clothing-get-handler && pnpm run test:clothing-ms2-api05 && pnpm run test:clothing-ms2-api06 && pnpm run test:clothing-ms2-api07 && pnpm run test:clothing-ms2-unit",
+    "test": "pnpm run test:bootstrap && pnpm run test:env && pnpm run test:dynamodb && pnpm run test:s3 && pnpm run test:errors && pnpm run test:response && pnpm run test:validation && pnpm run test:cursor && pnpm run test:logging && pnpm run test:local-router && pnpm run test:lambda-entry && pnpm run test:wardrobe-repo && pnpm run test:wardrobe-usecase && pnpm run test:wardrobe-create-handler && pnpm run test:wardrobe-get-handler && pnpm run test:wardrobe-ms1 && pnpm run test:clothing-schema && pnpm run test:template-schema && pnpm run test:clothing-key-builder && pnpm run test:template-key-builder && pnpm run test:template-repo && pnpm run test:clothing-batch-get-repo && pnpm run test:clothing-repo && pnpm run test:clothing-list-usecase && pnpm run test:clothing-list-handler && pnpm run test:clothing-ms2-api03 && pnpm run test:clothing-create-handler && pnpm run test:clothing-ms2-api04 && pnpm run test:clothing-get-usecase && pnpm run test:clothing-get-handler && pnpm run test:clothing-ms2-api05 && pnpm run test:clothing-ms2-api06 && pnpm run test:clothing-ms2-api07 && pnpm run test:clothing-ms2-unit && pnpm run test:template-list-usecase && pnpm run test:template-list-handler && pnpm run test:template-ms3-api08",
     "dev": "tsx watch src/index.ts",
     "start": "node dist/index.js",
     "build": "tsc --outDir dist",
@@ -44,7 +44,10 @@
     "test:clothing-ms2-api07": "node --import tsx/esm scripts/check-clothing-ms2-api07-spec.mjs",
     "test:clothing-ms2-unit": "node --import tsx/esm scripts/check-clothing-ms2-unit-spec.mjs",
     "test:template-repo": "node --import tsx/esm scripts/check-template-repo-spec.mjs",
-    "test:clothing-batch-get-repo": "node --import tsx/esm scripts/check-clothing-batch-get-repo-spec.mjs"
+    "test:clothing-batch-get-repo": "node --import tsx/esm scripts/check-clothing-batch-get-repo-spec.mjs",
+    "test:template-list-usecase": "node --import tsx/esm scripts/check-template-list-usecase-spec.mjs",
+    "test:template-list-handler": "node --import tsx/esm scripts/check-template-list-handler-spec.mjs",
+    "test:template-ms3-api08": "node --import tsx/esm scripts/check-template-ms3-api08-spec.mjs"
   },
   "keywords": [],
   "author": "",

@@ -97,6 +97,15 @@ jobs:
       - name: API template repo spec test
         run: pnpm --filter api test:template-repo
 
+      - name: API template list usecase spec test
+        run: pnpm --filter api test:template-list-usecase
+
+      - name: API template list handler spec test
+        run: pnpm --filter api test:template-list-handler
+
+      - name: API template API-08 aggregate spec test
+        run: pnpm --filter api test:template-ms3-api08
+
       - name: API clothing batch-get repo spec test
         run: pnpm --filter api test:clothing-batch-get-repo
 
