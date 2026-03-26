@@ -1,8 +1,11 @@
 import { decodeCursor, encodeCursor, type CursorPrimitive } from "../../../core/cursor/index.js";
+import { createAppError } from "../../../core/errors/index.js";
 import { createTemplateRepo, templateListIndexNames, type TemplateItem, type TemplateRepo } from "../repo/templateRepo.js";
 import type { TemplateListItemDto, TemplateListOrderDto, TemplateListParamsDto } from "../dto/templateDto.js";
 import { createClothingBatchGetRepo, reorderClothingItemsByIds, type BatchGetClothingRepo } from "../../clothing/repo/clothingBatchGetRepo.js";
 import type { ClothingStatus } from "../../clothing/schema/clothingSchema.js";
+import { createTemplateEntity } from "../entities/template.js";
+import { generateUuidV7 } from "../../wardrobe/usecases/wardrobeUsecase.js";
 
 const templateListResource = "template-list";
 
@@ -26,11 +29,23 @@ export type ListTemplateUsecaseOutput = {
   nextCursor: string | null;
 };
 
-export type TemplateUsecaseRepo = Pick<TemplateRepo, "list">;
+export type CreateTemplateUsecaseInput = {
+  wardrobeId: string;
+  name: string;
+  clothingIds: string[];
+};
+
+export type CreateTemplateUsecaseOutput = {
+  templateId: string;
+};
+
+export type TemplateUsecaseRepo = Pick<TemplateRepo, "list" | "create">;
 
 export type TemplateUsecaseDependencies = {
   repo?: TemplateUsecaseRepo | undefined;
   clothingBatchGetRepo?: Pick<BatchGetClothingRepo, "batchGetByIds"> | undefined;
+  now?: (() => number) | undefined;
+  generateTemplateId?: (() => string) | undefined;
 };
 
 type RepoListResult = Awaited<ReturnType<TemplateUsecaseRepo["list"]>>;
@@ -192,8 +207,56 @@ function toTemplateListItem(item: TemplateItem, clothingItemsById: Map<string, {
 export function createTemplateUsecase(dependencies: TemplateUsecaseDependencies = {}) {
   const repo = dependencies.repo ?? createTemplateRepo();
   const clothingBatchGetRepo = dependencies.clothingBatchGetRepo ?? createClothingBatchGetRepo();
+  const now = dependencies.now ?? Date.now;
+  const generateTemplateId = dependencies.generateTemplateId ?? (() => `tp_${generateUuidV7()}`);
 
   return {
+    async create(input: CreateTemplateUsecaseInput): Promise<CreateTemplateUsecaseOutput> {
+      const uniqueIds = new Set(input.clothingIds);
+      if (uniqueIds.size !== input.clothingIds.length) {
+        throw createAppError("CONFLICT", {
+          message: "clothingIds must not contain duplicates.",
+          details: {
+            reason: "duplicate clothingIds",
+          },
+        });
+      }
+
+      const clothingItems = extractBatchGetItems(await clothingBatchGetRepo.batchGetByIds({
+        wardrobeId: input.wardrobeId,
+        clothingIds: input.clothingIds,
+      }));
+
+      const activeIds = new Set(
+        clothingItems
+          .filter((item) => item.status === "ACTIVE")
+          .map((item) => item.clothingId),
+      );
+      const missingIds = input.clothingIds.filter((clothingId) => !activeIds.has(clothingId));
+      if (missingIds.length > 0) {
+        throw createAppError("NOT_FOUND", {
+          message: "Referenced clothing was not found.",
+          details: {
+            resource: "clothing",
+            wardrobeId: input.wardrobeId,
+            clothingIds: missingIds,
+          },
+        });
+      }
+
+      const templateId = generateTemplateId();
+      await repo.create(createTemplateEntity({
+        wardrobeId: input.wardrobeId,
+        templateId,
+        name: input.name,
+        clothingIds: input.clothingIds,
+        now: now(),
+      }));
+
+      return {
+        templateId,
+      };
+    },
     async list(input: ListTemplateUsecaseInput): Promise<ListTemplateUsecaseOutput> {
       const order = resolveOrder(input.params.order);
       const decodedCursor = decodeListCursor({
