@@ -12,6 +12,7 @@ import { updateClothingHandler } from "../../domains/clothing/handlers/updateClo
 import { deleteClothingHandler } from "../../domains/clothing/handlers/deleteClothingHandler.js";
 import { listTemplateHandler } from "../../domains/template/handlers/listTemplateHandler.js";
 import { createTemplateHandler } from "../../domains/template/handlers/createTemplateHandler.js";
+import { getTemplateHandler } from "../../domains/template/handlers/getTemplateHandler.js";
 
 export type LambdaEvent = {
   version?: string;
@@ -123,6 +124,13 @@ export const sharedDomainHandlers: Record<LocalDomain, LocalRouteHandler> = {
       return listTemplateHandler({
         path: request.path,
         query: request.query,
+        requestId: request.requestId,
+      });
+    }
+
+    if (request.method === "GET" && request.path.templateId) {
+      return getTemplateHandler({
+        path: request.path,
         requestId: request.requestId,
       });
     }
