@@ -142,6 +142,9 @@ jobs:
       - name: API template API-12 aggregate spec test
         run: pnpm --filter api test:template-ms3-api12
 
+      - name: API template MS3-T10 aggregate spec test
+        run: pnpm --filter api test:template-ms3-t10
+
       - name: API clothing batch-get repo spec test
         run: pnpm --filter api test:clothing-batch-get-repo
 
