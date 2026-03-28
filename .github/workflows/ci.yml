@@ -274,6 +274,9 @@ jobs:
       - name: API terraform dynamodb BE-MS7-T01 spec test
         run: pnpm --filter api test:terraform-dynamodb-ms7-t01
 
+      - name: API terraform S3 images BE-MS7-T02 spec test
+        run: pnpm --filter api test:terraform-s3-images-ms7-t02
+
       - name: Typecheck api
         run: pnpm --filter api exec tsc --noEmit
 
