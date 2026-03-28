@@ -226,6 +226,9 @@ jobs:
       - name: API history stats_write daily aggregation spec test
         run: pnpm --filter api test:history-stats-write-daily
 
+      - name: API history stats_write recompute spec test
+        run: pnpm --filter api test:history-stats-write-recompute
+
       - name: Typecheck api
         run: pnpm --filter api exec tsc --noEmit
 
