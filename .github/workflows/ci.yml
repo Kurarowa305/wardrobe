@@ -232,6 +232,10 @@ jobs:
       - name: API history stats_write transact builder spec test
         run: pnpm --filter api test:history-stats-write-transact-builder
 
+      - name: API history stats_write guard spec test
+        run: pnpm --filter api test:history-stats-write-guard
+
+
       - name: Typecheck api
         run: pnpm --filter api exec tsc --noEmit
 
