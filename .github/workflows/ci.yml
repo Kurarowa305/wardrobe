@@ -193,6 +193,9 @@ jobs:
       - name: API history repo spec test
         run: pnpm --filter api test:history-repo
 
+      - name: API history details resolver spec test
+        run: pnpm --filter api test:history-details-resolver
+
 
       - name: Typecheck api
         run: pnpm --filter api exec tsc --noEmit
