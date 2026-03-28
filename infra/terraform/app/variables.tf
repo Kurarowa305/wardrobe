@@ -18,6 +18,12 @@ variable "tags" {
   default = {}
 }
 
+
+variable "lambda_app_name" {
+  type    = string
+  default = "wardrobe"
+}
+
 variable "lambda_handler" {
   type    = string
   default = "index.handler"
