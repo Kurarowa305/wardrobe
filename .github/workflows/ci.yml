@@ -253,6 +253,9 @@ jobs:
       - name: API history API-16 handler spec test
         run: pnpm --filter api test:history-ms5-api16-handler
 
+      - name: API history MS5 write integration spec test
+        run: pnpm --filter api test:history-ms5-write-integration
+
 
       - name: Typecheck api
         run: pnpm --filter api exec tsc --noEmit
