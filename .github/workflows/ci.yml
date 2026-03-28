@@ -265,6 +265,9 @@ jobs:
       - name: API presign API-17 handler spec test
         run: pnpm --filter api test:presign-ms6-api17
 
+      - name: API presign MS6-T05 aggregate spec test
+        run: pnpm --filter api test:presign-ms6-t05
+
       - name: API presign schema/category spec test
         run: pnpm --filter api test:presign-schema
 
