@@ -23,10 +23,14 @@ export function buildPresignImageKey(
   dependencies: BuildPresignImageKeyDependencies = {},
 ): string {
   const prefix = presignCategoryPrefixMap[input.category];
-  const extension = resolvePresignExtension({
-    contentType: input.contentType,
-    extension: input.extension,
-  });
+  const extension = input.extension === undefined
+    ? resolvePresignExtension({
+      contentType: input.contentType,
+    })
+    : resolvePresignExtension({
+      contentType: input.contentType,
+      extension: input.extension,
+    });
   const generateUuid = dependencies.generateUuid ?? generateUuidV7;
 
   return `${prefix}/${input.wardrobeId}/${generateUuid()}.${extension}`;
