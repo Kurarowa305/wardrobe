@@ -127,8 +127,46 @@ await assert.rejects(
 );
 console.log("- handler rejects non-json content type as UNSUPPORTED_MEDIA_TYPE");
 
-const deleteResponse = deleteHistoryHandler({
+const deleteResponse = await deleteHistoryHandler({
   path: { wardrobeId: "wd_01", historyId: "hs_01" },
+  dependencies: {
+    async getHistory() {
+      return {
+        Item: {
+          wardrobeId: "wd_01",
+          historyId: "hs_01",
+          date: "20260101",
+          templateId: null,
+          clothingIds: ["cl_01"],
+          createdAt: 1735689600000,
+        },
+      };
+    },
+    async batchGetClothingByIds() {
+      return [
+        {
+          Responses: {
+            WardrobeTable: [
+              {
+                clothingId: "cl_01",
+                wearCount: 1,
+                lastWornAt: Date.UTC(2026, 0, 1, 0, 0, 0, 0),
+              },
+            ],
+          },
+        },
+      ];
+    },
+    async getWearDailyCount() {
+      return 1;
+    },
+    async findLatestBeforeDate() {
+      return null;
+    },
+    async transactWriteItems() {
+      return { ok: true };
+    },
+  },
 });
 assert.equal(deleteResponse.statusCode, 204);
 assert.equal(deleteResponse.body, "");
