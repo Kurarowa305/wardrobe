@@ -13,7 +13,6 @@ import { templateNameSchema } from "../../template/schema/templateSchema.js";
 export const historyListOrderValues = ["asc", "desc"] as const;
 
 export const historyDatePattern = /^\d{8}$/;
-export const historyClothingIdsMax = 4;
 export const historyListLimitMax = 30;
 
 export const historyListOrderSchema = z.enum(historyListOrderValues);
@@ -21,7 +20,7 @@ export const historyIdSchema = z.string().trim().min(1);
 export const wardrobeIdSchema = z.string().trim().min(1);
 export const historyDateSchema = z.string().regex(historyDatePattern, "Expected yyyymmdd format.");
 
-export const historyClothingIdsSchema = z.array(clothingIdSchema).min(1).max(historyClothingIdsMax);
+export const historyClothingIdsSchema = z.array(clothingIdSchema).min(1);
 
 export const historyListParamsSchema = z.object({
   from: historyDateSchema.optional(),

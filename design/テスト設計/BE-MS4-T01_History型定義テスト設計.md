@@ -24,7 +24,8 @@
 - 期待結果:
   - `historyListOrderValues` が `asc | desc` を持つ
   - `historyListParamsSchema` が `from` / `to` / `order` / `limit` / `cursor` を持つ
-  - `historyListLimitMax` が 30、`historyClothingIdsMax` が 4 として定義される
+  - `historyListLimitMax` が 30 として定義される
+  - `historyClothingIdsSchema` に最大数制限を設けない
 
 ### HS-03 履歴作成リクエストが templateId と clothingIds の排他入力を表現する
 - 観点: API-14 の入力制約を schema で検証できるか

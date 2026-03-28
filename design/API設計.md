@@ -494,7 +494,7 @@
 | historyId     | string         | 履歴ID                             |
 | date          | string         | `yyyymmdd`                       |
 | name  | string?        | テンプレ入力ならテンプレ名（組み合わせ入力なら null） |
-| clothingItems | [] | 着用服（順序付き・最大4件）                     |
+| clothingItems | [] | 着用服（順序付き）                     |
 
 ### template
 | フィールド      | 型      | 説明 |

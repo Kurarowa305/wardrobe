@@ -108,11 +108,10 @@ assert.ok(invalidInputError instanceof Error);
 
 const checks = [
   {
-    name: "schema defines history fields and limits from API design",
+    name: "schema defines history fields and limits from API design (clothingItems count is unlimited)",
     ok:
       Array.isArray(schemaModule.historyListOrderValues) &&
       schemaModule.historyListOrderValues.join(",") === "asc,desc" &&
-      schemaModule.historyClothingIdsMax === 4 &&
       schemaModule.historyListLimitMax === 30,
     detail: schemaModule,
   },
