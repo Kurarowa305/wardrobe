@@ -2,6 +2,44 @@ locals {
   cors_allow_origins = [
     "https://${aws_cloudfront_distribution.web.domain_name}"
   ]
+
+  apigw_domain_integrations = {
+    wardrobe = aws_lambda_function.domain["wardrobe"].invoke_arn
+    clothing = aws_lambda_function.domain["clothing"].invoke_arn
+    template = aws_lambda_function.domain["template"].invoke_arn
+    history  = aws_lambda_function.domain["history"].invoke_arn
+    presign  = aws_lambda_function.domain["presign"].invoke_arn
+  }
+
+  apigw_domain_route_keys = {
+    wardrobe = [
+      "ANY /wardrobes",
+      "ANY /wardrobes/{proxy+}"
+    ]
+    clothing = [
+      "ANY /wardrobes/{wardrobeId}/clothings",
+      "ANY /wardrobes/{wardrobeId}/clothings/{proxy+}"
+    ]
+    template = [
+      "ANY /wardrobes/{wardrobeId}/templates",
+      "ANY /wardrobes/{wardrobeId}/templates/{proxy+}"
+    ]
+    history = [
+      "ANY /wardrobes/{wardrobeId}/histories",
+      "ANY /wardrobes/{wardrobeId}/histories/{proxy+}"
+    ]
+    presign = [
+      "ANY /wardrobes/{wardrobeId}/images/presign",
+      "ANY /wardrobes/{wardrobeId}/images/presign/{proxy+}"
+    ]
+  }
+
+  apigw_route_integrations = merge([
+    for domain, route_keys in local.apigw_domain_route_keys : {
+      for route_key in route_keys :
+      route_key => domain
+    }
+  ]...)
 }
 
 resource "aws_apigatewayv2_api" "http_api" {
@@ -48,29 +86,29 @@ resource "aws_apigatewayv2_stage" "default" {
   tags = local.tags
 }
 
-resource "aws_apigatewayv2_integration" "lambda" {
+resource "aws_apigatewayv2_integration" "domain" {
+  for_each = local.apigw_domain_integrations
+
   api_id                 = aws_apigatewayv2_api.http_api.id
   integration_type       = "AWS_PROXY"
-  integration_uri        = aws_lambda_function.api.invoke_arn
+  integration_uri        = each.value
   payload_format_version = "2.0"
 }
 
-resource "aws_apigatewayv2_route" "root" {
+resource "aws_apigatewayv2_route" "domain" {
+  for_each = local.apigw_route_integrations
+
   api_id    = aws_apigatewayv2_api.http_api.id
-  route_key = "ANY /"
-  target    = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  route_key = each.key
+  target    = "integrations/${aws_apigatewayv2_integration.domain[each.value].id}"
 }
 
-resource "aws_apigatewayv2_route" "proxy" {
-  api_id    = aws_apigatewayv2_api.http_api.id
-  route_key = "ANY /{proxy+}"
-  target    = "integrations/${aws_apigatewayv2_integration.lambda.id}"
-}
+resource "aws_lambda_permission" "apigw_domain" {
+  for_each = local.lambda_domains
 
-resource "aws_lambda_permission" "apigw" {
-  statement_id  = "AllowExecutionFromApiGateway"
+  statement_id  = "AllowExecutionFromApiGateway${title(each.key)}"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.api.function_name
+  function_name = aws_lambda_function.domain[each.key].function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_apigatewayv2_api.http_api.execution_arn}/*/*"
 }
