@@ -17,6 +17,7 @@ import { createTemplateHandler } from "../../domains/template/handlers/createTem
 import { getTemplateHandler } from "../../domains/template/handlers/getTemplateHandler.js";
 import { updateTemplateHandler } from "../../domains/template/handlers/updateTemplateHandler.js";
 import { deleteTemplateHandler } from "../../domains/template/handlers/deleteTemplateHandler.js";
+import { createPresignHandler } from "../../domains/presign/handlers/createPresignHandler.js";
 
 export type LambdaEvent = {
   version?: string;
@@ -191,7 +192,18 @@ export const sharedDomainHandlers: Record<LocalDomain, LocalRouteHandler> = {
 
     return createDefaultDomainHandler("history")(request);
   },
-  presign: createDefaultDomainHandler("presign"),
+  presign(request) {
+    if (request.method === "POST" && request.pathname === `/wardrobes/${request.path.wardrobeId}/images/presign`) {
+      return createPresignHandler({
+        path: request.path,
+        body: request.body,
+        headers: request.headers,
+        requestId: request.requestId,
+      });
+    }
+
+    return createDefaultDomainHandler("presign")(request);
+  },
 };
 
 function decodeBody(event: LambdaEvent): unknown {
