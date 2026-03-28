@@ -277,6 +277,9 @@ jobs:
       - name: API terraform S3 images BE-MS7-T02 spec test
         run: pnpm --filter api test:terraform-s3-images-ms7-t02
 
+      - name: API terraform Lambda BE-MS7-T03 spec test
+        run: pnpm --filter api test:terraform-lambda-ms7-t03
+
       - name: Typecheck api
         run: pnpm --filter api exec tsc --noEmit
 
