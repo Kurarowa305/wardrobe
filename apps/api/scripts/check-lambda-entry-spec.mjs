@@ -102,9 +102,20 @@ const deletedHistoryResponse = await historyHandler({
   requestContext: { http: { method: "DELETE", path: "/wardrobes/wd_030/histories/hs_001" }, requestId: "ctx_history_delete" },
   headers: { "x-request-id": "req_history_delete" },
 });
-assert.equal(deletedHistoryResponse.statusCode, 204);
-assert.equal(deletedHistoryResponse.body, "");
-console.log("- history Lambda entry は deleteHistoryHandler と同じ no-content レスポンスを返せる");
+assert.equal(deletedHistoryResponse.statusCode, 404);
+assert.deepEqual(JSON.parse(deletedHistoryResponse.body), {
+  error: {
+    code: "NOT_FOUND",
+    message: "History was not found.",
+    details: {
+      resource: "history",
+      wardrobeId: "wd_030",
+      historyId: "hs_001",
+    },
+    requestId: "req_history_delete",
+  },
+});
+console.log("- history Lambda entry は deleteHistoryHandler で未存在時に共通エラー形式（NOT_FOUND）を返せる");
 
 const invalidHistoryResponse = await historyHandler({
   rawPath: "/wardrobes/wd_030/histories",
