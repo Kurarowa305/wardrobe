@@ -190,6 +190,9 @@ jobs:
       - name: API history key builder spec test
         run: pnpm --filter api test:history-key-builder
 
+      - name: API history repo spec test
+        run: pnpm --filter api test:history-repo
+
 
       - name: Typecheck api
         run: pnpm --filter api exec tsc --noEmit
