@@ -286,6 +286,9 @@ jobs:
       - name: API terraform IAM BE-MS7-T05 spec test
         run: pnpm --filter api test:terraform-iam-ms7-t05
 
+      - name: API terraform CloudFront/S3 web/images BE-MS7-T06 spec test
+        run: pnpm --filter api test:terraform-cloudfront-ms7-t06
+
       - name: Typecheck api
         run: pnpm --filter api exec tsc --noEmit
 
