@@ -196,6 +196,14 @@ jobs:
       - name: API history details resolver spec test
         run: pnpm --filter api test:history-details-resolver
 
+      - name: API history list usecase spec test
+        run: pnpm --filter api test:history-list-usecase
+
+      - name: API history list handler spec test
+        run: pnpm --filter api test:history-list-handler
+
+      - name: API history API-13 aggregate spec test
+        run: pnpm --filter api test:history-ms4-api13
 
       - name: Typecheck api
         run: pnpm --filter api exec tsc --noEmit
