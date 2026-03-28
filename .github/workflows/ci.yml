@@ -184,6 +184,9 @@ jobs:
       - name: API clothing MS2 unit spec test
         run: pnpm --filter api test:clothing-ms2-unit
 
+      - name: API history schema spec test
+        run: pnpm --filter api test:history-schema
+
 
       - name: Typecheck api
         run: pnpm --filter api exec tsc --noEmit
