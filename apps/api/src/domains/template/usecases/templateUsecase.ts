@@ -53,7 +53,12 @@ export type UpdateTemplateUsecaseInput = {
   clothingIds?: string[] | undefined;
 };
 
-export type TemplateUsecaseRepo = Pick<TemplateRepo, "list" | "create" | "get" | "update">;
+export type DeleteTemplateUsecaseInput = {
+  wardrobeId: string;
+  templateId: string;
+};
+
+export type TemplateUsecaseRepo = Pick<TemplateRepo, "list" | "create" | "get" | "update" | "delete">;
 
 export type TemplateUsecaseDependencies = {
   repo?: TemplateUsecaseRepo | undefined;
@@ -397,6 +402,29 @@ export function createTemplateUsecase(dependencies: TemplateUsecaseDependencies 
         ...currentTemplate,
         name: input.name ?? currentTemplate.name,
         clothingIds: nextClothingIds,
+      });
+    },
+    async delete(input: DeleteTemplateUsecaseInput): Promise<void> {
+      const currentTemplate = extractTemplateItemFromGetResult(await repo.get({
+        wardrobeId: input.wardrobeId,
+        templateId: input.templateId,
+      }));
+
+      if (!currentTemplate || currentTemplate.status !== "ACTIVE") {
+        throw createAppError("NOT_FOUND", {
+          message: "Template was not found.",
+          details: {
+            resource: "template",
+            wardrobeId: input.wardrobeId,
+            templateId: input.templateId,
+          },
+        });
+      }
+
+      await repo.delete({
+        wardrobeId: input.wardrobeId,
+        templateId: input.templateId,
+        deletedAt: now(),
       });
     },
     async get(input: GetTemplateUsecaseInput): Promise<GetTemplateUsecaseOutput> {
