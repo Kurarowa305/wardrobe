@@ -90,13 +90,11 @@ const createdHistoryResponse = await historyHandler({
   body: JSON.stringify({ date: "20260323", clothingIds: ["cl_001", "cl_002"] }),
 });
 assert.equal(createdHistoryResponse.statusCode, 201);
-assert.deepEqual(JSON.parse(createdHistoryResponse.body), {
-  ok: true,
-  wardrobeId: "wd_030",
-  date: "20260323",
-  inputType: "clothing",
-});
-console.log("- history Lambda entry は createHistoryHandler と同じバリデーション・成功レスポンスを返せる");
+const createdHistoryJson = JSON.parse(createdHistoryResponse.body);
+assert.equal(typeof createdHistoryJson.historyId, "string");
+assert.match(createdHistoryJson.historyId, /^hs_[A-Za-z0-9_-]+$/);
+assert.deepEqual(Object.keys(createdHistoryJson).sort(), ["historyId"]);
+console.log("- history Lambda entry は createHistoryHandler と同じバリデーションを行い、201 + hs_ 形式の historyId を返せる");
 
 const deletedHistoryResponse = await historyHandler({
   rawPath: "/wardrobes/wd_030/histories/hs_001",
@@ -112,7 +110,7 @@ const invalidHistoryResponse = await historyHandler({
   rawPath: "/wardrobes/wd_030/histories",
   pathParameters: { wardrobeId: "wd_030" },
   requestContext: { http: { method: "POST", path: "/wardrobes/wd_030/histories" }, requestId: "ctx_history_invalid" },
-  headers: { "x-request-id": "req_history_invalid" },
+  headers: { "content-type": "application/json", "x-request-id": "req_history_invalid" },
   body: JSON.stringify({ date: "2026-03-23" }),
 });
 assert.equal(invalidHistoryResponse.statusCode, 400);
