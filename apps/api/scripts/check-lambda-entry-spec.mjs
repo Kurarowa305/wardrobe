@@ -65,15 +65,22 @@ const templateResponse = await templateHandler({
   rawPath: "/wardrobes/wd_020/templates/tmp_001",
   pathParameters: { wardrobeId: "wd_020", templateId: "tmp_001" },
   requestContext: { http: { method: "DELETE", path: "/wardrobes/wd_020/templates/tmp_001" }, requestId: "ctx_template" },
+  headers: { "x-request-id": "req_template_delete" },
 });
-assert.equal(templateResponse.statusCode, 200);
+assert.equal(templateResponse.statusCode, 404);
 assert.deepEqual(JSON.parse(templateResponse.body), {
-  ok: true,
-  domain: "template",
-  method: "DELETE",
-  path: { wardrobeId: "wd_020", templateId: "tmp_001" },
+  error: {
+    code: "NOT_FOUND",
+    message: "Template was not found.",
+    details: {
+      resource: "template",
+      wardrobeId: "wd_020",
+      templateId: "tmp_001",
+    },
+    requestId: "req_template_delete",
+  },
 });
-console.log("- template Lambda entry は template ドメイン handler へ委譲できる");
+console.log("- template Lambda entry は DELETE /templates/{templateId} を API-12 handler へ委譲し、共通エラー形式を返せる");
 
 const createdHistoryResponse = await historyHandler({
   rawPath: "/wardrobes/wd_030/histories",
