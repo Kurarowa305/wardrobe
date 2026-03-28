@@ -1,5 +1,8 @@
 import assert from "node:assert/strict";
 
+import { createPresignHandler } from "../src/domains/presign/handlers/createPresignHandler.ts";
+import { createLambdaHandler } from "../src/entry/lambda/adapter.ts";
+
 process.env.AWS_REGION ??= "ap-northeast-1";
 process.env.DDB_ENDPOINT ??= "http://127.0.0.1:8000";
 process.env.TABLE_NAME ??= "wardrobe-local";
@@ -130,21 +133,111 @@ assert.equal(invalidHistoryJson.error.code, "VALIDATION_ERROR");
 assert.equal(invalidHistoryJson.error.requestId, "req_history_invalid");
 console.log("- history Lambda entry は handler 例外を共通エラーレスポンスへ正規化できる");
 
-const presignResponse = await presignHandler({
+const presignHandlerWithDeps = createLambdaHandler({
+  domain: "presign",
+  handler(request) {
+    return createPresignHandler({
+      path: request.path,
+      body: request.body,
+      headers: request.headers,
+      requestId: request.requestId,
+      dependencies: {
+        wardrobeRepo: {
+          async create() {
+            return { ok: true };
+          },
+          async get() {
+            return {
+              Item: {
+                PK: "W#wd_040",
+                SK: "META",
+                wardrobeId: "wd_040",
+                name: "Lambda entry preset",
+                createdAt: 1735689600000,
+              },
+            };
+          },
+        },
+        presign: {
+          buildImageKey() {
+            return "clothing/wd_040/01JENTRYTEST.png";
+          },
+          s3Client: {
+            async presignPutObject(input) {
+              return {
+                bucket: "wardrobe-local-bucket",
+                key: input.key,
+                method: "PUT",
+                uploadUrl: "https://example.com/upload?X-Amz-Signature=test",
+                publicUrl: "http://127.0.0.1:4566/public/clothing/wd_040/01JENTRYTEST.png",
+                expiresAt: "2026-03-28T00:10:00.000Z",
+                request: {
+                  operation: "PutObject",
+                  region: "ap-northeast-1",
+                  bucket: "wardrobe-local-bucket",
+                  storageDriver: "local",
+                  input: {
+                    Bucket: "wardrobe-local-bucket",
+                    Key: input.key,
+                    ContentType: input.contentType,
+                    ExpiresIn: 600,
+                  },
+                },
+              };
+            },
+          },
+        },
+      },
+    });
+  },
+});
+
+const presignResponse = await presignHandlerWithDeps({
   rawPath: "/wardrobes/wd_040/images/presign",
-  rawQueryString: "category=clothing&tag=a&tag=b",
   pathParameters: { wardrobeId: "wd_040" },
-  requestContext: { http: { method: "POST", path: "/wardrobes/wd_040/images/presign" }, requestId: "ctx_presign" },
+  requestContext: {
+    http: { method: "POST", path: "/wardrobes/wd_040/images/presign" },
+    requestId: "ctx_presign",
+  },
   headers: { "content-type": "application/json", "x-request-id": "req_presign" },
-  body: JSON.stringify({ contentType: "image/png" }),
+  body: JSON.stringify({ contentType: "image/png", category: "clothing", extension: "png" }),
 });
 assert.equal(presignResponse.statusCode, 200);
-assert.deepEqual(JSON.parse(presignResponse.body), {
-  ok: true,
-  domain: "presign",
-  method: "POST",
-  path: { wardrobeId: "wd_040" },
+const presignJson = JSON.parse(presignResponse.body);
+assert.equal(presignJson.imageKey, "clothing/wd_040/01JENTRYTEST.png");
+assert.equal(typeof presignJson.uploadUrl, "string");
+assert.equal(presignJson.method, "PUT");
+assert.equal(typeof presignJson.expiresAt, "string");
+console.log("- presign Lambda entry 検証は API-17 handler 経由で 200 + imageKey/uploadUrl/method/expiresAt を確認できる");
+
+const invalidPresignResponse = await presignHandlerWithDeps({
+  rawPath: "/wardrobes/wd_040/images/presign",
+  pathParameters: { wardrobeId: "wd_040" },
+  requestContext: {
+    http: { method: "POST", path: "/wardrobes/wd_040/images/presign" },
+    requestId: "ctx_presign_invalid",
+  },
+  headers: { "content-type": "application/json", "x-request-id": "req_presign_invalid" },
+  body: JSON.stringify({ contentType: "image/png", category: "invalid" }),
 });
-console.log("- presign Lambda entry は body/query を受け取れる adapter を経由して presign usecase を呼び出せる");
+assert.equal(invalidPresignResponse.statusCode, 400);
+const invalidPresignJson = JSON.parse(invalidPresignResponse.body);
+assert.equal(invalidPresignJson.error.code, "VALIDATION_ERROR");
+assert.equal(invalidPresignJson.error.requestId, "req_presign_invalid");
+console.log("- presign Lambda entry 検証は category 不正を VALIDATION_ERROR(400) で確認できる");
+
+const presignNotFoundResponse = await presignHandler({
+  rawPath: "/wardrobes/wd_040/images/presign",
+  pathParameters: { wardrobeId: "wd_040" },
+  requestContext: {
+    http: { method: "POST", path: "/wardrobes/wd_040/images/presign" },
+    requestId: "ctx_presign_not_found",
+  },
+  headers: { "content-type": "application/json", "x-request-id": "req_presign_not_found" },
+  body: JSON.stringify({ contentType: "image/png", category: "clothing" }),
+});
+assert.equal(presignNotFoundResponse.statusCode, 404);
+assert.equal(JSON.parse(presignNotFoundResponse.body).error.code, "NOT_FOUND");
+console.log("- 実際の presign Lambda entry も API-17 handler を経由し、wardrobe 未存在時は NOT_FOUND を返せる");
 
 console.log("BE-MS0-T12 lambda entry spec passed");
