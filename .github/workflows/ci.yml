@@ -223,6 +223,9 @@ jobs:
       - name: API history stats_write keys spec test
         run: pnpm --filter api test:history-stats-write-keys
 
+      - name: API history stats_write daily aggregation spec test
+        run: pnpm --filter api test:history-stats-write-daily
+
       - name: Typecheck api
         run: pnpm --filter api exec tsc --noEmit
 
