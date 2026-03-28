@@ -241,6 +241,9 @@ jobs:
       - name: API history stats_write wearDaily query repo spec test
         run: pnpm --filter api test:history-stats-write-wear-daily-query-repo
 
+      - name: API history API-14 usecase spec test
+        run: pnpm --filter api test:history-ms5-api14-usecase
+
 
       - name: Typecheck api
         run: pnpm --filter api exec tsc --noEmit
