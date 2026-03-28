@@ -271,6 +271,9 @@ jobs:
       - name: API presign schema/category spec test
         run: pnpm --filter api test:presign-schema
 
+      - name: API terraform dynamodb BE-MS7-T01 spec test
+        run: pnpm --filter api test:terraform-dynamodb-ms7-t01
+
       - name: Typecheck api
         run: pnpm --filter api exec tsc --noEmit
 
