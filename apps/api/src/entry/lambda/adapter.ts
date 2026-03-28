@@ -177,6 +177,7 @@ export const sharedDomainHandlers: Record<LocalDomain, LocalRouteHandler> = {
       return createHistoryHandler({
         path: request.path,
         body: request.body,
+        headers: request.headers,
         requestId: request.requestId,
       });
     }
