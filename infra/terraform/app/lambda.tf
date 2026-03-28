@@ -60,7 +60,7 @@ resource "aws_lambda_function" "domain" {
   for_each = local.lambda_domains
 
   function_name = local.lambda_domain_name_by_domain[each.key]
-  role          = aws_iam_role.lambda.arn
+  role          = aws_iam_role.lambda_domain[each.key].arn
   handler       = local.lambda_domain_handlers[each.key]
   runtime       = var.lambda_runtime
 
