@@ -46,7 +46,14 @@ export type GetTemplateUsecaseInput = {
 
 export type GetTemplateUsecaseOutput = TemplateDetailResponseDto;
 
-export type TemplateUsecaseRepo = Pick<TemplateRepo, "list" | "create" | "get">;
+export type UpdateTemplateUsecaseInput = {
+  wardrobeId: string;
+  templateId: string;
+  name?: string | undefined;
+  clothingIds?: string[] | undefined;
+};
+
+export type TemplateUsecaseRepo = Pick<TemplateRepo, "list" | "create" | "get" | "update">;
 
 export type TemplateUsecaseDependencies = {
   repo?: TemplateUsecaseRepo | undefined;
@@ -332,6 +339,65 @@ export function createTemplateUsecase(dependencies: TemplateUsecaseDependencies 
       return {
         templateId,
       };
+    },
+    async update(input: UpdateTemplateUsecaseInput): Promise<void> {
+      const currentTemplate = extractTemplateItemFromGetResult(await repo.get({
+        wardrobeId: input.wardrobeId,
+        templateId: input.templateId,
+      }));
+
+      if (!currentTemplate || currentTemplate.status !== "ACTIVE") {
+        throw createAppError("NOT_FOUND", {
+          message: "Template was not found.",
+          details: {
+            resource: "template",
+            wardrobeId: input.wardrobeId,
+            templateId: input.templateId,
+          },
+        });
+      }
+
+      const nextClothingIds = input.clothingIds ?? currentTemplate.clothingIds;
+      const uniqueIds = new Set(nextClothingIds);
+      if (uniqueIds.size !== nextClothingIds.length) {
+        throw createAppError("CONFLICT", {
+          message: "clothingIds must not contain duplicates.",
+          details: {
+            reason: "duplicate clothingIds",
+          },
+        });
+      }
+
+      if (input.clothingIds !== undefined) {
+        const clothingItems = extractBatchGetItems(await clothingBatchGetRepo.batchGetByIds({
+          wardrobeId: input.wardrobeId,
+          clothingIds: nextClothingIds,
+        }));
+
+        const activeIds = new Set(
+          clothingItems
+            .filter((item) => item.status === "ACTIVE")
+            .map((item) => item.clothingId),
+        );
+
+        const missingIds = nextClothingIds.filter((clothingId) => !activeIds.has(clothingId));
+        if (missingIds.length > 0) {
+          throw createAppError("NOT_FOUND", {
+            message: "Referenced clothing was not found.",
+            details: {
+              resource: "clothing",
+              wardrobeId: input.wardrobeId,
+              clothingIds: missingIds,
+            },
+          });
+        }
+      }
+
+      await repo.update({
+        ...currentTemplate,
+        name: input.name ?? currentTemplate.name,
+        clothingIds: nextClothingIds,
+      });
     },
     async get(input: GetTemplateUsecaseInput): Promise<GetTemplateUsecaseOutput> {
       const templateItem = extractTemplateItemFromGetResult(await repo.get({
