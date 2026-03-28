@@ -280,6 +280,9 @@ jobs:
       - name: API terraform Lambda BE-MS7-T03 spec test
         run: pnpm --filter api test:terraform-lambda-ms7-t03
 
+      - name: API terraform API Gateway BE-MS7-T04 spec test
+        run: pnpm --filter api test:terraform-apigw-ms7-t04
+
       - name: Typecheck api
         run: pnpm --filter api exec tsc --noEmit
 
