@@ -214,6 +214,9 @@ jobs:
       - name: API history API-15 aggregate spec test
         run: pnpm --filter api test:history-ms4-api15
 
+      - name: API history MS4-T07 aggregate spec test
+        run: pnpm --filter api test:history-ms4-t07
+
       - name: Typecheck api
         run: pnpm --filter api exec tsc --noEmit
 
