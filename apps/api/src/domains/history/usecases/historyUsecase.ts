@@ -1,6 +1,14 @@
 import { decodeCursor, encodeCursor, type CursorPrimitive } from "../../../core/cursor/index.js";
+import { createAppError } from "../../../core/errors/index.js";
 import { createHistoryRepo, type HistoryItem, type HistoryRepo } from "../repo/historyRepo.js";
-import type { HistoryListClothingItemDto, HistoryListItemDto, HistoryListOrderDto, HistoryListParamsDto } from "../dto/historyDto.js";
+import type {
+  HistoryDetailClothingItemDto,
+  HistoryDetailResponseDto,
+  HistoryListClothingItemDto,
+  HistoryListItemDto,
+  HistoryListOrderDto,
+  HistoryListParamsDto,
+} from "../dto/historyDto.js";
 import { createHistoryDetailsResolver, type ResolvedHistoryDetails } from "./historyDetailsResolver.js";
 
 const historyListResource = "history-list";
@@ -22,9 +30,16 @@ export type ListHistoryUsecaseOutput = {
   nextCursor: string | null;
 };
 
-export type HistoryUsecaseRepo = Pick<HistoryRepo, "list">;
+export type GetHistoryUsecaseInput = {
+  wardrobeId: string;
+  historyId: string;
+};
 
-export type HistoryUsecaseResolver = Pick<ReturnType<typeof createHistoryDetailsResolver>, "resolveMany">;
+export type GetHistoryUsecaseOutput = HistoryDetailResponseDto;
+
+export type HistoryUsecaseRepo = Pick<HistoryRepo, "list" | "get">;
+
+export type HistoryUsecaseResolver = Pick<ReturnType<typeof createHistoryDetailsResolver>, "resolveMany" | "resolveOne">;
 
 export type HistoryUsecaseDependencies = {
   repo?: HistoryUsecaseRepo | undefined;
@@ -38,6 +53,11 @@ type HistoryListQueryResult = {
   items?: unknown;
   LastEvaluatedKey?: unknown;
   lastEvaluatedKey?: unknown;
+};
+
+type HistoryDetailGetResult = {
+  Item?: unknown;
+  item?: unknown;
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -62,6 +82,19 @@ function extractListResult(result: RepoListResult): HistoryListQueryResult {
 
   const maybeItem = result as HistoryListQueryResult;
   if ("Items" in maybeItem || "items" in maybeItem || "LastEvaluatedKey" in maybeItem || "lastEvaluatedKey" in maybeItem) {
+    return maybeItem;
+  }
+
+  return {};
+}
+
+function extractGetResult(result: unknown): HistoryDetailGetResult {
+  if (!isRecord(result)) {
+    return {};
+  }
+
+  const maybeItem = result as HistoryDetailGetResult;
+  if ("Item" in maybeItem || "item" in maybeItem) {
     return maybeItem;
   }
 
@@ -152,11 +185,52 @@ function toHistoryListClothingItems(details: ResolvedHistoryDetails): HistoryLis
   }));
 }
 
+function toHistoryDetailClothingItems(details: ResolvedHistoryDetails): HistoryDetailClothingItemDto[] {
+  return details.clothingItems.map((item) => ({
+    clothingId: item.clothingId,
+    name: item.name,
+    genre: item.genre,
+    imageKey: item.imageKey,
+    status: item.status,
+    wearCount: item.wearCount,
+    lastWornAt: item.lastWornAt,
+  }));
+}
+
 export function createHistoryUsecase(dependencies: HistoryUsecaseDependencies = {}) {
   const repo = dependencies.repo ?? createHistoryRepo();
   const historyDetailsResolver = dependencies.historyDetailsResolver ?? createHistoryDetailsResolver();
 
   return {
+    async get(input: GetHistoryUsecaseInput): Promise<GetHistoryUsecaseOutput> {
+      const result = extractGetResult(await repo.get({
+        wardrobeId: input.wardrobeId,
+        historyId: input.historyId,
+      }));
+      const history = result.Item ?? result.item;
+
+      if (!isHistoryItem(history)) {
+        throw createAppError("NOT_FOUND", {
+          message: "History was not found.",
+          details: {
+            resource: "history",
+            wardrobeId: input.wardrobeId,
+            historyId: input.historyId,
+          },
+        });
+      }
+
+      const detail = await historyDetailsResolver.resolveOne({
+        wardrobeId: input.wardrobeId,
+        history,
+      });
+
+      return {
+        date: detail.date,
+        templateName: detail.templateName,
+        clothingItems: toHistoryDetailClothingItems(detail),
+      };
+    },
     async list(input: ListHistoryUsecaseInput): Promise<ListHistoryUsecaseOutput> {
       const order = resolveOrder(input.params.order);
       const exclusiveStartKey = decodeListCursor({

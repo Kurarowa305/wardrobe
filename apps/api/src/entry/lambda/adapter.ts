@@ -4,6 +4,7 @@ import type { LocalDomain, LocalRouteHandler, LocalRouteQuery } from "../local/r
 import { listHistoryHandler } from "../../domains/history/handlers/listHistoryHandler.js";
 import { createHistoryHandler } from "../../domains/history/handlers/createHistoryHandler.js";
 import { deleteHistoryHandler } from "../../domains/history/handlers/deleteHistoryHandler.js";
+import { getHistoryHandler } from "../../domains/history/handlers/getHistoryHandler.js";
 import { createWardrobeHandler } from "../../domains/wardrobe/handlers/createWardrobeHandler.js";
 import { getWardrobeHandler } from "../../domains/wardrobe/handlers/getWardrobeHandler.js";
 import { listClothingHandler } from "../../domains/clothing/handlers/listClothingHandler.js";
@@ -157,6 +158,13 @@ export const sharedDomainHandlers: Record<LocalDomain, LocalRouteHandler> = {
     return createDefaultDomainHandler("template")(request);
   },
   history(request) {
+    if (request.method === "GET" && request.path.historyId) {
+      return getHistoryHandler({
+        path: request.path,
+        requestId: request.requestId,
+      });
+    }
+
     if (request.method === "GET" && request.pathname === `/wardrobes/${request.path.wardrobeId}/histories`) {
       return listHistoryHandler({
         path: request.path,
