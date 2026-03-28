@@ -289,6 +289,9 @@ jobs:
       - name: API terraform CloudFront/S3 web/images BE-MS7-T06 spec test
         run: pnpm --filter api test:terraform-cloudfront-ms7-t06
 
+      - name: API terraform CI deploy BE-MS7-T07 spec test
+        run: pnpm --filter api test:terraform-ci-deploy-ms7-t07
+
       - name: Typecheck api
         run: pnpm --filter api exec tsc --noEmit
 
