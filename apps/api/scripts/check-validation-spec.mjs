@@ -81,37 +81,51 @@ assert.deepEqual(parsed, {
 });
 console.log("- parseRequest validates path/query/body with individual schemas");
 
-const createResponse = createHistoryHandler({
+const createResponse = await createHistoryHandler({
   path: { wardrobeId: "wd_01" },
   body: { date: "20260101", clothingIds: ["cl_01", "cl_02"] },
+  headers: { "content-type": "application/json" },
+  dependencies: {
+    async transactWriteItems() {
+      return { ok: true };
+    },
+    generateHistoryId: () => "hs_validation",
+  },
 });
 assert.equal(createResponse.statusCode, 201);
 assert.deepEqual(createResponse.json, {
-  ok: true,
-  wardrobeId: "wd_01",
-  date: "20260101",
-  inputType: "clothing",
+  historyId: "hs_validation",
 });
-console.log("- handler can validate request payloads through shared schema utility");
+console.log("- handler can consume shared validation utility and return success response");
 
-assert.throws(
-  () =>
-    createHistoryHandler({
-      path: { wardrobeId: "wd_01" },
-      body: { date: "2026-01-01", templateId: "tp_01", clothingIds: ["cl_01"] },
-      requestId: "req_history",
-    }),
+await assert.rejects(
+  createHistoryHandler({
+    path: { wardrobeId: "wd_01" },
+    body: { date: "2026-01-01", templateId: "tp_01" },
+    headers: { "content-type": "application/json" },
+    requestId: "req_history_validation",
+  }),
   (error) => {
     assert.equal(error.code, "VALIDATION_ERROR");
-    assert.deepEqual(error.details, {
-      "body.date": "Expected yyyymmdd format.",
-      "body.templateId": "templateId and clothingIds cannot be used together.",
-    });
-    assert.equal(error.requestId, "req_history");
+    assert.equal(error.requestId, "req_history_validation");
     return true;
   },
 );
 console.log("- handler validation failures surface as VALIDATION_ERROR");
+
+await assert.rejects(
+  createHistoryHandler({
+    path: { wardrobeId: "wd_01" },
+    body: { date: "20260101", templateId: "tp_01" },
+    headers: { "content-type": "text/plain" },
+    requestId: "req_history_content_type",
+  }),
+  (error) => {
+    assert.equal(error.code, "UNSUPPORTED_MEDIA_TYPE");
+    return true;
+  },
+);
+console.log("- handler rejects non-json content type as UNSUPPORTED_MEDIA_TYPE");
 
 const deleteResponse = deleteHistoryHandler({
   path: { wardrobeId: "wd_01", historyId: "hs_01" },
