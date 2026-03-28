@@ -13,6 +13,7 @@ import { deleteClothingHandler } from "../../domains/clothing/handlers/deleteClo
 import { listTemplateHandler } from "../../domains/template/handlers/listTemplateHandler.js";
 import { createTemplateHandler } from "../../domains/template/handlers/createTemplateHandler.js";
 import { getTemplateHandler } from "../../domains/template/handlers/getTemplateHandler.js";
+import { updateTemplateHandler } from "../../domains/template/handlers/updateTemplateHandler.js";
 
 export type LambdaEvent = {
   version?: string;
@@ -131,6 +132,15 @@ export const sharedDomainHandlers: Record<LocalDomain, LocalRouteHandler> = {
     if (request.method === "GET" && request.path.templateId) {
       return getTemplateHandler({
         path: request.path,
+        requestId: request.requestId,
+      });
+    }
+
+    if (request.method === "PATCH" && request.path.templateId) {
+      return updateTemplateHandler({
+        path: request.path,
+        body: request.body,
+        headers: request.headers,
         requestId: request.requestId,
       });
     }
