@@ -133,6 +133,15 @@ jobs:
       - name: API template API-11 aggregate spec test
         run: pnpm --filter api test:template-ms3-api11
 
+      - name: API template delete usecase spec test
+        run: pnpm --filter api test:template-delete-usecase
+
+      - name: API template delete handler spec test
+        run: pnpm --filter api test:template-delete-handler
+
+      - name: API template API-12 aggregate spec test
+        run: pnpm --filter api test:template-ms3-api12
+
       - name: API clothing batch-get repo spec test
         run: pnpm --filter api test:clothing-batch-get-repo
 

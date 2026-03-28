@@ -14,6 +14,7 @@ import { listTemplateHandler } from "../../domains/template/handlers/listTemplat
 import { createTemplateHandler } from "../../domains/template/handlers/createTemplateHandler.js";
 import { getTemplateHandler } from "../../domains/template/handlers/getTemplateHandler.js";
 import { updateTemplateHandler } from "../../domains/template/handlers/updateTemplateHandler.js";
+import { deleteTemplateHandler } from "../../domains/template/handlers/deleteTemplateHandler.js";
 
 export type LambdaEvent = {
   version?: string;
@@ -141,6 +142,13 @@ export const sharedDomainHandlers: Record<LocalDomain, LocalRouteHandler> = {
         path: request.path,
         body: request.body,
         headers: request.headers,
+        requestId: request.requestId,
+      });
+    }
+
+    if (request.method === "DELETE" && request.path.templateId) {
+      return deleteTemplateHandler({
+        path: request.path,
         requestId: request.requestId,
       });
     }
