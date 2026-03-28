@@ -27,7 +27,8 @@
    - JSON body と base64 でない payload を parse できる
 3. domain handler 委譲
    - `wardrobe` / `clothing` / `template` / `presign` が shared domain handler を呼び出せる
-   - `history` が `createHistoryHandler` / `deleteHistoryHandler` と同じ成功レスポンスを返せる
+   - `history` が `createHistoryHandler` と同じ成功レスポンスを返せる
+   - `history` の DELETE 委譲時に未存在データを共通エラー形式（`404 / NOT_FOUND`）で返せる
    - `history` の POST 委譲時に `headers`（`content-type` を含む）を `createHistoryHandler` へ引き継げる
    - handler で発生した validation error を共通エラーレスポンスへ変換できる
 4. CI 組み込み
@@ -55,7 +56,7 @@
   2. `POST /wardrobes/wd_030/histories` が `createHistoryHandler` と同じ 201 応答（`{ historyId }`）を返す
   3. 上記の `historyId` は固定値比較ではなく `hs_` プレフィックスを持つ文字列として検証する
   4. `POST /wardrobes/wd_030/histories` の `content-type: application/json` が adapter から handler へ受け渡され、415 回避要件を満たす
-  5. `DELETE /wardrobes/wd_030/histories/hs_001` が `deleteHistoryHandler` と同じ 204 応答を返す
+  5. `DELETE /wardrobes/wd_030/histories/hs_001` が未存在時に `404` / `NOT_FOUND` / `requestId` を返す
   6. 不正な履歴作成 payload が `400` / `VALIDATION_ERROR` / `requestId` を返す
 
 ### 4. CI 組み込み
