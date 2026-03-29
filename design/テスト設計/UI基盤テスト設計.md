@@ -31,17 +31,23 @@
 - 観点: 実画面で shadcn/ui コンポーネントが利用されているか
 - 期待結果: `WardrobeCreateScreen.tsx` で `Button` と `Input` を import し、JSXで利用している
 
-### UF-04 入力未設定時に destructive トーストでエラー通知する
-- 観点: エラー通知がトースト経由で実行されるか
-- 期待結果: 空入力判定時に `variant: "destructive"` の toast 呼び出しがある
+### UF-04 入力未設定時は作成ボタンを非活性にして送信を防止する
+- 観点: 空入力送信をUI側で防止できるか
+- 期待結果:
+  - `trimmedName` による空入力判定がある
+  - `Button` が `disabled={isSubmitDisabled || createWardrobeMutation.isPending}` を持つ
+  - `variant: "destructive"` のトースト呼び出しは存在しない
 
-### UF-05 作成成功時は共通トーストクエリ付きでホームへ遷移する
-- 観点: 作成完了トースト表示トリガー連携
-- 期待結果: `WardrobeCreateScreen.tsx` で `appendOperationToast(ROUTES.home(DEMO_IDS.wardrobe), OPERATION_TOAST_IDS.wardrobeCreated)` を利用して遷移する
+### UF-05 作成成功時はAPI作成結果の wardrobeId で共通トーストクエリ付き遷移を行う
+- 観点: 作成完了トースト表示トリガー連携がAPI結果に追従しているか
+- 期待結果:
+  - `createWardrobeMutation.mutateAsync` の戻り値を受け取る
+  - `appendOperationToast(ROUTES.home(created.wardrobeId), OPERATION_TOAST_IDS.wardrobeCreated)` で遷移する
+  - `ROUTES.home(DEMO_IDS.wardrobe)` は利用しない
 
-### UF-06 入力エラー文言が strings に定義されている
-- 観点: 文言定義の集約ルール準拠
-- 期待結果: `features/wardrobe/strings.ts` に `nameRequired` メッセージが存在する
+### UF-06 入力エラー文言が strings に残っていない
+- 観点: 入力エラーをトーストで表示しない現行方針との整合
+- 期待結果: `features/wardrobe/strings.ts` に `errors` / `nameRequired` が存在しない
 
 ### UF-07 ToastViewport が画面最上部中央に配置される
 - 観点: スマホ表示時のトースト配置崩れ防止

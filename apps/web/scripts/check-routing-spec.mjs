@@ -365,11 +365,14 @@ check("RT-19", "all in-wardrobe route calls use wardrobeId as first argument", (
   };
 });
 
-check("RT-20", "create page links to demo wardrobe home", () => {
-  const ok = includes(CREATE_SCREEN, "ROUTES.home(DEMO_IDS.wardrobe)");
+check("RT-20", "create page routes to API-created wardrobe home", () => {
+  const ok =
+    includes(CREATE_SCREEN, "const created = await createWardrobeMutation.mutateAsync({") &&
+    includes(CREATE_SCREEN, "ROUTES.home(created.wardrobeId)") &&
+    noIncludes(CREATE_SCREEN, "ROUTES.home(DEMO_IDS.wardrobe)");
   return {
     ok,
-    detail: "WardrobeCreateScreen should route to demo wardrobe home",
+    detail: "WardrobeCreateScreen should route to API-created wardrobe home ID",
   };
 });
 
