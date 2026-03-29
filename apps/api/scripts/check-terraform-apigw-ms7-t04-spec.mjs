@@ -31,18 +31,24 @@ const checks = [
       apigwTf.includes('presign  = aws_lambda_function.domain["presign"].invoke_arn'),
   },
   {
-    name: "path prefix ごとの route が定義されている",
+    name: "path prefix ごとの route が定義されている（clothing は単数）",
     ok:
       apigwTf.includes('"ANY /wardrobes"') &&
       apigwTf.includes('"ANY /wardrobes/{proxy+}"') &&
-      apigwTf.includes('"ANY /wardrobes/{wardrobeId}/clothings"') &&
-      apigwTf.includes('"ANY /wardrobes/{wardrobeId}/clothings/{proxy+}"') &&
+      apigwTf.includes('"ANY /wardrobes/{wardrobeId}/clothing"') &&
+      apigwTf.includes('"ANY /wardrobes/{wardrobeId}/clothing/{proxy+}"') &&
       apigwTf.includes('"ANY /wardrobes/{wardrobeId}/templates"') &&
       apigwTf.includes('"ANY /wardrobes/{wardrobeId}/templates/{proxy+}"') &&
       apigwTf.includes('"ANY /wardrobes/{wardrobeId}/histories"') &&
       apigwTf.includes('"ANY /wardrobes/{wardrobeId}/histories/{proxy+}"') &&
       apigwTf.includes('"ANY /wardrobes/{wardrobeId}/images/presign"') &&
       apigwTf.includes('"ANY /wardrobes/{wardrobeId}/images/presign/{proxy+}"'),
+  },
+  {
+    name: "旧 clothings path prefix が残っていない",
+    ok:
+      !apigwTf.includes('"ANY /wardrobes/{wardrobeId}/clothings"') &&
+      !apigwTf.includes('"ANY /wardrobes/{wardrobeId}/clothings/{proxy+}"'),
   },
   {
     name: "route -> integration が動的に紐づいている",
