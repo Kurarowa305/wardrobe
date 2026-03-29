@@ -15,9 +15,11 @@ export const OPERATION_TOAST_IDS = {
 export type OperationToastId = (typeof OPERATION_TOAST_IDS)[keyof typeof OPERATION_TOAST_IDS];
 
 export function appendOperationToast(pathname: string, toastId: OperationToastId) {
-  const searchParams = new URLSearchParams();
-  searchParams.set(OPERATION_TOAST_QUERY_KEY, toastId);
-  return `${pathname}?${searchParams.toString()}`;
+  const url = new URL(pathname, "https://wardrobe.local");
+  url.searchParams.set(OPERATION_TOAST_QUERY_KEY, toastId);
+  const search = url.searchParams.toString();
+  const normalizedPath = search.length > 0 ? `${url.pathname}?${search}` : url.pathname;
+  return `${normalizedPath}${url.hash}`;
 }
 
 export function consumeOperationToast(search: string) {

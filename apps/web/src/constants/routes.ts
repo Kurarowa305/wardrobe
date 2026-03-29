@@ -8,31 +8,80 @@ export const DEMO_IDS = {
   clothing: "clothing-001",
 } as const;
 
+const ROUTE_QUERY_KEYS = {
+  wardrobeId: "wardrobeId",
+  historyId: "historyId",
+  templateId: "templateId",
+  clothingId: "clothingId",
+  from: "from",
+} as const;
+
+function buildPathWithQuery(pathname: string, query: Record<string, string | undefined>) {
+  const searchParams = new URLSearchParams();
+
+  for (const [key, value] of Object.entries(query)) {
+    if (!value) {
+      continue;
+    }
+
+    searchParams.set(key, value);
+  }
+
+  const serialized = searchParams.toString();
+  return serialized.length > 0 ? `${pathname}?${serialized}` : pathname;
+}
+
 export const ROUTES = {
   root: "/",
   wardrobeNew: "/wardrobes/new",
-  wardrobeBase: (wardrobeId: string) => `/wardrobes/${wardrobeId}`,
+  wardrobeBase: (wardrobeId: string) =>
+    buildPathWithQuery("/home", { [ROUTE_QUERY_KEYS.wardrobeId]: wardrobeId }),
 
-  home: (wardrobeId: string) => `/wardrobes/${wardrobeId}/home`,
-  histories: (wardrobeId: string) => `/wardrobes/${wardrobeId}/histories`,
+  home: (wardrobeId: string) =>
+    buildPathWithQuery("/home", { [ROUTE_QUERY_KEYS.wardrobeId]: wardrobeId }),
+  histories: (wardrobeId: string) =>
+    buildPathWithQuery("/histories", { [ROUTE_QUERY_KEYS.wardrobeId]: wardrobeId }),
   historyDetail: (wardrobeId: string, historyId: string, from: HistoryOrigin = "histories") =>
-    `/wardrobes/${wardrobeId}/histories/${historyId}?from=${from}`,
+    buildPathWithQuery("/histories/detail", {
+      [ROUTE_QUERY_KEYS.wardrobeId]: wardrobeId,
+      [ROUTE_QUERY_KEYS.historyId]: historyId,
+      [ROUTE_QUERY_KEYS.from]: from,
+    }),
 
-  templates: (wardrobeId: string) => `/wardrobes/${wardrobeId}/templates`,
-  templateNew: (wardrobeId: string) => `/wardrobes/${wardrobeId}/templates/new`,
+  templates: (wardrobeId: string) =>
+    buildPathWithQuery("/templates", { [ROUTE_QUERY_KEYS.wardrobeId]: wardrobeId }),
+  templateNew: (wardrobeId: string) =>
+    buildPathWithQuery("/templates/new", { [ROUTE_QUERY_KEYS.wardrobeId]: wardrobeId }),
   templateDetail: (wardrobeId: string, templateId: string) =>
-    `/wardrobes/${wardrobeId}/templates/${templateId}`,
+    buildPathWithQuery("/templates/detail", {
+      [ROUTE_QUERY_KEYS.wardrobeId]: wardrobeId,
+      [ROUTE_QUERY_KEYS.templateId]: templateId,
+    }),
   templateEdit: (wardrobeId: string, templateId: string) =>
-    `/wardrobes/${wardrobeId}/templates/${templateId}/edit`,
+    buildPathWithQuery("/templates/edit", {
+      [ROUTE_QUERY_KEYS.wardrobeId]: wardrobeId,
+      [ROUTE_QUERY_KEYS.templateId]: templateId,
+    }),
 
-  clothings: (wardrobeId: string) => `/wardrobes/${wardrobeId}/clothings`,
-  clothingNew: (wardrobeId: string) => `/wardrobes/${wardrobeId}/clothings/new`,
+  clothings: (wardrobeId: string) =>
+    buildPathWithQuery("/clothings", { [ROUTE_QUERY_KEYS.wardrobeId]: wardrobeId }),
+  clothingNew: (wardrobeId: string) =>
+    buildPathWithQuery("/clothings/new", { [ROUTE_QUERY_KEYS.wardrobeId]: wardrobeId }),
   clothingDetail: (wardrobeId: string, clothingId: string) =>
-    `/wardrobes/${wardrobeId}/clothings/${clothingId}`,
+    buildPathWithQuery("/clothings/detail", {
+      [ROUTE_QUERY_KEYS.wardrobeId]: wardrobeId,
+      [ROUTE_QUERY_KEYS.clothingId]: clothingId,
+    }),
   clothingEdit: (wardrobeId: string, clothingId: string) =>
-    `/wardrobes/${wardrobeId}/clothings/${clothingId}/edit`,
+    buildPathWithQuery("/clothings/edit", {
+      [ROUTE_QUERY_KEYS.wardrobeId]: wardrobeId,
+      [ROUTE_QUERY_KEYS.clothingId]: clothingId,
+    }),
 
-  recordMethod: (wardrobeId: string) => `/wardrobes/${wardrobeId}/record`,
-  recordByTemplate: (wardrobeId: string) => `/wardrobes/${wardrobeId}/record/template`,
-  recordByCombination: (wardrobeId: string) => `/wardrobes/${wardrobeId}/record/combination`,
+  recordMethod: (wardrobeId: string) =>
+    buildPathWithQuery("/record", { [ROUTE_QUERY_KEYS.wardrobeId]: wardrobeId }),
+  recordByTemplate: (wardrobeId: string) =>
+    buildPathWithQuery("/record/template", { [ROUTE_QUERY_KEYS.wardrobeId]: wardrobeId }),
+  recordByCombination: (wardrobeId: string) =>
+    buildPathWithQuery("/record/combination", { [ROUTE_QUERY_KEYS.wardrobeId]: wardrobeId }),
 } as const;

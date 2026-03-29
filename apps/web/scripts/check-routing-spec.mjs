@@ -12,23 +12,23 @@ const failures = [];
 let checkCount = 0;
 
 const TAB_PAGES = [
-  "src/app/wardrobes/[wardrobeId]/(tabs)/home/page.tsx",
-  "src/app/wardrobes/[wardrobeId]/(tabs)/histories/page.tsx",
-  "src/app/wardrobes/[wardrobeId]/(tabs)/templates/page.tsx",
-  "src/app/wardrobes/[wardrobeId]/(tabs)/clothings/page.tsx",
+  "src/app/home/page.tsx",
+  "src/app/histories/page.tsx",
+  "src/app/templates/page.tsx",
+  "src/app/clothings/page.tsx",
 ];
 
 const STACK_PAGES = [
-  "src/app/wardrobes/[wardrobeId]/(stack)/record/page.tsx",
-  "src/app/wardrobes/[wardrobeId]/(stack)/record/template/page.tsx",
-  "src/app/wardrobes/[wardrobeId]/(stack)/record/combination/page.tsx",
-  "src/app/wardrobes/[wardrobeId]/(stack)/histories/[historyId]/page.tsx",
-  "src/app/wardrobes/[wardrobeId]/(stack)/templates/new/page.tsx",
-  "src/app/wardrobes/[wardrobeId]/(stack)/templates/[templateId]/page.tsx",
-  "src/app/wardrobes/[wardrobeId]/(stack)/templates/[templateId]/edit/page.tsx",
-  "src/app/wardrobes/[wardrobeId]/(stack)/clothings/new/page.tsx",
-  "src/app/wardrobes/[wardrobeId]/(stack)/clothings/[clothingId]/page.tsx",
-  "src/app/wardrobes/[wardrobeId]/(stack)/clothings/[clothingId]/edit/page.tsx",
+  "src/app/record/page.tsx",
+  "src/app/record/template/page.tsx",
+  "src/app/record/combination/page.tsx",
+  "src/app/histories/detail/page.tsx",
+  "src/app/templates/new/page.tsx",
+  "src/app/templates/detail/page.tsx",
+  "src/app/templates/edit/page.tsx",
+  "src/app/clothings/new/page.tsx",
+  "src/app/clothings/detail/page.tsx",
+  "src/app/clothings/edit/page.tsx",
 ];
 
 const TAB_SCREENS = [
@@ -51,9 +51,27 @@ const STACK_SCREENS = [
   "src/components/app/screens/HistoryDetailScreen.tsx",
 ];
 
+const QUERY_ROUTING_PAGES = [
+  "src/app/home/page.tsx",
+  "src/app/histories/page.tsx",
+  "src/app/templates/page.tsx",
+  "src/app/clothings/page.tsx",
+  "src/app/record/page.tsx",
+  "src/app/record/template/page.tsx",
+  "src/app/record/combination/page.tsx",
+  "src/app/templates/new/page.tsx",
+  "src/app/histories/detail/page.tsx",
+  "src/app/templates/detail/page.tsx",
+  "src/app/templates/edit/page.tsx",
+  "src/app/clothings/new/page.tsx",
+  "src/app/clothings/detail/page.tsx",
+  "src/app/clothings/edit/page.tsx",
+];
+
 const CREATE_SCREEN = "src/components/app/screens/WardrobeCreateScreen.tsx";
 const HISTORY_DETAIL_SCREEN = "src/components/app/screens/HistoryDetailScreen.tsx";
 const HISTORY_ROUTING = "src/features/history/routing.ts";
+const QUERY_PARAMS_HOOK = "src/features/routing/queryParams.ts";
 const CREATE_PAGE = "src/app/wardrobes/new/page.tsx";
 const ROOT_PAGE = "src/app/page.tsx";
 
@@ -142,16 +160,8 @@ check("RT-02", "wardrobe create page exists at /wardrobes/new", () => {
   return { ok, detail: `missing file: ${CREATE_PAGE}` };
 });
 
-check("RT-03", "legacy top-level routes do not exist", () => {
-  const forbidden = [
-    "src/app/home/page.tsx",
-    "src/app/histories/page.tsx",
-    "src/app/templates/page.tsx",
-    "src/app/clothings/page.tsx",
-    "src/app/record/page.tsx",
-    "src/app/(tabs)",
-    "src/app/(stack)",
-  ];
+check("RT-03", "legacy /wardrobes/[wardrobeId] routes do not exist", () => {
+  const forbidden = ["src/app/wardrobes/[wardrobeId]"];
   const remaining = forbidden.filter((item) => exists(item));
   return {
     ok: remaining.length === 0,
@@ -159,7 +169,7 @@ check("RT-03", "legacy top-level routes do not exist", () => {
   };
 });
 
-check("RT-04", "all stack routes under wardrobeId exist", () => {
+check("RT-04", "all stack routes with query-id pages exist", () => {
   const missing = STACK_PAGES.filter((file) => !exists(file));
   return {
     ok: missing.length === 0,
@@ -194,7 +204,7 @@ check("RT-06", "TabBar rendering is limited to tab screens", () => {
   };
 });
 
-check("RT-07", "tab transitions keep wardrobeId", () => {
+check("RT-07", "tab transitions keep wardrobeId in query route builders", () => {
   const ok = containsAll("src/components/app/navigation/TabBar.tsx", [
     "ROUTES.home(wardrobeId)",
     "ROUTES.histories(wardrobeId)",
@@ -332,10 +342,7 @@ check("RT-18", "history tab has no direct link to home tab", () => {
 });
 
 check("RT-19", "all in-wardrobe route calls use wardrobeId as first argument", () => {
-  const routeFiles = [
-    ...collectFiles(path.join(appRoot, "wardrobes", "[wardrobeId]")),
-    ...collectFiles(screenRoot),
-  ];
+  const routeFiles = [...collectFiles(appRoot), ...collectFiles(screenRoot)];
   const files = routeFiles
     .filter((file) => file.endsWith(".ts") || file.endsWith(".tsx"))
     .map((file) => path.relative(webRoot, file).replaceAll(path.sep, "/"))
@@ -372,8 +379,12 @@ check("RT-21", "history detail isolates searchParams access behind Suspense", ()
   const contentIndex = normalized.indexOf("function HistoryDetailScreenContent(");
   const suspenseIndex = normalized.indexOf("<Suspense");
   const fallbackIndex = normalized.indexOf("fallback={");
-  const searchSubtreeIndex = normalized.indexOf("<HistoryDetailScreenSearchParams wardrobeId={wardrobeId} historyId={historyId} />");
-  const fallbackContentIndex = normalized.indexOf("<HistoryDetailScreenContent wardrobeId={wardrobeId} historyId={historyId} backHref={ROUTES.histories(wardrobeId)} />");
+  const searchSubtreeIndex = normalized.indexOf(
+    "<HistoryDetailScreenSearchParams wardrobeId={wardrobeId} historyId={historyId} />",
+  );
+  const fallbackContentIndex = normalized.indexOf(
+    "<HistoryDetailScreenContent wardrobeId={wardrobeId} historyId={historyId} backHref={ROUTES.histories(wardrobeId)} />",
+  );
   const resolvesFromQuery = normalized.includes(
     'const backHref = resolveHistoryDetailBackHref(wardrobeId, searchParams.get("from"));',
   );
@@ -395,26 +406,20 @@ check("RT-21", "history detail isolates searchParams access behind Suspense", ()
   };
 });
 
-check("RT-22", "template detail/edit pages generate static params from fixtures and reserved mock ids", () => {
-  const pages = [
-    "src/app/wardrobes/[wardrobeId]/(stack)/templates/[templateId]/page.tsx",
-    "src/app/wardrobes/[wardrobeId]/(stack)/templates/[templateId]/edit/page.tsx",
-  ];
-  const invalid = pages.filter(
+check("RT-22", "all route pages resolve IDs from query helper", () => {
+  const missing = QUERY_ROUTING_PAGES.filter(
     (file) =>
-      !containsAll(file, [
-        'import { templateDetailFixtures } from "@/mocks/fixtures/template";',
-        'const MOCK_TEMPLATE_ID_PREFIX = "tp_mock_";',
-        "const MOCK_TEMPLATE_STATIC_PARAMS_COUNT = 200;",
-        "...templateDetailFixtures.map((fixture) => fixture.templateId)",
-        "...generateMockStaticTemplateIds(),",
-        "wardrobeId: DEMO_IDS.wardrobe,",
-        "templateId,",
-      ]),
+      !includes(file, '"use client";') ||
+      !includes(file, "<Suspense") ||
+      (!includes(file, "useWardrobeIdFromQuery") &&
+        !includes(file, "useHistoryRouteIdsFromQuery") &&
+        !includes(file, "useTemplateRouteIdsFromQuery") &&
+        !includes(file, "useClothingRouteIdsFromQuery")),
   );
+  const queryHelperHasWardrobe = includes(QUERY_PARAMS_HOOK, "useWardrobeIdFromQuery");
   return {
-    ok: invalid.length === 0,
-    detail: `template detail/edit generateStaticParams must cover fixture and reserved mock ids: ${invalid.join(", ") || "(none)"}`,
+    ok: missing.length === 0 && queryHelperHasWardrobe,
+    detail: `query-based page implementation is missing in: ${missing.join(", ") || "(none)"}`,
   };
 });
 
