@@ -35,9 +35,10 @@ function check(id, description, passed, detail) {
 }
 
 const target = "src/components/app/screens/ClothingDetailScreen.tsx";
-const detailPageTarget = "src/app/wardrobes/[wardrobeId]/(stack)/clothings/[clothingId]/page.tsx";
-const editPageTarget = "src/app/wardrobes/[wardrobeId]/(stack)/clothings/[clothingId]/edit/page.tsx";
+const detailPageTarget = "src/app/clothings/detail/page.tsx";
+const editPageTarget = "src/app/clothings/edit/page.tsx";
 const stringsTarget = "src/features/clothing/strings.ts";
+const routesTarget = "src/constants/routes.ts";
 
 check(
   "CDS-01",
@@ -102,26 +103,32 @@ check(
 
 check(
   "CDS-07",
-  "静的エクスポート向けに服詳細/編集ページの generateStaticParams が fixture 全件を返す",
-  includes(detailPageTarget, 'import { clothingDetailFixtures } from "@/mocks/fixtures/clothing";') &&
-    includes(detailPageTarget, "...clothingDetailFixtures.map((fixture) => fixture.clothingId),") &&
-    includes(detailPageTarget, "wardrobeId: DEMO_IDS.wardrobe,") &&
-    includes(editPageTarget, 'import { clothingDetailFixtures } from "@/mocks/fixtures/clothing";') &&
-    includes(editPageTarget, "...clothingDetailFixtures.map((fixture) => fixture.clothingId),") &&
-    includes(editPageTarget, "wardrobeId: DEMO_IDS.wardrobe,"),
-  "detail/edit ページの静的パス生成が fixture 全件対応になっていません",
+  "服詳細/編集ページが query パラメータから wardrobeId/clothingId を解決して screen へ渡す",
+  includes(detailPageTarget, 'import { DEMO_IDS } from "@/constants/routes";') &&
+    includes(detailPageTarget, 'import { useClothingRouteIdsFromQuery } from "@/features/routing/queryParams";') &&
+    includes(detailPageTarget, "const { wardrobeId, clothingId } = useClothingRouteIdsFromQuery();") &&
+    includes(detailPageTarget, "return <ClothingDetailScreen wardrobeId={wardrobeId} clothingId={clothingId} />;") &&
+    includes(detailPageTarget, "<Suspense") &&
+    includes(
+      detailPageTarget,
+      "fallback={<ClothingDetailScreen wardrobeId={DEMO_IDS.wardrobe} clothingId={DEMO_IDS.clothing} />}",
+    ) &&
+    includes(editPageTarget, 'import { DEMO_IDS } from "@/constants/routes";') &&
+    includes(editPageTarget, 'import { useClothingRouteIdsFromQuery } from "@/features/routing/queryParams";') &&
+    includes(editPageTarget, "const { wardrobeId, clothingId } = useClothingRouteIdsFromQuery();") &&
+    includes(editPageTarget, "return <ClothingEditScreen wardrobeId={wardrobeId} clothingId={clothingId} />;") &&
+    includes(editPageTarget, "<Suspense"),
+  "detail/edit ページの query 解決または ClothingScreen への受け渡しが不足しています",
 );
 
 check(
   "CDS-08",
-  "追加直後の服ID（cl_mock_XXXX）向け静的パスを事前生成する",
-  includes(detailPageTarget, 'const MOCK_CLOTHING_ID_PREFIX = "cl_mock_";') &&
-    includes(detailPageTarget, "const MOCK_CLOTHING_STATIC_PARAMS_COUNT = 200;") &&
-    includes(detailPageTarget, "...generateMockStaticClothingIds(),") &&
-    includes(editPageTarget, 'const MOCK_CLOTHING_ID_PREFIX = "cl_mock_";') &&
-    includes(editPageTarget, "const MOCK_CLOTHING_STATIC_PARAMS_COUNT = 200;") &&
-    includes(editPageTarget, "...generateMockStaticClothingIds(),"),
-  "detail/edit ページの cl_mock 系静的パス事前生成が不足しています",
+  "服詳細/編集URLが query パラメータ形式（/clothings/detail, /clothings/edit）で生成される",
+  includes(routesTarget, 'buildPathWithQuery("/clothings/detail", {') &&
+    includes(routesTarget, 'buildPathWithQuery("/clothings/edit", {') &&
+    includes(routesTarget, "[ROUTE_QUERY_KEYS.wardrobeId]: wardrobeId") &&
+    includes(routesTarget, "[ROUTE_QUERY_KEYS.clothingId]: clothingId"),
+  "ROUTES.clothingDetail / ROUTES.clothingEdit の query 形式生成が不足しています",
 );
 
 if (failures.length > 0) {

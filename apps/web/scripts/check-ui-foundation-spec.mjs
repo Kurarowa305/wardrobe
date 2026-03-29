@@ -127,13 +127,14 @@ check(
 
 check(
   "UF-08",
-  "ホーム画面で共通トーストクエリを判定し、表示後にURLを正規化する",
-  noIncludes("src/app/wardrobes/[wardrobeId]/(tabs)/home/page.tsx", "searchParams") &&
+  "ホーム画面で wardrobeId query を解決しつつ、共通トーストクエリを判定して表示後にURLを正規化する",
+  includes("src/app/home/page.tsx", "useWardrobeIdFromQuery") &&
+    includes("src/app/home/page.tsx", "<Suspense") &&
     includes("src/components/app/screens/HomeTabScreen.tsx", "consumeOperationToast(window.location.search)") &&
     includes("src/components/app/screens/HomeTabScreen.tsx", "OPERATION_TOAST_IDS.wardrobeCreated") &&
     includes("src/components/app/screens/HomeTabScreen.tsx", "HOME_STRINGS.toasts.wardrobeCreated") &&
     includes("src/components/app/screens/HomeTabScreen.tsx", "window.history.replaceState"),
-  "作成完了トーストの表示連携（home/page.tsx / HomeTabScreen.tsx）が不足しています",
+  "ホーム画面の query 解決または作成完了トーストの表示連携が不足しています",
 );
 
 check(

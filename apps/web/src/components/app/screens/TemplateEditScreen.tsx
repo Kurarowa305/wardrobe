@@ -1,3 +1,5 @@
+"use client";
+
 import { createElement } from "react";
 
 import { AppLayout } from "@/components/app/layout/AppLayout";

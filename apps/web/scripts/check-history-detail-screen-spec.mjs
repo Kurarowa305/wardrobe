@@ -35,7 +35,7 @@ function check(id, description, passed, detail) {
 }
 
 const target = "src/components/app/screens/HistoryDetailScreen.tsx";
-const pageTarget = "src/app/wardrobes/[wardrobeId]/(stack)/histories/[historyId]/page.tsx";
+const pageTarget = "src/app/histories/detail/page.tsx";
 const stringsTarget = "src/features/history/strings.ts";
 
 check(
@@ -97,15 +97,17 @@ check(
 
 check(
   "HDS-06",
-  "履歴詳細ページが historyId を screen に渡し、fixture と mock ID の静的パスを生成する",
-  includes(pageTarget, 'import { historyDetailFixtures } from "@/mocks/fixtures/history";') &&
-    includes(pageTarget, "const MOCK_HISTORY_ID_PREFIX = \"hs_mock_\";") &&
-    includes(pageTarget, "const MOCK_HISTORY_STATIC_PARAMS_COUNT = 200;") &&
-    includes(pageTarget, "...historyDetailFixtures.map((fixture) => fixture.historyId),") &&
-    includes(pageTarget, "...generateMockStaticHistoryIds(),") &&
-    includes(pageTarget, "wardrobeId: DEMO_IDS.wardrobe,") &&
-    includes(pageTarget, "return <HistoryDetailScreen wardrobeId={wardrobeId} historyId={historyId} />;"),
-  "履歴詳細ページの静的パス生成または historyId 受け渡しが不足しています",
+  "履歴詳細ページが query パラメータから wardrobeId/historyId を解決し、screen へ渡す",
+  includes(pageTarget, 'import { DEMO_IDS } from "@/constants/routes";') &&
+    includes(pageTarget, 'import { useHistoryRouteIdsFromQuery } from "@/features/routing/queryParams";') &&
+    includes(pageTarget, "const { wardrobeId, historyId } = useHistoryRouteIdsFromQuery();") &&
+    includes(pageTarget, "return <HistoryDetailScreen wardrobeId={wardrobeId} historyId={historyId} />;") &&
+    includes(pageTarget, "<Suspense") &&
+    includes(
+      pageTarget,
+      "fallback={<HistoryDetailScreen wardrobeId={DEMO_IDS.wardrobe} historyId={DEMO_IDS.history} />}",
+    ),
+  "履歴詳細ページの query 解決または HistoryDetailScreen への受け渡しが不足しています",
 );
 
 check(

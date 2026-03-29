@@ -32,7 +32,7 @@
 ### 2.4 ルーティング文脈
 
 * ワードローブ作成画面を除く画面は `wardrobeId` 文脈で描画する
-* `app/` の `page.tsx` は `params` 展開と `generateStaticParams` のみを担当する
+* `app/` の `page.tsx` は `searchParams`（query）からIDを解決して `*Screen` に渡す
 * 画面UIは `components/app/screens/*Screen.tsx` に実装し、`page.tsx` から呼び出す
 * `TabBar` は `wardrobeId` を用いて同一ワードローブ内のタブ遷移URLを生成する
 
@@ -114,7 +114,7 @@ src/components/
 
 **責務**：4タブのUI。選択状態と遷移通知。
 **主要props（TabBar）**：`activeTab`, `wardrobeId`
-**補足**：`wardrobeId` を使って `home/histories/templates/clothings` のURLを生成する
+**補足**：`wardrobeId` を使って `home/histories/templates/clothings` の query URL（`?wardrobeId=...`）を生成する
 
 ---
 
@@ -123,9 +123,9 @@ src/components/
 #### `*Screen.tsx`（画面コンテナ）
 
 **責務**：画面単位のUI組み立て（`AppLayout` + 画面内リンク/要素）を担当する。  
-**主要props**：`wardrobeId`、`templateId`、`clothingId` などルーティングで確定した値。  
+**主要props**：`wardrobeId`、`templateId`、`clothingId` など query から解決した値。  
 **補足**：
-* `app/**/page.tsx` は `params` 展開後に `*Screen` を呼ぶだけにする
+* `app/**/page.tsx` は `searchParams` から ID を解決して `*Screen` を呼ぶだけにする
 * 履歴詳細のみ `useSearchParams()` を使うため client component とする
 * `from` クエリの戻り先解決は `features/history/routing.ts` に置く
 

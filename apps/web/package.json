@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "test:routing": "node scripts/check-routing-spec.mjs",
+    "test:query-id-routing": "node scripts/check-query-id-routing-spec.mjs",
     "test:overflow-menu": "node scripts/check-overflow-menu-spec.mjs",
     "test:overflow-menu-icons": "node scripts/check-overflow-menu-icon-spec.mjs",
     "test:overflow-menu-trigger": "node scripts/check-overflow-menu-trigger-spec.mjs",
