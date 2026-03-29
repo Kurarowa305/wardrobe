@@ -1,10 +1,20 @@
 const DEFAULT_IMAGE_PUBLIC_BASE_URL = "/images";
 
-const configuredImagePublicBaseUrl = process.env.NEXT_PUBLIC_IMAGE_PUBLIC_BASE_URL?.trim();
-const IMAGE_PUBLIC_BASE_URL =
-  configuredImagePublicBaseUrl && configuredImagePublicBaseUrl.length > 0
-    ? configuredImagePublicBaseUrl
-    : DEFAULT_IMAGE_PUBLIC_BASE_URL;
+const configuredImagePublicBaseUrl = process.env.NEXT_PUBLIC_IMAGE_PUBLIC_BASE_URL?.trim() ?? "";
+
+function resolveImagePublicBaseUrl(): string {
+  if (configuredImagePublicBaseUrl.length > 0) {
+    return configuredImagePublicBaseUrl;
+  }
+
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("NEXT_PUBLIC_IMAGE_PUBLIC_BASE_URL is required in production builds.");
+  }
+
+  return DEFAULT_IMAGE_PUBLIC_BASE_URL;
+}
+
+const IMAGE_PUBLIC_BASE_URL = resolveImagePublicBaseUrl();
 
 function trimTrailingSlash(value: string): string {
   return value.replace(/\/+$/, "");
