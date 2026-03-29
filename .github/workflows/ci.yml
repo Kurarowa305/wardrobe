@@ -49,6 +49,9 @@ jobs:
       - name: API s3 client spec test
         run: pnpm --filter api test:s3
 
+      - name: API s3 env resolution spec test
+        run: pnpm --filter api test:s3-env-resolution
+
       - name: API errors spec test
         run: pnpm --filter api test:errors
 

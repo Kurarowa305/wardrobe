@@ -46,6 +46,25 @@ const LOCAL_ENDPOINT_PATTERN = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i;
 const isLocalEndpoint = (endpoint: string | undefined): boolean =>
   endpoint !== undefined && LOCAL_ENDPOINT_PATTERN.test(endpoint);
 
+const readNonEmptyEnv = (key: string): string | undefined => {
+  const value = process.env[key];
+  if (typeof value !== "string") {
+    return undefined;
+  }
+
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : undefined;
+};
+
+const readStorageDriverEnv = (): StorageDriver | undefined => {
+  const value = readNonEmptyEnv("STORAGE_DRIVER");
+  if (value === "local" || value === "s3") {
+    return value;
+  }
+
+  return undefined;
+};
+
 const stripTrailingSlash = (value: string): string => value.replace(/\/+$/, "");
 
 const joinUrl = (baseUrl: string, pathname: string): string =>
@@ -54,10 +73,10 @@ const joinUrl = (baseUrl: string, pathname: string): string =>
 export const createS3ClientConfig = (
   overrides: Partial<S3ClientConfig> = {},
 ): S3ClientConfig => ({
-  region: overrides.region ?? "ap-northeast-1",
-  bucket: overrides.bucket ?? "wardrobe-dev-images",
-  publicBaseUrl: overrides.publicBaseUrl ?? "http://localhost:4000/images",
-  storageDriver: overrides.storageDriver ?? "local",
+  region: overrides.region ?? readNonEmptyEnv("AWS_REGION") ?? "ap-northeast-1",
+  bucket: overrides.bucket ?? readNonEmptyEnv("S3_BUCKET") ?? "wardrobe-dev-images",
+  publicBaseUrl: overrides.publicBaseUrl ?? readNonEmptyEnv("IMAGE_PUBLIC_BASE_URL") ?? "http://localhost:4000/images",
+  storageDriver: overrides.storageDriver ?? readStorageDriverEnv() ?? "local",
   endpoint: overrides.endpoint,
   presignExpiresInSec: overrides.presignExpiresInSec ?? 600,
 });

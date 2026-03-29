@@ -11,6 +11,22 @@ const source = readFileSync(path.join(root, "src/clients/s3.ts"), "utf8");
 const packageJson = readFileSync(path.join(root, "package.json"), "utf8");
 const ciSource = readFileSync(path.join(root, "../../.github/workflows/ci.yml"), "utf8");
 
+const trackedEnvKeys = ["AWS_REGION", "S3_BUCKET", "IMAGE_PUBLIC_BASE_URL", "STORAGE_DRIVER"];
+const previousEnv = Object.fromEntries(trackedEnvKeys.map((key) => [key, process.env[key]]));
+
+const setEnv = (key, value) => {
+  if (value === undefined) {
+    delete process.env[key];
+    return;
+  }
+
+  process.env[key] = value;
+};
+
+for (const key of trackedEnvKeys) {
+  setEnv(key, undefined);
+}
+
 const defaultConfig = s3.createS3ClientConfig();
 const localClient = s3.createS3Client({
   bucket: "wardrobe-local-images",
@@ -35,6 +51,10 @@ const cloudSigned = await cloudClient.presignPutObject({
   contentType: "image/webp",
   expiresInSec: 120,
 });
+
+for (const key of trackedEnvKeys) {
+  setEnv(key, previousEnv[key]);
+}
 
 const checks = [
   {
