@@ -30,8 +30,13 @@ const { listHistoryHandler } = await import(listHandlerModulePath);
 const { getHistoryHandler } = await import(getHandlerModulePath);
 const { createDynamoDbClient } = await import(dynamoModulePath);
 const { encodeCursor } = await import(cursorModulePath);
+const mockDocumentClient = { send: async () => ({}) };
 
-const repoClient = createHistoryRepo(createDynamoDbClient({ endpoint: "http://localhost:8000", tableName: "SpecTable" }));
+const repoClient = createHistoryRepo(createDynamoDbClient({
+  endpoint: "http://localhost:8000",
+  tableName: "SpecTable",
+  documentClient: mockDocumentClient,
+}));
 const repoListResult = await repoClient.list({
   wardrobeId: "wd_001",
   from: "20260101",

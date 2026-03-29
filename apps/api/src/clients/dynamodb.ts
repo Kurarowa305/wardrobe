@@ -1,3 +1,20 @@
+import { DynamoDBClient, type DynamoDBClientConfig } from "@aws-sdk/client-dynamodb";
+import {
+  BatchGetCommand,
+  DynamoDBDocumentClient as AwsDynamoDbDocumentClient,
+  GetCommand,
+  PutCommand,
+  QueryCommand as AwsQueryCommand,
+  TransactWriteCommand,
+  UpdateCommand,
+  type BatchGetCommandOutput,
+  type GetCommandOutput,
+  type PutCommandOutput,
+  type QueryCommandOutput,
+  type TransactWriteCommandOutput,
+  type UpdateCommandOutput,
+} from "@aws-sdk/lib-dynamodb";
+
 export type DynamoDbTransportConfig = {
   region: string;
   endpoint?: string | undefined;
@@ -47,16 +64,18 @@ export type BatchGetItemInput = {
 };
 
 export type TransactWriteItem = {
-  Put?: { Item: DynamoDbItem; ConditionExpression?: string | undefined } | undefined;
+  Put?: { TableName?: string | undefined; Item: DynamoDbItem; ConditionExpression?: string | undefined } | undefined;
   Update?: {
+    TableName?: string | undefined;
     Key: DynamoDbKey;
     UpdateExpression: string;
     ConditionExpression?: string | undefined;
     ExpressionAttributeNames?: Record<string, string> | undefined;
     ExpressionAttributeValues?: Record<string, unknown> | undefined;
   } | undefined;
-  Delete?: { Key: DynamoDbKey; ConditionExpression?: string | undefined } | undefined;
+  Delete?: { TableName?: string | undefined; Key: DynamoDbKey; ConditionExpression?: string | undefined } | undefined;
   ConditionCheck?: {
+    TableName?: string | undefined;
     Key: DynamoDbKey;
     ConditionExpression: string;
     ExpressionAttributeNames?: Record<string, string> | undefined;
@@ -100,7 +119,18 @@ export type DynamoDbBuiltCommand =
   | BatchGetItemCommand
   | TransactWriteItemsCommand;
 
-export type DynamoDbSendResult<TCommand extends DynamoDbBuiltCommand> = {
+type DynamoDbOperationResultMap = {
+  GetItem: GetCommandOutput;
+  PutItem: PutCommandOutput;
+  UpdateItem: UpdateCommandOutput;
+  Query: QueryCommandOutput;
+  BatchGetItem: BatchGetCommandOutput;
+  TransactWriteItems: TransactWriteCommandOutput;
+};
+
+type DynamoDbOperationResult<TName extends DynamoDbOperationName> = DynamoDbOperationResultMap[TName];
+
+export type DynamoDbSendResult<TCommand extends DynamoDbBuiltCommand> = DynamoDbOperationResult<TCommand["operation"]> & {
   operation: TCommand["operation"];
   request: TCommand;
 };
@@ -109,6 +139,73 @@ const LOCAL_ENDPOINT_PATTERN = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i;
 
 const isLocalEndpoint = (endpoint: string | undefined): boolean =>
   endpoint !== undefined && LOCAL_ENDPOINT_PATTERN.test(endpoint);
+
+type AwsDocumentClientLike = Pick<AwsDynamoDbDocumentClient, "send">;
+
+export type CreateDynamoDbDocumentClientOptions = Partial<DynamoDbTransportConfig> & {
+  documentClient?: AwsDocumentClientLike | undefined;
+};
+
+export type CreateDynamoDbClientOptions = Partial<DynamoDbClientConfig> & {
+  documentClient?: AwsDocumentClientLike | undefined;
+};
+
+const executeBuiltCommand = async (documentClient: AwsDocumentClientLike, command: DynamoDbBuiltCommand): Promise<unknown> => {
+  switch (command.operation) {
+    case "GetItem":
+      return documentClient.send(new GetCommand(command.input));
+    case "PutItem":
+      return documentClient.send(new PutCommand(command.input));
+    case "UpdateItem":
+      return documentClient.send(new UpdateCommand(command.input));
+    case "Query":
+      return documentClient.send(new AwsQueryCommand(command.input));
+    case "BatchGetItem":
+      return documentClient.send(new BatchGetCommand(command.input));
+    case "TransactWriteItems":
+      return documentClient.send(
+        new TransactWriteCommand(command.input as ConstructorParameters<typeof TransactWriteCommand>[0]),
+      );
+    default: {
+      const exhaustiveCheck: never = command;
+      throw new Error(`Unsupported DynamoDB operation: ${(exhaustiveCheck as { operation?: string }).operation ?? "unknown"}`);
+    }
+  }
+};
+
+const attachTableNameToTransactItem = (item: TransactWriteItem, tableName: string): TransactWriteItem => {
+  const resolved: TransactWriteItem = {};
+
+  if (item.Put) {
+    resolved.Put = {
+      ...item.Put,
+      TableName: item.Put.TableName ?? tableName,
+    };
+  }
+
+  if (item.Update) {
+    resolved.Update = {
+      ...item.Update,
+      TableName: item.Update.TableName ?? tableName,
+    };
+  }
+
+  if (item.Delete) {
+    resolved.Delete = {
+      ...item.Delete,
+      TableName: item.Delete.TableName ?? tableName,
+    };
+  }
+
+  if (item.ConditionCheck) {
+    resolved.ConditionCheck = {
+      ...item.ConditionCheck,
+      TableName: item.ConditionCheck.TableName ?? tableName,
+    };
+  }
+
+  return resolved;
+};
 
 export const createDynamoDbClientConfig = (
   overrides: Partial<DynamoDbClientConfig> = {},
@@ -126,35 +223,60 @@ export const createDynamoDbTransportConfig = (
 });
 
 export const createDynamoDbDocumentClient = (
-  overrides: Partial<DynamoDbTransportConfig> = {},
+  overrides: CreateDynamoDbDocumentClientOptions = {},
 ) => {
   const transport = createDynamoDbTransportConfig(overrides);
+  const localMode = isLocalEndpoint(transport.endpoint);
+  const credentials = localMode
+    ? {
+        accessKeyId: "local",
+        secretAccessKey: "local",
+      }
+    : undefined;
+
+  const baseClientConfig: DynamoDBClientConfig = {
+    region: transport.region,
+    ...(transport.endpoint ? { endpoint: transport.endpoint } : {}),
+    ...(credentials ? { credentials } : {}),
+  };
+
+  const sdkDocumentClient =
+    overrides.documentClient
+    ?? AwsDynamoDbDocumentClient.from(new DynamoDBClient(baseClientConfig), {
+      marshallOptions: {
+        removeUndefinedValues: true,
+      },
+    });
 
   return {
     config: {
       region: transport.region,
       endpoint: transport.endpoint,
-      accessMode: isLocalEndpoint(transport.endpoint) ? ("local" as const) : ("aws" as const),
-      credentials: isLocalEndpoint(transport.endpoint)
-        ? {
-            accessKeyId: "local",
-            secretAccessKey: "local",
-          }
-        : undefined,
+      accessMode: localMode ? ("local" as const) : ("aws" as const),
+      credentials,
     },
-    send: async <TCommand extends DynamoDbBuiltCommand>(command: TCommand): Promise<DynamoDbSendResult<TCommand>> => ({
-      operation: command.operation,
-      request: command,
-    }),
+    send: async <TCommand extends DynamoDbBuiltCommand>(command: TCommand): Promise<DynamoDbSendResult<TCommand>> => {
+      const result = await executeBuiltCommand(sdkDocumentClient, command);
+
+      return {
+        ...(result as DynamoDbOperationResult<TCommand["operation"]>),
+        operation: command.operation,
+        request: command,
+      };
+    },
   };
 };
 
 export type DynamoDbDocumentClient = ReturnType<typeof createDynamoDbDocumentClient>;
 export type DynamoDbClient = ReturnType<typeof createDynamoDbClient>;
 
-export const createDynamoDbClient = (overrides: Partial<DynamoDbClientConfig> = {}) => {
-  const config = createDynamoDbClientConfig(overrides);
-  const documentClient = createDynamoDbDocumentClient(config);
+export const createDynamoDbClient = (overrides: CreateDynamoDbClientOptions = {}) => {
+  const { documentClient: injectedDocumentClient, ...configOverrides } = overrides;
+  const config = createDynamoDbClientConfig(configOverrides);
+  const documentClient = createDynamoDbDocumentClient({
+    ...config,
+    ...(injectedDocumentClient ? { documentClient: injectedDocumentClient } : {}),
+  });
 
   return {
     config,
@@ -205,11 +327,17 @@ export const createDynamoDbClient = (overrides: Partial<DynamoDbClientConfig> = 
     transactWriteItems: (
       input: { TransactItems: TransactWriteItem[] },
     ): Promise<DynamoDbSendResult<TransactWriteItemsCommand>> =>
-      documentClient.send({
-        operation: "TransactWriteItems",
-        region: config.region,
-        endpoint: config.endpoint,
-        input,
-      }),
+      {
+        const transactItems = input.TransactItems.map((item) => attachTableNameToTransactItem(item, config.tableName));
+
+        return documentClient.send({
+          operation: "TransactWriteItems",
+          region: config.region,
+          endpoint: config.endpoint,
+          input: {
+            TransactItems: transactItems,
+          },
+        });
+      },
   };
 };

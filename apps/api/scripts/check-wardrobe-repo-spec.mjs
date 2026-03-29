@@ -11,6 +11,7 @@ const repo = await import(repoModulePath);
 const source = readFileSync(repoModulePath, "utf8");
 const packageJson = readFileSync(path.join(root, "package.json"), "utf8");
 const ciSource = readFileSync(path.join(root, "../../.github/workflows/ci.yml"), "utf8");
+const mockDocumentClient = { send: async () => ({}) };
 
 const builtKey = repo.buildWardrobeMetaKey("wd_01HZZ8ABCDEF1234567890");
 const builtItem = repo.buildWardrobeMetaItem({
@@ -23,6 +24,7 @@ const repoClient = repo.createWardrobeRepo(
   (await import(path.join(root, "src/clients/dynamodb.ts"))).createDynamoDbClient({
     endpoint: "http://localhost:8000",
     tableName: "SpecTable",
+    documentClient: mockDocumentClient,
   }),
 );
 
