@@ -7,30 +7,66 @@ const __dirname = path.dirname(__filename);
 const root = path.resolve(__dirname, "..");
 
 const adapterModulePath = path.join(root, "src/entry/lambda/adapter.ts");
+const handlerModulePath = path.join(root, "src/domains/template/handlers/createTemplateHandler.ts");
 const packageJsonPath = path.join(root, "package.json");
 const ciPath = path.join(root, "../../.github/workflows/ci.yml");
 const source = readFileSync(adapterModulePath, "utf8");
 const packageJson = readFileSync(packageJsonPath, "utf8");
 const ciSource = readFileSync(ciPath, "utf8");
 
-const { sharedDomainHandlers, createLambdaHandler } = await import(adapterModulePath);
+const { createLambdaHandler } = await import(adapterModulePath);
+const { createTemplateHandler } = await import(handlerModulePath);
+
+const templateCreateDependencies = {
+  repo: {
+    async list() {
+      return {};
+    },
+    async create() {
+      return { ok: true };
+    },
+    async get() {
+      return {};
+    },
+    async update() {
+      return { ok: true };
+    },
+    async delete() {
+      return { ok: true };
+    },
+  },
+  clothingBatchGetRepo: {
+    async batchGetByIds() {
+      return [];
+    },
+  },
+};
 
 let postErrorCode = null;
 try {
-  await sharedDomainHandlers.template({
-    requestId: "req_template_post",
-    method: "POST",
-    pathname: "/wardrobes/wd_123/templates",
+  await createTemplateHandler({
     path: { wardrobeId: "wd_123" },
-    query: {},
     body: { name: "通勤", clothingIds: ["cl_001"] },
     headers: { "content-type": "application/json" },
+    requestId: "req_template_post",
+    dependencies: templateCreateDependencies,
   });
 } catch (error) {
   postErrorCode = error?.code ?? null;
 }
 
-const lambda = createLambdaHandler({ domain: "template" });
+const lambda = createLambdaHandler({
+  domain: "template",
+  handler(request) {
+    return createTemplateHandler({
+      path: request.path,
+      body: request.body,
+      headers: request.headers,
+      requestId: request.requestId,
+      dependencies: templateCreateDependencies,
+    });
+  },
+});
 const lambdaResponse = await lambda({
   rawPath: "/wardrobes/wd_123/templates",
   pathParameters: { wardrobeId: "wd_123" },

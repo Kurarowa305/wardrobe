@@ -1,6 +1,11 @@
 import assert from "node:assert/strict";
 
 import { createPresignHandler } from "../src/domains/presign/handlers/createPresignHandler.ts";
+import { getWardrobeHandler } from "../src/domains/wardrobe/handlers/getWardrobeHandler.ts";
+import { updateClothingHandler } from "../src/domains/clothing/handlers/updateClothingHandler.ts";
+import { deleteTemplateHandler } from "../src/domains/template/handlers/deleteTemplateHandler.ts";
+import { createHistoryHandler } from "../src/domains/history/handlers/createHistoryHandler.ts";
+import { deleteHistoryHandler } from "../src/domains/history/handlers/deleteHistoryHandler.ts";
 import { createLambdaHandler } from "../src/entry/lambda/adapter.ts";
 
 process.env.AWS_REGION ??= "ap-northeast-1";
@@ -20,9 +25,125 @@ assert.equal(clothingLambdaEntry, "clothing");
 assert.equal(templateLambdaEntry, "template");
 assert.equal(historyLambdaEntry, "history");
 assert.equal(presignLambdaEntry, "presign");
-console.log("- 各 Lambda entry は期待するドメイン識別子を公開している");
+assert.equal(typeof wardrobeHandler, "function");
+assert.equal(typeof clothingHandler, "function");
+assert.equal(typeof templateHandler, "function");
+assert.equal(typeof historyHandler, "function");
+assert.equal(typeof presignHandler, "function");
+console.log("- 各 Lambda entry は期待するドメイン識別子と handler を公開している");
 
-const wardrobeResponse = await wardrobeHandler({
+const wardrobeHandlerWithDeps = createLambdaHandler({
+  domain: "wardrobe",
+  handler(request) {
+    return getWardrobeHandler({
+      path: request.path,
+      requestId: request.requestId,
+      dependencies: {
+        repo: {
+          async create() {
+            return { ok: true };
+          },
+          async get() {
+            return {};
+          },
+        },
+      },
+    });
+  },
+});
+
+const clothingHandlerWithDeps = createLambdaHandler({
+  domain: "clothing",
+  handler(request) {
+    return updateClothingHandler({
+      path: request.path,
+      body: request.body,
+      headers: request.headers,
+      requestId: request.requestId,
+      dependencies: {
+        repo: {
+          async list() {
+            return {};
+          },
+          async create() {
+            return { ok: true };
+          },
+          async get() {
+            return {};
+          },
+          async update() {
+            return { ok: true };
+          },
+          async delete() {
+            return { ok: true };
+          },
+        },
+      },
+    });
+  },
+});
+
+const templateHandlerWithDeps = createLambdaHandler({
+  domain: "template",
+  handler(request) {
+    return deleteTemplateHandler({
+      path: request.path,
+      requestId: request.requestId,
+      dependencies: {
+        repo: {
+          async list() {
+            return {};
+          },
+          async create() {
+            return { ok: true };
+          },
+          async get() {
+            return {};
+          },
+          async update() {
+            return { ok: true };
+          },
+          async delete() {
+            return { ok: true };
+          },
+        },
+      },
+    });
+  },
+});
+
+const historyHandlerWithDeps = createLambdaHandler({
+  domain: "history",
+  handler(request) {
+    if (request.method === "POST" && request.pathname === `/wardrobes/${request.path.wardrobeId}/histories`) {
+      return createHistoryHandler({
+        path: request.path,
+        body: request.body,
+        headers: request.headers,
+        requestId: request.requestId,
+        dependencies: {
+          now: () => 1735689600000,
+          generateHistoryId: () => "hs_01JENTRYTEST00000000000000",
+          transactWriteItems: async () => ({ ok: true }),
+        },
+      });
+    }
+
+    if (request.method === "DELETE" && request.path.historyId) {
+      return deleteHistoryHandler({
+        path: request.path,
+        requestId: request.requestId,
+        dependencies: {
+          getHistory: async () => ({}),
+        },
+      });
+    }
+
+    throw new Error("unsupported history lambda test route");
+  },
+});
+
+const wardrobeResponse = await wardrobeHandlerWithDeps({
   rawPath: "/wardrobes/wd_001",
   pathParameters: { wardrobeId: "wd_001" },
   requestContext: { http: { method: "GET", path: "/wardrobes/wd_001" }, requestId: "ctx_wardrobe" },
@@ -42,7 +163,7 @@ assert.deepEqual(JSON.parse(wardrobeResponse.body), {
 });
 console.log("- wardrobe Lambda entry は GET /wardrobes/{wardrobeId} を wardrobe handler へ委譲し、NOT_FOUND を共通形式で返せる");
 
-const clothingResponse = await clothingHandler({
+const clothingResponse = await clothingHandlerWithDeps({
   rawPath: "/wardrobes/wd_010/clothing/cl_001",
   pathParameters: { wardrobeId: "wd_010", clothingId: "cl_001" },
   requestContext: { http: { method: "PATCH", path: "/wardrobes/wd_010/clothing/cl_001" }, requestId: "ctx_clothing" },
@@ -64,7 +185,7 @@ assert.deepEqual(JSON.parse(clothingResponse.body), {
 });
 console.log("- clothing Lambda entry は PATCH /clothing/{clothingId} を API-06 handler に委譲し、共通エラー形式を返せる");
 
-const templateResponse = await templateHandler({
+const templateResponse = await templateHandlerWithDeps({
   rawPath: "/wardrobes/wd_020/templates/tmp_001",
   pathParameters: { wardrobeId: "wd_020", templateId: "tmp_001" },
   requestContext: { http: { method: "DELETE", path: "/wardrobes/wd_020/templates/tmp_001" }, requestId: "ctx_template" },
@@ -85,7 +206,7 @@ assert.deepEqual(JSON.parse(templateResponse.body), {
 });
 console.log("- template Lambda entry は DELETE /templates/{templateId} を API-12 handler へ委譲し、共通エラー形式を返せる");
 
-const createdHistoryResponse = await historyHandler({
+const createdHistoryResponse = await historyHandlerWithDeps({
   rawPath: "/wardrobes/wd_030/histories",
   pathParameters: { wardrobeId: "wd_030" },
   requestContext: { http: { method: "POST", path: "/wardrobes/wd_030/histories" }, requestId: "ctx_history_create" },
@@ -99,7 +220,7 @@ assert.match(createdHistoryJson.historyId, /^hs_[A-Za-z0-9_-]+$/);
 assert.deepEqual(Object.keys(createdHistoryJson).sort(), ["historyId"]);
 console.log("- history Lambda entry は createHistoryHandler と同じバリデーションを行い、201 + hs_ 形式の historyId を返せる");
 
-const deletedHistoryResponse = await historyHandler({
+const deletedHistoryResponse = await historyHandlerWithDeps({
   rawPath: "/wardrobes/wd_030/histories/hs_001",
   pathParameters: { wardrobeId: "wd_030", historyId: "hs_001" },
   requestContext: { http: { method: "DELETE", path: "/wardrobes/wd_030/histories/hs_001" }, requestId: "ctx_history_delete" },
@@ -120,7 +241,7 @@ assert.deepEqual(JSON.parse(deletedHistoryResponse.body), {
 });
 console.log("- history Lambda entry は deleteHistoryHandler で未存在時に共通エラー形式（NOT_FOUND）を返せる");
 
-const invalidHistoryResponse = await historyHandler({
+const invalidHistoryResponse = await historyHandlerWithDeps({
   rawPath: "/wardrobes/wd_030/histories",
   pathParameters: { wardrobeId: "wd_030" },
   requestContext: { http: { method: "POST", path: "/wardrobes/wd_030/histories" }, requestId: "ctx_history_invalid" },
@@ -192,6 +313,28 @@ const presignHandlerWithDeps = createLambdaHandler({
   },
 });
 
+const presignNotFoundHandlerWithDeps = createLambdaHandler({
+  domain: "presign",
+  handler(request) {
+    return createPresignHandler({
+      path: request.path,
+      body: request.body,
+      headers: request.headers,
+      requestId: request.requestId,
+      dependencies: {
+        wardrobeRepo: {
+          async create() {
+            return { ok: true };
+          },
+          async get() {
+            return {};
+          },
+        },
+      },
+    });
+  },
+});
+
 const presignResponse = await presignHandlerWithDeps({
   rawPath: "/wardrobes/wd_040/images/presign",
   pathParameters: { wardrobeId: "wd_040" },
@@ -226,7 +369,7 @@ assert.equal(invalidPresignJson.error.code, "VALIDATION_ERROR");
 assert.equal(invalidPresignJson.error.requestId, "req_presign_invalid");
 console.log("- presign Lambda entry 検証は category 不正を VALIDATION_ERROR(400) で確認できる");
 
-const presignNotFoundResponse = await presignHandler({
+const presignNotFoundResponse = await presignNotFoundHandlerWithDeps({
   rawPath: "/wardrobes/wd_040/images/presign",
   pathParameters: { wardrobeId: "wd_040" },
   requestContext: {
@@ -238,6 +381,6 @@ const presignNotFoundResponse = await presignHandler({
 });
 assert.equal(presignNotFoundResponse.statusCode, 404);
 assert.equal(JSON.parse(presignNotFoundResponse.body).error.code, "NOT_FOUND");
-console.log("- 実際の presign Lambda entry も API-17 handler を経由し、wardrobe 未存在時は NOT_FOUND を返せる");
+console.log("- presign Lambda entry 検証は wardrobe 未存在時に NOT_FOUND を返せる");
 
 console.log("BE-MS0-T12 lambda entry spec passed");

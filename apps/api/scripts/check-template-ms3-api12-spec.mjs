@@ -7,30 +7,57 @@ const __dirname = path.dirname(__filename);
 const root = path.resolve(__dirname, "..");
 
 const adapterModulePath = path.join(root, "src/entry/lambda/adapter.ts");
+const handlerModulePath = path.join(root, "src/domains/template/handlers/deleteTemplateHandler.ts");
 const packageJsonPath = path.join(root, "package.json");
 const ciPath = path.join(root, "../../.github/workflows/ci.yml");
 const source = readFileSync(adapterModulePath, "utf8");
 const packageJson = readFileSync(packageJsonPath, "utf8");
 const ciSource = readFileSync(ciPath, "utf8");
 
-const { sharedDomainHandlers, createLambdaHandler } = await import(adapterModulePath);
+const { createLambdaHandler } = await import(adapterModulePath);
+const { deleteTemplateHandler } = await import(handlerModulePath);
+
+const templateDeleteDependencies = {
+  repo: {
+    async list() {
+      return {};
+    },
+    async create() {
+      return { ok: true };
+    },
+    async get() {
+      return {};
+    },
+    async update() {
+      return { ok: true };
+    },
+    async delete() {
+      return { ok: true };
+    },
+  },
+};
 
 let deleteErrorCode = null;
 try {
-  await sharedDomainHandlers.template({
-    requestId: "req_template_delete",
-    method: "DELETE",
-    pathname: "/wardrobes/wd_123/templates/tp_123",
+  await deleteTemplateHandler({
     path: { wardrobeId: "wd_123", templateId: "tp_123" },
-    query: {},
-    body: {},
-    headers: {},
+    requestId: "req_template_delete",
+    dependencies: templateDeleteDependencies,
   });
 } catch (error) {
   deleteErrorCode = error?.code ?? null;
 }
 
-const lambda = createLambdaHandler({ domain: "template" });
+const lambda = createLambdaHandler({
+  domain: "template",
+  handler(request) {
+    return deleteTemplateHandler({
+      path: request.path,
+      requestId: request.requestId,
+      dependencies: templateDeleteDependencies,
+    });
+  },
+});
 const lambdaResponse = await lambda({
   rawPath: "/wardrobes/wd_123/templates/tp_123",
   pathParameters: { wardrobeId: "wd_123", templateId: "tp_123" },

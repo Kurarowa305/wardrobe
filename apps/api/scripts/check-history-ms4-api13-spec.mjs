@@ -7,26 +7,61 @@ const __dirname = path.dirname(__filename);
 const root = path.resolve(__dirname, "..");
 
 const adapterModulePath = path.join(root, "src/entry/lambda/adapter.ts");
+const handlerModulePath = path.join(root, "src/domains/history/handlers/listHistoryHandler.ts");
 const packageJsonPath = path.join(root, "package.json");
 const ciPath = path.join(root, "../../.github/workflows/ci.yml");
 const source = readFileSync(adapterModulePath, "utf8");
 const packageJson = readFileSync(packageJsonPath, "utf8");
 const ciSource = readFileSync(ciPath, "utf8");
 
-const { sharedDomainHandlers, createLambdaHandler } = await import(adapterModulePath);
+const { createLambdaHandler } = await import(adapterModulePath);
+const { listHistoryHandler } = await import(handlerModulePath);
 
-const response = await sharedDomainHandlers.history({
-  requestId: "req_history_get",
-  method: "GET",
-  pathname: "/wardrobes/wd_123/histories",
+const historyListDependencies = {
+  repo: {
+    async list() {
+      return {
+        Items: [],
+      };
+    },
+    async get() {
+      return {};
+    },
+  },
+  historyDetailsResolver: {
+    async resolveMany() {
+      return [];
+    },
+    async resolveOne() {
+      return {
+        historyId: "hs_stub",
+        date: "20260101",
+        templateName: null,
+        clothingItems: [],
+      };
+    },
+  },
+};
+
+const response = await listHistoryHandler({
   path: { wardrobeId: "wd_123" },
   query: { order: "desc", limit: "1" },
-  body: {},
-  headers: {},
+  requestId: "req_history_get",
+  dependencies: historyListDependencies,
 });
 const parsedResponse = JSON.parse(response.body);
 
-const lambda = createLambdaHandler({ domain: "history" });
+const lambda = createLambdaHandler({
+  domain: "history",
+  handler(request) {
+    return listHistoryHandler({
+      path: request.path,
+      query: request.query,
+      requestId: request.requestId,
+      dependencies: historyListDependencies,
+    });
+  },
+});
 const lambdaResponse = await lambda({
   rawPath: "/wardrobes/wd_123/histories",
   rawQueryString: "order=desc&limit=1",
