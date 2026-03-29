@@ -16,6 +16,7 @@ export const TEMPLATE_STRINGS = {
       loading: "読み込み中...",
       empty: "テンプレートがまだ登録されていません。",
       error: "テンプレート一覧の読み込みに失敗しました。",
+      notFound: "ワードローブが見つかりませんでした。",
     },
     badges: { deleted: "削除済み" },
   },

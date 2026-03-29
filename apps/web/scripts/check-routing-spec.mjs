@@ -358,11 +358,14 @@ check("RT-19", "all in-wardrobe route calls use wardrobeId as first argument", (
   };
 });
 
-check("RT-20", "create page links to demo wardrobe home", () => {
-  const ok = includes(CREATE_SCREEN, "ROUTES.home(DEMO_IDS.wardrobe)");
+check("RT-20", "create page uses API-created wardrobeId for home route", () => {
+  const ok =
+    includes(CREATE_SCREEN, "useCreateWardrobeMutation") &&
+    includes(CREATE_SCREEN, "createWardrobeMutation.mutateAsync({ name: trimmedName })") &&
+    includes(CREATE_SCREEN, "ROUTES.home(created.wardrobeId)");
   return {
     ok,
-    detail: "WardrobeCreateScreen should route to demo wardrobe home",
+    detail: "WardrobeCreateScreen should route to home with created wardrobeId",
   };
 });
 
@@ -395,7 +398,7 @@ check("RT-21", "history detail isolates searchParams access behind Suspense", ()
   };
 });
 
-check("RT-22", "template detail/edit pages generate static params from fixtures and reserved mock ids", () => {
+check("RT-22", "template detail/edit pages generate static params with export placeholder ids", () => {
   const pages = [
     "src/app/wardrobes/[wardrobeId]/(stack)/templates/[templateId]/page.tsx",
     "src/app/wardrobes/[wardrobeId]/(stack)/templates/[templateId]/edit/page.tsx",
@@ -403,18 +406,15 @@ check("RT-22", "template detail/edit pages generate static params from fixtures 
   const invalid = pages.filter(
     (file) =>
       !containsAll(file, [
-        'import { templateDetailFixtures } from "@/mocks/fixtures/template";',
-        'const MOCK_TEMPLATE_ID_PREFIX = "tp_mock_";',
-        "const MOCK_TEMPLATE_STATIC_PARAMS_COUNT = 200;",
-        "...templateDetailFixtures.map((fixture) => fixture.templateId)",
-        "...generateMockStaticTemplateIds(),",
-        "wardrobeId: DEMO_IDS.wardrobe,",
-        "templateId,",
+        'const STATIC_EXPORT_WARDROBE_ID = "wd_static";',
+        'const STATIC_EXPORT_TEMPLATE_ID = "tp_static";',
+        "wardrobeId: STATIC_EXPORT_WARDROBE_ID,",
+        "templateId: STATIC_EXPORT_TEMPLATE_ID,",
       ]),
   );
   return {
     ok: invalid.length === 0,
-    detail: `template detail/edit generateStaticParams must cover fixture and reserved mock ids: ${invalid.join(", ") || "(none)"}`,
+    detail: `template detail/edit generateStaticParams must include static export placeholders: ${invalid.join(", ") || "(none)"}`,
   };
 });
 

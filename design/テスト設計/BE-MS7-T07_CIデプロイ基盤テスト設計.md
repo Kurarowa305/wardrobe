@@ -27,8 +27,10 @@
 | TC-03 | apply 実行順序 | `terraform.yml` を検査 | `apply` job が存在し、`needs: plan` を持ち、`terraform apply -auto-approve -var-file=../env/dev.tfvars` を実行する |
 | TC-04 | Lambda パッケージング導線 | `terraform.yml` を検査 | `plan` / `apply` job の両方で `bash infra/terraform/app/scripts/package-lambda.sh` を実行する |
 | TC-05 | 排他制御 | `terraform.yml` を検査 | `apply` job に `concurrency.group=wardrobe-dev-terraform` と `cancel-in-progress=false` が設定される |
-| TC-06 | テスト導線（package） | `apps/api/package.json` を検査 | `test:terraform-ci-deploy-ms7-t07` が定義され、`test` 集約スクリプトから呼び出される |
-| TC-07 | テスト導線（CI） | `.github/workflows/ci.yml` を検査 | `pnpm --filter api test:terraform-ci-deploy-ms7-t07` を実行するstepが存在する |
+| TC-06 | Terraform output 連携 | `terraform.yml` を検査 | `apply` job が `api_endpoint` / `images_cdn_domain` を `GITHUB_OUTPUT` 経由で公開する |
+| TC-07 | web build 環境変数注入 | `terraform.yml` を検査 | `deploy_web` の `pnpm --filter web build` で `NEXT_PUBLIC_API_BASE_URL` / `NEXT_PUBLIC_IMAGE_PUBLIC_BASE_URL` を設定する |
+| TC-08 | テスト導線（package） | `apps/api/package.json` を検査 | `test:terraform-ci-deploy-ms7-t07` が定義され、`test` 集約スクリプトから呼び出される |
+| TC-09 | テスト導線（CI） | `.github/workflows/ci.yml` を検査 | `pnpm --filter api test:terraform-ci-deploy-ms7-t07` を実行するstepが存在する |
 
 ## 5. 実行コマンド
 
@@ -36,5 +38,5 @@
 
 ## 6. 完了条件
 
-- TC-01〜TC-07 がすべて成功する。
+- TC-01〜TC-09 がすべて成功する。
 - CI 上で同一コマンドが自動実行され、失敗時にPRをブロックできる。

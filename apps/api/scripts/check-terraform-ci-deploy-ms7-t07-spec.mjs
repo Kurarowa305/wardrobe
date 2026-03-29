@@ -54,6 +54,25 @@ const checks = [
       terraformWorkflow.includes("cancel-in-progress: false"),
   },
   {
+    name: "apply job が API/Web 用 Terraform output を deploy_web へ公開する",
+    ok:
+      terraformWorkflow.includes("api_endpoint: ${{ steps.tf-outputs.outputs.api_endpoint }}") &&
+      terraformWorkflow.includes("images_cdn_domain: ${{ steps.tf-outputs.outputs.images_cdn_domain }}") &&
+      terraformWorkflow.includes('echo "api_endpoint=$(terraform output -raw api_endpoint)" >> "$GITHUB_OUTPUT"') &&
+      terraformWorkflow.includes(
+        'echo "images_cdn_domain=$(terraform output -raw images_cdn_domain)" >> "$GITHUB_OUTPUT"',
+      ),
+  },
+  {
+    name: "deploy_web job の web build が AWS 実環境の公開 URL を環境変数注入して実行される",
+    ok:
+      terraformWorkflow.includes("NEXT_PUBLIC_API_BASE_URL: ${{ needs.apply.outputs.api_endpoint }}") &&
+      terraformWorkflow.includes(
+        "NEXT_PUBLIC_IMAGE_PUBLIC_BASE_URL: https://${{ needs.apply.outputs.images_cdn_domain }}",
+      ) &&
+      terraformWorkflow.includes("run: pnpm --filter web build"),
+  },
+  {
     name: "テストスクリプトが package.json と CI に登録されている",
     ok:
       packageJson.includes(

@@ -8,6 +8,7 @@ export const HISTORY_STRINGS = {
       loading: "読み込み中...",
       empty: "履歴がまだ登録されていません。",
       error: "履歴一覧の読み込みに失敗しました。",
+      notFound: "ワードローブが見つかりませんでした。",
       combinationSummary: "選択した服の組み合わせ",
     },
     badges: {

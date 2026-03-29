@@ -16,6 +16,7 @@
     "test:query-foundation": "node scripts/check-query-foundation-spec.mjs",
     "test:query-keys": "node scripts/check-query-keys-spec.mjs",
     "test:api-client-foundation": "node scripts/check-api-client-foundation-spec.mjs",
+    "test:wardrobe-api-client": "node scripts/check-wardrobe-api-client-spec.mjs",
     "test:clothing-types": "node scripts/check-clothing-types-spec.mjs",
     "test:template-types": "node scripts/check-template-types-spec.mjs",
     "test:history-types": "node scripts/check-history-types-spec.mjs",

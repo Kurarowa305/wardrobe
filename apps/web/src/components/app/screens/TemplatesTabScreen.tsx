@@ -14,6 +14,7 @@ import { resolveImageUrl } from "@/features/clothing/imageUrl";
 import { TEMPLATE_STRINGS } from "@/features/template/strings";
 import { OPERATION_TOAST_IDS, consumeOperationToast } from "@/features/toast/operationToast";
 import type { TemplateListClothingItem, TemplateListItem } from "@/features/template/types";
+import { isAppError } from "@/lib/error/normalize";
 
 type TemplatesTabScreenProps = {
   wardrobeId: string;
@@ -27,6 +28,14 @@ type TemplateListPage = {
 const TEMPLATE_LIST_PAGE_SIZE = 30;
 const TEMPLATE_THUMBNAIL_LIMIT = 4;
 const TEMPLATE_THUMBNAIL_GRID_CLASS = "grid grid-cols-5 gap-2";
+
+function resolveTemplateListErrorMessage(error: unknown) {
+  if (isAppError(error) && error.status === 404) {
+    return TEMPLATE_STRINGS.list.messages.notFound;
+  }
+
+  return TEMPLATE_STRINGS.list.messages.error;
+}
 
 function TemplateThumbnail({ item }: { item: TemplateListClothingItem }) {
   const imageUrl = resolveImageUrl(item.imageKey);
@@ -82,7 +91,7 @@ export function TemplatesTabScreen({ wardrobeId }: TemplatesTabScreenProps) {
   const [pages, setPages] = useState<TemplateListPage[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
 
-  const { data, isPending, isFetching, isError } = useTemplateList(wardrobeId, {
+  const { data, error, isPending, isFetching, isError } = useTemplateList(wardrobeId, {
     limit: TEMPLATE_LIST_PAGE_SIZE,
     cursor,
   });
@@ -157,7 +166,7 @@ export function TemplatesTabScreen({ wardrobeId }: TemplatesTabScreenProps) {
 
       {isInitialLoading ? <p className="m-0 text-sm text-slate-600">{TEMPLATE_STRINGS.list.messages.loading}</p> : null}
 
-      {showInitialError ? <p className="m-0 text-sm text-red-700">{TEMPLATE_STRINGS.list.messages.error}</p> : null}
+      {showInitialError ? <p className="m-0 text-sm text-red-700">{resolveTemplateListErrorMessage(error)}</p> : null}
 
       {showEmptyState ? <p className="m-0 text-sm text-slate-600">{TEMPLATE_STRINGS.list.messages.empty}</p> : null}
 
@@ -169,7 +178,7 @@ export function TemplatesTabScreen({ wardrobeId }: TemplatesTabScreenProps) {
         </ul>
       ) : null}
 
-      {showInlineError ? <p className="m-0 text-sm text-red-700">{TEMPLATE_STRINGS.list.messages.error}</p> : null}
+      {showInlineError ? <p className="m-0 text-sm text-red-700">{resolveTemplateListErrorMessage(error)}</p> : null}
 
       <AutoLoadTrigger
         enabled={nextCursor !== null}

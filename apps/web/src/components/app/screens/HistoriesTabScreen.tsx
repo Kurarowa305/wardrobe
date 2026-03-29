@@ -10,6 +10,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { HISTORY_STRINGS } from "@/features/history/strings";
 import { OPERATION_TOAST_IDS, consumeOperationToast } from "@/features/toast/operationToast";
 import type { HistoryListItem } from "@/features/history/types";
+import { isAppError } from "@/lib/error/normalize";
 
 type HistoriesTabScreenProps = {
   wardrobeId: string;
@@ -22,6 +23,14 @@ type HistoryListPage = {
 
 const HISTORY_LIST_PAGE_SIZE = 30;
 
+function resolveHistoryListErrorMessage(error: unknown) {
+  if (isAppError(error) && error.status === 404) {
+    return HISTORY_STRINGS.list.messages.notFound;
+  }
+
+  return HISTORY_STRINGS.list.messages.error;
+}
+
 export function HistoriesTabScreen({ wardrobeId }: HistoriesTabScreenProps) {
   const { toast } = useToast();
   const hasShownToastRef = useRef(false);
@@ -29,7 +38,7 @@ export function HistoriesTabScreen({ wardrobeId }: HistoriesTabScreenProps) {
   const [pages, setPages] = useState<HistoryListPage[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
 
-  const { data, isPending, isFetching, isError } = useHistoryList(wardrobeId, {
+  const { data, error, isPending, isFetching, isError } = useHistoryList(wardrobeId, {
     limit: HISTORY_LIST_PAGE_SIZE,
     cursor,
   });
@@ -93,7 +102,7 @@ export function HistoriesTabScreen({ wardrobeId }: HistoriesTabScreenProps) {
     <>
       {isInitialLoading ? <p className="m-0 text-sm text-slate-600">{HISTORY_STRINGS.list.messages.loading}</p> : null}
 
-      {showInitialError ? <p className="m-0 text-sm text-red-700">{HISTORY_STRINGS.list.messages.error}</p> : null}
+      {showInitialError ? <p className="m-0 text-sm text-red-700">{resolveHistoryListErrorMessage(error)}</p> : null}
 
       {showEmptyState ? <p className="m-0 text-sm text-slate-600">{HISTORY_STRINGS.list.messages.empty}</p> : null}
 
@@ -105,7 +114,7 @@ export function HistoriesTabScreen({ wardrobeId }: HistoriesTabScreenProps) {
         </ul>
       ) : null}
 
-      {showInlineError ? <p className="m-0 text-sm text-red-700">{HISTORY_STRINGS.list.messages.error}</p> : null}
+      {showInlineError ? <p className="m-0 text-sm text-red-700">{resolveHistoryListErrorMessage(error)}</p> : null}
 
       <AutoLoadTrigger
         enabled={nextCursor !== null}

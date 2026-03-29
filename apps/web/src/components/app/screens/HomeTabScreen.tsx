@@ -12,11 +12,20 @@ import { useToast } from "@/components/ui/use-toast";
 import { ROUTES } from "@/constants/routes";
 import { HOME_STRINGS } from "@/features/home/strings";
 import { OPERATION_TOAST_IDS, consumeOperationToast } from "@/features/toast/operationToast";
+import { isAppError } from "@/lib/error/normalize";
 type HomeTabScreenProps = {
   wardrobeId: string;
 };
 
 const HOME_RECENT_HISTORY_LIMIT = 7;
+
+function resolveRecentHistoriesErrorMessage(error: unknown) {
+  if (isAppError(error) && error.status === 404) {
+    return HOME_STRINGS.messages.notFound;
+  }
+
+  return HOME_STRINGS.messages.errorRecentHistories;
+}
 
 export function HomeTabScreen({ wardrobeId }: HomeTabScreenProps) {
   const { toast } = useToast();
@@ -71,7 +80,7 @@ export function HomeTabScreen({ wardrobeId }: HomeTabScreenProps) {
         ) : null}
 
         {recentHistoriesQuery.isError ? (
-          <p className="m-0 text-sm text-red-700">{HOME_STRINGS.messages.errorRecentHistories}</p>
+          <p className="m-0 text-sm text-red-700">{resolveRecentHistoriesErrorMessage(recentHistoriesQuery.error)}</p>
         ) : null}
 
         {recentHistoriesQuery.data && recentHistoriesQuery.data.items.length === 0 ? (

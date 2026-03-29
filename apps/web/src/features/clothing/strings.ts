@@ -9,6 +9,7 @@ export const CLOTHING_STRINGS = {
       loading: "読み込み中...",
       empty: "服がまだ登録されていません。",
       error: "服一覧の読み込みに失敗しました。",
+      notFound: "ワードローブが見つかりませんでした。",
       sectionEmpty: "このジャンルの服はまだ登録されていません。",
     },
   },

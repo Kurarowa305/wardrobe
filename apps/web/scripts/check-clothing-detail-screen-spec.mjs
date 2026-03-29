@@ -102,26 +102,26 @@ check(
 
 check(
   "CDS-07",
-  "静的エクスポート向けに服詳細/編集ページの generateStaticParams が fixture 全件を返す",
-  includes(detailPageTarget, 'import { clothingDetailFixtures } from "@/mocks/fixtures/clothing";') &&
-    includes(detailPageTarget, "...clothingDetailFixtures.map((fixture) => fixture.clothingId),") &&
-    includes(detailPageTarget, "wardrobeId: DEMO_IDS.wardrobe,") &&
-    includes(editPageTarget, 'import { clothingDetailFixtures } from "@/mocks/fixtures/clothing";') &&
-    includes(editPageTarget, "...clothingDetailFixtures.map((fixture) => fixture.clothingId),") &&
-    includes(editPageTarget, "wardrobeId: DEMO_IDS.wardrobe,"),
-  "detail/edit ページの静的パス生成が fixture 全件対応になっていません",
+  "静的エクスポート向けに服詳細/編集ページの generateStaticParams が placeholder ID を返す",
+  includes(detailPageTarget, 'const STATIC_EXPORT_WARDROBE_ID = "wd_static";') &&
+    includes(detailPageTarget, 'const STATIC_EXPORT_CLOTHING_ID = "cl_static";') &&
+    includes(detailPageTarget, "wardrobeId: STATIC_EXPORT_WARDROBE_ID,") &&
+    includes(detailPageTarget, "clothingId: STATIC_EXPORT_CLOTHING_ID,") &&
+    includes(editPageTarget, 'const STATIC_EXPORT_WARDROBE_ID = "wd_static";') &&
+    includes(editPageTarget, 'const STATIC_EXPORT_CLOTHING_ID = "cl_static";') &&
+    includes(editPageTarget, "wardrobeId: STATIC_EXPORT_WARDROBE_ID,") &&
+    includes(editPageTarget, "clothingId: STATIC_EXPORT_CLOTHING_ID,"),
+  "detail/edit ページの静的パス生成が placeholder ID 対応になっていません",
 );
 
 check(
   "CDS-08",
-  "追加直後の服ID（cl_mock_XXXX）向け静的パスを事前生成する",
-  includes(detailPageTarget, 'const MOCK_CLOTHING_ID_PREFIX = "cl_mock_";') &&
-    includes(detailPageTarget, "const MOCK_CLOTHING_STATIC_PARAMS_COUNT = 200;") &&
-    includes(detailPageTarget, "...generateMockStaticClothingIds(),") &&
-    includes(editPageTarget, 'const MOCK_CLOTHING_ID_PREFIX = "cl_mock_";') &&
-    includes(editPageTarget, "const MOCK_CLOTHING_STATIC_PARAMS_COUNT = 200;") &&
-    includes(editPageTarget, "...generateMockStaticClothingIds(),"),
-  "detail/edit ページの cl_mock 系静的パス事前生成が不足しています",
+  "静的パラメータ生成が fixture / cl_mock 依存を持たない",
+  !includes(detailPageTarget, "clothingDetailFixtures") &&
+    !includes(detailPageTarget, "MOCK_CLOTHING_ID_PREFIX") &&
+    !includes(editPageTarget, "clothingDetailFixtures") &&
+    !includes(editPageTarget, "MOCK_CLOTHING_ID_PREFIX"),
+  "detail/edit ページに fixture / cl_mock 依存が残っています",
 );
 
 if (failures.length > 0) {

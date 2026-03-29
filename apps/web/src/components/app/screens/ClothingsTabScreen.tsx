@@ -13,11 +13,20 @@ import { ROUTES } from "@/constants/routes";
 import { CLOTHING_GENRES } from "@/features/clothing/genre";
 import { CLOTHING_STRINGS } from "@/features/clothing/strings";
 import { OPERATION_TOAST_IDS, consumeOperationToast } from "@/features/toast/operationToast";
+import { isAppError } from "@/lib/error/normalize";
 
 const CLOTHING_LIST_PAGE_SIZE = 50;
 
 type ClothingsTabScreenProps = { wardrobeId: string };
 type GenrePageState = { cursor: string | null; nextCursor: string | null; collapsed: boolean };
+
+function resolveClothingListErrorMessage(errors: Array<unknown>) {
+  if (errors.some((error) => isAppError(error) && error.status === 404)) {
+    return CLOTHING_STRINGS.list.messages.notFound;
+  }
+
+  return CLOTHING_STRINGS.list.messages.error;
+}
 
 function createInitialGenreState(): Record<ClothingGenreDto, GenrePageState> {
   return {
@@ -76,6 +85,7 @@ export function ClothingsTabScreen({ wardrobeId }: ClothingsTabScreenProps) {
   const isInitialError = CLOTHING_GENRES.every((genre) => genreQueries[genre].isError);
   const hasAnyItems = CLOTHING_GENRES.some((genre) => (genreQueries[genre].data?.items.length ?? 0) > 0);
   const showEmptyState = !isInitialLoading && !isInitialError && !hasAnyItems;
+  const initialErrorMessage = resolveClothingListErrorMessage(CLOTHING_GENRES.map((genre) => genreQueries[genre].error));
 
   const handleLoadMore = useCallback((genre: ClothingGenreDto) => {
     const nextCursor = genreStates[genre].nextCursor;
@@ -96,7 +106,7 @@ export function ClothingsTabScreen({ wardrobeId }: ClothingsTabScreenProps) {
       </div>
 
       {isInitialLoading ? <p className="m-0 text-sm text-slate-600">{CLOTHING_STRINGS.list.messages.loading}</p> : null}
-      {isInitialError ? <p className="m-0 text-sm text-red-700">{CLOTHING_STRINGS.list.messages.error}</p> : null}
+      {isInitialError ? <p className="m-0 text-sm text-red-700">{initialErrorMessage}</p> : null}
       {showEmptyState ? <p className="m-0 text-sm text-slate-600">{CLOTHING_STRINGS.list.messages.empty}</p> : null}
 
       <div className="grid gap-4">

@@ -67,6 +67,8 @@ jobs:
     outputs:
       web_bucket_name: ${{ steps.tf-outputs.outputs.web_bucket_name }}
       web_distribution_id: ${{ steps.tf-outputs.outputs.web_distribution_id }}
+      api_endpoint: ${{ steps.tf-outputs.outputs.api_endpoint }}
+      images_cdn_domain: ${{ steps.tf-outputs.outputs.images_cdn_domain }}
 
     steps:
       - uses: actions/checkout@v4
@@ -112,6 +114,8 @@ jobs:
         run: |
           echo "web_bucket_name=$(terraform output -raw web_bucket_name)" >> "$GITHUB_OUTPUT"
           echo "web_distribution_id=$(terraform output -raw web_cdn_distribution_id)" >> "$GITHUB_OUTPUT"
+          echo "api_endpoint=$(terraform output -raw api_endpoint)" >> "$GITHUB_OUTPUT"
+          echo "images_cdn_domain=$(terraform output -raw images_cdn_domain)" >> "$GITHUB_OUTPUT"
         working-directory: infra/terraform/app
 
   deploy_web:
@@ -134,6 +138,9 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build web
+        env:
+          NEXT_PUBLIC_API_BASE_URL: ${{ needs.apply.outputs.api_endpoint }}
+          NEXT_PUBLIC_IMAGE_PUBLIC_BASE_URL: https://${{ needs.apply.outputs.images_cdn_domain }}
         run: pnpm --filter web build
 
       - name: Configure AWS credentials

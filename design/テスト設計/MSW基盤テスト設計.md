@@ -32,10 +32,10 @@
 - 観点: ブラウザ向けMSW初期化経路の保証
 - 期待結果: `src/mocks/browser.ts` で `setupWorker(...handlers)` を実行している
 
-### MF-06 MSW 起動関数が開発環境またはVercel previewで一度だけ起動する
-- 観点: 本番環境への影響回避とプレビュー確認時のモック有効化、多重起動防止
+### MF-06 MSW 起動関数が development 環境で一度だけ起動する
+- 観点: 本番環境への影響回避と多重起動防止
 - 期待結果:
-  - `src/mocks/start.ts` に `shouldEnableMockServiceWorker` があり、`NODE_ENV=development` または `VERCEL_ENV=preview` を許可する
+  - `src/mocks/start.ts` に `shouldEnableMockServiceWorker` があり、`NODE_ENV=development` のみを許可する
   - `typeof window === "undefined"` ガードがある
   - `isStarted` フラグで再起動を防止している
   - `worker.start({ onUnhandledRequest: "bypass" })` を呼び出している

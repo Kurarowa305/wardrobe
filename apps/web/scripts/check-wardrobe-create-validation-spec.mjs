@@ -21,7 +21,7 @@ const checks = [
   {
     id: "WCV-02",
     name: "ワードローブ名未入力時は作成ボタンを非活性にしている",
-    ok: includes(screenPath, '<Button type="submit" className="w-full" disabled={isSubmitDisabled}>'),
+    ok: includes(screenPath, '<Button type="submit" className="w-full" disabled={isSubmitDisabled || createWardrobeMutation.isPending}>'),
     detail: "作成ボタンの disabled 制御が不足しています",
   },
   {
@@ -42,12 +42,14 @@ const checks = [
   },
   {
     id: "WCV-05",
-    name: "入力済みの場合のみ共通成功トースト導線でホームに遷移する",
+    name: "入力済みの場合のみ APIで作成し、返却 wardrobeId で共通成功トースト導線に遷移する",
     ok:
-      includes(screenPath, "if (isSubmitDisabled) {") &&
-      includes(screenPath, "appendOperationToast(ROUTES.home(DEMO_IDS.wardrobe), OPERATION_TOAST_IDS.wardrobeCreated)") &&
-      includes(screenPath, "router.push(appendOperationToast(ROUTES.home(DEMO_IDS.wardrobe), OPERATION_TOAST_IDS.wardrobeCreated));"),
-    detail: "入力済み時の作成成功トースト導線が期待どおりではありません",
+      includes(screenPath, "if (isSubmitDisabled || createWardrobeMutation.isPending) {") &&
+      includes(screenPath, "useCreateWardrobeMutation") &&
+      includes(screenPath, "createWardrobeMutation.mutateAsync({ name: trimmedName })") &&
+      includes(screenPath, "appendOperationToast(ROUTES.home(created.wardrobeId), OPERATION_TOAST_IDS.wardrobeCreated)") &&
+      includes(screenPath, "router.push(appendOperationToast(ROUTES.home(created.wardrobeId), OPERATION_TOAST_IDS.wardrobeCreated));"),
+    detail: "入力済み時の API作成 + 作成成功トースト導線が期待どおりではありません",
   },
 ];
 
