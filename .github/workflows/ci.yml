@@ -43,6 +43,9 @@ jobs:
       - name: API dynamodb client spec test
         run: pnpm --filter api test:dynamodb
 
+      - name: API dynamodb env resolution spec test
+        run: pnpm --filter api test:dynamodb-env-resolution
+
       - name: API s3 client spec test
         run: pnpm --filter api test:s3
 

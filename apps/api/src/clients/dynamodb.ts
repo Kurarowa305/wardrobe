@@ -140,6 +140,16 @@ const LOCAL_ENDPOINT_PATTERN = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i;
 const isLocalEndpoint = (endpoint: string | undefined): boolean =>
   endpoint !== undefined && LOCAL_ENDPOINT_PATTERN.test(endpoint);
 
+const readNonEmptyEnv = (key: string): string | undefined => {
+  const value = process.env[key];
+  if (typeof value !== "string") {
+    return undefined;
+  }
+
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : undefined;
+};
+
 type AwsDocumentClientLike = Pick<AwsDynamoDbDocumentClient, "send">;
 
 export type CreateDynamoDbDocumentClientOptions = Partial<DynamoDbTransportConfig> & {
@@ -210,9 +220,9 @@ const attachTableNameToTransactItem = (item: TransactWriteItem, tableName: strin
 export const createDynamoDbClientConfig = (
   overrides: Partial<DynamoDbClientConfig> = {},
 ): DynamoDbClientConfig => ({
-  region: overrides.region ?? "ap-northeast-1",
-  endpoint: overrides.endpoint,
-  tableName: overrides.tableName ?? "WardrobeTable",
+  region: overrides.region ?? readNonEmptyEnv("AWS_REGION") ?? "ap-northeast-1",
+  endpoint: overrides.endpoint ?? readNonEmptyEnv("DDB_ENDPOINT"),
+  tableName: overrides.tableName ?? readNonEmptyEnv("TABLE_NAME") ?? "WardrobeTable",
 });
 
 export const createDynamoDbTransportConfig = (
