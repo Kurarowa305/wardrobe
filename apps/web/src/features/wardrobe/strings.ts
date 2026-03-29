@@ -12,5 +12,8 @@ export const WARDROBE_STRINGS = {
     actions: {
       create: "作成",
     },
+    messages: {
+      submitError: "ワードローブの作成に失敗しました。時間をおいて再度お試しください。",
+    },
   },
 } as const;
