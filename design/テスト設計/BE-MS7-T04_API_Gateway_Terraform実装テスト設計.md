@@ -23,7 +23,7 @@
 | --- | --- | --- | --- |
 | TC-01 | HTTP API リソース定義 | `apigw_http_api.tf` を検査 | `aws_apigatewayv2_api.http_api` が定義される |
 | TC-02 | domain integration 定義 | `apigw_http_api.tf` の locals を検査 | `wardrobe` / `clothing` / `template` / `history` / `presign` がそれぞれ `aws_lambda_function.domain[<domain>]` に紐づく |
-| TC-03 | path prefix ルーティング | `apigw_http_api.tf` の route key を検査 | `/wardrobes`, `/clothings`, `/templates`, `/histories`, `/images/presign` の各 prefix が定義される |
+| TC-03 | path prefix ルーティング | `apigw_http_api.tf` の route key を検査 | `/wardrobes`, `/clothing`, `/templates`, `/histories`, `/images/presign` の各 prefix が定義される |
 | TC-04 | route から integration への紐付け | `apigw_http_api.tf` の route を検査 | route ごとに `aws_apigatewayv2_integration.domain` を参照する |
 | TC-05 | Lambda invoke 権限 | `apigw_http_api.tf` を検査 | `aws_lambda_permission.apigw_domain` が domain Lambda ごとに定義される |
 | TC-06 | テスト導線（package） | `apps/api/package.json` を検査 | `test:terraform-apigw-ms7-t04` が定義され、`test` 集約スクリプトから呼び出される |

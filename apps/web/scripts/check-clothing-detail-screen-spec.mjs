@@ -102,26 +102,20 @@ check(
 
 check(
   "CDS-07",
-  "静的エクスポート向けに服詳細/編集ページの generateStaticParams が fixture 全件を返す",
-  includes(detailPageTarget, 'import { clothingDetailFixtures } from "@/mocks/fixtures/clothing";') &&
-    includes(detailPageTarget, "...clothingDetailFixtures.map((fixture) => fixture.clothingId),") &&
-    includes(detailPageTarget, "wardrobeId: DEMO_IDS.wardrobe,") &&
-    includes(editPageTarget, 'import { clothingDetailFixtures } from "@/mocks/fixtures/clothing";') &&
-    includes(editPageTarget, "...clothingDetailFixtures.map((fixture) => fixture.clothingId),") &&
-    includes(editPageTarget, "wardrobeId: DEMO_IDS.wardrobe,"),
-  "detail/edit ページの静的パス生成が fixture 全件対応になっていません",
+  "SSR運用向けに服詳細/編集ページは runtime 動的ルートとして実装される",
+  !includes(detailPageTarget, "generateStaticParams") &&
+    !includes(detailPageTarget, "clothingDetailFixtures") &&
+    !includes(editPageTarget, "generateStaticParams") &&
+    !includes(editPageTarget, "clothingDetailFixtures"),
+  "detail/edit ページに fixture 依存の静的パス生成が残っています",
 );
 
 check(
   "CDS-08",
-  "追加直後の服ID（cl_mock_XXXX）向け静的パスを事前生成する",
-  includes(detailPageTarget, 'const MOCK_CLOTHING_ID_PREFIX = "cl_mock_";') &&
-    includes(detailPageTarget, "const MOCK_CLOTHING_STATIC_PARAMS_COUNT = 200;") &&
-    includes(detailPageTarget, "...generateMockStaticClothingIds(),") &&
-    includes(editPageTarget, 'const MOCK_CLOTHING_ID_PREFIX = "cl_mock_";') &&
-    includes(editPageTarget, "const MOCK_CLOTHING_STATIC_PARAMS_COUNT = 200;") &&
-    includes(editPageTarget, "...generateMockStaticClothingIds(),"),
-  "detail/edit ページの cl_mock 系静的パス事前生成が不足しています",
+  "詳細/編集ページは URL パラメータをそのまま screen に渡す",
+  includes(detailPageTarget, "return <ClothingDetailScreen wardrobeId={wardrobeId} clothingId={clothingId} />;") &&
+    includes(editPageTarget, "return <ClothingEditScreen wardrobeId={wardrobeId} clothingId={clothingId} />;"),
+  "detail/edit ページの screen へのパラメータ受け渡しが不足しています",
 );
 
 if (failures.length > 0) {

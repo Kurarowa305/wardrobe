@@ -358,11 +358,14 @@ check("RT-19", "all in-wardrobe route calls use wardrobeId as first argument", (
   };
 });
 
-check("RT-20", "create page links to demo wardrobe home", () => {
-  const ok = includes(CREATE_SCREEN, "ROUTES.home(DEMO_IDS.wardrobe)");
+check("RT-20", "create page routes to API-created wardrobe home", () => {
+  const ok =
+    includes(CREATE_SCREEN, "useCreateWardrobeMutation") &&
+    includes(CREATE_SCREEN, "const created = await createWardrobeMutation.mutateAsync({") &&
+    includes(CREATE_SCREEN, "ROUTES.home(created.wardrobeId)");
   return {
     ok,
-    detail: "WardrobeCreateScreen should route to demo wardrobe home",
+    detail: "WardrobeCreateScreen should route to API-created wardrobe home",
   };
 });
 
@@ -395,26 +398,20 @@ check("RT-21", "history detail isolates searchParams access behind Suspense", ()
   };
 });
 
-check("RT-22", "template detail/edit pages generate static params from fixtures and reserved mock ids", () => {
+check("RT-22", "template detail/edit pages are runtime dynamic routes (no fixture static params)", () => {
   const pages = [
     "src/app/wardrobes/[wardrobeId]/(stack)/templates/[templateId]/page.tsx",
     "src/app/wardrobes/[wardrobeId]/(stack)/templates/[templateId]/edit/page.tsx",
   ];
   const invalid = pages.filter(
     (file) =>
-      !containsAll(file, [
-        'import { templateDetailFixtures } from "@/mocks/fixtures/template";',
-        'const MOCK_TEMPLATE_ID_PREFIX = "tp_mock_";',
-        "const MOCK_TEMPLATE_STATIC_PARAMS_COUNT = 200;",
-        "...templateDetailFixtures.map((fixture) => fixture.templateId)",
-        "...generateMockStaticTemplateIds(),",
-        "wardrobeId: DEMO_IDS.wardrobe,",
-        "templateId,",
-      ]),
+      !noIncludes(file, "generateStaticParams") ||
+      !noIncludes(file, "templateDetailFixtures") ||
+      !noIncludes(file, "MOCK_TEMPLATE_ID_PREFIX"),
   );
   return {
     ok: invalid.length === 0,
-    detail: `template detail/edit generateStaticParams must cover fixture and reserved mock ids: ${invalid.join(", ") || "(none)"}`,
+    detail: `template detail/edit pages must not contain fixture static params: ${invalid.join(", ") || "(none)"}`,
   };
 });
 

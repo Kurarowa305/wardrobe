@@ -15,7 +15,7 @@ const checks = [
     name: "入力値を trim した結果で送信可否を判定している",
     ok:
       includes(screenPath, "const trimmedName = name.trim();") &&
-      includes(screenPath, "const isSubmitDisabled = trimmedName.length === 0;"),
+      includes(screenPath, "const isSubmitDisabled = trimmedName.length === 0 || createWardrobeMutation.isPending;"),
     detail: "trim 済みの入力値で送信可否を判定する実装が不足しています",
   },
   {
@@ -42,12 +42,14 @@ const checks = [
   },
   {
     id: "WCV-05",
-    name: "入力済みの場合のみ共通成功トースト導線でホームに遷移する",
+    name: "入力済みの場合のみワードローブ作成APIを実行し、返却IDでホームへ遷移する",
     ok:
       includes(screenPath, "if (isSubmitDisabled) {") &&
-      includes(screenPath, "appendOperationToast(ROUTES.home(DEMO_IDS.wardrobe), OPERATION_TOAST_IDS.wardrobeCreated)") &&
-      includes(screenPath, "router.push(appendOperationToast(ROUTES.home(DEMO_IDS.wardrobe), OPERATION_TOAST_IDS.wardrobeCreated));"),
-    detail: "入力済み時の作成成功トースト導線が期待どおりではありません",
+      includes(screenPath, "const created = await createWardrobeMutation.mutateAsync({") &&
+      includes(screenPath, "name: trimmedName,") &&
+      includes(screenPath, "appendOperationToast(ROUTES.home(created.wardrobeId), OPERATION_TOAST_IDS.wardrobeCreated)") &&
+      includes(screenPath, "router.push(appendOperationToast(ROUTES.home(created.wardrobeId), OPERATION_TOAST_IDS.wardrobeCreated));"),
+    detail: "作成API呼び出しまたは返却 wardrobeId を使った遷移が不足しています",
   },
 ];
 

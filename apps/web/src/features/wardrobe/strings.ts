@@ -12,5 +12,9 @@ export const WARDROBE_STRINGS = {
     actions: {
       create: "作成",
     },
+    messages: {
+      creating: "作成中...",
+      submitError: "ワードローブの作成に失敗しました。",
+    },
   },
 } as const;

@@ -92,7 +92,7 @@ check(
   "UF-04",
   "入力未設定時は作成ボタンを非活性にして送信を防止する",
   includes("src/components/app/screens/WardrobeCreateScreen.tsx", "const trimmedName = name.trim();") &&
-    includes("src/components/app/screens/WardrobeCreateScreen.tsx", "const isSubmitDisabled = trimmedName.length === 0;") &&
+    includes("src/components/app/screens/WardrobeCreateScreen.tsx", "const isSubmitDisabled = trimmedName.length === 0 || createWardrobeMutation.isPending;") &&
     includes("src/components/app/screens/WardrobeCreateScreen.tsx", 'disabled={isSubmitDisabled}') &&
     noIncludes("src/components/app/screens/WardrobeCreateScreen.tsx", 'variant: "destructive"') &&
     noIncludes("src/components/app/screens/WardrobeCreateScreen.tsx", "WARDROBE_STRINGS.create.errors"),
@@ -101,11 +101,13 @@ check(
 
 check(
   "UF-05",
-  "作成成功時はホーム遷移に共通トーストクエリを付与する",
-  includes("src/components/app/screens/WardrobeCreateScreen.tsx", "ROUTES.home(DEMO_IDS.wardrobe)") &&
+  "作成成功時はAPI返却の wardrobeId を使ってホーム遷移に共通トーストクエリを付与する",
+  includes("src/components/app/screens/WardrobeCreateScreen.tsx", "useCreateWardrobeMutation") &&
+    includes("src/components/app/screens/WardrobeCreateScreen.tsx", "createWardrobeMutation.mutateAsync") &&
+    includes("src/components/app/screens/WardrobeCreateScreen.tsx", "ROUTES.home(created.wardrobeId)") &&
     includes("src/components/app/screens/WardrobeCreateScreen.tsx", "appendOperationToast") &&
     includes("src/components/app/screens/WardrobeCreateScreen.tsx", "OPERATION_TOAST_IDS.wardrobeCreated"),
-  "WardrobeCreateScreen.tsx で作成完了トースト付き遷移が設定されていません",
+  "WardrobeCreateScreen.tsx でAPI返却IDを使った作成完了トースト付き遷移が設定されていません",
 );
 
 check(
