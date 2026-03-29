@@ -7,33 +7,60 @@ const __dirname = path.dirname(__filename);
 const root = path.resolve(__dirname, "..");
 
 const adapterModulePath = path.join(root, "src/entry/lambda/adapter.ts");
+const handlerModulePath = path.join(root, "src/domains/clothing/handlers/getClothingHandler.ts");
 const packageJsonPath = path.join(root, "package.json");
 const ciPath = path.join(root, "../../.github/workflows/ci.yml");
 const source = readFileSync(adapterModulePath, "utf8");
 const packageJson = readFileSync(packageJsonPath, "utf8");
 const ciSource = readFileSync(ciPath, "utf8");
 
-const { sharedDomainHandlers, createLambdaHandler } = await import(adapterModulePath);
+const { createLambdaHandler } = await import(adapterModulePath);
+const { getClothingHandler } = await import(handlerModulePath);
+
+const clothingGetDependencies = {
+  repo: {
+    async list() {
+      return {};
+    },
+    async create() {
+      return { ok: true };
+    },
+    async get() {
+      return {};
+    },
+    async update() {
+      return { ok: true };
+    },
+    async delete() {
+      return { ok: true };
+    },
+  },
+};
 
 let sharedErrorCode = null;
 let sharedErrorDetails = null;
 
 try {
-  await sharedDomainHandlers.clothing({
-    requestId: "req_clothing_get",
-    method: "GET",
-    pathname: "/wardrobes/wd_123/clothing/cl_123",
+  await getClothingHandler({
     path: { wardrobeId: "wd_123", clothingId: "cl_123" },
-    query: {},
-    body: {},
-    headers: {},
+    requestId: "req_clothing_get",
+    dependencies: clothingGetDependencies,
   });
 } catch (error) {
   sharedErrorCode = error?.code ?? null;
   sharedErrorDetails = error?.details ?? null;
 }
 
-const lambda = createLambdaHandler({ domain: "clothing" });
+const lambda = createLambdaHandler({
+  domain: "clothing",
+  handler(request) {
+    return getClothingHandler({
+      path: request.path,
+      requestId: request.requestId,
+      dependencies: clothingGetDependencies,
+    });
+  },
+});
 const lambdaResponse = await lambda({
   rawPath: "/wardrobes/wd_123/clothing/cl_123",
   pathParameters: { wardrobeId: "wd_123", clothingId: "cl_123" },

@@ -7,25 +7,56 @@ const __dirname = path.dirname(__filename);
 const root = path.resolve(__dirname, "..");
 
 const adapterModulePath = path.join(root, "src/entry/lambda/adapter.ts");
+const handlerModulePath = path.join(root, "src/domains/clothing/handlers/listClothingHandler.ts");
 const packageJsonPath = path.join(root, "package.json");
 const ciPath = path.join(root, "../../.github/workflows/ci.yml");
 const source = readFileSync(adapterModulePath, "utf8");
 const packageJson = readFileSync(packageJsonPath, "utf8");
 const ciSource = readFileSync(ciPath, "utf8");
 
-const { sharedDomainHandlers, createLambdaHandler } = await import(adapterModulePath);
+const { createLambdaHandler } = await import(adapterModulePath);
+const { listClothingHandler } = await import(handlerModulePath);
 
-const listResponse = await sharedDomainHandlers.clothing({
-  requestId: "req_clothing_list",
-  method: "GET",
-  pathname: "/wardrobes/wd_123/clothing",
+const clothingListDependencies = {
+  repo: {
+    async list() {
+      return {
+        Items: [],
+      };
+    },
+    async create() {
+      return { ok: true };
+    },
+    async get() {
+      return {};
+    },
+    async update() {
+      return { ok: true };
+    },
+    async delete() {
+      return { ok: true };
+    },
+  },
+};
+
+const listResponse = await listClothingHandler({
   path: { wardrobeId: "wd_123" },
   query: { order: "asc", genre: "tops", limit: "3" },
-  body: {},
-  headers: {},
+  requestId: "req_clothing_list",
+  dependencies: clothingListDependencies,
 });
 
-const lambda = createLambdaHandler({ domain: "clothing" });
+const lambda = createLambdaHandler({
+  domain: "clothing",
+  handler(request) {
+    return listClothingHandler({
+      path: request.path,
+      query: request.query,
+      requestId: request.requestId,
+      dependencies: clothingListDependencies,
+    });
+  },
+});
 const lambdaResponse = await lambda({
   rawPath: "/wardrobes/wd_123/clothing",
   rawQueryString: "order=asc&limit=3",

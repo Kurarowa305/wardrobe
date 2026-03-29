@@ -16,6 +16,7 @@ const ciSource = readFileSync(ciPath, "utf8");
 
 const repo = await import(repoModulePath);
 const { createDynamoDbClient } = await import(dynamoModulePath);
+const mockDocumentClient = { send: async () => ({}) };
 
 const entity = {
   wardrobeId: "wd_01HZZAAA",
@@ -30,7 +31,11 @@ const item = repo.buildHistoryItem(entity);
 const dateRangeDefault = repo.buildHistoryDateRange({});
 const dateRangeFiltered = repo.buildHistoryDateRange({ from: "20251201", to: "20251231" });
 const partitionPk = repo.buildHistoryPartitionKey({ wardrobeId: entity.wardrobeId });
-const repoClient = repo.createHistoryRepo(createDynamoDbClient({ endpoint: "http://localhost:8000", tableName: "SpecTable" }));
+const repoClient = repo.createHistoryRepo(createDynamoDbClient({
+  endpoint: "http://localhost:8000",
+  tableName: "SpecTable",
+  documentClient: mockDocumentClient,
+}));
 const getResult = await repoClient.get({ wardrobeId: entity.wardrobeId, historyId: entity.historyId });
 const listResult = await repoClient.list({
   wardrobeId: entity.wardrobeId,

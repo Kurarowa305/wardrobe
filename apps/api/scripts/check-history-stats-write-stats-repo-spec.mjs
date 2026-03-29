@@ -21,6 +21,7 @@ const ciSource = readFileSync(ciPath, "utf8");
 const clothingRepoModule = await import(clothingRepoPath);
 const templateRepoModule = await import(templateRepoPath);
 const { createDynamoDbClient } = await import(dynamoPath);
+const mockDocumentClient = { send: async () => ({}) };
 
 const clothingSortKeys = clothingRepoModule.buildClothingStatsSortKeys({
   clothingId: "cl_01HZZCCC",
@@ -34,7 +35,11 @@ const templateSortKeys = templateRepoModule.buildTemplateStatsSortKeys({
   lastWornAt: Date.UTC(2026, 0, 8, 0, 0, 0, 0),
 });
 
-const client = createDynamoDbClient({ endpoint: "http://localhost:8000", tableName: "SpecTable" });
+const client = createDynamoDbClient({
+  endpoint: "http://localhost:8000",
+  tableName: "SpecTable",
+  documentClient: mockDocumentClient,
+});
 
 const clothingRepo = clothingRepoModule.createClothingStatsRepo(client);
 const clothingUpdateResult = await clothingRepo.updateStats({

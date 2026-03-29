@@ -7,30 +7,61 @@ const __dirname = path.dirname(__filename);
 const root = path.resolve(__dirname, "..");
 
 const adapterModulePath = path.join(root, "src/entry/lambda/adapter.ts");
+const handlerModulePath = path.join(root, "src/domains/history/handlers/getHistoryHandler.ts");
 const packageJsonPath = path.join(root, "package.json");
 const ciPath = path.join(root, "../../.github/workflows/ci.yml");
 const source = readFileSync(adapterModulePath, "utf8");
 const packageJson = readFileSync(packageJsonPath, "utf8");
 const ciSource = readFileSync(ciPath, "utf8");
 
-const { sharedDomainHandlers, createLambdaHandler } = await import(adapterModulePath);
+const { createLambdaHandler } = await import(adapterModulePath);
+const { getHistoryHandler } = await import(handlerModulePath);
+
+const historyGetDependencies = {
+  repo: {
+    async list() {
+      return {};
+    },
+    async get() {
+      return {};
+    },
+  },
+  historyDetailsResolver: {
+    async resolveMany() {
+      return [];
+    },
+    async resolveOne() {
+      return {
+        historyId: "hs_stub",
+        date: "20260101",
+        templateName: null,
+        clothingItems: [],
+      };
+    },
+  },
+};
 
 let getErrorCode = null;
 try {
-  await sharedDomainHandlers.history({
-    requestId: "req_history_detail",
-    method: "GET",
-    pathname: "/wardrobes/wd_123/histories/hs_123",
+  await getHistoryHandler({
     path: { wardrobeId: "wd_123", historyId: "hs_123" },
-    query: {},
-    body: {},
-    headers: {},
+    requestId: "req_history_detail",
+    dependencies: historyGetDependencies,
   });
 } catch (error) {
   getErrorCode = error?.code ?? null;
 }
 
-const lambda = createLambdaHandler({ domain: "history" });
+const lambda = createLambdaHandler({
+  domain: "history",
+  handler(request) {
+    return getHistoryHandler({
+      path: request.path,
+      requestId: request.requestId,
+      dependencies: historyGetDependencies,
+    });
+  },
+});
 const lambdaResponse = await lambda({
   rawPath: "/wardrobes/wd_123/histories/hs_123",
   pathParameters: { wardrobeId: "wd_123", historyId: "hs_123" },

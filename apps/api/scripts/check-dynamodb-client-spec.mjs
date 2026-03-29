@@ -11,14 +11,20 @@ const source = readFileSync(path.join(root, "src/clients/dynamodb.ts"), "utf8");
 const packageJson = readFileSync(path.join(root, "package.json"), "utf8");
 const ciSource = readFileSync(path.join(root, "../../.github/workflows/ci.yml"), "utf8");
 
+const mockDocumentClient = {
+  send: async () => ({}),
+};
+
 const defaultConfig = dynamodb.createDynamoDbClientConfig();
 const localClient = dynamodb.createDynamoDbClient({
   endpoint: "http://localhost:8000",
   tableName: "SpecTable",
+  documentClient: mockDocumentClient,
 });
 const cloudClient = dynamodb.createDynamoDbClient({
   region: "us-east-1",
   tableName: "ProdTable",
+  documentClient: mockDocumentClient,
 });
 
 const sampleGet = await localClient.getItem({
@@ -88,6 +94,14 @@ const checks = [
     ok: ["GetItem", "PutItem", "UpdateItem", "Query", "BatchGetItem", "TransactWriteItems"].every(
       (token) => source.includes(`\"${token}\"`),
     ),
+  },
+  {
+    name: "source uses AWS SDK DynamoDB clients",
+    ok:
+      source.includes("@aws-sdk/client-dynamodb")
+      && source.includes("@aws-sdk/lib-dynamodb")
+      && source.includes("DynamoDBClient")
+      && source.includes("DynamoDBDocumentClient"),
   },
   {
     name: "package script and CI include dynamodb spec test",

@@ -7,25 +7,58 @@ const __dirname = path.dirname(__filename);
 const root = path.resolve(__dirname, "..");
 
 const adapterModulePath = path.join(root, "src/entry/lambda/adapter.ts");
+const handlerModulePath = path.join(root, "src/domains/clothing/handlers/createClothingHandler.ts");
 const packageJsonPath = path.join(root, "package.json");
 const ciPath = path.join(root, "../../.github/workflows/ci.yml");
 const source = readFileSync(adapterModulePath, "utf8");
 const packageJson = readFileSync(packageJsonPath, "utf8");
 const ciSource = readFileSync(ciPath, "utf8");
 
-const { sharedDomainHandlers, createLambdaHandler } = await import(adapterModulePath);
+const { createLambdaHandler } = await import(adapterModulePath);
+const { createClothingHandler } = await import(handlerModulePath);
 
-const createResponse = await sharedDomainHandlers.clothing({
-  requestId: "req_clothing_create",
-  method: "POST",
-  pathname: "/wardrobes/wd_123/clothing",
+const clothingCreateDependencies = {
+  repo: {
+    async list() {
+      return {};
+    },
+    async create() {
+      return { ok: true };
+    },
+    async get() {
+      return {};
+    },
+    async update() {
+      return { ok: true };
+    },
+    async delete() {
+      return { ok: true };
+    },
+  },
+  generateClothingId: () => "cl_01JMS2API04TEST000000000000",
+  now: () => 1735689600000,
+};
+
+const createResponse = await createClothingHandler({
   path: { wardrobeId: "wd_123" },
-  query: {},
   body: { name: "ネイビージャケット", genre: "tops", imageKey: "images/navy-jacket.png" },
   headers: { "content-type": "application/json" },
+  requestId: "req_clothing_create",
+  dependencies: clothingCreateDependencies,
 });
 
-const lambda = createLambdaHandler({ domain: "clothing" });
+const lambda = createLambdaHandler({
+  domain: "clothing",
+  handler(request) {
+    return createClothingHandler({
+      path: request.path,
+      body: request.body,
+      headers: request.headers,
+      requestId: request.requestId,
+      dependencies: clothingCreateDependencies,
+    });
+  },
+});
 const lambdaResponse = await lambda({
   rawPath: "/wardrobes/wd_123/clothing",
   pathParameters: { wardrobeId: "wd_123" },

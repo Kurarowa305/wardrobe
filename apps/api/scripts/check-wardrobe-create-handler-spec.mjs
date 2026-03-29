@@ -17,6 +17,7 @@ const handlerModulePath = path.join(root, "src/domains/wardrobe/handlers/createW
 const adapterModulePath = path.join(root, "src/entry/lambda/adapter.ts");
 const lambdaModulePath = path.join(root, "src/entry/lambda/wardrobe_server.ts");
 const handlerModule = await import(handlerModulePath);
+const adapterModule = await import(adapterModulePath);
 const lambdaModule = await import(lambdaModulePath);
 const handlerSource = readFileSync(handlerModulePath, "utf8");
 const adapterSource = readFileSync(adapterModulePath, "utf8");
@@ -68,7 +69,30 @@ try {
   mediaTypeError = error;
 }
 
-const lambdaResponse = await lambdaModule.handler({
+const lambdaHandler = adapterModule.createLambdaHandler({
+  domain: "wardrobe",
+  handler(request) {
+    return handlerModule.createWardrobeHandler({
+      headers: request.headers,
+      body: request.body,
+      requestId: request.requestId,
+      dependencies: {
+        repo: {
+          async create() {
+            return { ok: true };
+          },
+          async get() {
+            return {};
+          },
+        },
+        now: () => 1735600000000,
+        generateWardrobeId: () => "wd_018f05af-f4a8-7c90-9123-abcdef123456",
+      },
+    });
+  },
+});
+
+const lambdaResponse = await lambdaHandler({
   rawPath: "/wardrobes",
   requestContext: { http: { method: "POST", path: "/wardrobes" }, requestId: "ctx_create_wardrobe" },
   headers: { "content-type": "application/json", "x-request-id": "req_lambda_create_wardrobe" },

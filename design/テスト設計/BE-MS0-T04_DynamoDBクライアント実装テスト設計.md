@@ -3,6 +3,7 @@
 ## 目的
 - `apps/api/src/clients/dynamodb.ts` が本番AWS / ローカルDynamoDB Localの両方を想定したクライアント設定を提供できることを確認する。
 - BE-MS0-T04 の完了条件である `GetItem`, `PutItem`, `UpdateItem`, `Query`, `BatchGetItem`, `TransactWriteItems` の呼び出し口と endpoint 切替をCIで継続検証する。
+- 実装が AWS SDK（`@aws-sdk/client-dynamodb`, `@aws-sdk/lib-dynamodb`）を利用していることを継続検証する。
 
 ## 対象
 - `apps/api/src/clients/dynamodb.ts`
@@ -20,8 +21,10 @@
 2. 切替: ローカルendpoint指定時に DynamoDB Local 向け endpoint / credentials に切り替わる。
 3. 切替: 本番相当設定では region を保持し、ローカル固定 credentials を強制しない。
 4. API面: 必要な6操作の呼び出しメソッドが公開されている。
-5. 実装面: 必要なDynamoDB操作名とテーブル注入を伴うリクエスト組み立てが実装されている。
-6. CI整合: テストスクリプトが package script と CI workflow に登録されている。
+5. 実装面: 必要なDynamoDB操作名と `TableName` 注入（特に `TransactWriteItems` 内アイテム）が実装されている。
+6. 実装面: DynamoDBクライアントがAWS SDKコマンド送信で構成されている。
+7. テスト戦略: specテストは `documentClient` 注入でネットワーク非依存に検証できる。
+8. CI整合: テストスクリプトが package script と CI workflow に登録されている。
 
 ## テストケース
 | ID | 観点 | 条件 | 期待結果 |
@@ -31,4 +34,6 @@
 | TD-03 | 本番設定 | `region=us-east-1` かつ endpoint 未指定でクライアントを生成する | region が維持され、ローカル固定 credentials は設定されない |
 | TD-04 | API面 | 生成したクライアントを参照する | `getItem` / `putItem` / `updateItem` / `query` / `batchGetItem` / `transactWriteItems` が関数として公開される |
 | TD-05 | 実装面 | `src/clients/dynamodb.ts` を参照する | `GetItem` / `PutItem` / `UpdateItem` / `Query` / `BatchGetItem` / `TransactWriteItems` の操作名と `TableName` 注入が実装されている |
-| TD-06 | CI整合 | `apps/api/package.json` と `.github/workflows/ci.yml` を参照する | `pnpm --filter api test:dynamodb` が scripts / CI に追加されている |
+| TD-06 | SDK利用 | `src/clients/dynamodb.ts` を参照する | `@aws-sdk/client-dynamodb` と `@aws-sdk/lib-dynamodb` を利用している |
+| TD-07 | テスト戦略 | `check-dynamodb-client-spec.mjs` を実行する | `documentClient` モック注入でネットワーク非依存に6操作の組み立てを検証できる |
+| TD-08 | CI整合 | `apps/api/package.json` と `.github/workflows/ci.yml` を参照する | `pnpm --filter api test:dynamodb` が scripts / CI に追加されている |

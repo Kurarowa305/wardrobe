@@ -16,6 +16,7 @@ const ciSource = readFileSync(ciPath, "utf8");
 
 const repo = await import(repoModulePath);
 const { createDynamoDbClient } = await import(dynamoModulePath);
+const mockDocumentClient = { send: async () => ({}) };
 
 const entity = {
   wardrobeId: "wd_01HZZAAA",
@@ -33,7 +34,11 @@ const entity = {
 const item = repo.buildClothingItem(entity);
 const activeListPk = repo.buildClothingListKey({ wardrobeId: entity.wardrobeId });
 const deletedListPk = repo.buildClothingListKey({ wardrobeId: entity.wardrobeId, status: "DELETED" });
-const repoClient = repo.createClothingRepo(createDynamoDbClient({ endpoint: "http://localhost:8000", tableName: "SpecTable" }));
+const repoClient = repo.createClothingRepo(createDynamoDbClient({
+  endpoint: "http://localhost:8000",
+  tableName: "SpecTable",
+  documentClient: mockDocumentClient,
+}));
 const createResult = await repoClient.create(entity);
 const getResult = await repoClient.get({ wardrobeId: entity.wardrobeId, clothingId: entity.clothingId });
 const listResult = await repoClient.list({
