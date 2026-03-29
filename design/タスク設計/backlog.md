@@ -1,7 +1,8 @@
 - 優先度：S
-  - DynamoDBクライアントを実実装（AWS SDK）に置き換える。
-  - APIパス仕様の不整合。clothings→clothing
-  - IDをクエリパラメータへ寄せる
+  - ~~DynamoDBクライアントを実実装（AWS SDK）に置き換える。~~
+  - ~~APIパス仕様の不整合。clothings→clothing~~
+  - ~~IDをクエリパラメータへ寄せる~~
+  - web実装の開発環境依存削除
   - URLのwardrobeIdに存在しないものを指定した場合のエラーハンドル
   - 記録画面の日時入力欄右の余白改善
   - lambdaデプロイ 不要なファイル削除
