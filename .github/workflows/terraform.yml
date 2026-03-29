@@ -135,6 +135,10 @@ jobs:
 
       - name: Build web
         run: pnpm --filter web build
+        env:
+          NEXT_PUBLIC_API_BASE_URL: https://izkkveuro2.execute-api.ap-northeast-1.amazonaws.com
+          NEXT_PUBLIC_IMAGE_PUBLIC_BASE_URL: https://d3es6nwimv8wfx.cloudfront.net
+          NEXT_PUBLIC_ENABLE_MSW: "false"
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -142,8 +146,17 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Sync to S3
-        run: aws s3 sync apps/web/out s3://${{ needs.apply.outputs.web_bucket_name }}
+      - name: Sync to S3 (static export only)
+        id: sync-web
+        run: |
+          if [ -d apps/web/out ]; then
+            aws s3 sync apps/web/out s3://${{ needs.apply.outputs.web_bucket_name }}
+            echo "did_sync=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Skip sync: apps/web/out が存在しないため static 配信を実施しません（SSRモード想定）。"
+            echo "did_sync=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Invalidate CloudFront cache
+        if: steps.sync-web.outputs.did_sync == 'true'
         run: aws cloudfront create-invalidation --distribution-id ${{ needs.apply.outputs.web_distribution_id }} --paths "/*"

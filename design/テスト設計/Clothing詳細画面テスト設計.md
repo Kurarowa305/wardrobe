@@ -47,18 +47,17 @@
   - `src/features/clothing/strings.ts` に `wearCount` / `lastWornAt` / `loading` / `error` / `notFound` / `deleted` / `neverWorn` を定義する
 
 
-### CDS-07 静的エクスポート向けに詳細/編集ルートのパスを fixture 全件で生成する
-- 観点: `output: "export"` 環境で一覧→詳細（および詳細→編集）遷移時に404を防止する
+### CDS-07 SSR運用向けに詳細/編集ページが runtime 動的ルートとして実装される
+- 観点: 実ID遷移時に fixture/static params へ依存しないこと
 - 期待結果:
-  - `src/app/wardrobes/[wardrobeId]/(stack)/clothings/[clothingId]/page.tsx` が `clothingDetailFixtures` を使って `generateStaticParams` を構成する
-  - `src/app/wardrobes/[wardrobeId]/(stack)/clothings/[clothingId]/edit/page.tsx` も同様に `clothingDetailFixtures` を使って `generateStaticParams` を構成する
+  - `src/app/wardrobes/[wardrobeId]/(stack)/clothings/[clothingId]/page.tsx` に `generateStaticParams` / `clothingDetailFixtures` が存在しない
+  - `src/app/wardrobes/[wardrobeId]/(stack)/clothings/[clothingId]/edit/page.tsx` も同様に fixture 静的生成を持たない
 
-### CDS-08 追加直後の服ID（cl_mock_XXXX）向け静的パスを事前生成する
-- 観点: 服追加後に一覧から詳細へ遷移した際の404再発防止
+### CDS-08 詳細/編集ページが URL パラメータを screen に受け渡す
+- 観点: runtime URL の `wardrobeId` / `clothingId` をそのまま画面に伝搬できること
 - 期待結果:
-  - 詳細/編集ページで `MOCK_CLOTHING_ID_PREFIX = "cl_mock_"` を定義する
-  - 詳細/編集ページで `generateMockStaticClothingIds()` により `cl_mock_0001` 形式のIDレンジを生成する
-  - 詳細/編集ページの `generateStaticParams` が fixture ID に加えて mock IDレンジも含めて返す
+  - 詳細ページが `ClothingDetailScreen wardrobeId={wardrobeId} clothingId={clothingId}` を返す
+  - 編集ページが `ClothingEditScreen wardrobeId={wardrobeId} clothingId={clothingId}` を返す
 
 ## CI適用
 

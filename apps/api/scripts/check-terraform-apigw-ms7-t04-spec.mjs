@@ -35,8 +35,8 @@ const checks = [
     ok:
       apigwTf.includes('"ANY /wardrobes"') &&
       apigwTf.includes('"ANY /wardrobes/{proxy+}"') &&
-      apigwTf.includes('"ANY /wardrobes/{wardrobeId}/clothings"') &&
-      apigwTf.includes('"ANY /wardrobes/{wardrobeId}/clothings/{proxy+}"') &&
+      apigwTf.includes('"ANY /wardrobes/{wardrobeId}/clothing"') &&
+      apigwTf.includes('"ANY /wardrobes/{wardrobeId}/clothing/{proxy+}"') &&
       apigwTf.includes('"ANY /wardrobes/{wardrobeId}/templates"') &&
       apigwTf.includes('"ANY /wardrobes/{wardrobeId}/templates/{proxy+}"') &&
       apigwTf.includes('"ANY /wardrobes/{wardrobeId}/histories"') &&

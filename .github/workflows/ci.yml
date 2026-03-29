@@ -352,6 +352,9 @@ jobs:
       - name: API client foundation spec test
         run: pnpm --filter web test:api-client-foundation
 
+      - name: AWS runtime integration spec test
+        run: pnpm --filter web test:aws-runtime-integration
+
       - name: Clothing types spec test
         run: pnpm --filter web test:clothing-types
 

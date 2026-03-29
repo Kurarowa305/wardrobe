@@ -77,12 +77,11 @@ check(
 
 check(
   "MF-06",
-  "MSW 起動関数が開発環境またはVercel previewで一度だけ起動する",
+  "MSW 起動関数が NEXT_PUBLIC_ENABLE_MSW=true のときだけ一度だけ起動する",
   exists("src/mocks/start.ts") &&
     includes("src/mocks/start.ts", "let isStarted = false;") &&
     includes("src/mocks/start.ts", "export function shouldEnableMockServiceWorker()") &&
-    includes("src/mocks/start.ts", "process.env.NEXT_PUBLIC_VERCEL_ENV ?? process.env.VERCEL_ENV") &&
-    includes("src/mocks/start.ts", 'process.env.NODE_ENV === "development" || vercelEnv === "preview"') &&
+    includes("src/mocks/start.ts", 'return process.env.NEXT_PUBLIC_ENABLE_MSW === "true";') &&
     includes("src/mocks/start.ts", "if (!shouldEnableMockServiceWorker())") &&
     includes("src/mocks/start.ts", 'if (typeof window === "undefined")') &&
     includes("src/mocks/start.ts", "await worker.start({") &&

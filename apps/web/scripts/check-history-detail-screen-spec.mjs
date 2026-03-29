@@ -97,15 +97,11 @@ check(
 
 check(
   "HDS-06",
-  "履歴詳細ページが historyId を screen に渡し、fixture と mock ID の静的パスを生成する",
-  includes(pageTarget, 'import { historyDetailFixtures } from "@/mocks/fixtures/history";') &&
-    includes(pageTarget, "const MOCK_HISTORY_ID_PREFIX = \"hs_mock_\";") &&
-    includes(pageTarget, "const MOCK_HISTORY_STATIC_PARAMS_COUNT = 200;") &&
-    includes(pageTarget, "...historyDetailFixtures.map((fixture) => fixture.historyId),") &&
-    includes(pageTarget, "...generateMockStaticHistoryIds(),") &&
-    includes(pageTarget, "wardrobeId: DEMO_IDS.wardrobe,") &&
+  "履歴詳細ページは runtime 動的ルートで historyId を screen に渡す",
+  !includes(pageTarget, "generateStaticParams") &&
+    !includes(pageTarget, "historyDetailFixtures") &&
     includes(pageTarget, "return <HistoryDetailScreen wardrobeId={wardrobeId} historyId={historyId} />;"),
-  "履歴詳細ページの静的パス生成または historyId 受け渡しが不足しています",
+  "履歴詳細ページに fixture 静的パス生成が残っているか、historyId 受け渡しが不足しています",
 );
 
 check(
