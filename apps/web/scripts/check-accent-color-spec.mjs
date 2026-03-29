@@ -69,7 +69,7 @@ const checks = [
       ) &&
       includesNormalized(
         "src/components/app/screens/WardrobeCreateScreen.tsx",
-        '<Button type="submit" className="w-full" disabled={isSubmitDisabled}>',
+        '<Button type="submit" className="w-full" disabled={isSubmitDisabled || createWardrobeMutation.isPending}>',
       ) &&
       includesNormalized(
         "src/components/app/screens/TemplateForm.tsx",

@@ -331,6 +331,9 @@ jobs:
       - name: Wardrobe create validation spec test
         run: pnpm --filter web test:wardrobe-create-validation
 
+      - name: Wardrobe create API flow spec test
+        run: pnpm --filter web test:wardrobe-create-api-flow
+
       - name: List screen spacing spec test
         run: pnpm --filter web test:list-screen-spacing
 
