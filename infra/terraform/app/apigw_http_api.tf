@@ -17,8 +17,8 @@ locals {
       "ANY /wardrobes/{proxy+}"
     ]
     clothing = [
-      "ANY /wardrobes/{wardrobeId}/clothings",
-      "ANY /wardrobes/{wardrobeId}/clothings/{proxy+}"
+      "ANY /wardrobes/{wardrobeId}/clothing",
+      "ANY /wardrobes/{wardrobeId}/clothing/{proxy+}"
     ]
     template = [
       "ANY /wardrobes/{wardrobeId}/templates",
