@@ -34,10 +34,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build lambda package
-        run: |
-          pnpm --filter api exec tsc --outDir ../../infra/terraform/app/build --rootDir src
-          cd infra/terraform/app
-          zip -j build/lambda.zip build/index.js
+        run: bash infra/terraform/app/scripts/package-lambda.sh
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -87,10 +84,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build lambda package
-        run: |
-          pnpm --filter api exec tsc --outDir ../../infra/terraform/app/build --rootDir src
-          cd infra/terraform/app
-          zip -j build/lambda.zip build/index.js
+        run: bash infra/terraform/app/scripts/package-lambda.sh
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4

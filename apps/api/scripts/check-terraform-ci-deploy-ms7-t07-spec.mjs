@@ -14,6 +14,8 @@ const ciPath = path.join(root, "../../.github/workflows/ci.yml");
 const terraformWorkflow = readFileSync(terraformWorkflowPath, "utf8");
 const packageJson = readFileSync(packageJsonPath, "utf8");
 const ciSource = readFileSync(ciPath, "utf8");
+const lambdaPackagingScript = "bash infra/terraform/app/scripts/package-lambda.sh";
+const lambdaPackagingScriptExecutionCount = terraformWorkflow.split(lambdaPackagingScript).length - 1;
 
 const checks = [
   {
@@ -37,6 +39,12 @@ const checks = [
       terraformWorkflow.includes("needs: plan") &&
       terraformWorkflow.includes("- name: Terraform apply") &&
       terraformWorkflow.includes("terraform apply -auto-approve -var-file=../env/dev.tfvars"),
+  },
+  {
+    name: "plan/apply job が共通の Lambda パッケージングスクリプトを実行する",
+    ok:
+      terraformWorkflow.includes("- name: Build lambda package") &&
+      lambdaPackagingScriptExecutionCount >= 2,
   },
   {
     name: "apply job に concurrency が設定される",

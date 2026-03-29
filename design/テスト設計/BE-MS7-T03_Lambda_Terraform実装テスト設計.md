@@ -27,8 +27,9 @@
 | TC-03 | 命名規則 | `lambda.tf` の名前生成式を検査 | `{app}-{env}-{domain}_server` 形式（`${var.lambda_app_name}-${var.env}-${domain}_server`）で定義される |
 | TC-04 | handler 対応 | `lambda.tf` の handler map を検査 | 各ドメインが `entry/lambda/<domain>_server.handler` に紐づく |
 | TC-05 | Log Group 分離 | `lambda.tf` を検査 | `aws_cloudwatch_log_group.lambda_domain` が定義される |
-| TC-06 | テスト導線（package） | `apps/api/package.json` を検査 | `test:terraform-lambda-ms7-t03` が定義され、`test` 集約スクリプトから呼び出される |
-| TC-07 | テスト導線（CI） | `.github/workflows/ci.yml` を検査 | `pnpm --filter api test:terraform-lambda-ms7-t03` を実行するstepが存在する |
+| TC-06 | Lambda更新トリガー | `lambda.tf` を検査 | `aws_lambda_function.api` と `aws_lambda_function.domain` の両方に `source_code_hash = filebase64sha256(var.lambda_package_path)` が設定される |
+| TC-07 | テスト導線（package） | `apps/api/package.json` を検査 | `test:terraform-lambda-ms7-t03` が定義され、`test` 集約スクリプトから呼び出される |
+| TC-08 | テスト導線（CI） | `.github/workflows/ci.yml` を検査 | `pnpm --filter api test:terraform-lambda-ms7-t03` を実行するstepが存在する |
 
 ## 5. 実行コマンド
 
@@ -36,5 +37,5 @@
 
 ## 6. 完了条件
 
-- TC-01〜TC-07 がすべて成功する。
+- TC-01〜TC-08 がすべて成功する。
 - CI 上で同一コマンドが自動実行され、失敗時にPRをブロックできる。

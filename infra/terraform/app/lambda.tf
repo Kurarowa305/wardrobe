@@ -31,7 +31,8 @@ resource "aws_lambda_function" "api" {
   memory_size = var.lambda_memory_size
   timeout     = var.lambda_timeout
 
-  filename = var.lambda_package_path
+  filename         = var.lambda_package_path
+  source_code_hash = filebase64sha256(var.lambda_package_path)
 
   environment {
     variables = {
@@ -67,7 +68,8 @@ resource "aws_lambda_function" "domain" {
   memory_size = var.lambda_memory_size
   timeout     = var.lambda_timeout
 
-  filename = var.lambda_package_path
+  filename         = var.lambda_package_path
+  source_code_hash = filebase64sha256(var.lambda_package_path)
 
   environment {
     variables = {

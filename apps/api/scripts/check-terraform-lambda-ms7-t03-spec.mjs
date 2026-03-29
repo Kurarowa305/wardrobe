@@ -16,6 +16,8 @@ const packageJson = readFileSync(packageJsonPath, "utf8");
 const ciSource = readFileSync(ciPath, "utf8");
 
 const domains = ["wardrobe", "clothing", "template", "history", "presign"];
+const sourceCodeHashExpression = "source_code_hash = filebase64sha256(var.lambda_package_path)";
+const sourceCodeHashDefinitionCount = lambdaTf.split(sourceCodeHashExpression).length - 1;
 
 const checks = [
   {
@@ -44,6 +46,10 @@ const checks = [
   {
     name: "CloudWatch Log Group がドメインLambdaごとに作成される",
     ok: lambdaTf.includes('resource "aws_cloudwatch_log_group" "lambda_domain"'),
+  },
+  {
+    name: "Lambda ZIP変更を検知する source_code_hash が設定される",
+    ok: sourceCodeHashDefinitionCount >= 2,
   },
   {
     name: "テストスクリプトが package.json と CI に登録されている",
