@@ -355,6 +355,9 @@ jobs:
       - name: API client foundation spec test
         run: pnpm --filter web test:api-client-foundation
 
+      - name: Web production config spec test
+        run: pnpm --filter web test:web-production-config
+
       - name: Clothing types spec test
         run: pnpm --filter web test:clothing-types
 
@@ -528,6 +531,10 @@ jobs:
         run: pnpm --filter web test:clothing-msw-handlers
 
       - name: Build web
+        env:
+          NEXT_PUBLIC_API_BASE_URL: https://example.execute-api.ap-northeast-1.amazonaws.com
+          NEXT_PUBLIC_IMAGE_PUBLIC_BASE_URL: https://example-images.cloudfront.net
+          NEXT_PUBLIC_ENABLE_MSW: "false"
         run: |
           if [ -d apps/web/app ] || [ -d apps/web/pages ] || [ -d apps/web/src/app ]; then
             pnpm --filter web build

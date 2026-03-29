@@ -7,7 +7,21 @@ import {
 
 const DEFAULT_TIMEOUT_MS = 10_000;
 const DEFAULT_ACCEPT_HEADER = "application/json";
-const DEFAULT_API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL?.trim() ?? "";
+
+function resolveDefaultApiBaseUrl(): string {
+  const configuredBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.trim() ?? "";
+  if (configuredBaseUrl.length > 0) {
+    return configuredBaseUrl;
+  }
+
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("NEXT_PUBLIC_API_BASE_URL is required in production builds.");
+  }
+
+  return "";
+}
+
+const DEFAULT_API_BASE_URL = resolveDefaultApiBaseUrl();
 
 type PrimitiveQueryValue = string | number | boolean;
 export type QueryValue = PrimitiveQueryValue | null | undefined;

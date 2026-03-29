@@ -1,6 +1,20 @@
 let isStarted = false;
 
 export function shouldEnableMockServiceWorker() {
+  const enableMock = process.env.NEXT_PUBLIC_ENABLE_MSW?.trim().toLowerCase();
+
+  if (enableMock === "false") {
+    return false;
+  }
+
+  if (process.env.NODE_ENV === "production") {
+    return false;
+  }
+
+  if (enableMock === "true") {
+    return true;
+  }
+
   const vercelEnv = process.env.NEXT_PUBLIC_VERCEL_ENV ?? process.env.VERCEL_ENV;
 
   return process.env.NODE_ENV === "development" || vercelEnv === "preview";
