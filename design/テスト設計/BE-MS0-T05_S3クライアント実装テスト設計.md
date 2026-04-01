@@ -16,7 +16,7 @@
 - 補助確認: `pnpm install --frozen-lockfile`
 
 ## テスト観点
-1. 正常系: デフォルト設定で region / bucket / publicBaseUrl / storageDriver の既定値を取得できる。
+1. 正常系: 環境変数未設定時に region / bucket / publicBaseUrl / storageDriver の既定値を取得できる。
 2. 切替: `storageDriver=local` かつ endpoint 指定時に mock 向け endpoint / credentials に切り替わる。
 3. 切替: `storageDriver=s3` の場合は AWS モードを維持し、ローカル固定 credentials を強制しない。
 4. API面: `presignPutObject` が `uploadUrl`, `publicUrl`, `method`, `expiresAt` を返せる。
@@ -26,7 +26,7 @@
 ## テストケース
 | ID | 観点 | 条件 | 期待結果 |
 | --- | --- | --- | --- |
-| TS3-01 | 正常系 | `createS3ClientConfig()` を呼ぶ | `region=ap-northeast-1`, `bucket=wardrobe-dev-images`, `publicBaseUrl=http://localhost:4000/images`, `storageDriver=local`, `presignExpiresInSec=600` が返る |
+| TS3-01 | 正常系 | `AWS_REGION` / `S3_BUCKET` / `IMAGE_PUBLIC_BASE_URL` / `STORAGE_DRIVER` を未設定で `createS3ClientConfig()` を呼ぶ | `region=ap-northeast-1`, `bucket=wardrobe-dev-images`, `publicBaseUrl=http://localhost:4000/images`, `storageDriver=local`, `presignExpiresInSec=600` が返る |
 | TS3-02 | local切替 | `storageDriver=local`, `endpoint=http://localhost:4566` でクライアントを生成する | presigner endpoint が localhost を向き、ローカル用 credentials が設定される |
 | TS3-03 | s3切替 | `storageDriver=s3`, `region=us-east-1` でクライアントを生成する | `accessMode=aws` を維持し、ローカル固定 credentials は設定されない |
 | TS3-04 | presign API | `presignPutObject()` を呼ぶ | `method=PUT` と `uploadUrl`, `publicUrl`, `expiresAt`, `Bucket`, `ContentType` を含む結果が返る |
