@@ -36,10 +36,13 @@ resource "aws_lambda_function" "api" {
 
   environment {
     variables = {
-      TABLE_NAME        = aws_dynamodb_table.wardrobe.name
-      IMAGES_BUCKET     = aws_s3_bucket.images.bucket
-      IMAGES_CDN_DOMAIN = aws_cloudfront_distribution.images.domain_name
-      WEB_CDN_DOMAIN    = aws_cloudfront_distribution.web.domain_name
+      TABLE_NAME             = aws_dynamodb_table.wardrobe.name
+      S3_BUCKET              = aws_s3_bucket.images.bucket
+      IMAGE_PUBLIC_BASE_URL  = "https://${aws_cloudfront_distribution.images.domain_name}"
+      STORAGE_DRIVER         = "s3"
+      IMAGES_BUCKET          = aws_s3_bucket.images.bucket
+      IMAGES_CDN_DOMAIN      = aws_cloudfront_distribution.images.domain_name
+      WEB_CDN_DOMAIN         = aws_cloudfront_distribution.web.domain_name
     }
   }
 
@@ -73,11 +76,14 @@ resource "aws_lambda_function" "domain" {
 
   environment {
     variables = {
-      TABLE_NAME        = aws_dynamodb_table.wardrobe.name
-      IMAGES_BUCKET     = aws_s3_bucket.images.bucket
-      IMAGES_CDN_DOMAIN = aws_cloudfront_distribution.images.domain_name
-      WEB_CDN_DOMAIN    = aws_cloudfront_distribution.web.domain_name
-      LAMBDA_DOMAIN     = each.key
+      TABLE_NAME             = aws_dynamodb_table.wardrobe.name
+      S3_BUCKET              = aws_s3_bucket.images.bucket
+      IMAGE_PUBLIC_BASE_URL  = "https://${aws_cloudfront_distribution.images.domain_name}"
+      STORAGE_DRIVER         = "s3"
+      IMAGES_BUCKET          = aws_s3_bucket.images.bucket
+      IMAGES_CDN_DOMAIN      = aws_cloudfront_distribution.images.domain_name
+      WEB_CDN_DOMAIN         = aws_cloudfront_distribution.web.domain_name
+      LAMBDA_DOMAIN          = each.key
     }
   }
 

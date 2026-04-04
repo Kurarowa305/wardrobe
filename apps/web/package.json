@@ -43,6 +43,7 @@
     "test:image-presign-api-client": "node scripts/check-image-presign-api-client-spec.mjs",
     "test:image-presign-msw-handler": "node scripts/check-image-presign-msw-handler-spec.mjs",
     "test:image-pseudo-upload": "node scripts/check-image-pseudo-upload-spec.mjs",
+    "test:image-content-type-validation": "node scripts/check-image-content-type-validation-spec.mjs",
     "test:image-key-payload": "node scripts/check-image-key-payload-spec.mjs",
     "test:image-url-resolution": "node scripts/check-image-url-resolution-spec.mjs",
     "test:clothing-query-hooks": "node scripts/check-clothing-query-hooks-spec.mjs",

@@ -3,6 +3,7 @@
 ## 1. 目的
 
 - `infra/terraform/app/lambda.tf` に BE-MS7-T03 の完了条件（`wardrobe` / `clothing` / `template` / `history` / `presign` の domain別Lambda作成、命名規則準拠）が満たされる定義が存在することを継続検証する。
+- presign 実装が参照する `S3_BUCKET` / `IMAGE_PUBLIC_BASE_URL` / `STORAGE_DRIVER` が Lambda 環境変数として供給されることを継続検証する。
 - 専用テストスクリプトが `apps/api/package.json` と GitHub Actions CI (`.github/workflows/ci.yml`) に接続され、PRごとに自動実行されることを保証する。
 
 ## 2. 対象
@@ -30,6 +31,7 @@
 | TC-06 | Lambda更新トリガー | `lambda.tf` を検査 | `aws_lambda_function.api` と `aws_lambda_function.domain` の両方に `source_code_hash = filebase64sha256(var.lambda_package_path)` が設定される |
 | TC-07 | テスト導線（package） | `apps/api/package.json` を検査 | `test:terraform-lambda-ms7-t03` が定義され、`test` 集約スクリプトから呼び出される |
 | TC-08 | テスト導線（CI） | `.github/workflows/ci.yml` を検査 | `pnpm --filter api test:terraform-lambda-ms7-t03` を実行するstepが存在する |
+| TC-09 | presign 環境変数整合 | `lambda.tf` の environment variables を検査 | `S3_BUCKET` / `IMAGE_PUBLIC_BASE_URL` / `STORAGE_DRIVER="s3"` が API / domain Lambda 両方に定義される |
 
 ## 5. 実行コマンド
 
@@ -37,5 +39,5 @@
 
 ## 6. 完了条件
 
-- TC-01〜TC-08 がすべて成功する。
+- TC-01〜TC-09 がすべて成功する。
 - CI 上で同一コマンドが自動実行され、失敗時にPRをブロックできる。

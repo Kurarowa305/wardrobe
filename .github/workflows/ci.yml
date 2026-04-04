@@ -460,6 +460,9 @@ jobs:
       - name: Image pseudo upload spec test
         run: pnpm --filter web test:image-pseudo-upload
 
+      - name: Image content type validation spec test
+        run: pnpm --filter web test:image-content-type-validation
+
       - name: Image key payload spec test
         run: pnpm --filter web test:image-key-payload
 

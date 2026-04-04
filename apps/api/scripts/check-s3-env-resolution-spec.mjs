@@ -10,7 +10,15 @@ const s3 = await import(path.join(root, "src/clients/s3.ts"));
 const packageJson = readFileSync(path.join(root, "package.json"), "utf8");
 const ciSource = readFileSync(path.join(root, "../../.github/workflows/ci.yml"), "utf8");
 
-const trackedEnvKeys = ["AWS_REGION", "S3_BUCKET", "IMAGE_PUBLIC_BASE_URL", "STORAGE_DRIVER"];
+const trackedEnvKeys = [
+  "AWS_REGION",
+  "S3_BUCKET",
+  "IMAGE_PUBLIC_BASE_URL",
+  "STORAGE_DRIVER",
+  "AWS_ACCESS_KEY_ID",
+  "AWS_SECRET_ACCESS_KEY",
+  "AWS_SESSION_TOKEN",
+];
 const previousEnv = Object.fromEntries(trackedEnvKeys.map((key) => [key, process.env[key]]));
 
 const setEnv = (key, value) => {
@@ -32,6 +40,9 @@ setEnv("AWS_REGION", "us-west-2");
 setEnv("S3_BUCKET", "wardrobe-prod-images");
 setEnv("IMAGE_PUBLIC_BASE_URL", "https://images.example.com");
 setEnv("STORAGE_DRIVER", "s3");
+setEnv("AWS_ACCESS_KEY_ID", "test");
+setEnv("AWS_SECRET_ACCESS_KEY", "test");
+setEnv("AWS_SESSION_TOKEN", undefined);
 
 const envConfig = s3.createS3ClientConfig();
 const overrideConfig = s3.createS3ClientConfig({
@@ -93,7 +104,8 @@ const checks = [
       && presigned.request.region === "us-west-2"
       && presigned.request.bucket === "wardrobe-prod-images"
       && presigned.request.storageDriver === "s3"
-      && presigned.uploadUrl === "https://wardrobe-prod-images.s3.us-west-2.amazonaws.com/clothing/wd_900/example.jpg"
+      && presigned.uploadUrl.startsWith("https://wardrobe-prod-images.s3.us-west-2.amazonaws.com/clothing/wd_900/example.jpg")
+      && presigned.uploadUrl.includes("X-Amz-Algorithm=")
       && presigned.publicUrl === "https://images.example.com/clothing/wd_900/example.jpg",
     detail: { config: envClient.config, presigned },
   },
