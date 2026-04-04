@@ -43,6 +43,24 @@ const checks = [
       cloudfrontWebTf.includes('default_root_object = "index.html"'),
   },
   {
+    name: "web 配信で拡張子なしURLを .html へ rewrite する CloudFront Function が定義される",
+    ok:
+      cloudfrontWebTf.includes('resource "aws_cloudfront_function" "web_rewrite_html"') &&
+      cloudfrontWebTf.includes('runtime = "cloudfront-js-1.0"') &&
+      cloudfrontWebTf.includes('function_association {') &&
+      cloudfrontWebTf.includes('event_type   = "viewer-request"') &&
+      cloudfrontWebTf.includes("function_arn = aws_cloudfront_function.web_rewrite_html.arn"),
+  },
+  {
+    name: "web 配信で 403/404 を 404.html へフォールバックする",
+    ok:
+      cloudfrontWebTf.includes("custom_error_response {") &&
+      cloudfrontWebTf.includes("error_code            = 403") &&
+      cloudfrontWebTf.includes("error_code            = 404") &&
+      cloudfrontWebTf.includes('response_page_path    = "/404.html"') &&
+      cloudfrontWebTf.includes("response_code         = 404"),
+  },
+  {
     name: "images 配信用 CloudFront distribution と OAC が定義される",
     ok:
       cloudfrontImagesTf.includes('resource "aws_cloudfront_origin_access_control" "images"') &&

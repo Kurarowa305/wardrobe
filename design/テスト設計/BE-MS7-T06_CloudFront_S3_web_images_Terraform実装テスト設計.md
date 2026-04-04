@@ -30,8 +30,10 @@
 | TC-03 | images 配信用 CloudFront + OAC | `cloudfront_images.tf` を検査 | `aws_cloudfront_origin_access_control.images` と `aws_cloudfront_distribution.images` が定義され、distribution origin が OAC を参照する |
 | TC-04 | OAC 前提のバケットポリシー | `cloudfront_web.tf` / `cloudfront_images.tf` を検査 | 両バケットで `cloudfront.amazonaws.com` principal + `AWS:SourceArn` 条件付き `s3:GetObject` 許可ポリシーが定義される |
 | TC-05 | CDN 出力値 | `outputs.tf` を検査 | `web_cdn_domain` / `web_cdn_distribution_id` / `images_cdn_domain` / `images_cdn_distribution_id` が定義される |
-| TC-06 | テスト導線（package） | `apps/api/package.json` を検査 | `test:terraform-cloudfront-ms7-t06` が定義され、`test` 集約スクリプトから呼び出される |
-| TC-07 | テスト導線（CI） | `.github/workflows/ci.yml` を検査 | `pnpm --filter api test:terraform-cloudfront-ms7-t06` を実行するstepが存在する |
+| TC-06 | web 配信URL rewrite | `cloudfront_web.tf` を検査 | `aws_cloudfront_function.web_rewrite_html` が定義され、default cache behavior の `viewer-request` に関連付く |
+| TC-07 | web 配信エラー時のHTMLフォールバック | `cloudfront_web.tf` を検査 | `custom_error_response` で `403` / `404` が `response_page_path="/404.html"` を返す |
+| TC-08 | テスト導線（package） | `apps/api/package.json` を検査 | `test:terraform-cloudfront-ms7-t06` が定義され、`test` 集約スクリプトから呼び出される |
+| TC-09 | テスト導線（CI） | `.github/workflows/ci.yml` を検査 | `pnpm --filter api test:terraform-cloudfront-ms7-t06` を実行するstepが存在する |
 
 ## 5. 実行コマンド
 
@@ -39,5 +41,5 @@
 
 ## 6. 完了条件
 
-- TC-01〜TC-07 がすべて成功する。
+- TC-01〜TC-09 がすべて成功する。
 - CI 上で同一コマンドが自動実行され、失敗時にPRをブロックできる。
