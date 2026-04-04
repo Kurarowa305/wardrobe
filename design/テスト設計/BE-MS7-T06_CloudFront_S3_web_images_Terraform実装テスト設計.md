@@ -34,6 +34,7 @@
 | TC-07 | web 配信エラー時のHTMLフォールバック | `cloudfront_web.tf` を検査 | `custom_error_response` で `403` / `404` が `response_page_path="/404.html"` を返す |
 | TC-08 | テスト導線（package） | `apps/api/package.json` を検査 | `test:terraform-cloudfront-ms7-t06` が定義され、`test` 集約スクリプトから呼び出される |
 | TC-09 | テスト導線（CI） | `.github/workflows/ci.yml` を検査 | `pnpm --filter api test:terraform-cloudfront-ms7-t06` を実行するstepが存在する |
+| TC-10 | web 配信URL rewrite 詳細挙動 | `cloudfront_web.tf` 内 CloudFront Function を検査 | `/` は `/index.html`、`/wardrobes/new` は `/wardrobes/new.html`、`/wardrobes/new/` は `/wardrobes/new/index.html` に rewrite される。`/_next/static/chunks/*.js`・`/styles/*.css`・`/index.html` は rewrite されない |
 
 ## 5. 実行コマンド
 
@@ -41,5 +42,5 @@
 
 ## 6. 完了条件
 
-- TC-01〜TC-09 がすべて成功する。
+- TC-01〜TC-10 がすべて成功する。
 - CI 上で同一コマンドが自動実行され、失敗時にPRをブロックできる。

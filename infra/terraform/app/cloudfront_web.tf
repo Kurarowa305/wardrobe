@@ -23,7 +23,7 @@ resource "aws_cloudfront_function" "web_rewrite_html" {
       return request;
     }
 
-    if (/\\.[^\\/]+$/.test(uri)) {
+    if (/\.[^/]+$/.test(uri)) {
       return request;
     }
 

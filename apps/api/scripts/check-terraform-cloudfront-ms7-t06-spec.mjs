@@ -22,6 +22,32 @@ const s3ImagesTf = readFileSync(s3ImagesTfPath, "utf8");
 const outputsTf = readFileSync(outputsTfPath, "utf8");
 const packageJson = readFileSync(packageJsonPath, "utf8");
 const ciSource = readFileSync(ciPath, "utf8");
+const rewriteFunctionSourceMatch = cloudfrontWebTf.match(/code\s*=\s*<<-EOT\n([\s\S]*?)\n\s*EOT/);
+
+function buildRewriteHandler(source) {
+  if (!source.includes("function handler(event)")) {
+    return null;
+  }
+  try {
+    return new Function("event", `${source}\nreturn handler(event);`);
+  } catch {
+    return null;
+  }
+}
+
+const rewriteHandler = buildRewriteHandler(rewriteFunctionSourceMatch?.[1] ?? "");
+
+function rewriteUri(uri) {
+  if (rewriteHandler === null) {
+    return null;
+  }
+  try {
+    const rewritten = rewriteHandler({ request: { uri } });
+    return typeof rewritten?.uri === "string" ? rewritten.uri : null;
+  } catch {
+    return null;
+  }
+}
 
 const checks = [
   {
@@ -50,6 +76,16 @@ const checks = [
       cloudfrontWebTf.includes('function_association {') &&
       cloudfrontWebTf.includes('event_type   = "viewer-request"') &&
       cloudfrontWebTf.includes("function_arn = aws_cloudfront_function.web_rewrite_html.arn"),
+  },
+  {
+    name: "web 配信URL rewrite が拡張子付きアセットを保持し、拡張子なしURLのみ .html 化する",
+    ok:
+      rewriteUri("/") === "/index.html" &&
+      rewriteUri("/wardrobes/new") === "/wardrobes/new.html" &&
+      rewriteUri("/wardrobes/new/") === "/wardrobes/new/index.html" &&
+      rewriteUri("/_next/static/chunks/08daaf8a60b0a494.js") === "/_next/static/chunks/08daaf8a60b0a494.js" &&
+      rewriteUri("/styles/app.css") === "/styles/app.css" &&
+      rewriteUri("/index.html") === "/index.html",
   },
   {
     name: "web 配信で 403/404 を 404.html へフォールバックする",
