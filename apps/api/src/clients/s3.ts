@@ -1,3 +1,6 @@
+import { PutObjectCommand, S3Client as AwsS3Client } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+
 export type StorageDriver = "local" | "s3";
 
 export type S3TransportConfig = {
@@ -70,6 +73,32 @@ const stripTrailingSlash = (value: string): string => value.replace(/\/+$/, "");
 const joinUrl = (baseUrl: string, pathname: string): string =>
   `${stripTrailingSlash(baseUrl)}/${pathname.replace(/^\/+/, "")}`;
 
+const readAwsCredentials = (): {
+  accessKeyId: string;
+  secretAccessKey: string;
+  sessionToken?: string;
+} | undefined => {
+  const accessKeyId = readNonEmptyEnv("AWS_ACCESS_KEY_ID");
+  const secretAccessKey = readNonEmptyEnv("AWS_SECRET_ACCESS_KEY");
+  if (!accessKeyId || !secretAccessKey) {
+    return undefined;
+  }
+
+  const sessionToken = readNonEmptyEnv("AWS_SESSION_TOKEN");
+  if (sessionToken) {
+    return {
+      accessKeyId,
+      secretAccessKey,
+      sessionToken,
+    };
+  }
+
+  return {
+    accessKeyId,
+    secretAccessKey,
+  };
+};
+
 export const createS3ClientConfig = (
   overrides: Partial<S3ClientConfig> = {},
 ): S3ClientConfig => ({
@@ -104,6 +133,19 @@ export const createS3Presigner = (
     transport.storageDriver === "local"
       ? transport.endpoint ?? transport.publicBaseUrl
       : transport.endpoint;
+  const useLocalMode = transport.storageDriver === "local" || isLocalEndpoint(resolvedEndpoint);
+  const explicitCredentials = useLocalMode
+    ? {
+        accessKeyId: "local",
+        secretAccessKey: "local",
+      }
+    : readAwsCredentials();
+  const s3Client = new AwsS3Client({
+    region: transport.region,
+    ...(resolvedEndpoint ? { endpoint: resolvedEndpoint } : {}),
+    ...(useLocalMode ? { forcePathStyle: true } : {}),
+    ...(explicitCredentials ? { credentials: explicitCredentials } : {}),
+  });
 
   return {
     config: {
@@ -112,31 +154,29 @@ export const createS3Presigner = (
       publicBaseUrl: transport.publicBaseUrl,
       storageDriver: transport.storageDriver,
       endpoint: resolvedEndpoint,
-      accessMode:
-        transport.storageDriver === "local" || isLocalEndpoint(resolvedEndpoint)
-          ? ("local" as const)
-          : ("aws" as const),
-      credentials:
-        transport.storageDriver === "local" || isLocalEndpoint(resolvedEndpoint)
-          ? {
-              accessKeyId: "local",
-              secretAccessKey: "local",
-            }
-          : undefined,
+      accessMode: useLocalMode ? ("local" as const) : ("aws" as const),
+      credentials: explicitCredentials,
       presignExpiresInSec: transport.presignExpiresInSec,
     },
     presignPutObject: async (command: S3PresignCommand): Promise<S3PresignResult> => {
       const expiresAt = new Date(Date.now() + command.input.ExpiresIn * 1000).toISOString();
-      const uploadBaseUrl =
-        transport.storageDriver === "local"
-          ? resolvedEndpoint ?? transport.publicBaseUrl
-          : resolvedEndpoint ?? `https://${transport.bucket}.s3.${transport.region}.amazonaws.com`;
+      const uploadUrl = await getSignedUrl(
+        s3Client,
+        new PutObjectCommand({
+          Bucket: command.input.Bucket,
+          Key: command.input.Key,
+          ContentType: command.input.ContentType,
+        }),
+        {
+          expiresIn: command.input.ExpiresIn,
+        },
+      );
 
       return {
         bucket: command.bucket,
         key: command.input.Key,
         method: "PUT",
-        uploadUrl: joinUrl(uploadBaseUrl, command.input.Key),
+        uploadUrl,
         publicUrl: joinUrl(transport.publicBaseUrl, command.input.Key),
         expiresAt,
         request: command,

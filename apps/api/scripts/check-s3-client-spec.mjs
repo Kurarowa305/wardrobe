@@ -11,7 +11,15 @@ const source = readFileSync(path.join(root, "src/clients/s3.ts"), "utf8");
 const packageJson = readFileSync(path.join(root, "package.json"), "utf8");
 const ciSource = readFileSync(path.join(root, "../../.github/workflows/ci.yml"), "utf8");
 
-const trackedEnvKeys = ["AWS_REGION", "S3_BUCKET", "IMAGE_PUBLIC_BASE_URL", "STORAGE_DRIVER"];
+const trackedEnvKeys = [
+  "AWS_REGION",
+  "S3_BUCKET",
+  "IMAGE_PUBLIC_BASE_URL",
+  "STORAGE_DRIVER",
+  "AWS_ACCESS_KEY_ID",
+  "AWS_SECRET_ACCESS_KEY",
+  "AWS_SESSION_TOKEN",
+];
 const previousEnv = Object.fromEntries(trackedEnvKeys.map((key) => [key, process.env[key]]));
 
 const setEnv = (key, value) => {
@@ -35,6 +43,11 @@ const localClient = s3.createS3Client({
   endpoint: "http://localhost:4566",
   presignExpiresInSec: 300,
 });
+
+setEnv("AWS_ACCESS_KEY_ID", "test");
+setEnv("AWS_SECRET_ACCESS_KEY", "test");
+setEnv("AWS_SESSION_TOKEN", undefined);
+
 const cloudClient = s3.createS3Client({
   region: "us-east-1",
   bucket: "wardrobe-prod-images",
@@ -76,23 +89,25 @@ const checks = [
     detail: localClient.presigner.config,
   },
   {
-    name: "s3 storage keeps aws mode and does not force local credentials",
+    name: "s3 storage keeps aws mode",
     ok:
       cloudClient.config.region === "us-east-1" &&
-      cloudClient.presigner.config.accessMode === "aws" &&
-      cloudClient.presigner.config.credentials === undefined,
+      cloudClient.presigner.config.accessMode === "aws",
     detail: cloudClient.presigner.config,
   },
   {
     name: "presign put object returns upload url method public url and request payload",
     ok:
       localSigned.method === "PUT" &&
-      localSigned.uploadUrl === "http://localhost:4566/clothing/wd_01/example.jpg" &&
+      localSigned.uploadUrl.startsWith("http://localhost:4566/") &&
+      localSigned.uploadUrl.includes("X-Amz-Algorithm=") &&
       localSigned.publicUrl === "http://localhost:4000/images/clothing/wd_01/example.jpg" &&
       localSigned.request.input.Bucket === "wardrobe-local-images" &&
       localSigned.request.input.ContentType === "image/jpeg" &&
-      cloudSigned.uploadUrl ===
-        "https://wardrobe-prod-images.s3.us-east-1.amazonaws.com/template/wd_01/example.webp" &&
+      cloudSigned.uploadUrl.startsWith(
+        "https://wardrobe-prod-images.s3.us-east-1.amazonaws.com/template/wd_01/example.webp",
+      ) &&
+      cloudSigned.uploadUrl.includes("X-Amz-Algorithm=") &&
       cloudSigned.request.input.ExpiresIn === 120,
     detail: { localSigned, cloudSigned },
   },
@@ -108,7 +123,8 @@ const checks = [
     name: "source declares put object presign and local mock switching tokens",
     ok:
       [
-        'operation: "PutObject"',
+        "new PutObjectCommand(",
+        "getSignedUrl(",
         'storageDriver === "local"',
         "presignPutObject",
         "createImagePublicUrl",

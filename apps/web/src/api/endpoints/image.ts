@@ -29,7 +29,7 @@ function normalizeExtension(fileName: string): string | undefined {
 
 function resolveContentType(file: File): string {
   const normalizedType = file.type.trim().toLowerCase();
-  if (normalizedType.startsWith("image/")) {
+  if (normalizedType === "image/jpeg" || normalizedType === "image/png" || normalizedType === "image/webp") {
     return normalizedType;
   }
 
@@ -37,11 +37,14 @@ function resolveContentType(file: File): string {
   if (extension === "jpg" || extension === "jpeg") {
     return "image/jpeg";
   }
-  if (extension) {
-    return `image/${extension}`;
+  if (extension === "png") {
+    return "image/png";
+  }
+  if (extension === "webp") {
+    return "image/webp";
   }
 
-  return "image/png";
+  throw new Error("unsupported image type");
 }
 
 export async function uploadImageWithPresign(

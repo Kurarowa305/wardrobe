@@ -52,6 +52,13 @@ const checks = [
     ok: sourceCodeHashDefinitionCount >= 2,
   },
   {
+    name: "Lambda環境変数に S3_BUCKET / IMAGE_PUBLIC_BASE_URL / STORAGE_DRIVER が設定される",
+    ok:
+      lambdaTf.includes("S3_BUCKET") &&
+      lambdaTf.includes("IMAGE_PUBLIC_BASE_URL") &&
+      lambdaTf.includes('STORAGE_DRIVER         = "s3"'),
+  },
+  {
     name: "テストスクリプトが package.json と CI に登録されている",
     ok:
       packageJson.includes(
