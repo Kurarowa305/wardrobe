@@ -4,10 +4,14 @@ import { Suspense } from "react";
 
 import { ClothingCreateScreen } from "@/components/app/screens/ClothingCreateScreen";
 import { DEMO_IDS } from "@/constants/routes";
-import { useWardrobeIdFromQuery } from "@/features/routing/queryParams";
+import { useRedirectToWardrobeNewIfMissing, useWardrobeIdFromQuery } from "@/features/routing/queryParams";
 
 function ClothingCreatePageSearchParams() {
   const wardrobeId = useWardrobeIdFromQuery();
+  const canRender = useRedirectToWardrobeNewIfMissing([wardrobeId]);
+  if (!canRender) {
+    return null;
+  }
   return <ClothingCreateScreen wardrobeId={wardrobeId} />;
 }
 

@@ -99,7 +99,7 @@ check(
   "HDS-06",
   "履歴詳細ページが query パラメータから wardrobeId/historyId を解決し、screen へ渡す",
   includes(pageTarget, 'import { DEMO_IDS } from "@/constants/routes";') &&
-    includes(pageTarget, 'import { useHistoryRouteIdsFromQuery } from "@/features/routing/queryParams";') &&
+    includes(pageTarget, "useHistoryRouteIdsFromQuery") &&
     includes(pageTarget, "const { wardrobeId, historyId } = useHistoryRouteIdsFromQuery();") &&
     includes(pageTarget, "return <HistoryDetailScreen wardrobeId={wardrobeId} historyId={historyId} />;") &&
     includes(pageTarget, "<Suspense") &&

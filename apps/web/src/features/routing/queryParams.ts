@@ -1,8 +1,10 @@
 "use client";
 
-import { useSearchParams, type ReadonlyURLSearchParams } from "next/navigation";
+import { useEffect } from "react";
+import { useRouter, useSearchParams, type ReadonlyURLSearchParams } from "next/navigation";
 
-import { DEMO_IDS } from "@/constants/routes";
+import { isWardrobeId } from "@/api/schemas/wardrobe";
+import { ROUTES } from "@/constants/routes";
 
 function resolveQueryParam(searchParams: ReadonlyURLSearchParams, key: string) {
   const value = searchParams.get(key);
@@ -14,31 +16,55 @@ function resolveQueryParam(searchParams: ReadonlyURLSearchParams, key: string) {
   return trimmed.length > 0 ? trimmed : null;
 }
 
+function resolveWardrobeId(searchParams: ReadonlyURLSearchParams) {
+  const wardrobeId = resolveQueryParam(searchParams, "wardrobeId");
+  if (!wardrobeId) {
+    return null;
+  }
+
+  return isWardrobeId(wardrobeId) ? wardrobeId : null;
+}
+
 export function useWardrobeIdFromQuery() {
   const searchParams = useSearchParams();
-  return resolveQueryParam(searchParams, "wardrobeId") ?? DEMO_IDS.wardrobe;
+  return resolveWardrobeId(searchParams) ?? "";
 }
 
 export function useHistoryRouteIdsFromQuery() {
   const searchParams = useSearchParams();
   return {
-    wardrobeId: resolveQueryParam(searchParams, "wardrobeId") ?? DEMO_IDS.wardrobe,
-    historyId: resolveQueryParam(searchParams, "historyId") ?? DEMO_IDS.history,
+    wardrobeId: resolveWardrobeId(searchParams) ?? "",
+    historyId: resolveQueryParam(searchParams, "historyId") ?? "",
   };
 }
 
 export function useTemplateRouteIdsFromQuery() {
   const searchParams = useSearchParams();
   return {
-    wardrobeId: resolveQueryParam(searchParams, "wardrobeId") ?? DEMO_IDS.wardrobe,
-    templateId: resolveQueryParam(searchParams, "templateId") ?? DEMO_IDS.template,
+    wardrobeId: resolveWardrobeId(searchParams) ?? "",
+    templateId: resolveQueryParam(searchParams, "templateId") ?? "",
   };
 }
 
 export function useClothingRouteIdsFromQuery() {
   const searchParams = useSearchParams();
   return {
-    wardrobeId: resolveQueryParam(searchParams, "wardrobeId") ?? DEMO_IDS.wardrobe,
-    clothingId: resolveQueryParam(searchParams, "clothingId") ?? DEMO_IDS.clothing,
+    wardrobeId: resolveWardrobeId(searchParams) ?? "",
+    clothingId: resolveQueryParam(searchParams, "clothingId") ?? "",
   };
+}
+
+export function useRedirectToWardrobeNewIfMissing(ids: string[]) {
+  const router = useRouter();
+  const hasMissing = ids.some((value) => value.trim().length === 0);
+
+  useEffect(() => {
+    if (!hasMissing) {
+      return;
+    }
+
+    router.replace(ROUTES.wardrobeNew);
+  }, [hasMissing, router]);
+
+  return !hasMissing;
 }

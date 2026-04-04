@@ -105,7 +105,7 @@ check(
   "CDS-07",
   "服詳細/編集ページが query パラメータから wardrobeId/clothingId を解決して screen へ渡す",
   includes(detailPageTarget, 'import { DEMO_IDS } from "@/constants/routes";') &&
-    includes(detailPageTarget, 'import { useClothingRouteIdsFromQuery } from "@/features/routing/queryParams";') &&
+    includes(detailPageTarget, "useClothingRouteIdsFromQuery") &&
     includes(detailPageTarget, "const { wardrobeId, clothingId } = useClothingRouteIdsFromQuery();") &&
     includes(detailPageTarget, "return <ClothingDetailScreen wardrobeId={wardrobeId} clothingId={clothingId} />;") &&
     includes(detailPageTarget, "<Suspense") &&
@@ -114,7 +114,7 @@ check(
       "fallback={<ClothingDetailScreen wardrobeId={DEMO_IDS.wardrobe} clothingId={DEMO_IDS.clothing} />}",
     ) &&
     includes(editPageTarget, 'import { DEMO_IDS } from "@/constants/routes";') &&
-    includes(editPageTarget, 'import { useClothingRouteIdsFromQuery } from "@/features/routing/queryParams";') &&
+    includes(editPageTarget, "useClothingRouteIdsFromQuery") &&
     includes(editPageTarget, "const { wardrobeId, clothingId } = useClothingRouteIdsFromQuery();") &&
     includes(editPageTarget, "return <ClothingEditScreen wardrobeId={wardrobeId} clothingId={clothingId} />;") &&
     includes(editPageTarget, "<Suspense"),

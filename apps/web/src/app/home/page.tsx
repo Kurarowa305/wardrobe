@@ -4,10 +4,14 @@ import { Suspense } from "react";
 
 import { HomeTabScreen } from "@/components/app/screens/HomeTabScreen";
 import { DEMO_IDS } from "@/constants/routes";
-import { useWardrobeIdFromQuery } from "@/features/routing/queryParams";
+import { useRedirectToWardrobeNewIfMissing, useWardrobeIdFromQuery } from "@/features/routing/queryParams";
 
 function HomePageSearchParams() {
   const wardrobeId = useWardrobeIdFromQuery();
+  const canRender = useRedirectToWardrobeNewIfMissing([wardrobeId]);
+  if (!canRender) {
+    return null;
+  }
   return <HomeTabScreen wardrobeId={wardrobeId} />;
 }
 

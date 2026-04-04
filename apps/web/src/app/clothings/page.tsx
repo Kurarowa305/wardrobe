@@ -4,10 +4,14 @@ import { Suspense } from "react";
 
 import { ClothingsTabScreen } from "@/components/app/screens/ClothingsTabScreen";
 import { DEMO_IDS } from "@/constants/routes";
-import { useWardrobeIdFromQuery } from "@/features/routing/queryParams";
+import { useRedirectToWardrobeNewIfMissing, useWardrobeIdFromQuery } from "@/features/routing/queryParams";
 
 function ClothingsPageSearchParams() {
   const wardrobeId = useWardrobeIdFromQuery();
+  const canRender = useRedirectToWardrobeNewIfMissing([wardrobeId]);
+  if (!canRender) {
+    return null;
+  }
   return <ClothingsTabScreen wardrobeId={wardrobeId} />;
 }
 
