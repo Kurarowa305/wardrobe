@@ -14,7 +14,11 @@ const checks = [
       exists("src/api/endpoints/wardrobe.ts") &&
       includes("src/api/endpoints/wardrobe.ts", 'const WARDROBE_COLLECTION_PATH = "/wardrobes";') &&
       includes("src/api/endpoints/wardrobe.ts", "export function createWardrobe(") &&
-      includes("src/api/endpoints/wardrobe.ts", "apiClient.post<CreateWardrobeResponseDto"),
+      (includes("src/api/endpoints/wardrobe.ts", "apiClient.post<CreateWardrobeResponseDto")
+        || (
+          includes("src/api/endpoints/wardrobe.ts", "apiClient.post<unknown, CreateWardrobeRequestDto>") &&
+          includes("src/api/endpoints/wardrobe.ts", "parseCreateWardrobeResponseDto")
+        )),
     detail: "src/api/endpoints/wardrobe.ts の作成APIクライアント実装が不足しています",
   },
   {
