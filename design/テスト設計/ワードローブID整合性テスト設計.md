@@ -42,6 +42,11 @@
 - 期待結果:
   - `home/histories/templates/clothings/record` 系および詳細/編集/追加ページで `useRedirectToWardrobeNewIfMissing` を利用する
 
+### WIG-06 query 解決ページの Suspense fallback が DEMO_IDS.wardrobe を使わない
+- 観点: fallback 描画由来で `wardrobeId=1` がリンクに混入しないか
+- 期待結果:
+  - query 解決ページの fallback が `DEMO_IDS.wardrobe` を参照しない
+
 ## CI適用
 
 - `.github/workflows/ci.yml` に `Wardrobe ID integrity spec test` を追加し、push 時に自動検証する
@@ -53,3 +58,4 @@
 - WIG-03 query解決での DEMO_IDS フォールバック除去
 - WIG-04 欠落IDリダイレクトガードhook
 - WIG-05 query解決ページの欠落IDガード適用
+- WIG-06 Suspense fallback での DEMO_IDS.wardrobe 非使用

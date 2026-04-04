@@ -98,15 +98,11 @@ check(
 check(
   "HDS-06",
   "履歴詳細ページが query パラメータから wardrobeId/historyId を解決し、screen へ渡す",
-  includes(pageTarget, 'import { DEMO_IDS } from "@/constants/routes";') &&
-    includes(pageTarget, "useHistoryRouteIdsFromQuery") &&
+  includes(pageTarget, "useHistoryRouteIdsFromQuery") &&
     includes(pageTarget, "const { wardrobeId, historyId } = useHistoryRouteIdsFromQuery();") &&
     includes(pageTarget, "return <HistoryDetailScreen wardrobeId={wardrobeId} historyId={historyId} />;") &&
     includes(pageTarget, "<Suspense") &&
-    includes(
-      pageTarget,
-      "fallback={<HistoryDetailScreen wardrobeId={DEMO_IDS.wardrobe} historyId={DEMO_IDS.history} />}",
-    ),
+    includes(pageTarget, "fallback={null}"),
   "履歴詳細ページの query 解決または HistoryDetailScreen への受け渡しが不足しています",
 );
 

@@ -67,6 +67,28 @@ const checks = [
       ].every((file) => includes(file, "useRedirectToWardrobeNewIfMissing")),
     detail: "一部の query 解決ページで欠落IDガードが使われていません",
   },
+  {
+    id: "WIG-06",
+    name: "query 解決ページの Suspense fallback が DEMO_IDS.wardrobe を使わない",
+    ok:
+      [
+        "src/app/home/page.tsx",
+        "src/app/histories/page.tsx",
+        "src/app/templates/page.tsx",
+        "src/app/clothings/page.tsx",
+        "src/app/record/page.tsx",
+        "src/app/record/template/page.tsx",
+        "src/app/record/combination/page.tsx",
+        "src/app/templates/new/page.tsx",
+        "src/app/templates/detail/page.tsx",
+        "src/app/templates/edit/page.tsx",
+        "src/app/clothings/new/page.tsx",
+        "src/app/clothings/detail/page.tsx",
+        "src/app/clothings/edit/page.tsx",
+        "src/app/histories/detail/page.tsx",
+      ].every((file) => !includes(file, "DEMO_IDS.wardrobe")),
+    detail: "query 解決ページの fallback に DEMO_IDS.wardrobe が残っています",
+  },
 ];
 
 let hasFailure = false;

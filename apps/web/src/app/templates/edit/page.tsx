@@ -3,7 +3,6 @@
 import { Suspense } from "react";
 
 import { TemplateEditScreen } from "@/components/app/screens/TemplateEditScreen";
-import { DEMO_IDS } from "@/constants/routes";
 import { useRedirectToWardrobeNewIfMissing, useTemplateRouteIdsFromQuery } from "@/features/routing/queryParams";
 
 function TemplateEditPageSearchParams() {
@@ -17,7 +16,7 @@ function TemplateEditPageSearchParams() {
 
 export default function TemplateEditPage() {
   return (
-    <Suspense fallback={<TemplateEditScreen wardrobeId={DEMO_IDS.wardrobe} templateId={DEMO_IDS.template} />}>
+    <Suspense fallback={null}>
       <TemplateEditPageSearchParams />
     </Suspense>
   );
