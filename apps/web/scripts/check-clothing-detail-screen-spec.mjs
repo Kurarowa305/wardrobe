@@ -104,20 +104,16 @@ check(
 check(
   "CDS-07",
   "服詳細/編集ページが query パラメータから wardrobeId/clothingId を解決して screen へ渡す",
-  includes(detailPageTarget, 'import { DEMO_IDS } from "@/constants/routes";') &&
-    includes(detailPageTarget, "useClothingRouteIdsFromQuery") &&
+  includes(detailPageTarget, "useClothingRouteIdsFromQuery") &&
     includes(detailPageTarget, "const { wardrobeId, clothingId } = useClothingRouteIdsFromQuery();") &&
     includes(detailPageTarget, "return <ClothingDetailScreen wardrobeId={wardrobeId} clothingId={clothingId} />;") &&
     includes(detailPageTarget, "<Suspense") &&
-    includes(
-      detailPageTarget,
-      "fallback={<ClothingDetailScreen wardrobeId={DEMO_IDS.wardrobe} clothingId={DEMO_IDS.clothing} />}",
-    ) &&
-    includes(editPageTarget, 'import { DEMO_IDS } from "@/constants/routes";') &&
+    includes(detailPageTarget, "fallback={null}") &&
     includes(editPageTarget, "useClothingRouteIdsFromQuery") &&
     includes(editPageTarget, "const { wardrobeId, clothingId } = useClothingRouteIdsFromQuery();") &&
     includes(editPageTarget, "return <ClothingEditScreen wardrobeId={wardrobeId} clothingId={clothingId} />;") &&
-    includes(editPageTarget, "<Suspense"),
+    includes(editPageTarget, "<Suspense") &&
+    includes(editPageTarget, "fallback={null}"),
   "detail/edit ページの query 解決または ClothingScreen への受け渡しが不足しています",
 );
 

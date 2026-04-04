@@ -3,7 +3,6 @@
 import { Suspense } from "react";
 
 import { RecordByCombinationScreen } from "@/components/app/screens/RecordByCombinationScreen";
-import { DEMO_IDS } from "@/constants/routes";
 import { useRedirectToWardrobeNewIfMissing, useWardrobeIdFromQuery } from "@/features/routing/queryParams";
 
 function RecordByCombinationPageSearchParams() {
@@ -17,7 +16,7 @@ function RecordByCombinationPageSearchParams() {
 
 export default function RecordByCombinationPage() {
   return (
-    <Suspense fallback={<RecordByCombinationScreen wardrobeId={DEMO_IDS.wardrobe} />}>
+    <Suspense fallback={null}>
       <RecordByCombinationPageSearchParams />
     </Suspense>
   );

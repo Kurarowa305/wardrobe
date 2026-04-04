@@ -3,7 +3,6 @@
 import { Suspense } from "react";
 
 import { TemplatesTabScreen } from "@/components/app/screens/TemplatesTabScreen";
-import { DEMO_IDS } from "@/constants/routes";
 import { useRedirectToWardrobeNewIfMissing, useWardrobeIdFromQuery } from "@/features/routing/queryParams";
 
 function TemplatesPageSearchParams() {
@@ -17,7 +16,7 @@ function TemplatesPageSearchParams() {
 
 export default function TemplatesPage() {
   return (
-    <Suspense fallback={<TemplatesTabScreen wardrobeId={DEMO_IDS.wardrobe} />}>
+    <Suspense fallback={null}>
       <TemplatesPageSearchParams />
     </Suspense>
   );

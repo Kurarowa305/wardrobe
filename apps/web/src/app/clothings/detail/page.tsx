@@ -3,7 +3,6 @@
 import { Suspense } from "react";
 
 import { ClothingDetailScreen } from "@/components/app/screens/ClothingDetailScreen";
-import { DEMO_IDS } from "@/constants/routes";
 import { useClothingRouteIdsFromQuery, useRedirectToWardrobeNewIfMissing } from "@/features/routing/queryParams";
 
 function ClothingDetailPageSearchParams() {
@@ -17,9 +16,7 @@ function ClothingDetailPageSearchParams() {
 
 export default function ClothingDetailPage() {
   return (
-    <Suspense
-      fallback={<ClothingDetailScreen wardrobeId={DEMO_IDS.wardrobe} clothingId={DEMO_IDS.clothing} />}
-    >
+    <Suspense fallback={null}>
       <ClothingDetailPageSearchParams />
     </Suspense>
   );

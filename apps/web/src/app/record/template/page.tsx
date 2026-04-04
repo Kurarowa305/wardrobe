@@ -3,7 +3,6 @@
 import { Suspense } from "react";
 
 import { RecordByTemplateScreen } from "@/components/app/screens/RecordByTemplateScreen";
-import { DEMO_IDS } from "@/constants/routes";
 import { useRedirectToWardrobeNewIfMissing, useWardrobeIdFromQuery } from "@/features/routing/queryParams";
 
 function RecordByTemplatePageSearchParams() {
@@ -17,7 +16,7 @@ function RecordByTemplatePageSearchParams() {
 
 export default function RecordByTemplatePage() {
   return (
-    <Suspense fallback={<RecordByTemplateScreen wardrobeId={DEMO_IDS.wardrobe} />}>
+    <Suspense fallback={null}>
       <RecordByTemplatePageSearchParams />
     </Suspense>
   );
