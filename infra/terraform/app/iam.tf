@@ -10,8 +10,9 @@ data "aws_iam_policy_document" "lambda_assume_role" {
 }
 
 locals {
-  lambda_dynamodb_domains = toset(["wardrobe", "clothing", "template", "history"])
-  lambda_s3_domains       = toset(["presign"])
+  lambda_dynamodb_domains             = toset(["wardrobe", "clothing", "template", "history"])
+  lambda_dynamodb_read_only_domains   = toset(["presign"])
+  lambda_s3_domains                   = toset(["presign"])
 }
 
 resource "aws_iam_role" "lambda" {
@@ -121,6 +122,20 @@ data "aws_iam_policy_document" "lambda_domain_policy" {
       resources = [
         aws_dynamodb_table.wardrobe.arn,
         "${aws_dynamodb_table.wardrobe.arn}/index/*",
+      ]
+    }
+  }
+
+  dynamic "statement" {
+    for_each = contains(local.lambda_dynamodb_read_only_domains, each.key) ? [1] : []
+
+    content {
+      actions = [
+        "dynamodb:GetItem",
+      ]
+
+      resources = [
+        aws_dynamodb_table.wardrobe.arn,
       ]
     }
   }
