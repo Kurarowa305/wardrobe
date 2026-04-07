@@ -100,6 +100,9 @@ jobs:
       - name: API clothing key builder spec test
         run: pnpm --filter api test:clothing-key-builder
 
+      - name: API clothing status+genre key spec test
+        run: pnpm --filter api test:clothing-status-genre-key
+
       - name: API template key builder spec test
         run: pnpm --filter api test:template-key-builder
 
@@ -168,6 +171,9 @@ jobs:
 
       - name: API clothing MS2 API-03 aggregate spec test
         run: pnpm --filter api test:clothing-ms2-api03
+
+      - name: API clothing MS2 API-03 genre GSI aggregate spec test
+        run: pnpm --filter api test:clothing-ms2-api03-genre-gsi
 
       - name: API clothing create handler spec test
         run: pnpm --filter api test:clothing-create-handler
@@ -285,6 +291,9 @@ jobs:
 
       - name: API terraform dynamodb BE-MS7-T01 spec test
         run: pnpm --filter api test:terraform-dynamodb-ms7-t01
+
+      - name: API terraform dynamodb BE-MS7-T08 spec test
+        run: pnpm --filter api test:terraform-dynamodb-ms7-t08
 
       - name: API terraform S3 images BE-MS7-T02 spec test
         run: pnpm --filter api test:terraform-s3-images-ms7-t02

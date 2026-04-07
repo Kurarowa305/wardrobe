@@ -48,8 +48,26 @@ const listResult = await repoClient.list({
   scanIndexForward: false,
   exclusiveStartKey: { PK: item.PK, SK: item.SK, statusListPk: item.statusListPk, wearCountSk: item.wearCountSk },
 });
+const genreListResult = await repoClient.list({
+  wardrobeId: entity.wardrobeId,
+  indexName: repo.clothingListIndexNames.statusGenreCreatedAt,
+  genre: "tops",
+  limit: 20,
+  scanIndexForward: false,
+  exclusiveStartKey: {
+    PK: item.PK,
+    SK: item.SK,
+    statusGenreListPk: item.statusGenreListPk,
+    createdAtSk: item.createdAtSk,
+  },
+});
 const updateResult = await repoClient.update({ ...entity, wearCount: 13, lastWornAt: 1735700000000 });
-const deleteResult = await repoClient.delete({ wardrobeId: entity.wardrobeId, clothingId: entity.clothingId, deletedAt: 1735800000000 });
+const deleteResult = await repoClient.delete({
+  wardrobeId: entity.wardrobeId,
+  clothingId: entity.clothingId,
+  genre: entity.genre,
+  deletedAt: 1735800000000,
+});
 
 const checks = [
   {
@@ -58,6 +76,7 @@ const checks = [
       item.PK === "W#wd_01HZZAAA#CLOTH" &&
       item.SK === "CLOTH#cl_01HZZBBB" &&
       item.statusListPk === "W#wd_01HZZAAA#CLOTH#ACTIVE" &&
+      item.statusGenreListPk === "W#wd_01HZZAAA#CLOTH#ACTIVE#GENRE#tops" &&
       item.createdAtSk === "CREATED#1735690000123#cl_01HZZBBB" &&
       item.wearCountSk === "WEAR#0000000012#cl_01HZZBBB" &&
       item.lastWornAtSk === "LASTWORN#1735600000000#cl_01HZZBBB",
@@ -76,6 +95,7 @@ const checks = [
       createResult.operation === "PutItem" &&
       createResult.request.input.TableName === "SpecTable" &&
       createResult.request.input.Item.statusListPk === "W#wd_01HZZAAA#CLOTH#ACTIVE" &&
+      createResult.request.input.Item.statusGenreListPk === "W#wd_01HZZAAA#CLOTH#ACTIVE#GENRE#tops" &&
       createResult.request.input.Item.wearCountSk === "WEAR#0000000012#cl_01HZZBBB" &&
       createResult.request.input.ConditionExpression === "attribute_not_exists(PK)",
     detail: createResult,
@@ -102,25 +122,37 @@ const checks = [
     detail: listResult,
   },
   {
+    name: "repo list can query status+genre GSI when index and genre are specified",
+    ok:
+      genreListResult.operation === "Query" &&
+      genreListResult.request.input.IndexName === "StatusGenreListByCreatedAt" &&
+      genreListResult.request.input.KeyConditionExpression === "#statusGenreListPk = :statusGenreListPk" &&
+      genreListResult.request.input.ExpressionAttributeValues[":statusGenreListPk"] === "W#wd_01HZZAAA#CLOTH#ACTIVE#GENRE#tops" &&
+      genreListResult.request.input.ExclusiveStartKey.createdAtSk === "CREATED#1735690000123#cl_01HZZBBB",
+    detail: genreListResult,
+  },
+  {
     name: "repo update rewrites editable fields and all GSI attributes in one UpdateItem",
     ok:
       updateResult.operation === "UpdateItem" &&
       updateResult.request.input.ConditionExpression === "attribute_exists(PK)" &&
       updateResult.request.input.ReturnValues === "ALL_NEW" &&
       updateResult.request.input.UpdateExpression.includes("statusListPk = :statusListPk") &&
+      updateResult.request.input.UpdateExpression.includes("statusGenreListPk = :statusGenreListPk") &&
       updateResult.request.input.UpdateExpression.includes("wearCountSk = :wearCountSk") &&
       updateResult.request.input.ExpressionAttributeValues[":wearCount"] === 13 &&
       updateResult.request.input.ExpressionAttributeValues[":lastWornAtSk"] === "LASTWORN#1735700000000#cl_01HZZBBB",
     detail: updateResult,
   },
   {
-    name: "repo delete performs logical deletion by switching status, deletedAt, and statusListPk",
+    name: "repo delete performs logical deletion by switching status, deletedAt, and list partition keys",
     ok:
       deleteResult.operation === "UpdateItem" &&
-      deleteResult.request.input.UpdateExpression === "SET #status = :status, deletedAt = :deletedAt, statusListPk = :statusListPk" &&
+      deleteResult.request.input.UpdateExpression === "SET #status = :status, deletedAt = :deletedAt, statusListPk = :statusListPk, statusGenreListPk = :statusGenreListPk" &&
       deleteResult.request.input.ExpressionAttributeValues[":status"] === "DELETED" &&
       deleteResult.request.input.ExpressionAttributeValues[":deletedAt"] === 1735800000000 &&
-      deleteResult.request.input.ExpressionAttributeValues[":statusListPk"] === "W#wd_01HZZAAA#CLOTH#DELETED",
+      deleteResult.request.input.ExpressionAttributeValues[":statusListPk"] === "W#wd_01HZZAAA#CLOTH#DELETED" &&
+      deleteResult.request.input.ExpressionAttributeValues[":statusGenreListPk"] === "W#wd_01HZZAAA#CLOTH#DELETED#GENRE#tops",
     detail: deleteResult,
   },
   {

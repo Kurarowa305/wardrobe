@@ -22,6 +22,11 @@ const statusListPk = keyModule.buildClothingStatusListPk({
   wardrobeId: "wd_01HZZAAA",
   status: "ACTIVE",
 });
+const statusGenreListPk = keyModule.buildClothingStatusGenreListPk({
+  wardrobeId: "wd_01HZZAAA",
+  status: "ACTIVE",
+  genre: "tops",
+});
 const createdAtSk = keyModule.buildClothingCreatedAtSk({
   clothingId: "cl_01HZZBBB",
   value: 1735690000123,
@@ -37,6 +42,7 @@ const lastWornAtSk = keyModule.buildClothingLastWornAtSk({
 const compositeKeys = keyModule.buildClothingIndexKeys({
   wardrobeId: "wd_01HZZAAA",
   clothingId: "cl_01HZZBBB",
+  genre: "tops",
   status: "DELETED",
   createdAt: 1735690000123,
   wearCount: 12,
@@ -50,9 +56,11 @@ const checks = [
     detail: baseKey,
   },
   {
-    name: "status list pk uses wardrobe clothing partition and status",
-    ok: statusListPk === "W#wd_01HZZAAA#CLOTH#ACTIVE",
-    detail: statusListPk,
+    name: "status list pk and status+genre list pk can be generated",
+    ok:
+      statusListPk === "W#wd_01HZZAAA#CLOTH#ACTIVE" &&
+      statusGenreListPk === "W#wd_01HZZAAA#CLOTH#ACTIVE#GENRE#tops",
+    detail: { statusListPk, statusGenreListPk },
   },
   {
     name: "createdAt and lastWornAt sort keys preserve raw unix-ms values",
@@ -72,6 +80,7 @@ const checks = [
       compositeKeys.PK === "W#wd_01HZZAAA#CLOTH" &&
       compositeKeys.SK === "CLOTH#cl_01HZZBBB" &&
       compositeKeys.statusListPk === "W#wd_01HZZAAA#CLOTH#DELETED" &&
+      compositeKeys.statusGenreListPk === "W#wd_01HZZAAA#CLOTH#DELETED#GENRE#tops" &&
       compositeKeys.createdAtSk === "CREATED#1735690000123#cl_01HZZBBB" &&
       compositeKeys.wearCountSk === "WEAR#0000000012#cl_01HZZBBB" &&
       compositeKeys.lastWornAtSk === "LASTWORN#1735600000000#cl_01HZZBBB",
@@ -82,6 +91,7 @@ const checks = [
     ok:
       source.includes("export function buildClothingBaseKey") &&
       source.includes("export function buildClothingStatusListPk") &&
+      source.includes("export function buildClothingStatusGenreListPk") &&
       source.includes("export function buildClothingIndexKeys") &&
       packageJson.includes('"test:clothing-key-builder": "node --import tsx/esm scripts/check-clothing-key-builder-spec.mjs"') &&
       packageJson.includes("pnpm run test:clothing-key-builder") &&

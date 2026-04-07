@@ -12,7 +12,8 @@ const clothingListResource = "clothing-list";
 export type ClothingListCursorPosition = {
   PK: string;
   SK: string;
-  statusListPk: string;
+  statusListPk?: string;
+  statusGenreListPk?: string;
   createdAtSk?: string;
   wearCountSk?: string;
   lastWornAtSk?: string;
@@ -147,7 +148,13 @@ function extractLastEvaluatedKey(result: ClothingListQueryResult): ClothingListC
   }
 
   const position = Object.fromEntries(positionEntries) as ClothingListCursorPosition;
-  if (typeof position.PK !== "string" || typeof position.SK !== "string" || typeof position.statusListPk !== "string") {
+  if (typeof position.PK !== "string" || typeof position.SK !== "string") {
+    return null;
+  }
+
+  const hasStatusListPk = typeof position.statusListPk === "string";
+  const hasStatusGenreListPk = typeof position.statusGenreListPk === "string";
+  if (!hasStatusListPk && !hasStatusGenreListPk) {
     return null;
   }
 
@@ -251,15 +258,16 @@ export function createClothingUsecase(dependencies: ClothingUsecaseDependencies 
 
       const result = extractListResult(await repo.list({
         wardrobeId: input.wardrobeId,
-        indexName: clothingListIndexNames.createdAt,
+        indexName: input.params.genre
+          ? clothingListIndexNames.statusGenreCreatedAt
+          : clothingListIndexNames.createdAt,
+        ...(input.params.genre ? { genre: input.params.genre } : {}),
         ...(input.params.limit !== undefined ? { limit: input.params.limit } : {}),
         ...(exclusiveStartKey ? { exclusiveStartKey } : {}),
         scanIndexForward: order === "asc",
       }));
 
-      const items = extractItems(result)
-        .filter((item) => !input.params.genre || item.genre === input.params.genre)
-        .map(toClothingListItem);
+      const items = extractItems(result).map(toClothingListItem);
       const nextPosition = extractLastEvaluatedKey(result);
 
       return {
@@ -336,6 +344,7 @@ export function createClothingUsecase(dependencies: ClothingUsecaseDependencies 
         wardrobeId: currentItem.wardrobeId,
         clothingId: currentItem.clothingId,
         deletedAt: now(),
+        genre: currentItem.genre,
       });
     },
   };

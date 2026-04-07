@@ -23,6 +23,7 @@
 ### 2.3 一覧取得と参照補完
 
 * 服・テンプレの一覧は **GSI + Query**（並び替えはGSIを統一利用）
+* 服一覧（API-03）の `genre` 指定時は **status+genre 専用GSI** を使い、DBレベルで絞り込みしてからページングする
 * テンプレ／履歴のサムネ表示は `clothingIds` を元に **BatchGet** で服情報（imageKey/status）を取得し、N+1を避ける
     * **BatchGetの上限は80**とする。(実装上の分割単位)
 
@@ -100,6 +101,7 @@
 | -------------- | ------------- | -------------------- |
 | clothingId     | String        | 服ID                  |
 | name           | String        | 服名 / 上限40字                 |
+| genre          | String        | `tops` / `bottoms` / `others` |
 | status         | String        | ACTIVE / DELETED     |
 | imageKey       | String        | 画像キー（任意）             |
 | wearCount      | Number        | 着用回数                 |
@@ -111,6 +113,8 @@
 
 * `W#<wardrobeId>#<type>#<status>`
     * 例 `W#wd_01HZZ...#CLOTH#ACTIVE`
+* `W#<wardrobeId>#CLOTH#<status>#GENRE#<genre>`
+    * 例 `W#wd_01HZZ...#CLOTH#ACTIVE#GENRE#tops`
 * `CREATED#<createdAt>#<clothingId/templateId>`
     * 例 `CREATED#1735690000123#cl_01HZZ...`
 * `WEAR#<wearCount>#<clothingId/templateId>`
@@ -189,6 +193,7 @@
 | GSI名                         | PK             | SK                 | 用途    |
 | ---------------------------- | -------------- | ------------------ | ----- |
 | `StatusListByCreatedAt`  | `W#<wardrobeId>#<type>#<status>` | `CREATED#<createdAt>#<clothingId/templateId>`  | 登録順   |
+| `StatusGenreListByCreatedAt` | `W#<wardrobeId>#CLOTH#<status>#GENRE#<genre>` | `CREATED#<createdAt>#<clothingId>` | 服一覧（genre指定時の登録順） |
 | `StatusListByWearCount`  | `W#<wardrobeId>#<type>#<status>` | `WEAR#<wearCount>#<clothingId/templateId>`  | 着た回数順 |
 | `StatusListByLastWornAt` | `W#<wardrobeId>#<type>#<status>` | `LASTWORN#<lastWornAt>#<clothingId/templateId>` | 最近着た順 |
 | `HistoryByDate` | `W#<wardrobeId>#HIST` | `DATE#<date>#<historyId>` | 履歴一覧 |
@@ -206,7 +211,7 @@
 
 * ACTIVE一覧：`statusListPk=...#ACTIVE`
 * DELETED一覧：`statusListPk=...#DELETED`
-* 削除／復元時は `status` と `deletedAt` に加えて **`statusListPk` を更新**する（GSIの集合が変わるため）
+* 削除／復元時は `status` と `deletedAt` に加えて **`statusListPk` / `statusGenreListPk` を更新**する（GSIの集合が変わるため）
 
 ---
 
@@ -232,11 +237,11 @@
 | AP-01 | ワードローブ新規作成          | PutItem                                  | Wardrobe                                  | PK=`W#<wardrobeId>` / SK=`META`                                                                                                                                                                                                                                                                                                                                   |                                           |
 | AP-02 | ワードローブを開く（URL）      | GetItem                                  | Wardrobe                                  | PK=`W#<wardrobeId>` / SK=`META`                                                                                                                                                                                                                                                                                                                                   | ヘッダー表示                                    |
 | AP-03 | ホーム：直近1週間の履歴        | Query（GSI: HistoryByDate）                | History                                   | PK=`W#<wardrobeId>#HIST`、SK=`DATE#<from>..DATE#<to>`                                                                                                                                                                                                                                                                                                              |                                           |
-| AP-04 | 服一覧（登録順／回数順／最近順）    | Query（GSI）                               | Clothing                                  | PK=`W#<wardrobeId>#CLOTH#ACTIVE`、SK=軸別                                                                                                                                                                                                                                                                                                                            | `wearCount` / `lastWornAt` を使用            |
+| AP-04 | 服一覧（登録順、genre任意）    | Query（GSI）                               | Clothing                                  | genre未指定: GSI=`StatusListByCreatedAt`, PK=`W#<wardrobeId>#CLOTH#ACTIVE` / genre指定: GSI=`StatusGenreListByCreatedAt`, PK=`W#<wardrobeId>#CLOTH#ACTIVE#GENRE#<genre>` / SK=`CREATED#...`                                                                                                                                                                                                                          | `genre` 指定時も DB で絞り込み後にページングする            |
 | AP-05 | 服詳細表示               | GetItem                                  | Clothing                                  | PK=`W#<wardrobeId>#CLOTH` / SK=`CLOTH#<clothingId>`                                                                                                                                                                                                                                                                                                               |                                           |
 | AP-06 | 服の追加                | PutItem                                  | Clothing                                  | PK=`W#<wardrobeId>#CLOTH` / SK=`CLOTH#<clothingId>`                                                                                                                                                                                                                                                                                                               | `status=ACTIVE`                           |
-| AP-07 | 服の編集                | UpdateItem                               | Clothing                                  | PK=`W#<wardrobeId>#CLOTH` / SK=`CLOTH#<clothingId>`                                                                                                                                                                                                                                                                                                               | 並び替えに関わる属性更新時はGSI用SKも更新                   |
-| AP-08 | 服の削除（論理）            | UpdateItem                               | Clothing                                  | PK=`W#<wardrobeId>#CLOTH` / SK=`CLOTH#<clothingId>`                                                                                                                                                                                                                                                                                                               | `ACTIVE → DELETED`（GSI PK切替）              |
+| AP-07 | 服の編集                | UpdateItem                               | Clothing                                  | PK=`W#<wardrobeId>#CLOTH` / SK=`CLOTH#<clothingId>`                                                                                                                                                                                                                                                                                                               | `genre` 更新時は `statusGenreListPk` も更新                   |
+| AP-08 | 服の削除（論理）            | UpdateItem                               | Clothing                                  | PK=`W#<wardrobeId>#CLOTH` / SK=`CLOTH#<clothingId>`                                                                                                                                                                                                                                                                                                               | `ACTIVE → DELETED`（`statusListPk` / `statusGenreListPk` 切替）              |
 | AP-09 | テンプレ一覧（登録順／回数順／最近順） | Query（GSI） + BatchGetItem                | Template / Clothing                       | Template: PK=`W#<wardrobeId>#TPL#ACTIVE`、SK=軸別 / Clothing: PK=`W#<wardrobeId>#CLOTH`、SK=`CLOTH#<clothingId>`（複数）                                                                                                                                                                                                                                                  | BatchGetItem：サムネ補間                        |
 | AP-10 | テンプレ詳細表示            | GetItem                                  | Template                                  | PK=`W#<wardrobeId>#TPL` / SK=`TPL#<templateId>`                                                                                                                                                                                                                                                                                                                   |                                           |
 | AP-11 | テンプレの追加             | PutItem                                  | Template                                  | PK=`W#<wardrobeId>#TPL` / SK=`TPL#<templateId>`                                                                                                                                                                                                                                                                                                                   | `status=ACTIVE`                           |
@@ -364,5 +369,3 @@
 
 そのため、
 **単一テーブル設計の利点（アクセスパターンが明確・低コスト）を損なわずに統計要件を満たせる**。
-
-
