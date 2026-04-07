@@ -1,4 +1,11 @@
-import { createAppError } from "../../core/errors/index.js";
+import { createAppError, isErrorCode, type ErrorCode } from "../../core/errors/index.js";
+import {
+  createConsoleLogger,
+  createErrorLogOutcome,
+  logRequest,
+  measureDurationMs,
+  type StructuredLogger,
+} from "../../core/logging/index.js";
 import { createErrorResponse, createSuccessResponse, type JsonResponse } from "../../core/response/index.js";
 import type { LocalDomain, LocalRouteHandler, LocalRouteQuery } from "../local/router.js";
 import { listHistoryHandler } from "../../domains/history/handlers/listHistoryHandler.js";
@@ -261,12 +268,45 @@ function toQuery(queryStringParameters: LambdaEvent["queryStringParameters"], ra
 export type LambdaAdapterOptions = {
   domain: LocalDomain;
   handler?: LocalRouteHandler;
+  logger?: StructuredLogger;
 };
+
+function extractErrorCode(response: { body: string; json?: unknown }): ErrorCode | undefined {
+  const source = "json" in response ? response.json : undefined;
+  if (source && typeof source === "object" && "error" in source) {
+    const error = (source as { error?: unknown }).error;
+    if (error && typeof error === "object" && "code" in error) {
+      const code = (error as { code?: unknown }).code;
+      return isErrorCode(code) ? code : undefined;
+    }
+  }
+
+  if (!response.body) {
+    return undefined;
+  }
+
+  try {
+    const parsed = JSON.parse(response.body) as unknown;
+    if (parsed && typeof parsed === "object" && "error" in parsed) {
+      const error = (parsed as { error?: unknown }).error;
+      if (error && typeof error === "object" && "code" in error) {
+        const code = (error as { code?: unknown }).code;
+        return isErrorCode(code) ? code : undefined;
+      }
+    }
+  } catch {
+    return undefined;
+  }
+
+  return undefined;
+}
 
 export function createLambdaHandler(options: LambdaAdapterOptions) {
   const handler = options.handler ?? sharedDomainHandlers[options.domain];
+  const logger = options.logger ?? createConsoleLogger();
 
   return async function lambdaHandler(event: LambdaEvent): Promise<LambdaResponse> {
+    const startTime = Date.now();
     const headers = normalizeHeaders(event.headers);
     const method = event.requestContext?.http?.method?.toUpperCase() ?? "GET";
     const pathname = event.rawPath ?? event.requestContext?.http?.path ?? "/";
@@ -277,6 +317,13 @@ export function createLambdaHandler(options: LambdaAdapterOptions) {
         path[key] = value;
       }
     }
+    const logContext = {
+      requestId,
+      method,
+      path: pathname,
+      domain: options.domain,
+      ...(path.wardrobeId ? { wardrobeId: path.wardrobeId } : {}),
+    };
 
     try {
       const body = method === "GET" || method === "DELETE" ? {} : decodeBody(event);
@@ -289,14 +336,34 @@ export function createLambdaHandler(options: LambdaAdapterOptions) {
         body,
         headers,
       });
+      const statusCode = response.statusCode;
+      const errorCode = extractErrorCode(response);
+
+      logRequest(
+        logger,
+        logContext,
+        errorCode
+          ? { statusCode, durationMs: measureDurationMs(startTime), errorCode }
+          : { statusCode, durationMs: measureDurationMs(startTime) },
+      );
 
       return {
-        statusCode: response.statusCode,
+        statusCode,
         headers: response.headers,
         body: response.body,
       };
     } catch (error) {
       const response = createErrorResponse(error, { requestId });
+      const errorOutcome = createErrorLogOutcome(error, {
+        requestId,
+        statusCode: response.statusCode,
+      });
+
+      logRequest(logger, logContext, {
+        ...errorOutcome,
+        durationMs: measureDurationMs(startTime),
+      });
+
       return {
         statusCode: response.statusCode,
         headers: response.headers,

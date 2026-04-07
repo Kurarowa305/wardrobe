@@ -67,6 +67,9 @@ jobs:
       - name: API logging spec test
         run: pnpm --filter api test:logging
 
+      - name: API lambda logging spec test
+        run: pnpm --filter api test:lambda-logging
+
       - name: API local router spec test
         run: pnpm --filter api test:local-router
 
