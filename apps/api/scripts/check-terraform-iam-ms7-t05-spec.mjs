@@ -37,11 +37,15 @@ const checks = [
       iamTf.includes('"logs:PutLogEvents"'),
   },
   {
-    name: "presign のみ S3 権限、その他ドメインは DynamoDB 権限が付与される",
+    name: "presign は S3 権限に加えて DynamoDB read-only 権限を持ち、他ドメインは DynamoDB 権限が付与される",
     ok:
-      iamTf.includes('lambda_dynamodb_domains = toset(["wardrobe", "clothing", "template", "history"])') &&
-      iamTf.includes('lambda_s3_domains       = toset(["presign"])') &&
+      iamTf.includes('lambda_dynamodb_domains') &&
+      iamTf.includes('toset(["wardrobe", "clothing", "template", "history"])') &&
+      iamTf.includes('lambda_dynamodb_read_only_domains') &&
+      iamTf.includes('toset(["presign"])') &&
+      iamTf.includes('lambda_s3_domains') &&
       iamTf.includes('for_each = contains(local.lambda_dynamodb_domains, each.key) ? [1] : []') &&
+      iamTf.includes('for_each = contains(local.lambda_dynamodb_read_only_domains, each.key) ? [1] : []') &&
       iamTf.includes('for_each = contains(local.lambda_s3_domains, each.key) ? [1] : []'),
   },
   {
