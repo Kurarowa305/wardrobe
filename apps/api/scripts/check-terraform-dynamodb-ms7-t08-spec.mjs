@@ -15,8 +15,6 @@ const dynamodbTf = readFileSync(dynamodbTfPath, "utf8");
 const packageJson = readFileSync(packageJsonPath, "utf8");
 const ciSource = readFileSync(ciPath, "utf8");
 
-const gsiCount = (dynamodbTf.match(/global_secondary_index\s*\{/g) ?? []).length;
-
 const hasGsi = (name, hashKey, rangeKey) => {
   const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const escapedHashKey = hashKey.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -30,56 +28,44 @@ const hasGsi = (name, hashKey, rangeKey) => {
 
 const checks = [
   {
-    name: "WardrobeTable が PK/SK 複合キーを定義している",
-    ok:
-      dynamodbTf.includes('resource "aws_dynamodb_table" "wardrobe"') &&
-      dynamodbTf.includes('hash_key     = "PK"') &&
-      dynamodbTf.includes('range_key    = "SK"'),
+    name: "StatusGenreListByCreatedAt GSI が追加されている",
+    ok: hasGsi("StatusGenreListByCreatedAt", "statusGenreListPk", "createdAtSk"),
   },
   {
-    name: "課題要件の4つのGSIが定義されている（追加GSIが存在してもよい）",
+    name: "status+genre GSI 用 attribute が定義されている",
+    ok:
+      dynamodbTf.includes('name = "statusGenreListPk"') &&
+      dynamodbTf.includes('name = "createdAtSk"'),
+  },
+  {
+    name: "既存4 GSI が維持されている",
     ok:
       hasGsi("StatusListByCreatedAt", "statusListPk", "createdSk") &&
       hasGsi("StatusListByWearCount", "statusListPk", "wearSk") &&
       hasGsi("StatusListByLastWornAt", "statusListPk", "lastWornSk") &&
-      hasGsi("HistoryByDate", "PK", "historyDateSk") &&
-      gsiCount >= 4,
-    detail: { gsiCount },
-  },
-  {
-    name: "on-demand (PAY_PER_REQUEST) が有効",
-    ok: dynamodbTf.includes('billing_mode = "PAY_PER_REQUEST"'),
-  },
-  {
-    name: "PITR が有効",
-    ok:
-      dynamodbTf.includes("point_in_time_recovery {") &&
-      dynamodbTf.includes("enabled = true"),
+      hasGsi("HistoryByDate", "PK", "historyDateSk"),
   },
   {
     name: "テストスクリプトが package.json と CI に登録されている",
     ok:
       packageJson.includes(
-        '"test:terraform-dynamodb-ms7-t01": "node scripts/check-terraform-dynamodb-ms7-t01-spec.mjs"',
+        '"test:terraform-dynamodb-ms7-t08": "node scripts/check-terraform-dynamodb-ms7-t08-spec.mjs"',
       ) &&
-      packageJson.includes("pnpm run test:terraform-dynamodb-ms7-t01") &&
-      ciSource.includes("pnpm --filter api test:terraform-dynamodb-ms7-t01"),
+      packageJson.includes("pnpm run test:terraform-dynamodb-ms7-t08") &&
+      ciSource.includes("pnpm --filter api test:terraform-dynamodb-ms7-t08"),
   },
 ];
 
 const failures = checks.filter((check) => !check.ok);
 if (failures.length > 0) {
-  console.error("BE-MS7-T01 dynamodb terraform spec failed:");
+  console.error("BE-MS7-T08 dynamodb status+genre GSI spec failed:");
   for (const failure of failures) {
     console.error(`- ${failure.name}`);
-    if (failure.detail) {
-      console.error(failure.detail);
-    }
   }
   process.exit(1);
 }
 
-console.log("BE-MS7-T01 dynamodb terraform spec passed");
+console.log("BE-MS7-T08 dynamodb status+genre GSI spec passed");
 for (const check of checks) {
   assert.ok(check.ok, check.name);
   console.log(`- ${check.name}`);

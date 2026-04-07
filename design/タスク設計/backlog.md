@@ -10,6 +10,6 @@
 - 優先度：A
   - チュートリアルの追加
   - CIの最適化
-  - 【リファクタ】服の一覧取得をジャンルごとの取得に修正
+  - 【リファクタ】服一覧の genre 指定を `StatusGenreListByCreatedAt`（status+genre GSI）で直接取得へ修正
 - 優先度：B
 - 優先度：C

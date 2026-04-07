@@ -1,10 +1,16 @@
 import { createDynamoDbClient, type DynamoDbClient, type DynamoDbKey } from "../../../clients/dynamodb.js";
 import type { ClothingEntity, ClothingEntityKey } from "../entities/clothing.js";
-import { buildClothingBaseKey, buildClothingIndexKeys, buildClothingStatusListPk } from "./clothingKeys.js";
-import type { ClothingStatus } from "../schema/clothingSchema.js";
+import {
+  buildClothingBaseKey,
+  buildClothingIndexKeys,
+  buildClothingStatusGenreListPk,
+  buildClothingStatusListPk,
+} from "./clothingKeys.js";
+import type { ClothingGenre, ClothingStatus } from "../schema/clothingSchema.js";
 
 export const clothingListIndexNames = {
   createdAt: "StatusListByCreatedAt",
+  statusGenreCreatedAt: "StatusGenreListByCreatedAt",
   wearCount: "StatusListByWearCount",
   lastWornAt: "StatusListByLastWornAt",
 } as const;
@@ -15,6 +21,7 @@ export type ClothingItem = ClothingEntity & {
   PK: string;
   SK: string;
   statusListPk: string;
+  statusGenreListPk: string;
   createdAtSk: string;
   wearCountSk: string;
   lastWornAtSk: string;
@@ -23,11 +30,12 @@ export type ClothingItem = ClothingEntity & {
 export type CreateClothingInput = ClothingEntity;
 export type UpdateClothingInput = ClothingEntity;
 export type GetClothingInput = ClothingEntityKey;
-export type DeleteClothingInput = ClothingEntityKey & { deletedAt: number };
+export type DeleteClothingInput = ClothingEntityKey & { deletedAt: number; genre: ClothingGenre };
 export type ListClothingInput = {
   wardrobeId: string;
   indexName: ClothingListIndexName;
   status?: ClothingStatus;
+  genre?: ClothingGenre;
   limit?: number;
   exclusiveStartKey?: DynamoDbKey;
   scanIndexForward?: boolean;
@@ -49,6 +57,18 @@ export function buildClothingListKey(input: { wardrobeId: string; status?: Cloth
   });
 }
 
+export function buildClothingGenreListKey(input: {
+  wardrobeId: string;
+  status?: ClothingStatus;
+  genre: ClothingGenre;
+}) {
+  return buildClothingStatusGenreListPk({
+    wardrobeId: input.wardrobeId,
+    status: input.status ?? "ACTIVE",
+    genre: input.genre,
+  });
+}
+
 export function createClothingRepo(client: DynamoDbClient = createDynamoDbClient()) {
   return {
     client,
@@ -65,15 +85,33 @@ export function createClothingRepo(client: DynamoDbClient = createDynamoDbClient
       });
     },
     async list(input: ListClothingInput) {
+      if (input.indexName === clothingListIndexNames.statusGenreCreatedAt) {
+        if (!input.genre) {
+          throw new Error("genre is required when querying StatusGenreListByCreatedAt");
+        }
+
+        return client.query({
+          IndexName: input.indexName,
+          KeyConditionExpression: "#statusGenreListPk = :statusGenreListPk",
+          ExpressionAttributeNames: { "#statusGenreListPk": "statusGenreListPk" },
+          ExpressionAttributeValues: {
+            ":statusGenreListPk": buildClothingGenreListKey({
+              wardrobeId: input.wardrobeId,
+              ...(input.status !== undefined ? { status: input.status } : {}),
+              genre: input.genre,
+            }),
+          },
+          ExclusiveStartKey: input.exclusiveStartKey,
+          Limit: input.limit,
+          ScanIndexForward: input.scanIndexForward,
+        });
+      }
+
       return client.query({
         IndexName: input.indexName,
         KeyConditionExpression: "#statusListPk = :statusListPk",
-        ExpressionAttributeNames: {
-          "#statusListPk": "statusListPk",
-        },
-        ExpressionAttributeValues: {
-          ":statusListPk": buildClothingListKey(input),
-        },
+        ExpressionAttributeNames: { "#statusListPk": "statusListPk" },
+        ExpressionAttributeValues: { ":statusListPk": buildClothingListKey(input) },
         ExclusiveStartKey: input.exclusiveStartKey,
         Limit: input.limit,
         ScanIndexForward: input.scanIndexForward,
@@ -94,6 +132,7 @@ export function createClothingRepo(client: DynamoDbClient = createDynamoDbClient
           "createdAt = :createdAt",
           "deletedAt = :deletedAt",
           "statusListPk = :statusListPk",
+          "statusGenreListPk = :statusGenreListPk",
           "createdAtSk = :createdAtSk",
           "wearCountSk = :wearCountSk",
           "lastWornAtSk = :lastWornAtSk",
@@ -114,6 +153,7 @@ export function createClothingRepo(client: DynamoDbClient = createDynamoDbClient
           ":createdAt": item.createdAt,
           ":deletedAt": item.deletedAt,
           ":statusListPk": item.statusListPk,
+          ":statusGenreListPk": item.statusGenreListPk,
           ":createdAtSk": item.createdAtSk,
           ":wearCountSk": item.wearCountSk,
           ":lastWornAtSk": item.lastWornAtSk,
@@ -124,7 +164,7 @@ export function createClothingRepo(client: DynamoDbClient = createDynamoDbClient
     async delete(input: DeleteClothingInput) {
       return client.updateItem({
         Key: buildClothingBaseKey(input),
-        UpdateExpression: "SET #status = :status, deletedAt = :deletedAt, statusListPk = :statusListPk",
+        UpdateExpression: "SET #status = :status, deletedAt = :deletedAt, statusListPk = :statusListPk, statusGenreListPk = :statusGenreListPk",
         ConditionExpression: "attribute_exists(PK)",
         ExpressionAttributeNames: {
           "#status": "status",
@@ -135,6 +175,11 @@ export function createClothingRepo(client: DynamoDbClient = createDynamoDbClient
           ":statusListPk": buildClothingStatusListPk({
             wardrobeId: input.wardrobeId,
             status: "DELETED",
+          }),
+          ":statusGenreListPk": buildClothingStatusGenreListPk({
+            wardrobeId: input.wardrobeId,
+            status: "DELETED",
+            genre: input.genre,
           }),
         },
         ReturnValues: "ALL_NEW",

@@ -1,5 +1,5 @@
 import type { ClothingEntityKey } from "../entities/clothing.js";
-import type { ClothingStatus } from "../schema/clothingSchema.js";
+import type { ClothingGenre, ClothingStatus } from "../schema/clothingSchema.js";
 
 const CLOTHING_PARTITION_SEGMENT = "CLOTH";
 const CREATED_AT_PREFIX = "CREATED";
@@ -15,6 +15,12 @@ export type ClothingBaseKey = {
 export type ClothingStatusListKeyInput = {
   wardrobeId: string;
   status: ClothingStatus;
+};
+
+export type ClothingStatusGenreListKeyInput = {
+  wardrobeId: string;
+  status: ClothingStatus;
+  genre: ClothingGenre;
 };
 
 export type ClothingSortKeyInput = {
@@ -33,6 +39,10 @@ export function buildClothingStatusListPk(input: ClothingStatusListKeyInput): st
   return `W#${input.wardrobeId}#${CLOTHING_PARTITION_SEGMENT}#${input.status}`;
 }
 
+export function buildClothingStatusGenreListPk(input: ClothingStatusGenreListKeyInput): string {
+  return `W#${input.wardrobeId}#${CLOTHING_PARTITION_SEGMENT}#${input.status}#GENRE#${input.genre}`;
+}
+
 export function buildClothingCreatedAtSk(input: ClothingSortKeyInput): string {
   return `${CREATED_AT_PREFIX}#${input.value}#${input.clothingId}`;
 }
@@ -46,6 +56,7 @@ export function buildClothingLastWornAtSk(input: ClothingSortKeyInput): string {
 }
 
 export function buildClothingIndexKeys(input: ClothingEntityKey & {
+  genre: ClothingGenre;
   status: ClothingStatus;
   createdAt: number;
   wearCount: number;
@@ -54,6 +65,7 @@ export function buildClothingIndexKeys(input: ClothingEntityKey & {
   return {
     ...buildClothingBaseKey(input),
     statusListPk: buildClothingStatusListPk(input),
+    statusGenreListPk: buildClothingStatusGenreListPk(input),
     createdAtSk: buildClothingCreatedAtSk({ clothingId: input.clothingId, value: input.createdAt }),
     wearCountSk: buildClothingWearCountSk({ clothingId: input.clothingId, value: input.wearCount }),
     lastWornAtSk: buildClothingLastWornAtSk({ clothingId: input.clothingId, value: input.lastWornAt }),

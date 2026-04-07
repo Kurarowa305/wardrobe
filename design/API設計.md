@@ -98,11 +98,13 @@
 | フィールド  | 型       | 説明             |
 | ------ | ------- | -------------- |
 | order  | string  | `asc` / `desc` |
+| genre  | string? | `tops` / `bottoms` / `others` |
 | limit  | number  | 取得件数 / 上限50件          |
 | cursor | string? | ページング時の開始位置(ResponseのnextCursorを渡す)          |
 
 ※本APIの cursor は、当該APIにおける並び順および取得条件を前提としたページング位置を示す。
 並び順または取得条件を変更した場合、cursor は使用できない。
+※ `genre` 指定時は DB の `status+genre` インデックスを使用し、絞り込み後の結果をページングする（サーバー側の後段filterは行わない）。
 
 ## Response
 | フィールド      | 型       | 説明             |
@@ -125,6 +127,7 @@
     {
       "clothingId": "cl_01HZZAAA",
       "name": "黒Tシャツ",
+      "genre": "tops",
       "imageKey": "clothing/black_t.png"
     }
   ],

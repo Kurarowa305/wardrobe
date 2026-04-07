@@ -20,6 +20,16 @@ resource "aws_dynamodb_table" "wardrobe" {
   }
 
   attribute {
+    name = "statusGenreListPk"
+    type = "S"
+  }
+
+  attribute {
+    name = "createdAtSk"
+    type = "S"
+  }
+
+  attribute {
     name = "createdSk"
     type = "S"
   }
@@ -43,6 +53,13 @@ resource "aws_dynamodb_table" "wardrobe" {
     name            = "StatusListByCreatedAt"
     hash_key        = "statusListPk"
     range_key       = "createdSk"
+    projection_type = "ALL"
+  }
+
+  global_secondary_index {
+    name            = "StatusGenreListByCreatedAt"
+    hash_key        = "statusGenreListPk"
+    range_key       = "createdAtSk"
     projection_type = "ALL"
   }
 

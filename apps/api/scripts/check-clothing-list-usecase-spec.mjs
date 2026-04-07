@@ -28,7 +28,7 @@ const repo = {
       LastEvaluatedKey: {
         PK: "W#wd_001#CLOTH",
         SK: "CLOTH#cl_002",
-        statusListPk: "W#wd_001#CLOTH#ACTIVE",
+        statusGenreListPk: "W#wd_001#CLOTH#ACTIVE#GENRE#bottoms",
         createdAtSk: "CREATED#1735690000123#cl_002",
       },
     };
@@ -63,7 +63,7 @@ await cursorUsecase.list({
       position: {
         PK: "W#wd_001#CLOTH",
         SK: "CLOTH#cl_010",
-        statusListPk: "W#wd_001#CLOTH#ACTIVE",
+        statusGenreListPk: "W#wd_001#CLOTH#ACTIVE#GENRE#tops",
         createdAtSk: "CREATED#1735699999999#cl_010",
       },
     }),
@@ -85,23 +85,26 @@ try {
 
 const checks = [
   {
-    name: "list usecase queries createdAt index with asc order, limit, and decoded ACTIVE cursor context",
+    name: "list usecase queries status+genre createdAt index with asc order, limit, and genre forwarding",
     ok:
       repoCalls.length === 1 &&
-      repoCalls[0].indexName === "StatusListByCreatedAt" &&
+      repoCalls[0].indexName === "StatusGenreListByCreatedAt" &&
+      repoCalls[0].genre === "bottoms" &&
       repoCalls[0].limit === 5 &&
       repoCalls[0].scanIndexForward === true &&
       repoCalls[0].exclusiveStartKey === undefined,
     detail: repoCalls,
   },
   {
-    name: "list usecase filters items by genre and exposes nextCursor envelope",
+    name: "list usecase keeps repo result as-is and exposes nextCursor envelope with genre filter context",
     ok:
-      listResult.items.length === 1 &&
-      listResult.items[0].clothingId === "cl_002" &&
+      listResult.items.length === 2 &&
+      listResult.items[0].clothingId === "cl_001" &&
+      listResult.items[1].clothingId === "cl_002" &&
       decodedCursor.resource === "clothing-list" &&
       decodedCursor.order === "asc" &&
       decodedCursor.filters.genre === "bottoms" &&
+      decodedCursor.position.statusGenreListPk === "W#wd_001#CLOTH#ACTIVE#GENRE#bottoms" &&
       decodedCursor.position.createdAtSk === "CREATED#1735690000123#cl_002",
     detail: { listResult, decodedCursor },
   },
@@ -109,6 +112,8 @@ const checks = [
     name: "list usecase decodes cursor and forwards it as ExclusiveStartKey on subsequent requests",
     ok:
       repoWithCursorCalls.length === 1 &&
+      repoWithCursorCalls[0].indexName === "StatusGenreListByCreatedAt" &&
+      repoWithCursorCalls[0].genre === "tops" &&
       repoWithCursorCalls[0].scanIndexForward === false &&
       repoWithCursorCalls[0].exclusiveStartKey.createdAtSk === "CREATED#1735699999999#cl_010",
     detail: repoWithCursorCalls,
