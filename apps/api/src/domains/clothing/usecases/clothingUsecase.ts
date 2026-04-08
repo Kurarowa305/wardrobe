@@ -128,6 +128,10 @@ function isClothingStatus(value: unknown): value is ClothingItem["status"] {
   return value === "ACTIVE" || value === "DELETED";
 }
 
+function isClothingGenre(value: unknown): value is ClothingGenre {
+  return value === "tops" || value === "bottoms" || value === "others";
+}
+
 function extractItems(result: ClothingListQueryResult): ClothingItem[] {
   const candidates = result.Items ?? result.items;
   if (!Array.isArray(candidates)) {
@@ -219,7 +223,7 @@ function extractClothingItem(result: RepoGetResult): ClothingItem | null {
   return candidate;
 }
 
-function extractClothingItemWithBackwardCompatibility(result: RepoGetResult): ClothingItem | null {
+function extractClothingItemWithBackwardCompatibility(result: RepoGetResult): ClothingDetailResponseDto | null {
   if (!isRecord(result)) {
     return null;
   }
@@ -229,25 +233,16 @@ function extractClothingItemWithBackwardCompatibility(result: RepoGetResult): Cl
     return null;
   }
 
+  const listCandidate = candidate;
   const detailCandidate = candidate as Record<string, unknown>;
   return {
-    wardrobeId: typeof detailCandidate.wardrobeId === "string" ? detailCandidate.wardrobeId : "",
-    clothingId: detailCandidate.clothingId,
-    name: detailCandidate.name,
-    genre: detailCandidate.genre as ClothingItem["genre"],
-    imageKey: detailCandidate.imageKey,
+    clothingId: listCandidate.clothingId,
+    name: listCandidate.name,
+    genre: isClothingGenre(listCandidate.genre) ? listCandidate.genre : "others",
+    imageKey: listCandidate.imageKey,
     status: isClothingStatus(detailCandidate.status) ? detailCandidate.status : "ACTIVE",
     wearCount: typeof detailCandidate.wearCount === "number" ? detailCandidate.wearCount : 0,
     lastWornAt: typeof detailCandidate.lastWornAt === "number" ? detailCandidate.lastWornAt : 0,
-    ...(typeof detailCandidate.createdAt === "number" ? { createdAt: detailCandidate.createdAt } : {}),
-    ...(typeof detailCandidate.deletedAt === "number" ? { deletedAt: detailCandidate.deletedAt } : {}),
-    ...(typeof detailCandidate.PK === "string" ? { PK: detailCandidate.PK } : {}),
-    ...(typeof detailCandidate.SK === "string" ? { SK: detailCandidate.SK } : {}),
-    ...(typeof detailCandidate.statusListPk === "string" ? { statusListPk: detailCandidate.statusListPk } : {}),
-    ...(typeof detailCandidate.statusGenreListPk === "string" ? { statusGenreListPk: detailCandidate.statusGenreListPk } : {}),
-    ...(typeof detailCandidate.createdAtSk === "string" ? { createdAtSk: detailCandidate.createdAtSk } : {}),
-    ...(typeof detailCandidate.wearCountSk === "string" ? { wearCountSk: detailCandidate.wearCountSk } : {}),
-    ...(typeof detailCandidate.lastWornAtSk === "string" ? { lastWornAtSk: detailCandidate.lastWornAtSk } : {}),
   };
 }
 
@@ -331,7 +326,7 @@ export function createClothingUsecase(dependencies: ClothingUsecaseDependencies 
         });
       }
 
-      return toClothingDetail(item);
+      return item;
     },
     async update(input: UpdateClothingUsecaseInput): Promise<void> {
       const currentResult = await repo.get({
