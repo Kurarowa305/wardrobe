@@ -39,9 +39,9 @@ const checks = [
   {
     name: "課題要件の4つのGSIが定義されている（追加GSIが存在してもよい）",
     ok:
-      hasGsi("StatusListByCreatedAt", "statusListPk", "createdSk") &&
-      hasGsi("StatusListByWearCount", "statusListPk", "wearSk") &&
-      hasGsi("StatusListByLastWornAt", "statusListPk", "lastWornSk") &&
+      hasGsi("StatusListByCreatedAt", "statusListPk", "createdAtSk") &&
+      hasGsi("StatusListByWearCount", "statusListPk", "wearCountSk") &&
+      hasGsi("StatusListByLastWornAt", "statusListPk", "lastWornAtSk") &&
       hasGsi("HistoryByDate", "PK", "historyDateSk") &&
       gsiCount >= 4,
     detail: { gsiCount },

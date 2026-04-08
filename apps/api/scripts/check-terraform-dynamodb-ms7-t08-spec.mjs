@@ -40,9 +40,9 @@ const checks = [
   {
     name: "既存4 GSI が維持されている",
     ok:
-      hasGsi("StatusListByCreatedAt", "statusListPk", "createdSk") &&
-      hasGsi("StatusListByWearCount", "statusListPk", "wearSk") &&
-      hasGsi("StatusListByLastWornAt", "statusListPk", "lastWornSk") &&
+      hasGsi("StatusListByCreatedAt", "statusListPk", "createdAtSk") &&
+      hasGsi("StatusListByWearCount", "statusListPk", "wearCountSk") &&
+      hasGsi("StatusListByLastWornAt", "statusListPk", "lastWornAtSk") &&
       hasGsi("HistoryByDate", "PK", "historyDateSk"),
   },
   {

@@ -30,17 +30,12 @@ resource "aws_dynamodb_table" "wardrobe" {
   }
 
   attribute {
-    name = "createdSk"
+    name = "wearCountSk"
     type = "S"
   }
 
   attribute {
-    name = "wearSk"
-    type = "S"
-  }
-
-  attribute {
-    name = "lastWornSk"
+    name = "lastWornAtSk"
     type = "S"
   }
 
@@ -52,7 +47,7 @@ resource "aws_dynamodb_table" "wardrobe" {
   global_secondary_index {
     name            = "StatusListByCreatedAt"
     hash_key        = "statusListPk"
-    range_key       = "createdSk"
+    range_key       = "createdAtSk"
     projection_type = "ALL"
   }
 
@@ -66,14 +61,14 @@ resource "aws_dynamodb_table" "wardrobe" {
   global_secondary_index {
     name            = "StatusListByWearCount"
     hash_key        = "statusListPk"
-    range_key       = "wearSk"
+    range_key       = "wearCountSk"
     projection_type = "ALL"
   }
 
   global_secondary_index {
     name            = "StatusListByLastWornAt"
     hash_key        = "statusListPk"
-    range_key       = "lastWornSk"
+    range_key       = "lastWornAtSk"
     projection_type = "ALL"
   }
 
