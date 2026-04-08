@@ -18,15 +18,15 @@ locals {
     ]
     clothing = [
       "ANY /wardrobes/{wardrobeId}/clothing",
-      "ANY /wardrobes/{wardrobeId}/clothing/{proxy+}"
+      "ANY /wardrobes/{wardrobeId}/clothing/{clothingId}"
     ]
     template = [
       "ANY /wardrobes/{wardrobeId}/templates",
-      "ANY /wardrobes/{wardrobeId}/templates/{proxy+}"
+      "ANY /wardrobes/{wardrobeId}/templates/{templateId}"
     ]
     history = [
       "ANY /wardrobes/{wardrobeId}/histories",
-      "ANY /wardrobes/{wardrobeId}/histories/{proxy+}"
+      "ANY /wardrobes/{wardrobeId}/histories/{historyId}"
     ]
     presign = [
       "ANY /wardrobes/{wardrobeId}/images/presign",
