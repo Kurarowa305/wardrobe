@@ -124,6 +124,14 @@ function isClothingDetailItem(value: unknown): value is ClothingItem {
     && typeof candidate.lastWornAt === "number";
 }
 
+function isClothingStatus(value: unknown): value is ClothingItem["status"] {
+  return value === "ACTIVE" || value === "DELETED";
+}
+
+function isClothingGenre(value: unknown): value is ClothingGenre {
+  return value === "tops" || value === "bottoms" || value === "others";
+}
+
 function extractItems(result: ClothingListQueryResult): ClothingItem[] {
   const candidates = result.Items ?? result.items;
   if (!Array.isArray(candidates)) {
@@ -215,6 +223,29 @@ function extractClothingItem(result: RepoGetResult): ClothingItem | null {
   return candidate;
 }
 
+function extractClothingItemWithBackwardCompatibility(result: RepoGetResult): ClothingDetailResponseDto | null {
+  if (!isRecord(result)) {
+    return null;
+  }
+
+  const candidate = (result as { Item?: unknown; item?: unknown }).Item ?? (result as { item?: unknown }).item;
+  if (!isClothingListItem(candidate)) {
+    return null;
+  }
+
+  const listCandidate = candidate;
+  const detailCandidate = candidate as Record<string, unknown>;
+  return {
+    clothingId: listCandidate.clothingId,
+    name: listCandidate.name,
+    genre: isClothingGenre(listCandidate.genre) ? listCandidate.genre : "others",
+    imageKey: listCandidate.imageKey,
+    status: isClothingStatus(detailCandidate.status) ? detailCandidate.status : "ACTIVE",
+    wearCount: typeof detailCandidate.wearCount === "number" ? detailCandidate.wearCount : 0,
+    lastWornAt: typeof detailCandidate.lastWornAt === "number" ? detailCandidate.lastWornAt : 0,
+  };
+}
+
 function toClothingDetail(item: ClothingItem): ClothingDetailResponseDto {
   return {
     clothingId: item.clothingId,
@@ -282,7 +313,7 @@ export function createClothingUsecase(dependencies: ClothingUsecaseDependencies 
         wardrobeId: input.wardrobeId,
         clothingId: input.clothingId,
       });
-      const item = extractClothingItem(result);
+      const item = extractClothingItemWithBackwardCompatibility(result);
 
       if (!item) {
         throw createAppError("NOT_FOUND", {
@@ -295,7 +326,7 @@ export function createClothingUsecase(dependencies: ClothingUsecaseDependencies 
         });
       }
 
-      return toClothingDetail(item);
+      return item;
     },
     async update(input: UpdateClothingUsecaseInput): Promise<void> {
       const currentResult = await repo.get({

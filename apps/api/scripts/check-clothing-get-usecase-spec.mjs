@@ -44,6 +44,51 @@ const usecase = createClothingUsecase({
 
 const result = await usecase.get({ wardrobeId: "wd_001", clothingId: "cl_001" });
 
+const backwardCompatibleResult = await createClothingUsecase({
+  repo: {
+    async get(input) {
+      return {
+        Item: {
+          wardrobeId: input.wardrobeId,
+          clothingId: input.clothingId,
+          name: "白シャツ",
+          genre: "tops",
+          imageKey: null,
+        },
+      };
+    },
+    async list() {
+      return { Items: [], LastEvaluatedKey: null };
+    },
+    async create() {
+      return { ok: true };
+    },
+  },
+}).get({ wardrobeId: "wd_legacy", clothingId: "cl_legacy" });
+
+const backwardCompatibleDeletedResult = await createClothingUsecase({
+  repo: {
+    async get(input) {
+      return {
+        Item: {
+          wardrobeId: input.wardrobeId,
+          clothingId: input.clothingId,
+          name: "古いコート",
+          genre: "outer",
+          imageKey: null,
+          status: "DELETED",
+        },
+      };
+    },
+    async list() {
+      return { Items: [], LastEvaluatedKey: null };
+    },
+    async create() {
+      return { ok: true };
+    },
+  },
+}).get({ wardrobeId: "wd_legacy", clothingId: "cl_deleted" });
+
 let notFoundCode = null;
 try {
   await createClothingUsecase({
@@ -87,9 +132,28 @@ const checks = [
     detail: notFoundCode,
   },
   {
+    name: "get usecase defaults status/wearCount/lastWornAt for backward compatibility",
+    ok:
+      backwardCompatibleResult.clothingId === "cl_legacy" &&
+      backwardCompatibleResult.status === "ACTIVE" &&
+      backwardCompatibleResult.wearCount === 0 &&
+      backwardCompatibleResult.lastWornAt === 0,
+    detail: backwardCompatibleResult,
+  },
+  {
+    name: "get usecase keeps DELETED status while defaulting missing counters",
+    ok:
+      backwardCompatibleDeletedResult.clothingId === "cl_deleted" &&
+      backwardCompatibleDeletedResult.status === "DELETED" &&
+      backwardCompatibleDeletedResult.wearCount === 0 &&
+      backwardCompatibleDeletedResult.lastWornAt === 0,
+    detail: backwardCompatibleDeletedResult,
+  },
+  {
     name: "source exports get usecase flow plus package script / CI wiring",
     ok:
       source.includes("async get(input: GetClothingUsecaseInput)") &&
+      source.includes("extractClothingItemWithBackwardCompatibility") &&
       packageJson.includes('"test:clothing-get-usecase": "node --import tsx/esm scripts/check-clothing-get-usecase-spec.mjs"') &&
       ciSource.includes("pnpm --filter api test:clothing-get-usecase"),
     detail: { packageJson, ciSource },
