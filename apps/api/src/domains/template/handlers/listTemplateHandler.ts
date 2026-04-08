@@ -11,9 +11,15 @@ import {
 import { createTemplateUsecase, type TemplateUsecaseDependencies } from "../usecases/templateUsecase.js";
 
 const templateListQuerySchema = z.object({
-  order: templateListOrderSchema.optional(),
-  limit: z.coerce.number().int().min(1).max(templateListLimitMax).optional(),
-  cursor: z.string().trim().min(1).optional(),
+  order: z.preprocess((value) => Array.isArray(value) ? value[0] : value, templateListOrderSchema.optional()),
+  limit: z.preprocess(
+    (value) => Array.isArray(value) ? value[0] : value,
+    z.coerce.number().int().min(1).max(templateListLimitMax).optional(),
+  ),
+  cursor: z.preprocess(
+    (value) => Array.isArray(value) ? value[0] : value,
+    z.string().trim().min(1).optional(),
+  ),
 }).strict();
 
 export const listTemplateRequestSchema = {

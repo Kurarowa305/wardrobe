@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { encodeCursor } from "../src/core/cursor/index.ts";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -14,6 +15,17 @@ const packageJson = readFileSync(packageJsonPath, "utf8");
 const ciSource = readFileSync(ciPath, "utf8");
 
 const { listTemplateHandler } = await import(handlerModulePath);
+const encodedCursor = encodeCursor({
+  resource: "template-list",
+  order: "asc",
+  filters: {},
+  position: {
+    PK: "W#wd_001#TPL",
+    SK: "TPL#tp_003",
+    statusListPk: "W#wd_001#TPL#ACTIVE",
+    createdAtSk: "CREATED#1735690000999#tp_003",
+  },
+});
 
 const usecaseCalls = [];
 const response = await listTemplateHandler({
@@ -46,6 +58,29 @@ const response = await listTemplateHandler({
   },
 });
 
+const arrayQueryCalls = [];
+const arrayQueryResponse = await listTemplateHandler({
+  path: { wardrobeId: "wd_001" },
+  query: { order: ["asc", "desc"], limit: ["3", "9"], cursor: [encodedCursor, "cursor_002"] },
+  requestId: "req_template_handler_array_query",
+  dependencies: {
+    repo: {
+      async list(input) {
+        arrayQueryCalls.push(input);
+        return {
+          Items: [],
+          LastEvaluatedKey: null,
+        };
+      },
+    },
+    clothingBatchGetRepo: {
+      async batchGetByIds() {
+        return [];
+      },
+    },
+  },
+});
+
 let validationCode = null;
 try {
   await listTemplateHandler({
@@ -58,6 +93,7 @@ try {
 }
 
 const responseJson = JSON.parse(response.body);
+const arrayQueryResponseJson = JSON.parse(arrayQueryResponse.body);
 
 const checks = [
   {
@@ -78,6 +114,17 @@ const checks = [
       usecaseCalls[0].limit === 2 &&
       usecaseCalls[0].scanIndexForward === false,
     detail: usecaseCalls,
+  },
+  {
+    name: "list handler accepts array query values from multi-value query strings and uses first value",
+    ok:
+      arrayQueryResponse.statusCode === 200 &&
+      arrayQueryResponseJson.items.length === 0 &&
+      arrayQueryCalls.length === 1 &&
+      arrayQueryCalls[0].limit === 3 &&
+      arrayQueryCalls[0].scanIndexForward === true &&
+      typeof arrayQueryCalls[0].exclusiveStartKey?.PK === "string",
+    detail: { arrayQueryResponse, arrayQueryResponseJson, arrayQueryCalls },
   },
   {
     name: "list handler rejects invalid wardrobeId/limit with VALIDATION_ERROR",
