@@ -184,6 +184,9 @@ jobs:
       - name: API clothing get usecase spec test
         run: pnpm --filter api test:clothing-get-usecase
 
+      - name: API clothing get backward compatibility spec test
+        run: pnpm --filter api test:clothing-get-backward-compat
+
       - name: API clothing get handler spec test
         run: pnpm --filter api test:clothing-get-handler
 

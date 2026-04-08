@@ -124,6 +124,10 @@ function isClothingDetailItem(value: unknown): value is ClothingItem {
     && typeof candidate.lastWornAt === "number";
 }
 
+function isClothingStatus(value: unknown): value is ClothingItem["status"] {
+  return value === "ACTIVE" || value === "DELETED";
+}
+
 function extractItems(result: ClothingListQueryResult): ClothingItem[] {
   const candidates = result.Items ?? result.items;
   if (!Array.isArray(candidates)) {
@@ -215,6 +219,38 @@ function extractClothingItem(result: RepoGetResult): ClothingItem | null {
   return candidate;
 }
 
+function extractClothingItemWithBackwardCompatibility(result: RepoGetResult): ClothingItem | null {
+  if (!isRecord(result)) {
+    return null;
+  }
+
+  const candidate = (result as { Item?: unknown; item?: unknown }).Item ?? (result as { item?: unknown }).item;
+  if (!isClothingListItem(candidate)) {
+    return null;
+  }
+
+  const detailCandidate = candidate as Record<string, unknown>;
+  return {
+    wardrobeId: typeof detailCandidate.wardrobeId === "string" ? detailCandidate.wardrobeId : "",
+    clothingId: detailCandidate.clothingId,
+    name: detailCandidate.name,
+    genre: detailCandidate.genre as ClothingItem["genre"],
+    imageKey: detailCandidate.imageKey,
+    status: isClothingStatus(detailCandidate.status) ? detailCandidate.status : "ACTIVE",
+    wearCount: typeof detailCandidate.wearCount === "number" ? detailCandidate.wearCount : 0,
+    lastWornAt: typeof detailCandidate.lastWornAt === "number" ? detailCandidate.lastWornAt : 0,
+    ...(typeof detailCandidate.createdAt === "number" ? { createdAt: detailCandidate.createdAt } : {}),
+    ...(typeof detailCandidate.deletedAt === "number" ? { deletedAt: detailCandidate.deletedAt } : {}),
+    ...(typeof detailCandidate.PK === "string" ? { PK: detailCandidate.PK } : {}),
+    ...(typeof detailCandidate.SK === "string" ? { SK: detailCandidate.SK } : {}),
+    ...(typeof detailCandidate.statusListPk === "string" ? { statusListPk: detailCandidate.statusListPk } : {}),
+    ...(typeof detailCandidate.statusGenreListPk === "string" ? { statusGenreListPk: detailCandidate.statusGenreListPk } : {}),
+    ...(typeof detailCandidate.createdAtSk === "string" ? { createdAtSk: detailCandidate.createdAtSk } : {}),
+    ...(typeof detailCandidate.wearCountSk === "string" ? { wearCountSk: detailCandidate.wearCountSk } : {}),
+    ...(typeof detailCandidate.lastWornAtSk === "string" ? { lastWornAtSk: detailCandidate.lastWornAtSk } : {}),
+  };
+}
+
 function toClothingDetail(item: ClothingItem): ClothingDetailResponseDto {
   return {
     clothingId: item.clothingId,
@@ -282,7 +318,7 @@ export function createClothingUsecase(dependencies: ClothingUsecaseDependencies 
         wardrobeId: input.wardrobeId,
         clothingId: input.clothingId,
       });
-      const item = extractClothingItem(result);
+      const item = extractClothingItemWithBackwardCompatibility(result);
 
       if (!item) {
         throw createAppError("NOT_FOUND", {
