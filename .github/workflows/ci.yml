@@ -76,6 +76,9 @@ jobs:
       - name: API lambda entry spec test
         run: pnpm --filter api test:lambda-entry
 
+      - name: API lambda detail routing spec test
+        run: pnpm --filter api test:lambda-detail-routing
+
       - name: API wardrobe repo spec test
         run: pnpm --filter api test:wardrobe-repo
 
