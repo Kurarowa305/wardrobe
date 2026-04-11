@@ -53,6 +53,15 @@ const buildDailyKeyString = (wardrobeId, target, date) => {
 
 const hasUnsupportedArithmeticInConditionExpression = (conditionExpression) => /\s[+-]\s/.test(conditionExpression);
 
+const resolveOperationKey = (item) => {
+  const key = item?.ConditionCheck?.Key
+    ?? item?.Delete?.Key
+    ?? item?.Update?.Key
+    ?? (item?.Put?.Item ? { PK: item.Put.Item.PK, SK: item.Put.Item.SK } : null);
+
+  return key?.PK && key?.SK ? `${key.PK}|${key.SK}` : null;
+};
+
 const createState = () => {
   const baseItems = new Map([
     ["W#wd_001#TPL|TPL#tp_001", { PK: "W#wd_001#TPL", SK: "TPL#tp_001", templateId: "tp_001", wearCount: 2, lastWornAt: toEpochMs("20260103") }],
@@ -122,6 +131,13 @@ const createDependencies = (state) => ({
   },
   async transactWriteItems(items) {
     state.transactCalls.push(items);
+
+    const operationKeys = items.map(resolveOperationKey).filter(Boolean);
+    if (new Set(operationKeys).size !== operationKeys.length) {
+      const error = new Error("Transaction request cannot include multiple operations on one item");
+      error.name = "ValidationException";
+      throw error;
+    }
 
     const localItems = new Map(state.items);
     const localDaily = new Map(state.wearDaily);

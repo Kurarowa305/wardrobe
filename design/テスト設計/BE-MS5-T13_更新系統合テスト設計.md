@@ -14,6 +14,7 @@
 - delete 後に create で作成した daily カウンタが削除される（件数 0 到達時）。
 - delete 後に `lastWornAt` が直近過去日へ再計算される。
 - 疑似 `transactWriteItems` が `ConditionExpression` 内の算術演算を `ValidationException` として拒否し、本番 DynamoDB との乖離を防ぐ。
+- 疑似 `transactWriteItems` が同一 item への複数操作を `ValidationException` として拒否し、本番 DynamoDB の制約乖離を防ぐ。
 - package script と CI workflow から当該統合テストを実行できる。
 
 ## テストケース
@@ -44,7 +45,13 @@
   - 現行 create/delete シナリオが `ValidationException` なしで通る。
   - 未来の回帰で `ConditionExpression` に算術演算が再導入された場合、統合テストが失敗する。
 
-### HMS5INT-04 導線: package script と CI で実行できる
+### HMS5INT-04 回帰防止: 同一 item への複数操作を統合テストで検知できる
+- 疑似 `transactWriteItems` は同一 `PK/SK` へ複数の `Put` / `Update` / `Delete` / `ConditionCheck` が含まれる場合、`ValidationException` を throw する。
+- 期待値:
+  - 現行 create/delete シナリオが `ValidationException` なしで通る。
+  - 将来 `ConditionCheck` と `Update` の併用などが再導入された場合、統合テストが失敗する。
+
+### HMS5INT-05 導線: package script と CI で実行できる
 
 - `apps/api/package.json` に `test:history-ms5-write-integration` が定義されている。
 - `.github/workflows/ci.yml` に `pnpm --filter api test:history-ms5-write-integration` が含まれる。

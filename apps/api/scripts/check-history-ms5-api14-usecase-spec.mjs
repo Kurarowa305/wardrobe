@@ -66,15 +66,32 @@ const clothingCall = transactCalls[1] ?? [];
 const hasHistoryPut = (items) =>
   items.some((item) => item?.Put?.Item?.historyId === "hs_custom" && item?.Put?.ConditionExpression?.includes("attribute_not_exists"));
 
-const hasTemplateConditionCheck = (items) =>
-  items.some((item) => item?.ConditionCheck?.Key?.SK === "TPL#tp_001" && item?.ConditionCheck?.ConditionExpression === "attribute_exists(PK)");
-
-const hasClothingConditionChecks = (items) =>
-  items.filter((item) => item?.ConditionCheck?.Key?.SK?.startsWith("CLOTH#")).length === 2;
+const hasNoConditionChecks = (items) => items.every((item) => item?.ConditionCheck === undefined);
 
 const hasStatsWriteUpdates = (items) =>
   items.some((item) => item?.Update?.Key?.PK?.includes("#COUNT#"))
   && items.some((item) => item?.Update?.UpdateExpression?.includes("wearCount"));
+
+const getOperationKey = (item) => {
+  const key = item?.ConditionCheck?.Key
+    ?? item?.Delete?.Key
+    ?? item?.Update?.Key
+    ?? (item?.Put?.Item ? { PK: item.Put.Item.PK, SK: item.Put.Item.SK } : null);
+
+  return key?.PK && key?.SK ? `${key.PK}|${key.SK}` : null;
+};
+
+const hasUniqueOperationKeys = (items) => {
+  const keys = items.map(getOperationKey).filter(Boolean);
+  return new Set(keys).size === keys.length;
+};
+
+const hasTemplateExistenceGuardOnUpdate = (items) =>
+  items.some((item) => item?.Update?.Key?.SK === "TPL#tp_001" && item?.Update?.ConditionExpression === "attribute_exists(PK)");
+
+const hasClothingExistenceGuardsOnUpdate = (items) =>
+  items.filter((item) => item?.Update?.Key?.SK?.startsWith("CLOTH#") && item?.Update?.ConditionExpression === "attribute_exists(PK)")
+    .length === 2;
 
 const hasSafeConditionExpressions = (items) =>
   items
@@ -98,19 +115,23 @@ const checks = [
     detail: duplicateCode,
   },
   {
-    name: "API-14 template flow builds one transact with history Put + template existence check + stats updates",
+    name: "API-14 template flow builds one transact with history Put + update-based existence guard + stats updates",
     ok:
       hasHistoryPut(templateCall)
-      && hasTemplateConditionCheck(templateCall)
+      && hasNoConditionChecks(templateCall)
+      && hasUniqueOperationKeys(templateCall)
+      && hasTemplateExistenceGuardOnUpdate(templateCall)
       && hasStatsWriteUpdates(templateCall)
       && hasSafeConditionExpressions(templateCall),
     detail: templateCall,
   },
   {
-    name: "API-14 clothing flow builds one transact with history Put + clothing existence checks + stats updates",
+    name: "API-14 clothing flow builds one transact with update-based existence guards + unique item operations",
     ok:
       hasHistoryPut(clothingCall)
-      && hasClothingConditionChecks(clothingCall)
+      && hasNoConditionChecks(clothingCall)
+      && hasUniqueOperationKeys(clothingCall)
+      && hasClothingExistenceGuardsOnUpdate(clothingCall)
       && hasStatsWriteUpdates(clothingCall)
       && hasSafeConditionExpressions(clothingCall),
     detail: clothingCall,

@@ -26,14 +26,18 @@
 - 観点: 履歴作成と統計更新の同一トランザクション化
 - 期待結果:
   - `history Put` を含む
-  - `template` 存在確認の `ConditionCheck` を含む
+  - `ConditionCheck` を使わない
+  - `template` 更新の `ConditionExpression=attribute_exists(PK)` で存在確認を兼ねる
+  - 同一 `PK/SK` への複数操作を含まない
   - `wearDaily` 更新 + 統計キャッシュ更新（`wearCount` / `lastWornAt`）を含む
 
 ### HMS5API14-04 clothing入力の作成トランザクションを1回で構築できる
 - 観点: templateなし入力でも同様に同一トランザクションで処理できるか
 - 期待結果:
   - `history Put` を含む
-  - 各 `clothing` の存在確認 `ConditionCheck` を含む
+  - `ConditionCheck` を使わない
+  - 各 `clothing` 更新の `ConditionExpression=attribute_exists(PK)` で存在確認を兼ねる
+  - 同一 `PK/SK` への複数操作を含まない
   - `wearDaily` 更新 + 統計キャッシュ更新（`wearCount` / `lastWornAt`）を含む
 
 ### HMS5API14-05 package script と CI 導線が維持される
