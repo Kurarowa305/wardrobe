@@ -5,6 +5,7 @@
 
 ## 対象
 - `apps/api/src/domains/clothing/usecases/clothingUsecase.ts`
+- `apps/api/src/domains/clothing/dto/clothingDetailDto.ts`
 - `apps/api/scripts/check-clothing-get-backward-compat-spec.mjs`
 - CI ジョブ（`.github/workflows/ci.yml`）の API テストステップ
 
@@ -39,8 +40,9 @@
 ### API05-BC-03 実装と CI 配線の退行防止
 - 観点: 後方互換ロジックと CI 実行が維持されるか
 - 入力:
-  - usecase ソース、`apps/api/package.json`、`.github/workflows/ci.yml` を静的検査
+  - usecase ソース、共通 DTO helper、`apps/api/package.json`、`.github/workflows/ci.yml` を静的検査
 - 期待結果:
-  - `extractClothingItemWithBackwardCompatibility` と補完式が存在する
+  - `clothingUsecase.ts` に `extractClothingItemWithBackwardCompatibility` と `toClothingDetailResponseDto` の利用が存在する
+  - `clothingDetailDto.ts` に `status` / `wearCount` / `lastWornAt` の補完式が存在する
   - `test:clothing-get-backward-compat` が package script に存在する
   - CI で `pnpm --filter api test:clothing-get-backward-compat` が実行される

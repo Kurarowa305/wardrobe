@@ -7,9 +7,11 @@ const __dirname = path.dirname(__filename);
 const root = path.resolve(__dirname, "..");
 
 const usecaseModulePath = path.join(root, "src/domains/clothing/usecases/clothingUsecase.ts");
+const detailDtoModulePath = path.join(root, "src/domains/clothing/dto/clothingDetailDto.ts");
 const packageJsonPath = path.join(root, "package.json");
 const ciPath = path.join(root, "../../.github/workflows/ci.yml");
 const source = readFileSync(usecaseModulePath, "utf8");
+const detailDtoSource = readFileSync(detailDtoModulePath, "utf8");
 const packageJson = readFileSync(packageJsonPath, "utf8");
 const ciSource = readFileSync(ciPath, "utf8");
 
@@ -75,12 +77,14 @@ const checks = [
     name: "source and package/CI wiring include backward compatibility path",
     ok:
       source.includes("extractClothingItemWithBackwardCompatibility") &&
-      source.includes('status: isClothingStatus(detailCandidate.status) ? detailCandidate.status : "ACTIVE"') &&
-      source.includes('wearCount: typeof detailCandidate.wearCount === "number" ? detailCandidate.wearCount : 0') &&
-      source.includes('lastWornAt: typeof detailCandidate.lastWornAt === "number" ? detailCandidate.lastWornAt : 0') &&
+      source.includes("toClothingDetailResponseDto") &&
+      detailDtoSource.includes("export function toClothingDetailResponseDto") &&
+      detailDtoSource.includes('status: isClothingStatus(detailCandidate.status) ? detailCandidate.status : "ACTIVE"') &&
+      detailDtoSource.includes('wearCount: typeof detailCandidate.wearCount === "number" ? detailCandidate.wearCount : 0') &&
+      detailDtoSource.includes('lastWornAt: typeof detailCandidate.lastWornAt === "number" ? detailCandidate.lastWornAt : 0') &&
       packageJson.includes('"test:clothing-get-backward-compat": "node --import tsx/esm scripts/check-clothing-get-backward-compat-spec.mjs"') &&
       ciSource.includes("pnpm --filter api test:clothing-get-backward-compat"),
-    detail: { packageJson, ciSource },
+    detail: { detailDtoSource, packageJson, ciSource },
   },
 ];
 
