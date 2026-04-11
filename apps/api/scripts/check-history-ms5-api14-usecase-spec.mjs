@@ -76,6 +76,11 @@ const hasStatsWriteUpdates = (items) =>
   items.some((item) => item?.Update?.Key?.PK?.includes("#COUNT#"))
   && items.some((item) => item?.Update?.UpdateExpression?.includes("wearCount"));
 
+const hasSafeConditionExpressions = (items) =>
+  items
+    .flatMap((item) => item?.Update?.ConditionExpression ? [item.Update.ConditionExpression] : [])
+    .every((expression) => !expression.includes(" + ") && !expression.includes(" - "));
+
 const checks = [
   {
     name: "API-14 usecase returns generated historyId",
@@ -97,7 +102,8 @@ const checks = [
     ok:
       hasHistoryPut(templateCall)
       && hasTemplateConditionCheck(templateCall)
-      && hasStatsWriteUpdates(templateCall),
+      && hasStatsWriteUpdates(templateCall)
+      && hasSafeConditionExpressions(templateCall),
     detail: templateCall,
   },
   {
@@ -105,7 +111,8 @@ const checks = [
     ok:
       hasHistoryPut(clothingCall)
       && hasClothingConditionChecks(clothingCall)
-      && hasStatsWriteUpdates(clothingCall),
+      && hasStatsWriteUpdates(clothingCall)
+      && hasSafeConditionExpressions(clothingCall),
     detail: clothingCall,
   },
   {

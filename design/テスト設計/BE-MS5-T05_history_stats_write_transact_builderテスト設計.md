@@ -23,19 +23,33 @@
 - 期待結果:
   - `UpdateExpression` が `if_not_exists + :countDelta` で構成される
   - `:countDelta = 1` が渡される
+  - create 用 `ConditionExpression` に `#count + :countDelta` のような算術演算を含めない
 
-### HSWT-03 delete 用に wearCount 減分 + lastWornAt 再計算値を反映できる
+### HSWT-03 create 用 cache 更新が item 存在確認のみで加算できる
+- 観点: template / clothing 統計更新で正の増分時に不要な条件式エラーを起こさないこと
+- 期待結果:
+  - cache 更新 item の `ConditionExpression` が `attribute_exists(PK)` になる
+  - 正の増分時に `:requiredWearCount` のような減算用ガード値を要求しない
+
+### HSWT-04 delete 用に wearCount 減分 + lastWornAt 再計算値を反映できる
 - 観点: 完了条件「delete用 items を生成できる」を満たすこと
 - 期待結果:
+  - wearDaily 更新 item の `ConditionExpression` が `attribute_exists(#count) AND #count >= :requiredCount` になる
+  - cache 更新 item の `ConditionExpression` が `attribute_exists(PK) AND wearCount >= :requiredWearCount` になる
   - cache 更新 item で `:wearCountDelta = -1`
   - 再計算済み `:lastWornAt` が反映される
 
-### HSWT-04 recompute resolver 未指定時に明示的に失敗する
+### HSWT-05 生成される ConditionExpression に算術演算を含めない
+- 観点: DynamoDB の条件式構文に反する `+` / `-` を CI で早期検知できること
+- 期待結果:
+  - create/delete いずれの stats update item でも `ConditionExpression` に算術演算子を含めない
+
+### HSWT-06 recompute resolver 未指定時に明示的に失敗する
 - 観点: delete 時の再計算依存を見落とさない安全性
 - 期待結果:
   - `lastWornAt recompute result is required` を含む例外が発生する
 
-### HSWT-05 package script と CI 導線が維持される
+### HSWT-07 package script と CI 導線が維持される
 - 観点: PR 上で自動検証される実行導線の担保
 - 期待結果:
   - `apps/api/package.json` に `test:history-stats-write-transact-builder` が定義される

@@ -33,13 +33,16 @@ const buildWearDailyUpdateItem = (fact: WearDailyFact): TransactWriteItem => ({
       date: fact.date,
     }),
     UpdateExpression: "SET #count = if_not_exists(#count, :zero) + :countDelta",
-    ConditionExpression: "attribute_not_exists(#count) OR #count + :countDelta >= :zero",
+    ...(fact.count < 0
+      ? { ConditionExpression: "attribute_exists(#count) AND #count >= :requiredCount" }
+      : {}),
     ExpressionAttributeNames: {
       "#count": "count",
     },
     ExpressionAttributeValues: {
       ":zero": 0,
       ":countDelta": fact.count,
+      ...(fact.count < 0 ? { ":requiredCount": Math.abs(fact.count) } : {}),
     },
   },
 });
@@ -61,11 +64,14 @@ const buildCacheUpdateItem = (
       Key: buildStatsTargetBaseKey(fact),
       UpdateExpression:
         "SET wearCount = if_not_exists(wearCount, :zero) + :wearCountDelta, lastWornAt = :lastWornAt",
-      ConditionExpression: "attribute_exists(PK) AND wearCount + :wearCountDelta >= :zero",
+      ConditionExpression: fact.wearCountDelta < 0
+        ? "attribute_exists(PK) AND wearCount >= :requiredWearCount"
+        : "attribute_exists(PK)",
       ExpressionAttributeValues: {
         ":zero": 0,
         ":wearCountDelta": fact.wearCountDelta,
         ":lastWornAt": nextLastWornAt,
+        ...(fact.wearCountDelta < 0 ? { ":requiredWearCount": Math.abs(fact.wearCountDelta) } : {}),
       },
     },
   };
