@@ -271,14 +271,9 @@ export type LambdaAdapterOptions = {
   logger?: StructuredLogger;
 };
 
-function extractErrorCode(response: { body: string; json?: unknown }): ErrorCode | undefined {
-  const source = "json" in response ? response.json : undefined;
-  if (source && typeof source === "object" && "error" in source) {
-    const error = (source as { error?: unknown }).error;
-    if (error && typeof error === "object" && "code" in error) {
-      const code = (error as { code?: unknown }).code;
-      return isErrorCode(code) ? code : undefined;
-    }
+function extractLoggableResponseBody(response: { body: string; json?: unknown }): unknown {
+  if ("json" in response && response.json !== undefined) {
+    return response.json;
   }
 
   if (!response.body) {
@@ -286,19 +281,24 @@ function extractErrorCode(response: { body: string; json?: unknown }): ErrorCode
   }
 
   try {
-    const parsed = JSON.parse(response.body) as unknown;
-    if (parsed && typeof parsed === "object" && "error" in parsed) {
-      const error = (parsed as { error?: unknown }).error;
-      if (error && typeof error === "object" && "code" in error) {
-        const code = (error as { code?: unknown }).code;
-        return isErrorCode(code) ? code : undefined;
-      }
-    }
+    return JSON.parse(response.body) as unknown;
   } catch {
+    return response.body;
+  }
+}
+
+function extractErrorCode(responseBody: unknown): ErrorCode | undefined {
+  if (!responseBody || typeof responseBody !== "object" || !("error" in responseBody)) {
     return undefined;
   }
 
-  return undefined;
+  const error = (responseBody as { error?: unknown }).error;
+  if (!error || typeof error !== "object" || !("code" in error)) {
+    return undefined;
+  }
+
+  const code = (error as { code?: unknown }).code;
+  return isErrorCode(code) ? code : undefined;
 }
 
 export function createLambdaHandler(options: LambdaAdapterOptions) {
@@ -337,14 +337,18 @@ export function createLambdaHandler(options: LambdaAdapterOptions) {
         headers,
       });
       const statusCode = response.statusCode;
-      const errorCode = extractErrorCode(response);
+      const errorResponseBody = statusCode >= 400 ? extractLoggableResponseBody(response) : undefined;
+      const errorCode = extractErrorCode(errorResponseBody);
 
       logRequest(
         logger,
         logContext,
-        errorCode
-          ? { statusCode, durationMs: measureDurationMs(startTime), errorCode }
-          : { statusCode, durationMs: measureDurationMs(startTime) },
+        {
+          statusCode,
+          durationMs: measureDurationMs(startTime),
+          ...(errorCode ? { errorCode } : {}),
+          ...(errorResponseBody !== undefined ? { errorResponseBody } : {}),
+        },
       );
 
       return {
@@ -362,6 +366,7 @@ export function createLambdaHandler(options: LambdaAdapterOptions) {
       logRequest(logger, logContext, {
         ...errorOutcome,
         durationMs: measureDurationMs(startTime),
+        errorResponseBody: response.json,
       });
 
       return {

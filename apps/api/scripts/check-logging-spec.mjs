@@ -52,13 +52,27 @@ const errorEntry = createRequestLogEntry(
     statusCode: 400,
     durationMs: 12,
     errorCode: "VALIDATION_ERROR",
+    errorResponseBody: {
+      error: {
+        code: "VALIDATION_ERROR",
+        message: "Validation failed",
+        requestId: "req_002",
+      },
+    },
   },
   { timestamp, message: "request_failed" },
 );
 assert.equal(errorEntry.level, "error");
 assert.equal(errorEntry.errorCode, "VALIDATION_ERROR");
+assert.deepEqual(errorEntry.errorResponseBody, {
+  error: {
+    code: "VALIDATION_ERROR",
+    message: "Validation failed",
+    requestId: "req_002",
+  },
+});
 assert.equal(errorEntry.message, "request_failed");
-console.log("- error logs include errorCode and switch level to error");
+console.log("- error logs include errorCode and optional errorResponseBody");
 
 assert.equal(
   serializeLogEntry(successEntry),

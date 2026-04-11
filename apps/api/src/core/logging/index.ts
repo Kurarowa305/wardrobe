@@ -14,6 +14,7 @@ export type LogOutcome = {
   statusCode: number;
   durationMs: number;
   errorCode?: ErrorCode;
+  errorResponseBody?: unknown;
 };
 
 export type RequestLogEntry = {
@@ -28,6 +29,7 @@ export type RequestLogEntry = {
   statusCode: number;
   durationMs: number;
   errorCode?: ErrorCode;
+  errorResponseBody?: unknown;
 };
 
 export type CreateRequestLogEntryOptions = {
@@ -60,6 +62,7 @@ export function createRequestLogEntry(
     statusCode: outcome.statusCode,
     durationMs: outcome.durationMs,
     ...(outcome.errorCode ? { errorCode: outcome.errorCode } : {}),
+    ...(outcome.errorResponseBody !== undefined ? { errorResponseBody: outcome.errorResponseBody } : {}),
   };
 }
 
