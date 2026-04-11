@@ -27,6 +27,6 @@ export function buildHistoryDateSk(input: HistoryDateSortKeyInput): string {
 export function buildHistoryIndexKeys(input: HistoryEntityKey & { date: string }) {
   return {
     ...buildHistoryBaseKey(input),
-    dateSk: buildHistoryDateSk({ date: input.date, historyId: input.historyId }),
+    historyDateSk: buildHistoryDateSk({ date: input.date, historyId: input.historyId }),
   };
 }

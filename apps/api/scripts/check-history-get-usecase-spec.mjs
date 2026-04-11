@@ -29,7 +29,7 @@ const usecase = createHistoryUsecase({
         Item: {
           PK: "W#wd_001#HIST",
           SK: "HIST#hs_001",
-          dateSk: "DATE#20260105#hs_001",
+          historyDateSk: "DATE#20260105#hs_001",
           wardrobeId: "wd_001",
           historyId: "hs_001",
           date: "20260105",

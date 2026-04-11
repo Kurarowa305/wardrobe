@@ -16,7 +16,7 @@ const historyListResource = "history-list";
 export type HistoryListCursorPosition = {
   PK: string;
   SK: string;
-  dateSk: string;
+  historyDateSk: string;
 };
 
 export type ListHistoryUsecaseInput = {
@@ -125,7 +125,11 @@ function extractLastEvaluatedKey(result: HistoryListQueryResult): HistoryListCur
   }
 
   const position = Object.fromEntries(positionEntries) as HistoryListCursorPosition;
-  if (typeof position.PK !== "string" || typeof position.SK !== "string" || typeof position.dateSk !== "string") {
+  if (
+    typeof position.PK !== "string"
+    || typeof position.SK !== "string"
+    || typeof position.historyDateSk !== "string"
+  ) {
     return null;
   }
 

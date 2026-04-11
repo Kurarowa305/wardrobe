@@ -43,7 +43,7 @@ const listResult = await repoClient.list({
   to: "20251231",
   order: "desc",
   limit: 15,
-  exclusiveStartKey: { PK: item.PK, SK: item.SK, dateSk: item.dateSk },
+  exclusiveStartKey: { PK: item.PK, SK: item.SK, historyDateSk: item.historyDateSk },
 });
 const deleteResult = await repoClient.delete({ wardrobeId: entity.wardrobeId, historyId: entity.historyId });
 
@@ -53,7 +53,7 @@ const checks = [
     ok:
       item.PK === "W#wd_01HZZAAA#HIST" &&
       item.SK === "HIST#hs_01HZZBBB" &&
-      item.dateSk === "DATE#20260101#hs_01HZZBBB",
+      item.historyDateSk === "DATE#20260101#hs_01HZZBBB",
     detail: item,
   },
   {
@@ -84,13 +84,14 @@ const checks = [
     ok:
       listResult.operation === "Query" &&
       listResult.request.input.IndexName === "HistoryByDate" &&
-      listResult.request.input.KeyConditionExpression === "#PK = :PK AND #dateSk BETWEEN :fromDateSk AND :toDateSk" &&
+      listResult.request.input.KeyConditionExpression
+        === "#PK = :PK AND #historyDateSk BETWEEN :fromDateSk AND :toDateSk" &&
       listResult.request.input.ExpressionAttributeValues[":PK"] === "W#wd_01HZZAAA#HIST" &&
       listResult.request.input.ExpressionAttributeValues[":fromDateSk"] === "DATE#20251201#" &&
       listResult.request.input.ExpressionAttributeValues[":toDateSk"] === "DATE#20251231#~" &&
       listResult.request.input.ScanIndexForward === false &&
       listResult.request.input.Limit === 15 &&
-      listResult.request.input.ExclusiveStartKey.dateSk === "DATE#20260101#hs_01HZZBBB",
+      listResult.request.input.ExclusiveStartKey.historyDateSk === "DATE#20260101#hs_01HZZBBB",
     detail: listResult,
   },
   {

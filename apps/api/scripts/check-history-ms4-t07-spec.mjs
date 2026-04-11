@@ -46,7 +46,7 @@ const repoListResult = await repoClient.list({
   exclusiveStartKey: {
     PK: "W#wd_001#HIST",
     SK: "HIST#hs_001",
-    dateSk: "DATE#20260101#hs_001",
+    historyDateSk: "DATE#20260101#hs_001",
   },
 });
 
@@ -62,7 +62,7 @@ const sharedDependencies = {
           {
             PK: "W#wd_001#HIST",
             SK: "HIST#hs_101",
-            dateSk: "DATE#20260110#hs_101",
+            historyDateSk: "DATE#20260110#hs_101",
             wardrobeId: "wd_001",
             historyId: "hs_101",
             date: "20260110",
@@ -73,7 +73,7 @@ const sharedDependencies = {
           {
             PK: "W#wd_001#HIST",
             SK: "HIST#hs_102",
-            dateSk: "DATE#20260111#hs_102",
+            historyDateSk: "DATE#20260111#hs_102",
             wardrobeId: "wd_001",
             historyId: "hs_102",
             date: "20260111",
@@ -85,7 +85,7 @@ const sharedDependencies = {
         LastEvaluatedKey: {
           PK: "W#wd_001#HIST",
           SK: "HIST#hs_102",
-          dateSk: "DATE#20260111#hs_102",
+          historyDateSk: "DATE#20260111#hs_102",
         },
       };
     },
@@ -95,7 +95,7 @@ const sharedDependencies = {
           Item: {
             PK: "W#wd_001#HIST",
             SK: "HIST#hs_101",
-            dateSk: "DATE#20260110#hs_101",
+            historyDateSk: "DATE#20260110#hs_101",
             wardrobeId: "wd_001",
             historyId: "hs_101",
             date: "20260110",
@@ -110,7 +110,7 @@ const sharedDependencies = {
         Item: {
           PK: "W#wd_001#HIST",
           SK: "HIST#hs_102",
-          dateSk: "DATE#20260111#hs_102",
+          historyDateSk: "DATE#20260111#hs_102",
           wardrobeId: "wd_001",
           historyId: "hs_102",
           date: "20260111",
@@ -219,7 +219,7 @@ const validCursor = encodeCursor({
   position: {
     PK: "W#wd_001#HIST",
     SK: "HIST#hs_001",
-    dateSk: "DATE#20260101#hs_001",
+    historyDateSk: "DATE#20260101#hs_001",
   },
 });
 
@@ -277,18 +277,22 @@ const checks = [
     name: "history repo list supports from/to date range query and forwards order/limit/cursor",
     ok:
       repoListResult.operation === "Query"
+      && repoListResult.request.input.KeyConditionExpression
+        === "#PK = :PK AND #historyDateSk BETWEEN :fromDateSk AND :toDateSk"
+      && repoListResult.request.input.ExpressionAttributeNames["#historyDateSk"] === "historyDateSk"
       && repoListResult.request.input.ExpressionAttributeValues[":fromDateSk"] === "DATE#20260101#"
       && repoListResult.request.input.ExpressionAttributeValues[":toDateSk"] === "DATE#20260131#~"
       && repoListResult.request.input.ScanIndexForward === true
       && repoListResult.request.input.Limit === 5
-      && repoListResult.request.input.ExclusiveStartKey?.SK === "HIST#hs_001",
+      && repoListResult.request.input.ExclusiveStartKey?.SK === "HIST#hs_001"
+      && repoListResult.request.input.ExclusiveStartKey?.historyDateSk === "DATE#20260101#hs_001",
     detail: repoListResult,
   },
   {
     name: "history list usecase keeps cursor consistency and supports template/combo entries",
     ok:
       listCalls.length >= 1
-      && listCalls[0]?.exclusiveStartKey?.dateSk === "DATE#20260101#hs_001"
+      && listCalls[0]?.exclusiveStartKey?.historyDateSk === "DATE#20260101#hs_001"
       && resolveManyCalls.length >= 1
       && usecaseResult.items.length === 2
       && usecaseResult.items[0]?.name === "通勤テンプレ"

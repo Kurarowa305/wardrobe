@@ -12,18 +12,18 @@
 - `.github/workflows/ci.yml`
 
 ## テスト観点
-1. `buildHistoryItem` が entity に `PK` / `SK` / `dateSk` を付与する。
+1. `buildHistoryItem` が entity に `PK` / `SK` / `historyDateSk` を付与する。
 2. `buildHistoryDateRange` がデフォルト範囲（`00000000`〜`99999999`）と、`from/to` 指定範囲の双方を生成できる。
 3. `buildHistoryPartitionKey` が `W#<wardrobeId>#HIST` を返す。
 4. `get` が base key への `ConsistentRead=true` の `GetItem` を構築する。
-5. `list` が `HistoryByDate` に対して `PK + dateSk BETWEEN` を使い、`order/limit/exclusiveStartKey` を透過する。
+5. `list` が `HistoryByDate` に対して `PK + historyDateSk BETWEEN` を使い、`order/limit/exclusiveStartKey` を透過する。
 6. `delete` が `attribute_exists(PK)` ガード付きの物理削除トランザクションを構築する。
 7. `package.json` と CI に `test:history-repo` が追加されている。
 
 ## テストケース
 | No. | 観点 | 入力/操作 | 期待結果 |
 | --- | --- | --- | --- |
-| 1 | item構築 | History entity を `buildHistoryItem` に渡す | `PK=W#...#HIST` / `SK=HIST#...` / `dateSk=DATE#<date>#<historyId>` |
+| 1 | item構築 | History entity を `buildHistoryItem` に渡す | `PK=W#...#HIST` / `SK=HIST#...` / `historyDateSk=DATE#<date>#<historyId>` |
 | 2 | 日付範囲 | `buildHistoryDateRange({})` と `buildHistoryDateRange({ from, to })` | デフォルト範囲と指定範囲を正しく返す |
 | 3 | パーティションキー | `buildHistoryPartitionKey({ wardrobeId })` | `W#<wardrobeId>#HIST` を返す |
 | 4 | get | `get({ wardrobeId, historyId })` | `GetItem` / `ConsistentRead=true` |

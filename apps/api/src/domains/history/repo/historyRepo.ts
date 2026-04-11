@@ -11,7 +11,7 @@ const HISTORY_MAX_DATE = "99999999";
 export type HistoryItem = HistoryEntity & {
   PK: string;
   SK: string;
-  dateSk: string;
+  historyDateSk: string;
 };
 
 export type GetHistoryInput = HistoryEntityKey;
@@ -72,10 +72,10 @@ export function createHistoryRepo(client: DynamoDbClient = createDynamoDbClient(
 
       return client.query({
         IndexName: historyListIndexName,
-        KeyConditionExpression: "#PK = :PK AND #dateSk BETWEEN :fromDateSk AND :toDateSk",
+        KeyConditionExpression: "#PK = :PK AND #historyDateSk BETWEEN :fromDateSk AND :toDateSk",
         ExpressionAttributeNames: {
           "#PK": "PK",
-          "#dateSk": "dateSk",
+          "#historyDateSk": "historyDateSk",
         },
         ExpressionAttributeValues: {
           ":PK": buildHistoryPartitionKey({ wardrobeId: input.wardrobeId }),

@@ -12,7 +12,7 @@ const repo = {
         {
           PK: "W#wd_001#HIST",
           SK: "HIST#hs_002",
-          dateSk: "DATE#20260102#hs_002",
+          historyDateSk: "DATE#20260102#hs_002",
           wardrobeId: "wd_001",
           historyId: "hs_002",
           date: "20260102",
@@ -24,7 +24,7 @@ const repo = {
       LastEvaluatedKey: {
         PK: "W#wd_001#HIST",
         SK: "HIST#hs_002",
-        dateSk: "DATE#20260102#hs_002",
+        historyDateSk: "DATE#20260102#hs_002",
       },
     };
   },
@@ -74,7 +74,7 @@ const cursor = encodeCursor({
   position: {
     PK: "W#wd_001#HIST",
     SK: "HIST#hs_001",
-    dateSk: "DATE#20260101#hs_001",
+    historyDateSk: "DATE#20260101#hs_001",
   },
 });
 
@@ -113,7 +113,7 @@ const checks = [
       && listCalls[0]?.to === "20260131"
       && listCalls[0]?.order === "asc"
       && listCalls[0]?.limit === 10
-      && listCalls[0]?.exclusiveStartKey?.dateSk === "DATE#20260101#hs_001",
+      && listCalls[0]?.exclusiveStartKey?.historyDateSk === "DATE#20260101#hs_001",
     detail: listCalls,
   },
   {

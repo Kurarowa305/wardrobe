@@ -25,13 +25,13 @@
 - 入力: `date=20260101`, `historyId=hs_01HZZBBB`
 - 観点: 完了条件「DATE#<date>#<historyId> 用キー」を満たすこと
 - 期待結果:
-  - `dateSk = DATE#20260101#hs_01HZZBBB`
+  - `historyDateSk = DATE#20260101#hs_01HZZBBB`
 
 ### HKB-03: repository 更新に必要なキー群をまとめて生成できる
 - 入力: `wardrobeId`, `historyId`, `date`
 - 観点: base key と date 用キーを1回で組み立てられること
 - 期待結果:
-  - `PK`, `SK`, `dateSk` を返す
+  - `PK`, `SK`, `historyDateSk` を返す
 
 ### HKB-04: package script と CI に組み込まれている
 - 観点: テストスクリプトがローカル集約テストと GitHub Actions `CI` の両方で継続実行されること

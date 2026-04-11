@@ -18,7 +18,7 @@ const baseKey = keyModule.buildHistoryBaseKey({
   wardrobeId: "wd_01HZZAAA",
   historyId: "hs_01HZZBBB",
 });
-const dateSk = keyModule.buildHistoryDateSk({
+const historyDateSk = keyModule.buildHistoryDateSk({
   date: "20260101",
   historyId: "hs_01HZZBBB",
 });
@@ -36,15 +36,15 @@ const checks = [
   },
   {
     name: "date sort key uses DATE#<date>#<historyId>",
-    ok: dateSk === "DATE#20260101#hs_01HZZBBB",
-    detail: dateSk,
+    ok: historyDateSk === "DATE#20260101#hs_01HZZBBB",
+    detail: historyDateSk,
   },
   {
     name: "composite builder returns base and date index key for list query",
     ok:
       compositeKeys.PK === "W#wd_01HZZAAA#HIST" &&
       compositeKeys.SK === "HIST#hs_01HZZBBB" &&
-      compositeKeys.dateSk === "DATE#20260101#hs_01HZZBBB",
+      compositeKeys.historyDateSk === "DATE#20260101#hs_01HZZBBB",
     detail: compositeKeys,
   },
   {

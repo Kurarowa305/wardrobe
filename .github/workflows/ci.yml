@@ -214,6 +214,9 @@ jobs:
       - name: API history repo spec test
         run: pnpm --filter api test:history-repo
 
+      - name: API history date GSI alignment spec test
+        run: pnpm --filter api test:history-date-gsi-alignment
+
       - name: API history details resolver spec test
         run: pnpm --filter api test:history-details-resolver
 
