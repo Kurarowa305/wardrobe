@@ -84,6 +84,9 @@ try {
   missingRecomputeError = String(error);
 }
 
+const conditionExpressions = [...createItems, ...deleteItems]
+  .flatMap((item) => item?.Update?.ConditionExpression ? [item.Update.ConditionExpression] : []);
+
 const checks = [
   {
     name: "create 用に wearDaily + cache 更新の TransactWriteItems を組み立てられる",
@@ -96,19 +99,36 @@ const checks = [
     detail: createItems,
   },
   {
-    name: "create 用 wearDaily 更新式が count 増分（if_not_exists 付き）になっている",
+    name: "create 用 wearDaily 更新式は count 増分で、条件式に算術演算を含めない",
     ok:
       createItems[0]?.Update?.UpdateExpression === "SET #count = if_not_exists(#count, :zero) + :countDelta"
+      && createItems[0]?.Update?.ConditionExpression === undefined
       && createItems[0]?.Update?.ExpressionAttributeValues?.[":countDelta"] === 1,
     detail: createItems[0],
   },
   {
-    name: "delete 用は wearCount 減分と再計算済み lastWornAt を同時に反映できる",
+    name: "create 用 cache 更新は item 存在確認のみで加算できる",
+    ok:
+      createItems[2]?.Update?.ConditionExpression === "attribute_exists(PK)"
+      && createItems[2]?.Update?.ExpressionAttributeValues?.[":requiredWearCount"] === undefined,
+    detail: createItems[2],
+  },
+  {
+    name: "delete 用は減算ガードと再計算済み lastWornAt を同時に反映できる",
     ok:
       deleteItems.length === 2
+      && deleteItems[0]?.Update?.ConditionExpression === "attribute_exists(#count) AND #count >= :requiredCount"
+      && deleteItems[0]?.Update?.ExpressionAttributeValues?.[":requiredCount"] === 1
+      && deleteItems[1]?.Update?.ConditionExpression === "attribute_exists(PK) AND wearCount >= :requiredWearCount"
+      && deleteItems[1]?.Update?.ExpressionAttributeValues?.[":requiredWearCount"] === 1
       && deleteItems[1]?.Update?.ExpressionAttributeValues?.[":wearCountDelta"] === -1
       && deleteItems[1]?.Update?.ExpressionAttributeValues?.[":lastWornAt"] === Date.UTC(2026, 0, 2, 0, 0, 0, 0),
     detail: deleteItems,
+  },
+  {
+    name: "生成される ConditionExpression に算術演算子を含めない",
+    ok: conditionExpressions.every((expression) => !expression.includes(" + ") && !expression.includes(" - ")),
+    detail: conditionExpressions,
   },
   {
     name: "recompute モードで resolver 未指定の場合は明示的に失敗する",

@@ -13,6 +13,7 @@
 - delete 後に `template` / `clothing` の `wearCount` がベースラインへ戻る。
 - delete 後に create で作成した daily カウンタが削除される（件数 0 到達時）。
 - delete 後に `lastWornAt` が直近過去日へ再計算される。
+- 疑似 `transactWriteItems` が `ConditionExpression` 内の算術演算を `ValidationException` として拒否し、本番 DynamoDB との乖離を防ぐ。
 - package script と CI workflow から当該統合テストを実行できる。
 
 ## テストケース
@@ -37,7 +38,13 @@
   - clothing daily `DATE#20260106` は create で作成、delete で削除。
   - clothing `lastWornAt` は create 日へ更新後、delete で過去日へ再計算される。
 
-### HMS5INT-03 導線: package script と CI で実行できる
+### HMS5INT-03 回帰防止: ConditionExpression の文法違反を統合テストで検知できる
+- 疑似 `transactWriteItems` は `ConditionExpression` に `+` / `-` の算術演算が含まれる場合、`ValidationException` を throw する。
+- 期待値:
+  - 現行 create/delete シナリオが `ValidationException` なしで通る。
+  - 未来の回帰で `ConditionExpression` に算術演算が再導入された場合、統合テストが失敗する。
+
+### HMS5INT-04 導線: package script と CI で実行できる
 
 - `apps/api/package.json` に `test:history-ms5-write-integration` が定義されている。
 - `.github/workflows/ci.yml` に `pnpm --filter api test:history-ms5-write-integration` が含まれる。

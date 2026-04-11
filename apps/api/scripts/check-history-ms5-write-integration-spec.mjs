@@ -51,6 +51,8 @@ const buildDailyKeyString = (wardrobeId, target, date) => {
   return `W#${wardrobeId}#COUNT#${segment}#${target.id}|DATE#${date}`;
 };
 
+const hasUnsupportedArithmeticInConditionExpression = (conditionExpression) => /\s[+-]\s/.test(conditionExpression);
+
 const createState = () => {
   const baseItems = new Map([
     ["W#wd_001#TPL|TPL#tp_001", { PK: "W#wd_001#TPL", SK: "TPL#tp_001", templateId: "tp_001", wearCount: 2, lastWornAt: toEpochMs("20260103") }],
@@ -126,6 +128,17 @@ const createDependencies = (state) => ({
     const localHistories = new Map(state.histories);
 
     for (const item of items) {
+      const conditionExpression = item.ConditionCheck?.ConditionExpression
+        ?? item.Delete?.ConditionExpression
+        ?? item.Put?.ConditionExpression
+        ?? item.Update?.ConditionExpression;
+      if (typeof conditionExpression === "string" && hasUnsupportedArithmeticInConditionExpression(conditionExpression)) {
+        const operator = conditionExpression.includes(" + ") ? "+" : "-";
+        const error = new Error(`Invalid ConditionExpression: Syntax error; token: "${operator}", near: "${conditionExpression}"`);
+        error.name = "ValidationException";
+        throw error;
+      }
+
       if (item.ConditionCheck) {
         const key = `${item.ConditionCheck.Key.PK}|${item.ConditionCheck.Key.SK}`;
         if (!localItems.has(key)) {
