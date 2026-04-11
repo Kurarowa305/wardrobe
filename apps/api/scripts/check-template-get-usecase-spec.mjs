@@ -7,9 +7,11 @@ const __dirname = path.dirname(__filename);
 const root = path.resolve(__dirname, "..");
 
 const usecaseModulePath = path.join(root, "src/domains/template/usecases/templateUsecase.ts");
+const detailDtoModulePath = path.join(root, "src/domains/clothing/dto/clothingDetailDto.ts");
 const packageJsonPath = path.join(root, "package.json");
 const ciPath = path.join(root, "../../.github/workflows/ci.yml");
 const source = readFileSync(usecaseModulePath, "utf8");
+const detailDtoSource = readFileSync(detailDtoModulePath, "utf8");
 const packageJson = readFileSync(packageJsonPath, "utf8");
 const ciSource = readFileSync(ciPath, "utf8");
 
@@ -61,6 +63,16 @@ const usecase = createTemplateUsecase({
                 status: "DELETED",
                 wearCount: 4,
                 lastWornAt: 1735000000000,
+                PK: "W#wd_001#CLOTH",
+                SK: "CLOTH#cl_003",
+                wardrobeId: "wd_001",
+                createdAt: 1734900000000,
+                deletedAt: 1735800000000,
+                statusListPk: "W#wd_001#CLOTH#DELETED",
+                statusGenreListPk: "W#wd_001#CLOTH#DELETED#GENRE#others",
+                createdAtSk: "CREATED#1734900000000#cl_003",
+                wearCountSk: "WEAR#0000000004#cl_003",
+                lastWornAtSk: "LASTWORN#1735000000000#cl_003",
               },
               {
                 clothingId: "cl_001",
@@ -70,6 +82,16 @@ const usecase = createTemplateUsecase({
                 status: "ACTIVE",
                 wearCount: 10,
                 lastWornAt: 1735689600000,
+                PK: "W#wd_001#CLOTH",
+                SK: "CLOTH#cl_001",
+                wardrobeId: "wd_001",
+                createdAt: 1735500000000,
+                deletedAt: null,
+                statusListPk: "W#wd_001#CLOTH#ACTIVE",
+                statusGenreListPk: "W#wd_001#CLOTH#ACTIVE#GENRE#tops",
+                createdAtSk: "CREATED#1735500000000#cl_001",
+                wearCountSk: "WEAR#0000000010#cl_001",
+                lastWornAtSk: "LASTWORN#1735689600000#cl_001",
               },
               {
                 clothingId: "cl_002",
@@ -79,6 +101,16 @@ const usecase = createTemplateUsecase({
                 status: "ACTIVE",
                 wearCount: 11,
                 lastWornAt: 1735603200000,
+                PK: "W#wd_001#CLOTH",
+                SK: "CLOTH#cl_002",
+                wardrobeId: "wd_001",
+                createdAt: 1735400000000,
+                deletedAt: null,
+                statusListPk: "W#wd_001#CLOTH#ACTIVE",
+                statusGenreListPk: "W#wd_001#CLOTH#ACTIVE#GENRE#bottoms",
+                createdAtSk: "CREATED#1735400000000#cl_002",
+                wearCountSk: "WEAR#0000000011#cl_002",
+                lastWornAtSk: "LASTWORN#1735603200000#cl_002",
               },
             ],
           },
@@ -91,6 +123,53 @@ const usecase = createTemplateUsecase({
 const result = await usecase.get({
   wardrobeId: "wd_001",
   templateId: "tp_001",
+});
+
+const backwardCompatibleResult = await createTemplateUsecase({
+  repo: {
+    async list() {
+      return { Items: [], LastEvaluatedKey: undefined };
+    },
+    async create() {
+      return {};
+    },
+    async get() {
+      return {
+        Item: {
+          wardrobeId: "wd_legacy",
+          templateId: "tp_legacy",
+          name: "旧テンプレ",
+          clothingIds: ["cl_legacy"],
+        },
+      };
+    },
+  },
+  clothingBatchGetRepo: {
+    async batchGetByIds() {
+      return [
+        {
+          Responses: {
+            WardrobeTable: [
+              {
+                clothingId: "cl_legacy",
+                name: "旧Tシャツ",
+                genre: "tops",
+                imageKey: null,
+                status: "ACTIVE",
+                wearCount: 2,
+                lastWornAt: 1735000000000,
+                PK: "W#wd_legacy#CLOTH",
+                SK: "CLOTH#cl_legacy",
+              },
+            ],
+          },
+        },
+      ];
+    },
+  },
+}).get({
+  wardrobeId: "wd_legacy",
+  templateId: "tp_legacy",
 });
 
 let notFoundCode = null;
@@ -132,13 +211,24 @@ const checks = [
       result.clothingItems.length === 3 &&
       result.clothingItems[0].clothingId === "cl_001" &&
       result.clothingItems[1].clothingId === "cl_002" &&
-      result.clothingItems[2].clothingId === "cl_003",
+      result.clothingItems[2].clothingId === "cl_003" &&
+      !Object.hasOwn(result.clothingItems[0], "PK") &&
+      !Object.hasOwn(result.clothingItems[0], "statusListPk"),
     detail: result,
   },
   {
     name: "get usecase can include deleted clothing as status=DELETED",
     ok: result.clothingItems.some((item) => item.clothingId === "cl_003" && item.status === "DELETED"),
     detail: result,
+  },
+  {
+    name: "get usecase defaults missing template status and counters for backward compatibility",
+    ok:
+      backwardCompatibleResult.name === "旧テンプレ" &&
+      backwardCompatibleResult.status === "ACTIVE" &&
+      backwardCompatibleResult.wearCount === 0 &&
+      backwardCompatibleResult.lastWornAt === 0,
+    detail: backwardCompatibleResult,
   },
   {
     name: "get usecase reads template clothingIds through clothing batch-get",
@@ -157,9 +247,11 @@ const checks = [
     name: "source exports template get usecase and package / CI wiring",
     ok:
       source.includes("async get(input: GetTemplateUsecaseInput)") &&
+      source.includes("toClothingDetailResponseDto") &&
+      detailDtoSource.includes("export function toClothingDetailResponseDto") &&
       packageJson.includes('"test:template-get-usecase": "node --import tsx/esm scripts/check-template-get-usecase-spec.mjs"') &&
       ciSource.includes("pnpm --filter api test:template-get-usecase"),
-    detail: { packageJson, ciSource },
+    detail: { detailDtoSource, packageJson, ciSource },
   },
 ];
 

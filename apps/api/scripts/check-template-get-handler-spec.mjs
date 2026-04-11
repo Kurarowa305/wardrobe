@@ -62,6 +62,16 @@ const response = await getTemplateHandler({
                   status: "DELETED",
                   wearCount: 3,
                   lastWornAt: 1735603200000,
+                  PK: "W#wd_001#CLOTH",
+                  SK: "CLOTH#cl_002",
+                  wardrobeId: "wd_001",
+                  createdAt: 1735500000000,
+                  deletedAt: 1735800000000,
+                  statusListPk: "W#wd_001#CLOTH#DELETED",
+                  statusGenreListPk: "W#wd_001#CLOTH#DELETED#GENRE#bottoms",
+                  createdAtSk: "CREATED#1735500000000#cl_002",
+                  wearCountSk: "WEAR#0000000003#cl_002",
+                  lastWornAtSk: "LASTWORN#1735603200000#cl_002",
                 },
                 {
                   clothingId: "cl_001",
@@ -71,6 +81,16 @@ const response = await getTemplateHandler({
                   status: "ACTIVE",
                   wearCount: 7,
                   lastWornAt: 1735689600000,
+                  PK: "W#wd_001#CLOTH",
+                  SK: "CLOTH#cl_001",
+                  wardrobeId: "wd_001",
+                  createdAt: 1735400000000,
+                  deletedAt: null,
+                  statusListPk: "W#wd_001#CLOTH#ACTIVE",
+                  statusGenreListPk: "W#wd_001#CLOTH#ACTIVE#GENRE#tops",
+                  createdAtSk: "CREATED#1735400000000#cl_001",
+                  wearCountSk: "WEAR#0000000007#cl_001",
+                  lastWornAtSk: "LASTWORN#1735689600000#cl_001",
                 },
               ],
             },
@@ -100,7 +120,9 @@ const checks = [
       response.statusCode === 200 &&
       response.headers["content-type"]?.includes("application/json") &&
       responseJson.name === "休日コーデ" &&
-      responseJson.clothingItems.length === 2,
+      responseJson.clothingItems.length === 2 &&
+      !Object.hasOwn(responseJson.clothingItems[0], "PK") &&
+      !Object.hasOwn(responseJson.clothingItems[0], "statusListPk"),
     detail: { response, responseJson },
   },
   {
