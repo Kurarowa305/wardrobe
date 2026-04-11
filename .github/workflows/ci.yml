@@ -277,6 +277,9 @@ jobs:
       - name: API history MS5 write integration spec test
         run: pnpm --filter api test:history-ms5-write-integration
 
+      - name: API history IAM condition check spec test
+        run: pnpm --filter api test:history-iam-condition-check
+
       - name: API presign image key builder spec test
         run: pnpm --filter api test:presign-image-key
 

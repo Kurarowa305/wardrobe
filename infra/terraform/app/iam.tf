@@ -51,6 +51,7 @@ data "aws_iam_policy_document" "lambda_policy" {
       "dynamodb:UpdateItem",
       "dynamodb:Query",
       "dynamodb:BatchGetItem",
+      "dynamodb:ConditionCheckItem",
       "dynamodb:TransactWriteItems",
       "dynamodb:DescribeTable",
     ]
@@ -115,6 +116,7 @@ data "aws_iam_policy_document" "lambda_domain_policy" {
         "dynamodb:UpdateItem",
         "dynamodb:Query",
         "dynamodb:BatchGetItem",
+        "dynamodb:ConditionCheckItem",
         "dynamodb:TransactWriteItems",
         "dynamodb:DescribeTable",
       ]
