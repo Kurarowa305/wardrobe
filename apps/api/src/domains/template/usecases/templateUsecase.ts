@@ -3,7 +3,8 @@ import { createAppError } from "../../../core/errors/index.js";
 import { createTemplateRepo, templateListIndexNames, type TemplateItem, type TemplateRepo } from "../repo/templateRepo.js";
 import type { TemplateDetailResponseDto, TemplateListItemDto, TemplateListOrderDto, TemplateListParamsDto } from "../dto/templateDto.js";
 import { createClothingBatchGetRepo, reorderClothingItemsByIds, type BatchGetClothingRepo } from "../../clothing/repo/clothingBatchGetRepo.js";
-import type { ClothingGenre, ClothingStatus } from "../../clothing/schema/clothingSchema.js";
+import { toClothingDetailResponseDto } from "../../clothing/dto/clothingDetailDto.js";
+import type { ClothingStatus } from "../../clothing/schema/clothingSchema.js";
 import { createTemplateEntity } from "../entities/template.js";
 import { generateUuidV7 } from "../../wardrobe/usecases/wardrobeUsecase.js";
 
@@ -77,6 +78,17 @@ type TemplateListQueryResult = {
   lastEvaluatedKey?: unknown;
 };
 
+type TemplateDetailItem = {
+  templateId: string;
+  name: string;
+  status: "ACTIVE" | "DELETED";
+  clothingIds: string[];
+  wearCount: number;
+  lastWornAt: number;
+  createdAt: number;
+  deletedAt: number | null;
+};
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return !!value && typeof value === "object" && !Array.isArray(value);
 }
@@ -96,7 +108,11 @@ function isTemplateDetailResult(value: unknown): value is { Item?: unknown; item
   return isRecord(value) && ("Item" in value || "item" in value);
 }
 
-function extractTemplateItemFromGetResult(result: unknown): TemplateItem | null {
+function isTemplateStatus(value: unknown): value is TemplateDetailItem["status"] {
+  return value === "ACTIVE" || value === "DELETED";
+}
+
+function extractTemplateItemFromGetResult(result: unknown): TemplateDetailItem | null {
   if (!isTemplateDetailResult(result)) {
     return null;
   }
@@ -106,7 +122,21 @@ function extractTemplateItemFromGetResult(result: unknown): TemplateItem | null 
     return null;
   }
 
-  return candidate;
+  const templateCandidate = candidate as Record<string, unknown>;
+
+  return {
+    templateId: candidate.templateId,
+    name: candidate.name,
+    status: isTemplateStatus(templateCandidate.status) ? templateCandidate.status : "ACTIVE",
+    clothingIds: candidate.clothingIds,
+    wearCount: typeof templateCandidate.wearCount === "number" ? templateCandidate.wearCount : 0,
+    lastWornAt: typeof templateCandidate.lastWornAt === "number" ? templateCandidate.lastWornAt : 0,
+    createdAt: typeof templateCandidate.createdAt === "number" ? templateCandidate.createdAt : 0,
+    deletedAt:
+      templateCandidate.deletedAt === null || typeof templateCandidate.deletedAt === "number"
+        ? templateCandidate.deletedAt
+        : null,
+  };
 }
 
 function isClothingListItem(value: unknown): value is { clothingId: string; imageKey: string | null; status: ClothingStatus } {
@@ -114,29 +144,6 @@ function isClothingListItem(value: unknown): value is { clothingId: string; imag
     && typeof value.clothingId === "string"
     && (value.imageKey === null || typeof value.imageKey === "string")
     && (value.status === "ACTIVE" || value.status === "DELETED");
-}
-
-function isClothingDetailItem(value: unknown): value is {
-  clothingId: string;
-  name: string;
-  genre: ClothingGenre;
-  imageKey: string | null;
-  status: ClothingStatus;
-  wearCount: number;
-  lastWornAt: number;
-} {
-  return isRecord(value)
-    && typeof value.clothingId === "string"
-    && typeof value.name === "string"
-    && (value.genre === "tops" || value.genre === "bottoms" || value.genre === "others")
-    && (value.imageKey === null || typeof value.imageKey === "string")
-    && (value.status === "ACTIVE" || value.status === "DELETED")
-    && typeof value.wearCount === "number"
-    && Number.isInteger(value.wearCount)
-    && value.wearCount >= 0
-    && typeof value.lastWornAt === "number"
-    && Number.isInteger(value.lastWornAt)
-    && value.lastWornAt >= 0;
 }
 
 function extractListResult(result: RepoListResult): TemplateListQueryResult {
@@ -237,15 +244,7 @@ function extractBatchGetItems(result: BatchGetResult): { clothingId: string; ima
   });
 }
 
-function extractBatchGetDetailItems(result: BatchGetResult): {
-  clothingId: string;
-  name: string;
-  genre: ClothingGenre;
-  imageKey: string | null;
-  status: ClothingStatus;
-  wearCount: number;
-  lastWornAt: number;
-}[] {
+function extractBatchGetDetailItems(result: BatchGetResult): TemplateDetailResponseDto["clothingItems"] {
   return result.flatMap((entry) => {
     if (!isRecord(entry)) {
       return [];
@@ -261,7 +260,9 @@ function extractBatchGetDetailItems(result: BatchGetResult): {
         return [];
       }
 
-      return response.filter(isClothingDetailItem);
+      return response
+        .map((item) => toClothingDetailResponseDto(item))
+        .filter((item): item is NonNullable<typeof item> => item !== null);
     });
   });
 }
@@ -399,9 +400,15 @@ export function createTemplateUsecase(dependencies: TemplateUsecaseDependencies 
       }
 
       await repo.update({
-        ...currentTemplate,
+        wardrobeId: input.wardrobeId,
+        templateId: input.templateId,
         name: input.name ?? currentTemplate.name,
+        status: currentTemplate.status,
         clothingIds: nextClothingIds,
+        wearCount: currentTemplate.wearCount,
+        lastWornAt: currentTemplate.lastWornAt,
+        createdAt: currentTemplate.createdAt,
+        deletedAt: currentTemplate.deletedAt,
       });
     },
     async delete(input: DeleteTemplateUsecaseInput): Promise<void> {

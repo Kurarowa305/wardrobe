@@ -7,9 +7,11 @@ const __dirname = path.dirname(__filename);
 const root = path.resolve(__dirname, "..");
 
 const usecaseModulePath = path.join(root, "src/domains/clothing/usecases/clothingUsecase.ts");
+const detailDtoModulePath = path.join(root, "src/domains/clothing/dto/clothingDetailDto.ts");
 const packageJsonPath = path.join(root, "package.json");
 const ciPath = path.join(root, "../../.github/workflows/ci.yml");
 const source = readFileSync(usecaseModulePath, "utf8");
+const detailDtoSource = readFileSync(detailDtoModulePath, "utf8");
 const packageJson = readFileSync(packageJsonPath, "utf8");
 const ciSource = readFileSync(ciPath, "utf8");
 
@@ -30,6 +32,10 @@ const usecase = createClothingUsecase({
           status: "DELETED",
           wearCount: 12,
           lastWornAt: 1_735_690_000_123,
+          PK: "W#wd_001#CLOTH",
+          SK: "CLOTH#cl_001",
+          wardrobeId: input.wardrobeId,
+          createdAt: 1_735_600_000_000,
         },
       };
     },
@@ -123,7 +129,9 @@ const checks = [
       result.imageKey === null &&
       result.status === "DELETED" &&
       result.wearCount === 12 &&
-      result.lastWornAt === 1_735_690_000_123,
+      result.lastWornAt === 1_735_690_000_123 &&
+      !Object.hasOwn(result, "PK") &&
+      !Object.hasOwn(result, "createdAt"),
     detail: result,
   },
   {
@@ -154,9 +162,11 @@ const checks = [
     ok:
       source.includes("async get(input: GetClothingUsecaseInput)") &&
       source.includes("extractClothingItemWithBackwardCompatibility") &&
+      source.includes("toClothingDetailResponseDto") &&
+      detailDtoSource.includes("export function toClothingDetailResponseDto") &&
       packageJson.includes('"test:clothing-get-usecase": "node --import tsx/esm scripts/check-clothing-get-usecase-spec.mjs"') &&
       ciSource.includes("pnpm --filter api test:clothing-get-usecase"),
-    detail: { packageJson, ciSource },
+    detail: { detailDtoSource, packageJson, ciSource },
   },
 ];
 
