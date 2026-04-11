@@ -2,8 +2,6 @@ import { createDynamoDbClient, type TransactWriteItem } from "../../../clients/d
 import { createAppError } from "../../../core/errors/index.js";
 import { createHistoryEntity } from "../entities/history.js";
 import { buildHistoryItem } from "../repo/historyRepo.js";
-import { buildClothingBaseKey } from "../../clothing/repo/clothingKeys.js";
-import { buildTemplateBaseKey } from "../../template/repo/templateKeys.js";
 import { generateUuidV7 } from "../../wardrobe/usecases/wardrobeUsecase.js";
 import { buildDailyStatsCacheUpdateFacts, buildWearDailyFacts } from "../stats_write/aggregations/daily.js";
 import { buildHistoryStatsWriteItems } from "../stats_write/transact/buildItems.js";
@@ -74,36 +72,6 @@ const createHistorySource = (input: CreateHistoryWithStatsWriteInput): { templat
   };
 };
 
-const buildReferenceConditionChecks = (input: {
-  wardrobeId: string;
-  templateId: string | null;
-  clothingIds: string[];
-}): TransactWriteItem[] => {
-  const templateChecks = input.templateId
-    ? [{
-        ConditionCheck: {
-          Key: buildTemplateBaseKey({
-            wardrobeId: input.wardrobeId,
-            templateId: input.templateId,
-          }),
-          ConditionExpression: "attribute_exists(PK)",
-        },
-      } satisfies TransactWriteItem]
-    : [];
-
-  const clothingChecks = input.clothingIds.map((clothingId) => ({
-    ConditionCheck: {
-      Key: buildClothingBaseKey({
-        wardrobeId: input.wardrobeId,
-        clothingId,
-      }),
-      ConditionExpression: "attribute_exists(PK)",
-    },
-  } satisfies TransactWriteItem));
-
-  return [...templateChecks, ...clothingChecks];
-};
-
 export function createHistoryWithStatsWriteUsecase(
   dependencies: CreateHistoryWithStatsWriteDependencies = {},
 ) {
@@ -142,11 +110,6 @@ export function createHistoryWithStatsWriteUsecase(
             ConditionExpression: "attribute_not_exists(PK) AND attribute_not_exists(SK)",
           },
         },
-        ...buildReferenceConditionChecks({
-          wardrobeId: input.wardrobeId,
-          templateId: source.templateId,
-          clothingIds: source.clothingIds,
-        }),
         ...statsItems,
       ];
 
