@@ -49,6 +49,7 @@ function createLogSink() {
   assert.equal(typeof entries[0]?.entry.durationMs, "number");
   assert.equal(entries[0]?.entry.durationMs >= 0, true);
   assert.equal(entries[0]?.entry.errorCode, undefined);
+  assert.equal(entries[0]?.entry.errorResponseBody, undefined);
   console.log("- lambda success path emits info log with required request metadata");
 }
 
@@ -80,13 +81,15 @@ function createLogSink() {
   });
 
   assert.equal(response.statusCode, 404);
+  const responseBody = JSON.parse(response.body);
   assert.equal(entries.length, 1);
   assert.equal(entries[0]?.level, "error");
   assert.equal(entries[0]?.entry.requestId, "req_handler_error");
   assert.equal(entries[0]?.entry.domain, "template");
   assert.equal(entries[0]?.entry.statusCode, 404);
   assert.equal(entries[0]?.entry.errorCode, "NOT_FOUND");
-  console.log("- lambda handler error response is logged with error level and errorCode");
+  assert.deepEqual(entries[0]?.entry.errorResponseBody, responseBody);
+  console.log("- lambda handler error response is logged with error level, errorCode, and errorResponseBody");
 }
 
 {
@@ -117,7 +120,8 @@ function createLogSink() {
   assert.equal(entries[0]?.entry.domain, "clothing");
   assert.equal(entries[0]?.entry.statusCode, 500);
   assert.equal(entries[0]?.entry.errorCode, "INTERNAL_ERROR");
-  console.log("- lambda adapter exception path is normalized and logged as INTERNAL_ERROR");
+  assert.deepEqual(entries[0]?.entry.errorResponseBody, json);
+  console.log("- lambda adapter exception path is normalized and logged with errorResponseBody");
 }
 
 {
@@ -145,7 +149,8 @@ function createLogSink() {
 
   assert.equal(called, false);
   assert.equal(response.statusCode, 400);
-  assert.equal(JSON.parse(response.body).error.code, "VALIDATION_ERROR");
+  const responseBody = JSON.parse(response.body);
+  assert.equal(responseBody.error.code, "VALIDATION_ERROR");
 
   assert.equal(entries.length, 1);
   assert.equal(entries[0]?.level, "error");
@@ -153,7 +158,8 @@ function createLogSink() {
   assert.equal(entries[0]?.entry.domain, "presign");
   assert.equal(entries[0]?.entry.statusCode, 400);
   assert.equal(entries[0]?.entry.errorCode, "VALIDATION_ERROR");
-  console.log("- invalid JSON request body is rejected before handler and logged with VALIDATION_ERROR");
+  assert.deepEqual(entries[0]?.entry.errorResponseBody, responseBody);
+  console.log("- invalid JSON request body is rejected before handler and logged with errorResponseBody");
 }
 
 console.log("Lambda logging spec passed");

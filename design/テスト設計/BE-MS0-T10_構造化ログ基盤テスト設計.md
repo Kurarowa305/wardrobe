@@ -5,6 +5,7 @@
 - BE-MS0-T10（構造化ログ基盤）の完了条件を継続的に検証する
 - `core/logging` に JSONログ生成・出力・エラー時の共通ログ整形を集約し、API横断で同一フォーマットを利用できる状態をCIで担保する
 - `requestId`, `method`, `path`, `domain`, `wardrobeId`, `statusCode`, `durationMs`, `errorCode` を含む共通ログ項目を欠落なく出力できることを確認する
+- エラー時のみ任意で `errorResponseBody` を含められることを確認する
 
 ## 対象スクリプト
 
@@ -19,7 +20,7 @@
 
 ### LG-02 エラーログで errorCode を含む error レベルへ切り替えられる
 - 観点: 失敗時の判別容易性
-- 期待結果: `errorCode` 付き outcome を渡すと `level: "error"` となり、`errorCode` がログへ含まれる
+- 期待結果: `errorCode` 付き outcome を渡すと `level: "error"` となり、`errorCode` と任意の `errorResponseBody` がログへ含まれる
 
 ### LG-03 構造化ログをJSON文字列へ直列化できる
 - 観点: CloudWatch等への1行JSON出力
