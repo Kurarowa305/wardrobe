@@ -64,7 +64,14 @@ const resolveOperationKey = (item) => {
 
 const createState = () => {
   const baseItems = new Map([
-    ["W#wd_001#TPL|TPL#tp_001", { PK: "W#wd_001#TPL", SK: "TPL#tp_001", templateId: "tp_001", wearCount: 2, lastWornAt: toEpochMs("20260103") }],
+    ["W#wd_001#TPL|TPL#tp_001", {
+      PK: "W#wd_001#TPL",
+      SK: "TPL#tp_001",
+      templateId: "tp_001",
+      clothingIds: ["cl_001", "cl_002"],
+      wearCount: 2,
+      lastWornAt: toEpochMs("20260103"),
+    }],
     ["W#wd_001#CLOTH|CLOTH#cl_001", { PK: "W#wd_001#CLOTH", SK: "CLOTH#cl_001", clothingId: "cl_001", wearCount: 3, lastWornAt: toEpochMs("20260104") }],
     ["W#wd_001#CLOTH|CLOTH#cl_002", { PK: "W#wd_001#CLOTH", SK: "CLOTH#cl_002", clothingId: "cl_002", wearCount: 1, lastWornAt: toEpochMs("20260102") }],
   ]);
@@ -86,6 +93,11 @@ const createState = () => {
 const createDependencies = (state) => ({
   now: () => toEpochMs("20260110"),
   generateHistoryId: () => `hs_${String(state.histories.size + 1).padStart(3, "0")}`,
+  templateRepo: {
+    async get({ wardrobeId, templateId }) {
+      return { Item: state.items.get(`W#${wardrobeId}#TPL|TPL#${templateId}`) };
+    },
+  },
   async getHistory({ wardrobeId, historyId }) {
     const key = `W#${wardrobeId}#HIST|HIST#${historyId}`;
     const item = state.histories.get(key);
@@ -286,13 +298,17 @@ const runScenario = async () => {
 
   const clothing1AfterCreate = state.items.get("W#wd_001#CLOTH|CLOTH#cl_001");
   const clothing2AfterCreate = state.items.get("W#wd_001#CLOTH|CLOTH#cl_002");
-  assertState(clothing1AfterCreate?.wearCount === 4, "clothing cl_001 wearCount should increase on create", clothing1AfterCreate);
-  assertState(clothing2AfterCreate?.wearCount === 2, "clothing cl_002 wearCount should increase on create", clothing2AfterCreate);
+  assertState(clothing1AfterCreate?.wearCount === 5, "clothing cl_001 wearCount should increase on create", clothing1AfterCreate);
+  assertState(clothing2AfterCreate?.wearCount === 3, "clothing cl_002 wearCount should increase on create", clothing2AfterCreate);
   assertState(clothing1AfterCreate?.lastWornAt === toEpochMs("20260106"), "clothing cl_001 lastWornAt should become created date", clothing1AfterCreate);
   assertState(clothing2AfterCreate?.lastWornAt === toEpochMs("20260106"), "clothing cl_002 lastWornAt should become created date", clothing2AfterCreate);
 
   assertState(state.wearDaily.get(buildDailyKeyString("wd_001", { kind: "template", id: "tp_001" }, "20260105")) === 1,
     "template wearDaily should be incremented for create date", state.wearDaily);
+  assertState(state.wearDaily.get(buildDailyKeyString("wd_001", { kind: "clothing", id: "cl_001" }, "20260105")) === 1,
+    "clothing cl_001 wearDaily should be incremented for template create date", state.wearDaily);
+  assertState(state.wearDaily.get(buildDailyKeyString("wd_001", { kind: "clothing", id: "cl_002" }, "20260105")) === 1,
+    "clothing cl_002 wearDaily should be incremented for template create date", state.wearDaily);
   assertState(state.wearDaily.get(buildDailyKeyString("wd_001", { kind: "clothing", id: "cl_001" }, "20260106")) === 1,
     "clothing cl_001 wearDaily should be incremented for create date", state.wearDaily);
   assertState(state.wearDaily.get(buildDailyKeyString("wd_001", { kind: "clothing", id: "cl_002" }, "20260106")) === 1,
@@ -326,6 +342,10 @@ const runScenario = async () => {
 
   assertState(!state.wearDaily.has(buildDailyKeyString("wd_001", { kind: "template", id: "tp_001" }, "20260105")),
     "template wearDaily on created date should be removed after delete", state.wearDaily);
+  assertState(!state.wearDaily.has(buildDailyKeyString("wd_001", { kind: "clothing", id: "cl_001" }, "20260105")),
+    "clothing cl_001 wearDaily on template-created date should be removed after delete", state.wearDaily);
+  assertState(!state.wearDaily.has(buildDailyKeyString("wd_001", { kind: "clothing", id: "cl_002" }, "20260105")),
+    "clothing cl_002 wearDaily on template-created date should be removed after delete", state.wearDaily);
   assertState(!state.wearDaily.has(buildDailyKeyString("wd_001", { kind: "clothing", id: "cl_001" }, "20260106")),
     "clothing cl_001 wearDaily on created date should be removed after delete", state.wearDaily);
   assertState(!state.wearDaily.has(buildDailyKeyString("wd_001", { kind: "clothing", id: "cl_002" }, "20260106")),
