@@ -19,6 +19,15 @@ const transactCalls = [];
 const usecase = createHistoryWithStatsWriteUsecase({
   now: () => 1735689600000,
   generateHistoryId: () => "hs_custom",
+  templateRepo: {
+    async get() {
+      return {
+        Item: {
+          clothingIds: ["cl_010", "cl_011"],
+        },
+      };
+    },
+  },
   async transactWriteItems(items) {
     transactCalls.push(items);
     return { ok: true };
@@ -93,6 +102,17 @@ const hasClothingExistenceGuardsOnUpdate = (items) =>
   items.filter((item) => item?.Update?.Key?.SK?.startsWith("CLOTH#") && item?.Update?.ConditionExpression === "attribute_exists(PK)")
     .length === 2;
 
+const hasHistoryPutWithTemplateClothingIds = (items) =>
+  items.some((item) => {
+    const putItem = item?.Put?.Item;
+    return putItem?.historyId === "hs_custom"
+      && putItem?.templateId === "tp_001"
+      && Array.isArray(putItem?.clothingIds)
+      && putItem.clothingIds.length === 2
+      && putItem.clothingIds[0] === "cl_010"
+      && putItem.clothingIds[1] === "cl_011";
+  });
+
 const hasSafeConditionExpressions = (items) =>
   items
     .flatMap((item) => item?.Update?.ConditionExpression ? [item.Update.ConditionExpression] : [])
@@ -115,12 +135,14 @@ const checks = [
     detail: duplicateCode,
   },
   {
-    name: "API-14 template flow builds one transact with history Put + update-based existence guard + stats updates",
+    name: "API-14 template flow builds one transact with template clothingIds snapshot + update-based existence guard + stats updates",
     ok:
       hasHistoryPut(templateCall)
+      && hasHistoryPutWithTemplateClothingIds(templateCall)
       && hasNoConditionChecks(templateCall)
       && hasUniqueOperationKeys(templateCall)
       && hasTemplateExistenceGuardOnUpdate(templateCall)
+      && hasClothingExistenceGuardsOnUpdate(templateCall)
       && hasStatsWriteUpdates(templateCall)
       && hasSafeConditionExpressions(templateCall),
     detail: templateCall,

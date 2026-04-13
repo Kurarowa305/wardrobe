@@ -283,6 +283,9 @@ jobs:
       - name: API history create DynamoDB transaction spec test
         run: pnpm --filter api test:history-create-dynamodb-transaction
 
+      - name: API history template input clothingIds spec test
+        run: pnpm --filter api test:history-template-input-clothing-ids
+
       - name: API presign image key builder spec test
         run: pnpm --filter api test:presign-image-key
 
