@@ -39,6 +39,17 @@
 - 期待結果:
   - トランザクション条件チェック失敗（`ConditionalCheckFailed`）を `NOT_FOUND` に変換する
 
+
+### HMS5API14H-07 template 解決で `NOT_FOUND(404)` を返せる
+- 観点: usecase の template 参照エラーを handler 仕様で返却できるか
+- 期待結果:
+  - template 解決で `NOT_FOUND` が発生した場合、handler も `NOT_FOUND` を返す
+
+### HMS5API14H-08 template 不正（`clothingIds` 空など）を `VALIDATION_ERROR(400)` で返せる
+- 観点: template 由来データ不整合のハンドリング
+- 期待結果:
+  - template 解決で不正 payload が返る場合、handler は `VALIDATION_ERROR` を返す
+
 ### HMS5API14H-06 package script と CI 導線が維持される
 - 観点: PR 上で自動検証される導線の担保
 - 期待結果:

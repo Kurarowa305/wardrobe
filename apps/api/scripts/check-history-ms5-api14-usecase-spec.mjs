@@ -16,9 +16,18 @@ const ciSource = readFileSync(ciPath, "utf8");
 const { createHistoryWithStatsWriteUsecase } = await import(usecaseModulePath);
 
 const transactCalls = [];
+const templateFixtures = new Map([
+  ["tp_001", { templateId: "tp_001", clothingIds: ["cl_001", "cl_002"] }],
+  ["tp_invalid", { templateId: "tp_invalid", clothingIds: [] }],
+]);
+
 const usecase = createHistoryWithStatsWriteUsecase({
   now: () => 1735689600000,
   generateHistoryId: () => "hs_custom",
+  async getTemplate({ templateId }) {
+    const item = templateFixtures.get(templateId);
+    return item ? { Item: item } : {};
+  },
   async transactWriteItems(items) {
     transactCalls.push(items);
     return { ok: true };
@@ -60,6 +69,28 @@ try {
   duplicateCode = error?.code ?? null;
 }
 
+let templateNotFoundCode = null;
+try {
+  await usecase.create({
+    wardrobeId: "wd_001",
+    date: "20260103",
+    templateId: "tp_missing",
+  });
+} catch (error) {
+  templateNotFoundCode = error?.code ?? null;
+}
+
+let templateValidationCode = null;
+try {
+  await usecase.create({
+    wardrobeId: "wd_001",
+    date: "20260104",
+    templateId: "tp_invalid",
+  });
+} catch (error) {
+  templateValidationCode = error?.code ?? null;
+}
+
 const templateCall = transactCalls[0] ?? [];
 const clothingCall = transactCalls[1] ?? [];
 
@@ -89,9 +120,18 @@ const hasUniqueOperationKeys = (items) => {
 const hasTemplateExistenceGuardOnUpdate = (items) =>
   items.some((item) => item?.Update?.Key?.SK === "TPL#tp_001" && item?.Update?.ConditionExpression === "attribute_exists(PK)");
 
-const hasClothingExistenceGuardsOnUpdate = (items) =>
+const hasClothingExistenceGuardsOnUpdate = (items, expected) =>
   items.filter((item) => item?.Update?.Key?.SK?.startsWith("CLOTH#") && item?.Update?.ConditionExpression === "attribute_exists(PK)")
-    .length === 2;
+    .length === expected;
+
+const hasTemplateDerivedClothingIdsOnHistoryPut = (items) =>
+  items.some((item) => {
+    const clothingIds = item?.Put?.Item?.clothingIds;
+    return Array.isArray(clothingIds)
+      && clothingIds.length === 2
+      && clothingIds.includes("cl_001")
+      && clothingIds.includes("cl_002");
+  });
 
 const hasSafeConditionExpressions = (items) =>
   items
@@ -115,12 +155,24 @@ const checks = [
     detail: duplicateCode,
   },
   {
+    name: "API-14 usecase resolves template not found to NOT_FOUND",
+    ok: templateNotFoundCode === "NOT_FOUND",
+    detail: templateNotFoundCode,
+  },
+  {
+    name: "API-14 usecase resolves invalid template clothingIds to VALIDATION_ERROR",
+    ok: templateValidationCode === "VALIDATION_ERROR",
+    detail: templateValidationCode,
+  },
+  {
     name: "API-14 template flow builds one transact with history Put + update-based existence guard + stats updates",
     ok:
       hasHistoryPut(templateCall)
+      && hasTemplateDerivedClothingIdsOnHistoryPut(templateCall)
       && hasNoConditionChecks(templateCall)
       && hasUniqueOperationKeys(templateCall)
       && hasTemplateExistenceGuardOnUpdate(templateCall)
+      && hasClothingExistenceGuardsOnUpdate(templateCall, 2)
       && hasStatsWriteUpdates(templateCall)
       && hasSafeConditionExpressions(templateCall),
     detail: templateCall,
@@ -131,7 +183,7 @@ const checks = [
       hasHistoryPut(clothingCall)
       && hasNoConditionChecks(clothingCall)
       && hasUniqueOperationKeys(clothingCall)
-      && hasClothingExistenceGuardsOnUpdate(clothingCall)
+      && hasClothingExistenceGuardsOnUpdate(clothingCall, 2)
       && hasStatsWriteUpdates(clothingCall)
       && hasSafeConditionExpressions(clothingCall),
     detail: clothingCall,

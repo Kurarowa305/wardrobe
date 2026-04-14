@@ -40,6 +40,23 @@
   - 同一 `PK/SK` への複数操作を含まない
   - `wearDaily` 更新 + 統計キャッシュ更新（`wearCount` / `lastWornAt`）を含む
 
+
+### HMS5API14-06 template 不在時に `NOT_FOUND` を返せる
+- 観点: template 解決時の参照整合
+- 期待結果:
+  - `templateId` 指定時に template が取得できない場合 `NOT_FOUND` を送出する
+
+### HMS5API14-07 template 不正時（`clothingIds` 空配列など）に `VALIDATION_ERROR` を返せる
+- 観点: template 由来データの入力保証
+- 期待結果:
+  - template の `clothingIds` が空配列または不正値の場合 `VALIDATION_ERROR` を送出する
+
+### HMS5API14-08 template入力時に history/clothing 更新へ template 由来 `clothingIds` を反映できる
+- 観点: template 作成フローが template 自体と配下 clothing の統計更新を同時に行う
+- 期待結果:
+  - history Put の `Item.clothingIds` に template 由来 ID 群が入る（空配列ではない）
+  - transact に `SK=CLOTH#...` の clothing 更新が含まれる
+
 ### HMS5API14-05 package script と CI 導線が維持される
 - 観点: PR 上で自動検証される導線の担保
 - 期待結果:

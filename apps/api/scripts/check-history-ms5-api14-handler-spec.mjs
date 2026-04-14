@@ -22,6 +22,9 @@ const response = await createHistoryHandler({
   headers: { "content-type": "application/json; charset=utf-8" },
   requestId: "req_history_create",
   dependencies: {
+    async getTemplate() {
+      return { Item: { templateId: "tp_001", clothingIds: ["cl_001", "cl_002"] } };
+    },
     async transactWriteItems(items) {
       createCalls.push(items);
       return { ok: true };
@@ -74,6 +77,47 @@ try {
   conflictCode = error?.code ?? null;
 }
 
+
+let templateNotFoundCode = null;
+try {
+  await createHistoryHandler({
+    path: { wardrobeId: "wd_001" },
+    body: { date: "20260101", templateId: "tp_missing" },
+    headers: { "content-type": "application/json" },
+    requestId: "req_history_template_not_found",
+    dependencies: {
+      async getTemplate() {
+        return {};
+      },
+      async transactWriteItems() {
+        return { ok: true };
+      },
+    },
+  });
+} catch (error) {
+  templateNotFoundCode = error?.code ?? null;
+}
+
+let templateValidationCode = null;
+try {
+  await createHistoryHandler({
+    path: { wardrobeId: "wd_001" },
+    body: { date: "20260101", templateId: "tp_invalid" },
+    headers: { "content-type": "application/json" },
+    requestId: "req_history_template_validation",
+    dependencies: {
+      async getTemplate() {
+        return { Item: { templateId: "tp_invalid", clothingIds: [] } };
+      },
+      async transactWriteItems() {
+        return { ok: true };
+      },
+    },
+  });
+} catch (error) {
+  templateValidationCode = error?.code ?? null;
+}
+
 let notFoundCode = null;
 try {
   await createHistoryHandler({
@@ -122,6 +166,16 @@ const checks = [
     name: "API-14 handler maps duplicate clothingIds conflict to CONFLICT",
     ok: conflictCode === "CONFLICT",
     detail: conflictCode,
+  },
+  {
+    name: "API-14 handler returns NOT_FOUND when template resolution fails",
+    ok: templateNotFoundCode === "NOT_FOUND",
+    detail: templateNotFoundCode,
+  },
+  {
+    name: "API-14 handler returns VALIDATION_ERROR when template payload is invalid",
+    ok: templateValidationCode === "VALIDATION_ERROR",
+    detail: templateValidationCode,
   },
   {
     name: "API-14 handler maps transact conditional check failure to NOT_FOUND",

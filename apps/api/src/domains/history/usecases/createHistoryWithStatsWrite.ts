@@ -3,6 +3,7 @@ import { createAppError } from "../../../core/errors/index.js";
 import { createHistoryEntity } from "../entities/history.js";
 import { buildHistoryItem } from "../repo/historyRepo.js";
 import { generateUuidV7 } from "../../wardrobe/usecases/wardrobeUsecase.js";
+import { createTemplateRepo } from "../../template/repo/templateRepo.js";
 import { buildDailyStatsCacheUpdateFacts, buildWearDailyFacts } from "../stats_write/aggregations/daily.js";
 import { buildHistoryStatsWriteItems } from "../stats_write/transact/buildItems.js";
 import { assertHistoryStatsWriteItemsWithinLimit } from "../stats_write/transact/guard.js";
@@ -23,14 +24,46 @@ export type CreateHistoryWithStatsWriteDependencies = {
   now?: (() => number) | undefined;
   generateHistoryId?: (() => string) | undefined;
   transactWriteItems?: ((items: TransactWriteItem[]) => Promise<unknown>) | undefined;
+  getTemplate?: ((input: { wardrobeId: string; templateId: string }) => Promise<unknown>) | undefined;
 };
 
 const unique = (values: string[]): string[] => [...new Set(values)];
 
-const createHistorySource = (input: CreateHistoryWithStatsWriteInput): { templateId: string; clothingIds: string[] } | {
+const resolveTemplateClothingIds = (templateResult: unknown, templateId: string): string[] => {
+  const candidate = templateResult as { Item?: { clothingIds?: unknown } } | undefined;
+  const clothingIds = candidate?.Item?.clothingIds;
+
+  if (!Array.isArray(clothingIds) || clothingIds.length === 0 || clothingIds.some((id) => typeof id !== "string" || id.trim().length === 0)) {
+    throw createAppError("VALIDATION_ERROR", {
+      message: "Template clothingIds is invalid.",
+      details: {
+        templateId,
+      },
+    });
+  }
+
+  const normalized = unique(clothingIds);
+  if (normalized.length !== clothingIds.length) {
+    throw createAppError("VALIDATION_ERROR", {
+      message: "Template clothingIds must be unique.",
+      details: {
+        templateId,
+      },
+    });
+  }
+
+  return normalized;
+};
+
+const createHistorySource = async (
+  input: CreateHistoryWithStatsWriteInput,
+  dependencies: {
+    getTemplate: (params: { wardrobeId: string; templateId: string }) => Promise<unknown>;
+  },
+): Promise<{ templateId: string; clothingIds: string[] } | {
   templateId: null;
   clothingIds: string[];
-} => {
+}> => {
   if (input.templateId && input.clothingIds) {
     throw createAppError("CONFLICT", {
       message: "templateId and clothingIds are mutually exclusive",
@@ -42,9 +75,24 @@ const createHistorySource = (input: CreateHistoryWithStatsWriteInput): { templat
   }
 
   if (input.templateId) {
+    const templateResult = await dependencies.getTemplate({
+      wardrobeId: input.wardrobeId,
+      templateId: input.templateId,
+    });
+
+    const candidate = templateResult as { Item?: unknown } | undefined;
+    if (!candidate?.Item) {
+      throw createAppError("NOT_FOUND", {
+        message: "Template not found.",
+        details: {
+          templateId: input.templateId,
+        },
+      });
+    }
+
     return {
       templateId: input.templateId,
-      clothingIds: [],
+      clothingIds: resolveTemplateClothingIds(templateResult, input.templateId),
     };
   }
 
@@ -75,14 +123,19 @@ const createHistorySource = (input: CreateHistoryWithStatsWriteInput): { templat
 export function createHistoryWithStatsWriteUsecase(
   dependencies: CreateHistoryWithStatsWriteDependencies = {},
 ) {
+  const templateRepo = createTemplateRepo();
   const now = dependencies.now ?? Date.now;
   const generateHistoryId = dependencies.generateHistoryId ?? (() => `hs_${generateUuidV7()}`);
   const transactWriteItems = dependencies.transactWriteItems
     ?? ((items: TransactWriteItem[]) => createDynamoDbClient().transactWriteItems({ TransactItems: items }));
+  const getTemplate = dependencies.getTemplate
+    ?? ((input: { wardrobeId: string; templateId: string }) => templateRepo.get(input));
 
   return {
     async create(input: CreateHistoryWithStatsWriteInput): Promise<CreateHistoryWithStatsWriteOutput> {
-      const source = createHistorySource(input);
+      const source = await createHistorySource(input, {
+        getTemplate,
+      });
       const historyId = generateHistoryId();
       const history = createHistoryEntity({
         wardrobeId: input.wardrobeId,

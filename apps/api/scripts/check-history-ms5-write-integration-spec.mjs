@@ -64,7 +64,7 @@ const resolveOperationKey = (item) => {
 
 const createState = () => {
   const baseItems = new Map([
-    ["W#wd_001#TPL|TPL#tp_001", { PK: "W#wd_001#TPL", SK: "TPL#tp_001", templateId: "tp_001", wearCount: 2, lastWornAt: toEpochMs("20260103") }],
+    ["W#wd_001#TPL|TPL#tp_001", { PK: "W#wd_001#TPL", SK: "TPL#tp_001", templateId: "tp_001", clothingIds: ["cl_001", "cl_002"], wearCount: 2, lastWornAt: toEpochMs("20260103") }],
     ["W#wd_001#CLOTH|CLOTH#cl_001", { PK: "W#wd_001#CLOTH", SK: "CLOTH#cl_001", clothingId: "cl_001", wearCount: 3, lastWornAt: toEpochMs("20260104") }],
     ["W#wd_001#CLOTH|CLOTH#cl_002", { PK: "W#wd_001#CLOTH", SK: "CLOTH#cl_002", clothingId: "cl_002", wearCount: 1, lastWornAt: toEpochMs("20260102") }],
   ]);
@@ -270,6 +270,18 @@ const runScenario = async () => {
 
   const templateHistoryId = JSON.parse(templateCreate.body).historyId;
 
+  const clothing1AfterTemplateCreate = state.items.get("W#wd_001#CLOTH|CLOTH#cl_001");
+  const clothing2AfterTemplateCreate = state.items.get("W#wd_001#CLOTH|CLOTH#cl_002");
+  assertState(clothing1AfterTemplateCreate?.wearCount === 4, "template create should also increment clothing cl_001 wearCount", clothing1AfterTemplateCreate);
+  assertState(clothing2AfterTemplateCreate?.wearCount === 2, "template create should also increment clothing cl_002 wearCount", clothing2AfterTemplateCreate);
+  assertState(clothing1AfterTemplateCreate?.lastWornAt === toEpochMs("20260105"), "template create should update clothing cl_001 lastWornAt", clothing1AfterTemplateCreate);
+  assertState(clothing2AfterTemplateCreate?.lastWornAt === toEpochMs("20260105"), "template create should update clothing cl_002 lastWornAt", clothing2AfterTemplateCreate);
+
+  assertState(state.wearDaily.get(buildDailyKeyString("wd_001", { kind: "clothing", id: "cl_001" }, "20260105")) === 1,
+    "template create should increment clothing cl_001 wearDaily via template clothingIds", state.wearDaily);
+  assertState(state.wearDaily.get(buildDailyKeyString("wd_001", { kind: "clothing", id: "cl_002" }, "20260105")) === 1,
+    "template create should increment clothing cl_002 wearDaily via template clothingIds", state.wearDaily);
+
   const clothingCreate = await createHistoryHandler({
     path: { wardrobeId: "wd_001" },
     body: { date: "20260106", clothingIds: ["cl_001", "cl_002"] },
@@ -286,8 +298,8 @@ const runScenario = async () => {
 
   const clothing1AfterCreate = state.items.get("W#wd_001#CLOTH|CLOTH#cl_001");
   const clothing2AfterCreate = state.items.get("W#wd_001#CLOTH|CLOTH#cl_002");
-  assertState(clothing1AfterCreate?.wearCount === 4, "clothing cl_001 wearCount should increase on create", clothing1AfterCreate);
-  assertState(clothing2AfterCreate?.wearCount === 2, "clothing cl_002 wearCount should increase on create", clothing2AfterCreate);
+  assertState(clothing1AfterCreate?.wearCount === 5, "clothing cl_001 wearCount should increase on create", clothing1AfterCreate);
+  assertState(clothing2AfterCreate?.wearCount === 3, "clothing cl_002 wearCount should increase on create", clothing2AfterCreate);
   assertState(clothing1AfterCreate?.lastWornAt === toEpochMs("20260106"), "clothing cl_001 lastWornAt should become created date", clothing1AfterCreate);
   assertState(clothing2AfterCreate?.lastWornAt === toEpochMs("20260106"), "clothing cl_002 lastWornAt should become created date", clothing2AfterCreate);
 
@@ -303,6 +315,18 @@ const runScenario = async () => {
     requestId: "req-ms5-int-delete-template",
     dependencies: deps,
   });
+
+  const clothing1AfterTemplateDelete = state.items.get("W#wd_001#CLOTH|CLOTH#cl_001");
+  const clothing2AfterTemplateDelete = state.items.get("W#wd_001#CLOTH|CLOTH#cl_002");
+  assertState(clothing1AfterTemplateDelete?.wearCount === 4, "template delete should only rollback template-origin clothing increment for cl_001", clothing1AfterTemplateDelete);
+  assertState(clothing2AfterTemplateDelete?.wearCount === 2, "template delete should only rollback template-origin clothing increment for cl_002", clothing2AfterTemplateDelete);
+  assertState(clothing1AfterTemplateDelete?.lastWornAt === toEpochMs("20260106"), "template delete keeps latest clothing cl_001 lastWornAt from clothing history", clothing1AfterTemplateDelete);
+  assertState(clothing2AfterTemplateDelete?.lastWornAt === toEpochMs("20260106"), "template delete keeps latest clothing cl_002 lastWornAt from clothing history", clothing2AfterTemplateDelete);
+
+  assertState(!state.wearDaily.has(buildDailyKeyString("wd_001", { kind: "clothing", id: "cl_001" }, "20260105")),
+    "template delete should remove template-origin clothing cl_001 wearDaily", state.wearDaily);
+  assertState(!state.wearDaily.has(buildDailyKeyString("wd_001", { kind: "clothing", id: "cl_002" }, "20260105")),
+    "template delete should remove template-origin clothing cl_002 wearDaily", state.wearDaily);
 
   const clothingDelete = await deleteHistoryHandler({
     path: { wardrobeId: "wd_001", historyId: clothingHistoryId },
