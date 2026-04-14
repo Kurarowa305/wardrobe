@@ -4,6 +4,7 @@
 
 - BE-MS5-T09（API-14 usecase 実装）の完了条件を継続検証する
 - 履歴作成時に `history作成 + daily counter更新 + wearCount更新 + lastWornAt更新` を同一トランザクションで実行することを CI で担保する
+- `templateId` 指定時にテンプレートから `clothingIds` を解決し、不正テンプレート入力を除外できることを担保する
 
 ## 対象スクリプト
 
@@ -22,16 +23,35 @@
 - 期待結果:
   - `clothingIds` に重複がある場合 `CONFLICT` を送出する
 
-### HMS5API14-03 template入力の作成トランザクションを1回で構築できる
-- 観点: 履歴作成と統計更新の同一トランザクション化
+### HMS5API14-03 `templateId` 指定時に `wardrobeId/templateId` でテンプレートを取得できる
+- 観点: 履歴作成入力からテンプレート解決に必要なキーを正しく引き渡せるか
+- 期待結果:
+  - `getTemplate({ wardrobeId, templateId })` が呼び出される
+
+### HMS5API14-04 不正テンプレート（status / clothingIds）を `NOT_FOUND` で拒否できる
+- 観点: 無効テンプレートに基づく履歴作成を防止できるか
+- 期待結果:
+  - `status !== ACTIVE` のテンプレートを `NOT_FOUND` とする
+  - `clothingIds` が配列でない / 空配列 / 非 string 要素を含むテンプレートを `NOT_FOUND` とする
+  - `Item` が存在しない応答を `NOT_FOUND` とする
+
+### HMS5API14-05 テンプレート解決後にも `clothingIds` 重複を拒否できる
+- 観点: 重複禁止ロジックの共通化によりテンプレート起点でも二重加算防止が効くか
+- 期待結果:
+  - テンプレート由来の `clothingIds` に重複がある場合 `CONFLICT` を送出する
+
+### HMS5API14-06 template入力の作成トランザクションを1回で構築できる
+- 観点: 履歴作成と統計更新の同一トランザクション化、およびテンプレート由来 `clothingIds` の反映
 - 期待結果:
   - `history Put` を含む
+  - `history.templateId` に入力 `templateId` を保持する
+  - `history.clothingIds` にテンプレート由来 `clothingIds` を設定する
   - `ConditionCheck` を使わない
   - `template` 更新の `ConditionExpression=attribute_exists(PK)` で存在確認を兼ねる
   - 同一 `PK/SK` への複数操作を含まない
   - `wearDaily` 更新 + 統計キャッシュ更新（`wearCount` / `lastWornAt`）を含む
 
-### HMS5API14-04 clothing入力の作成トランザクションを1回で構築できる
+### HMS5API14-07 clothing入力の作成トランザクションを1回で構築できる
 - 観点: templateなし入力でも同様に同一トランザクションで処理できるか
 - 期待結果:
   - `history Put` を含む
@@ -40,7 +60,7 @@
   - 同一 `PK/SK` への複数操作を含まない
   - `wearDaily` 更新 + 統計キャッシュ更新（`wearCount` / `lastWornAt`）を含む
 
-### HMS5API14-05 package script と CI 導線が維持される
+### HMS5API14-08 package script と CI 導線が維持される
 - 観点: PR 上で自動検証される導線の担保
 - 期待結果:
   - `apps/api/package.json` に `test:history-ms5-api14-usecase` が定義される

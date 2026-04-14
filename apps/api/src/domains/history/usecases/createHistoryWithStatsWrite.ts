@@ -1,5 +1,6 @@
 import { createDynamoDbClient, type TransactWriteItem } from "../../../clients/dynamodb.js";
 import { createAppError } from "../../../core/errors/index.js";
+import { createTemplateRepo } from "../../template/repo/templateRepo.js";
 import { createHistoryEntity } from "../entities/history.js";
 import { buildHistoryItem } from "../repo/historyRepo.js";
 import { generateUuidV7 } from "../../wardrobe/usecases/wardrobeUsecase.js";
@@ -22,15 +23,70 @@ export type CreateHistoryWithStatsWriteOutput = {
 export type CreateHistoryWithStatsWriteDependencies = {
   now?: (() => number) | undefined;
   generateHistoryId?: (() => string) | undefined;
+  getTemplate?: ((input: { wardrobeId: string; templateId: string }) => Promise<unknown>) | undefined;
   transactWriteItems?: ((items: TransactWriteItem[]) => Promise<unknown>) | undefined;
 };
 
 const unique = (values: string[]): string[] => [...new Set(values)];
 
-const createHistorySource = (input: CreateHistoryWithStatsWriteInput): { templateId: string; clothingIds: string[] } | {
+const isRecord = (value: unknown): value is Record<string, unknown> => {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+};
+
+const extractGetItem = (result: unknown): unknown => {
+  if (!isRecord(result)) {
+    return undefined;
+  }
+
+  return result.Item ?? result.item;
+};
+
+const isValidTemplateClothingIds = (value: unknown): value is string[] => {
+  return Array.isArray(value) && value.length > 0 && value.every((entry) => typeof entry === "string");
+};
+
+const validateUniqueClothingIdsOrThrow = (clothingIds: string[]): string[] => {
+  const normalized = unique(clothingIds);
+  if (normalized.length !== clothingIds.length) {
+    throw createAppError("CONFLICT", {
+      message: "clothingIds must be unique",
+      details: {
+        clothingIds: "Duplicate clothingIds are not allowed.",
+      },
+    });
+  }
+
+  return normalized;
+};
+
+const resolveTemplateClothingIdsOrThrow = (
+  result: unknown,
+  input: { wardrobeId: string; templateId: string },
+): string[] => {
+  const item = extractGetItem(result);
+  if (!isRecord(item) || item.status !== "ACTIVE" || !isValidTemplateClothingIds(item.clothingIds)) {
+    throw createAppError("NOT_FOUND", {
+      message: "Template was not found.",
+      details: {
+        resource: "template",
+        wardrobeId: input.wardrobeId,
+        templateId: input.templateId,
+      },
+    });
+  }
+
+  return validateUniqueClothingIdsOrThrow(item.clothingIds);
+};
+
+const createHistorySource = async (
+  input: CreateHistoryWithStatsWriteInput,
+  dependencies: {
+    getTemplate: (input: { wardrobeId: string; templateId: string }) => Promise<unknown>;
+  },
+): Promise<{ templateId: string; clothingIds: string[] } | {
   templateId: null;
   clothingIds: string[];
-} => {
+}> => {
   if (input.templateId && input.clothingIds) {
     throw createAppError("CONFLICT", {
       message: "templateId and clothingIds are mutually exclusive",
@@ -42,9 +98,17 @@ const createHistorySource = (input: CreateHistoryWithStatsWriteInput): { templat
   }
 
   if (input.templateId) {
+    const templateResult = await dependencies.getTemplate({
+      wardrobeId: input.wardrobeId,
+      templateId: input.templateId,
+    });
+
     return {
       templateId: input.templateId,
-      clothingIds: [],
+      clothingIds: resolveTemplateClothingIdsOrThrow(templateResult, {
+        wardrobeId: input.wardrobeId,
+        templateId: input.templateId,
+      }),
     };
   }
 
@@ -56,33 +120,26 @@ const createHistorySource = (input: CreateHistoryWithStatsWriteInput): { templat
     });
   }
 
-  const normalized = unique(input.clothingIds);
-  if (normalized.length !== input.clothingIds.length) {
-    throw createAppError("CONFLICT", {
-      message: "clothingIds must be unique",
-      details: {
-        clothingIds: "Duplicate clothingIds are not allowed.",
-      },
-    });
-  }
-
   return {
     templateId: null,
-    clothingIds: normalized,
+    clothingIds: validateUniqueClothingIdsOrThrow(input.clothingIds),
   };
 };
 
 export function createHistoryWithStatsWriteUsecase(
   dependencies: CreateHistoryWithStatsWriteDependencies = {},
 ) {
+  const templateRepo = createTemplateRepo();
   const now = dependencies.now ?? Date.now;
   const generateHistoryId = dependencies.generateHistoryId ?? (() => `hs_${generateUuidV7()}`);
+  const getTemplate = dependencies.getTemplate
+    ?? ((input: { wardrobeId: string; templateId: string }) => templateRepo.get(input));
   const transactWriteItems = dependencies.transactWriteItems
     ?? ((items: TransactWriteItem[]) => createDynamoDbClient().transactWriteItems({ TransactItems: items }));
 
   return {
     async create(input: CreateHistoryWithStatsWriteInput): Promise<CreateHistoryWithStatsWriteOutput> {
-      const source = createHistorySource(input);
+      const source = await createHistorySource(input, { getTemplate });
       const historyId = generateHistoryId();
       const history = createHistoryEntity({
         wardrobeId: input.wardrobeId,

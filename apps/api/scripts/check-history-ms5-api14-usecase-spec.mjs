@@ -16,9 +16,23 @@ const ciSource = readFileSync(ciPath, "utf8");
 const { createHistoryWithStatsWriteUsecase } = await import(usecaseModulePath);
 
 const transactCalls = [];
+const templateCalls = [];
+const templateFixtures = new Map([
+  ["tp_001", { Item: { status: "ACTIVE", clothingIds: ["cl_010", "cl_011"] } }],
+  ["tp_deleted", { Item: { status: "DELETED", clothingIds: ["cl_010", "cl_011"] } }],
+  ["tp_empty", { Item: { status: "ACTIVE", clothingIds: [] } }],
+  ["tp_mixed", { Item: { status: "ACTIVE", clothingIds: ["cl_010", 123] } }],
+  ["tp_duplicate", { Item: { status: "ACTIVE", clothingIds: ["cl_010", "cl_010"] } }],
+  ["tp_missing", {}],
+]);
+
 const usecase = createHistoryWithStatsWriteUsecase({
   now: () => 1735689600000,
   generateHistoryId: () => "hs_custom",
+  async getTemplate(input) {
+    templateCalls.push(input);
+    return templateFixtures.get(input.templateId) ?? {};
+  },
   async transactWriteItems(items) {
     transactCalls.push(items);
     return { ok: true };
@@ -60,6 +74,61 @@ try {
   duplicateCode = error?.code ?? null;
 }
 
+let templateDeletedCode = null;
+try {
+  await usecase.create({
+    wardrobeId: "wd_001",
+    date: "20260101",
+    templateId: "tp_deleted",
+  });
+} catch (error) {
+  templateDeletedCode = error?.code ?? null;
+}
+
+let templateEmptyCode = null;
+try {
+  await usecase.create({
+    wardrobeId: "wd_001",
+    date: "20260101",
+    templateId: "tp_empty",
+  });
+} catch (error) {
+  templateEmptyCode = error?.code ?? null;
+}
+
+let templateMixedCode = null;
+try {
+  await usecase.create({
+    wardrobeId: "wd_001",
+    date: "20260101",
+    templateId: "tp_mixed",
+  });
+} catch (error) {
+  templateMixedCode = error?.code ?? null;
+}
+
+let templateDuplicateCode = null;
+try {
+  await usecase.create({
+    wardrobeId: "wd_001",
+    date: "20260101",
+    templateId: "tp_duplicate",
+  });
+} catch (error) {
+  templateDuplicateCode = error?.code ?? null;
+}
+
+let templateMissingCode = null;
+try {
+  await usecase.create({
+    wardrobeId: "wd_001",
+    date: "20260101",
+    templateId: "tp_missing",
+  });
+} catch (error) {
+  templateMissingCode = error?.code ?? null;
+}
+
 const templateCall = transactCalls[0] ?? [];
 const clothingCall = transactCalls[1] ?? [];
 
@@ -98,6 +167,15 @@ const hasSafeConditionExpressions = (items) =>
     .flatMap((item) => item?.Update?.ConditionExpression ? [item.Update.ConditionExpression] : [])
     .every((expression) => !expression.includes(" + ") && !expression.includes(" - "));
 
+const hasClothingIdsFromTemplate = (items) => {
+  const historyPut = items.find((item) => item?.Put?.Item?.historyId === "hs_custom")?.Put?.Item;
+  return Array.isArray(historyPut?.clothingIds)
+    && historyPut.clothingIds.length === 2
+    && historyPut.clothingIds[0] === "cl_010"
+    && historyPut.clothingIds[1] === "cl_011"
+    && historyPut.templateId === "tp_001";
+};
+
 const checks = [
   {
     name: "API-14 usecase returns generated historyId",
@@ -115,6 +193,21 @@ const checks = [
     detail: duplicateCode,
   },
   {
+    name: "API-14 usecase resolves template by wardrobeId/templateId",
+    ok: templateCalls.some((call) => call.wardrobeId === "wd_001" && call.templateId === "tp_001"),
+    detail: templateCalls,
+  },
+  {
+    name: "API-14 usecase rejects invalid template payloads with NOT_FOUND",
+    ok: [templateDeletedCode, templateEmptyCode, templateMixedCode, templateMissingCode].every((code) => code === "NOT_FOUND"),
+    detail: { templateDeletedCode, templateEmptyCode, templateMixedCode, templateMissingCode },
+  },
+  {
+    name: "API-14 usecase applies duplicate clothing guard even after template resolution",
+    ok: templateDuplicateCode === "CONFLICT",
+    detail: templateDuplicateCode,
+  },
+  {
     name: "API-14 template flow builds one transact with history Put + update-based existence guard + stats updates",
     ok:
       hasHistoryPut(templateCall)
@@ -122,7 +215,8 @@ const checks = [
       && hasUniqueOperationKeys(templateCall)
       && hasTemplateExistenceGuardOnUpdate(templateCall)
       && hasStatsWriteUpdates(templateCall)
-      && hasSafeConditionExpressions(templateCall),
+      && hasSafeConditionExpressions(templateCall)
+      && hasClothingIdsFromTemplate(templateCall),
     detail: templateCall,
   },
   {
