@@ -271,6 +271,9 @@ jobs:
       - name: API history API-14 handler spec test
         run: pnpm --filter api test:history-ms5-api14-handler
 
+      - name: API history template source guard spec test
+        run: pnpm --filter api test:history-template-source-guard
+
       - name: API history API-16 usecase spec test
         run: pnpm --filter api test:history-ms5-api16-usecase
 

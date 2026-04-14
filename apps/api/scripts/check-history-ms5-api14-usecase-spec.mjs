@@ -19,6 +19,14 @@ const transactCalls = [];
 const usecase = createHistoryWithStatsWriteUsecase({
   now: () => 1735689600000,
   generateHistoryId: () => "hs_custom",
+  async getTemplate() {
+    return {
+      Item: {
+        status: "ACTIVE",
+        clothingIds: ["cl_010", "cl_011"],
+      },
+    };
+  },
   async transactWriteItems(items) {
     transactCalls.push(items);
     return { ok: true };
