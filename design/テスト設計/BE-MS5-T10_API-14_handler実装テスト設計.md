@@ -34,12 +34,22 @@
 - 期待結果:
   - `clothingIds` に重複がある場合 `CONFLICT` を送出する
 
-### HMS5API14H-05 参照テンプレ/服の不在を `NOT_FOUND(404)` に正規化できる
-- 観点: API設計の 404 仕様
+### HMS5API14H-05 template 不在を `NOT_FOUND(404)` に正規化できる
+- 観点: API設計の 404 仕様（template 指定時）
 - 期待結果:
-  - トランザクション条件チェック失敗（`ConditionalCheckFailed`）を `NOT_FOUND` に変換する
+  - `templateId` 指定でトランザクション条件チェック失敗（`ConditionalCheckFailed`）が発生した場合に `NOT_FOUND` を返す
 
-### HMS5API14H-06 package script と CI 導線が維持される
+### HMS5API14H-06 clothing 不在を `NOT_FOUND(404)` に正規化できる
+- 観点: API設計の 404 仕様（clothingIds 指定時）
+- 期待結果:
+  - `clothingIds` 指定でトランザクション条件チェック失敗（`ConditionalCheckFailed`）が発生した場合に `NOT_FOUND` を返す
+
+### HMS5API14H-07 template 不正入力を `VALIDATION_ERROR(400)` で拒否できる
+- 観点: API設計の 400 仕様（template パラメータ不正）
+- 期待結果:
+  - `templateId` が空文字など schema 非準拠の場合に `VALIDATION_ERROR` を返す
+
+### HMS5API14H-08 package script と CI 導線が維持される
 - 観点: PR 上で自動検証される導線の担保
 - 期待結果:
   - `apps/api/package.json` に `test:history-ms5-api14-handler` が定義される

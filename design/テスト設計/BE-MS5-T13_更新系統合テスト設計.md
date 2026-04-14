@@ -8,6 +8,7 @@
 ## テスト観点
 
 - create 後に `template` / `clothing` の `wearCount` が増加する。
+- template 記録の create でも、template に紐づく clothing 側 `wearCount` / `wearDaily` / `lastWornAt` が同時更新される。
 - create 後に `template` / `clothing` の daily カウンタが対象日で増加する。
 - create 後に `lastWornAt` が作成日に更新される。
 - delete 後に `template` / `clothing` の `wearCount` がベースラインへ戻る。
@@ -28,6 +29,8 @@
   - template `wearCount` は `2 -> 3 -> 2`。
   - template daily `DATE#20260105` は create で作成、delete で削除。
   - template `lastWornAt` は `20260103 -> 20260105 -> 20260103`。
+  - template に紐づく clothing（`cl_001` / `cl_002`）も create で `wearCount` と `lastWornAt` が更新され、delete でベースラインへ戻る。
+  - template に紐づく clothing daily `DATE#20260105` は create で作成、delete で削除。
 
 ### HMS5INT-02 正常系: clothing 記録の create/delete で統計整合を維持できる
 

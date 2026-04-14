@@ -94,6 +94,38 @@ try {
   notFoundCode = error?.code ?? null;
 }
 
+let templateNotFoundCode = null;
+try {
+  await createHistoryHandler({
+    path: { wardrobeId: "wd_001" },
+    body: { date: "20260101", templateId: "tp_404" },
+    headers: { "content-type": "application/json" },
+    requestId: "req_history_template_not_found",
+    dependencies: {
+      async transactWriteItems() {
+        const error = new Error("Transaction cancelled");
+        error.name = "TransactionCanceledException";
+        error.CancellationReasons = [{ Code: "ConditionalCheckFailed" }];
+        throw error;
+      },
+    },
+  });
+} catch (error) {
+  templateNotFoundCode = error?.code ?? null;
+}
+
+let invalidTemplateCode = null;
+try {
+  await createHistoryHandler({
+    path: { wardrobeId: "wd_001" },
+    body: { date: "20260101", templateId: "" },
+    headers: { "content-type": "application/json" },
+    requestId: "req_history_invalid_template_id",
+  });
+} catch (error) {
+  invalidTemplateCode = error?.code ?? null;
+}
+
 const checks = [
   {
     name: "API-14 handler validates request and returns 201 with historyId",
@@ -124,9 +156,19 @@ const checks = [
     detail: conflictCode,
   },
   {
-    name: "API-14 handler maps transact conditional check failure to NOT_FOUND",
+    name: "API-14 handler maps clothing conditional check failure to NOT_FOUND",
     ok: notFoundCode === "NOT_FOUND",
     detail: notFoundCode,
+  },
+  {
+    name: "API-14 handler maps template conditional check failure to NOT_FOUND",
+    ok: templateNotFoundCode === "NOT_FOUND",
+    detail: templateNotFoundCode,
+  },
+  {
+    name: "API-14 handler rejects invalid templateId with VALIDATION_ERROR",
+    ok: invalidTemplateCode === "VALIDATION_ERROR",
+    detail: invalidTemplateCode,
   },
   {
     name: "source exports API-14 handler and package / CI wiring",

@@ -40,7 +40,15 @@
   - 同一 `PK/SK` への複数操作を含まない
   - `wearDaily` 更新 + 統計キャッシュ更新（`wearCount` / `lastWornAt`）を含む
 
-### HMS5API14-05 package script と CI 導線が維持される
+
+### HMS5API14-05 `templateId` 記録時に `history.clothingIds` 保存と clothing 統計更新を同時に満たせる
+- 観点: template 記録でも履歴詳細解決に必要な `history.clothingIds` を保持しつつ、服側集計（`wearCount` / `lastWornAt` / `wearDaily`）を更新できるか
+- 期待結果:
+  - `templateId` 入力の `history Put` に `clothingIds` が保存される
+  - template 更新に加えて、template 配下の各 clothing 更新（`attribute_exists(PK)`）を含む
+  - 各 clothing の `wearDaily` 更新 + 統計キャッシュ更新（`wearCount` / `lastWornAt`）を含む
+
+### HMS5API14-06 package script と CI 導線が維持される
 - 観点: PR 上で自動検証される導線の担保
 - 期待結果:
   - `apps/api/package.json` に `test:history-ms5-api14-usecase` が定義される
