@@ -502,6 +502,9 @@ jobs:
       - name: Image URL resolution spec test
         run: pnpm --filter web test:image-url-resolution
 
+      - name: Clothing detail image layout spec test
+        run: pnpm --filter web test:clothing-detail-image-layout
+
       - name: Clothing query hooks spec test
         run: pnpm --filter web test:clothing-query-hooks
 
