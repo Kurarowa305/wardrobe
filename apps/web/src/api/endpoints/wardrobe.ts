@@ -3,6 +3,7 @@ import { AppError } from "@/lib/error/normalize";
 import type {
   CreateWardrobeRequestDto,
   CreateWardrobeResponseDto,
+  WardrobeDetailResponseDto,
 } from "@/api/schemas/wardrobe";
 import { isWardrobeId } from "@/api/schemas/wardrobe";
 
@@ -26,6 +27,24 @@ function parseCreateWardrobeResponseDto(value: unknown): CreateWardrobeResponseD
   });
 }
 
+function parseWardrobeDetailResponseDto(value: unknown): WardrobeDetailResponseDto {
+  if (isRecord(value) && typeof value.name === "string") {
+    return { name: value.name };
+  }
+
+  throw new AppError({
+    code: "INVALID_RESPONSE",
+    message: "ワードローブ取得APIのレスポンス形式が不正です。",
+    details: {
+      expected: '{ "name": "My Wardrobe" }',
+    },
+  });
+}
+
+function buildWardrobeDetailPath(wardrobeId: string) {
+  return `${WARDROBE_COLLECTION_PATH}/${wardrobeId}`;
+}
+
 export function createWardrobe(
   body: CreateWardrobeRequestDto,
 ): Promise<CreateWardrobeResponseDto> {
@@ -35,4 +54,10 @@ export function createWardrobe(
       body,
     },
   ).then((response) => parseCreateWardrobeResponseDto(response));
+}
+
+export function getWardrobe(wardrobeId: string): Promise<WardrobeDetailResponseDto> {
+  return apiClient
+    .get<unknown>(buildWardrobeDetailPath(wardrobeId))
+    .then((response) => parseWardrobeDetailResponseDto(response));
 }

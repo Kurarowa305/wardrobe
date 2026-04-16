@@ -4,6 +4,7 @@ import Link from "next/link";
 import { createElement, useEffect, useRef } from "react";
 
 import { useRecentHistories } from "@/api/hooks/history";
+import { useWardrobeDetail } from "@/api/hooks/wardrobe";
 import { SharedHistoryCard } from "@/components/app/history/HistoryCard";
 import { TabBarIcon } from "@/components/ui/tab-bar-icon";
 import { AppLayout } from "@/components/app/layout/AppLayout";
@@ -21,6 +22,7 @@ const HOME_RECENT_HISTORY_LIMIT = 7;
 export function HomeTabScreen({ wardrobeId }: HomeTabScreenProps) {
   const { toast } = useToast();
   const hasShownToastRef = useRef(false);
+  const wardrobeQuery = useWardrobeDetail(wardrobeId);
   const recentHistoriesQuery = useRecentHistories(wardrobeId, HOME_RECENT_HISTORY_LIMIT);
 
   useEffect(() => {
@@ -96,7 +98,7 @@ export function HomeTabScreen({ wardrobeId }: HomeTabScreenProps) {
   );
 
   return createElement(AppLayout, {
-    title: HOME_STRINGS.titlePlaceholder,
+    title: wardrobeQuery.data?.name ?? "",
     tabKey: "home",
     wardrobeId,
     children: content,
