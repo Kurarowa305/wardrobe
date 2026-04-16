@@ -22,6 +22,14 @@ const response = await createHistoryHandler({
   headers: { "content-type": "application/json; charset=utf-8" },
   requestId: "req_history_create",
   dependencies: {
+    async getTemplate() {
+      return {
+        Item: {
+          templateId: "tp_001",
+          clothingIds: ["cl_001", "cl_002"],
+        },
+      };
+    },
     async transactWriteItems(items) {
       createCalls.push(items);
       return { ok: true };
