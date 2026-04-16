@@ -14,7 +14,7 @@ locals {
   apigw_domain_route_keys = {
     wardrobe = [
       "ANY /wardrobes",
-      "ANY /wardrobes/{proxy+}"
+      "ANY /wardrobes/{wardrobeId}"
     ]
     clothing = [
       "ANY /wardrobes/{wardrobeId}/clothing",
