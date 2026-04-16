@@ -42,18 +42,18 @@ const ciTarget = ".github/workflows/ci.yml";
 
 check(
   "CDIL-01",
-  "服詳細画像が object-cover ではなく比率追従の object-contain で表示される",
-  includes(detailTarget, 'className="max-w-full h-auto max-h-[60dvh] rounded-md object-contain"') &&
-    !includes(detailTarget, 'className="h-48 w-full rounded-md border border-slate-200 bg-slate-100 object-cover"'),
-  "服詳細画像の可変高さ表示または object-cover 除去が不足しています",
+  "服詳細画像が横幅いっぱい・縦横比維持で画像単体表示される",
+  includes(detailTarget, 'className="block w-full h-auto rounded-md"') &&
+    !includes(detailTarget, "max-h-[60dvh]") &&
+    !includes(detailTarget, "object-cover"),
+  "服詳細画像の横幅維持・比率追従表示、または高さ上限制限の除去が不足しています",
 );
 
 check(
   "CDIL-02",
-  "服詳細画像ラッパーが中央寄せ・枠線・背景付きで max-h-[60dvh] を許容する",
-  includes(detailTarget, 'className="flex items-center justify-center rounded-md border border-slate-200 bg-slate-100 p-2"') &&
-    includes(detailTarget, "max-h-[60dvh]"),
-  "服詳細画像ラッパーの中央寄せレイアウトまたは高さ上限指定が不足しています",
+  "服詳細画像が専用ラッパーなしで表示される",
+  !includes(detailTarget, 'className="flex items-center justify-center rounded-md border border-slate-200 bg-slate-100 p-2"'),
+  "服詳細画像の背景付きラッパーが残っています",
 );
 
 check(
