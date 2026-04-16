@@ -21,6 +21,14 @@ const transactCalls = [];
 const usecase = createHistoryWithStatsWriteUsecase({
   now: () => 1_735_689_600_000,
   generateHistoryId: () => "hs_tx_guard",
+  async getTemplate() {
+    return {
+      Item: {
+        templateId: "tp_001",
+        clothingIds: ["cl_010", "cl_011"],
+      },
+    };
+  },
   async transactWriteItems(items) {
     transactCalls.push(items);
     return { ok: true };
