@@ -90,13 +90,7 @@ export function ClothingDetailScreen({ wardrobeId, clothingId }: ClothingDetailS
       {clothingQuery.data ? (
         <>
           {imageUrl ? (
-            <div className="flex items-center justify-center rounded-md border border-slate-200 bg-slate-100 p-2">
-              <img
-                src={imageUrl}
-                alt={`${clothingQuery.data.name}の画像`}
-                className="max-w-full h-auto max-h-[60dvh] rounded-md object-contain"
-              />
-            </div>
+            <img src={imageUrl} alt={`${clothingQuery.data.name}の画像`} className="block w-full h-auto rounded-md" />
           ) : (
             <div className="flex h-48 items-center justify-center rounded-md border border-slate-200 bg-slate-100 px-2 text-center text-xs font-semibold uppercase tracking-wide text-slate-600">
               {COMMON_STRINGS.placeholders.noImage}
