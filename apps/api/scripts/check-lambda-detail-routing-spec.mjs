@@ -35,6 +35,33 @@ async function runCase(handler, domain, title, event, expectDefault) {
 const clothingHandler = createLambdaHandler({ domain: "clothing" });
 const templateHandler = createLambdaHandler({ domain: "template" });
 const historyHandler = createLambdaHandler({ domain: "history" });
+const wardrobeHandler = createLambdaHandler({ domain: "wardrobe" });
+
+await runCase(
+  wardrobeHandler,
+  "wardrobe",
+  "wardrobe GET detail は wardrobeId があると get handler 分岐へ到達し default 応答にならない",
+  {
+    rawPath: "/wardrobes/wd_001",
+    pathParameters: { wardrobeId: "wd_001" },
+    requestContext: { http: { method: "GET", path: "/wardrobes/wd_001" }, requestId: "ctx_w_get" },
+    headers: { "x-request-id": "req_w_get" },
+  },
+  false,
+);
+
+await runCase(
+  wardrobeHandler,
+  "wardrobe",
+  "wardrobe GET detail 相当でも wardrobeId が欠落し proxy のみだと default 応答へフォールバックする",
+  {
+    rawPath: "/wardrobes/wd_001",
+    pathParameters: { proxy: "wd_001" },
+    requestContext: { http: { method: "GET", path: "/wardrobes/wd_001" }, requestId: "ctx_w_proxy" },
+    headers: { "x-request-id": "req_w_proxy" },
+  },
+  true,
+);
 
 await runCase(
   clothingHandler,

@@ -31,10 +31,10 @@ const checks = [
       apigwTf.includes('presign  = aws_lambda_function.domain["presign"].invoke_arn'),
   },
   {
-    name: "path prefix ごとの route が定義され、detail 系は ID パラメータで定義されている（clothing は単数）",
+    name: "path prefix ごとの route が定義され、wardrobe/clothing/template/history の detail 系は ID パラメータで定義されている",
     ok:
       apigwTf.includes('"ANY /wardrobes"') &&
-      apigwTf.includes('"ANY /wardrobes/{proxy+}"') &&
+      apigwTf.includes('"ANY /wardrobes/{wardrobeId}"') &&
       apigwTf.includes('"ANY /wardrobes/{wardrobeId}/clothing"') &&
       apigwTf.includes('"ANY /wardrobes/{wardrobeId}/clothing/{clothingId}"') &&
       apigwTf.includes('"ANY /wardrobes/{wardrobeId}/templates"') &&
@@ -45,8 +45,9 @@ const checks = [
       apigwTf.includes('"ANY /wardrobes/{wardrobeId}/images/presign/{proxy+}"'),
   },
   {
-    name: "clothing/template/history の detail route に {proxy+} が残っていない",
+    name: "wardrobe/clothing/template/history の detail route に {proxy+} が残っていない",
     ok:
+      !apigwTf.includes('"ANY /wardrobes/{proxy+}"') &&
       !apigwTf.includes('"ANY /wardrobes/{wardrobeId}/clothing/{proxy+}"') &&
       !apigwTf.includes('"ANY /wardrobes/{wardrobeId}/templates/{proxy+}"') &&
       !apigwTf.includes('"ANY /wardrobes/{wardrobeId}/histories/{proxy+}"'),
