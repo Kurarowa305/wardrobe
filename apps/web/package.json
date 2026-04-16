@@ -46,6 +46,7 @@
     "test:image-content-type-validation": "node scripts/check-image-content-type-validation-spec.mjs",
     "test:image-key-payload": "node scripts/check-image-key-payload-spec.mjs",
     "test:image-url-resolution": "node scripts/check-image-url-resolution-spec.mjs",
+    "test:clothing-detail-image-layout": "node scripts/check-clothing-detail-image-layout-spec.mjs",
     "test:clothing-query-hooks": "node scripts/check-clothing-query-hooks-spec.mjs",
     "test:clothing-mutation-hooks": "node scripts/check-clothing-mutation-hooks-spec.mjs",
     "test:clothing-list-screen": "node scripts/check-clothing-list-screen-spec.mjs",
