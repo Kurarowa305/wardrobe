@@ -406,6 +406,9 @@ jobs:
       - name: Web production config spec test
         run: pnpm --filter web test:web-production-config
 
+      - name: PWA home icon spec test
+        run: pnpm --filter web test:pwa-home-icon
+
       - name: Clothing types spec test
         run: pnpm --filter web test:clothing-types
 
