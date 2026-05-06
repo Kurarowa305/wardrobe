@@ -34,6 +34,7 @@ jobs:
       - name: Home header wardrobe title spec test
         run: pnpm --filter web test:home-header-wardrobe-title
 
+
       - name: API bootstrap spec test
         run: pnpm --filter api test:bootstrap
 
