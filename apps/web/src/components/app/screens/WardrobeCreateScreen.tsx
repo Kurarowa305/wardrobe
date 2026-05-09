@@ -8,6 +8,7 @@ import { AppLayout } from "@/components/app/layout/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ROUTES } from "@/constants/routes";
+import { writeLastWardrobeId } from "@/features/routing/lastWardrobeStorage";
 import { OPERATION_TOAST_IDS, appendOperationToast } from "@/features/toast/operationToast";
 import { WARDROBE_STRINGS } from "@/features/wardrobe/strings";
 
@@ -29,6 +30,7 @@ export function WardrobeCreateScreen() {
       const created = await createWardrobeMutation.mutateAsync({
         name: trimmedName,
       });
+      writeLastWardrobeId(created.wardrobeId);
       router.push(
         appendOperationToast(
           ROUTES.home(created.wardrobeId),

@@ -29,7 +29,8 @@ const checks = [
     id: "WIG-03",
     name: "query パラメータ解決が DEMO_IDS へフォールバックしない",
     ok:
-      includes("src/features/routing/queryParams.ts", "resolveWardrobeId(searchParams) ?? \"\"") &&
+      includes("src/features/routing/queryParams.ts", "const wardrobeId = resolveWardrobeId(searchParams);") &&
+      includes("src/features/routing/queryParams.ts", "return wardrobeId ?? \"\";") &&
       !includes("src/features/routing/queryParams.ts", "DEMO_IDS.wardrobe") &&
       !includes("src/features/routing/queryParams.ts", "DEMO_IDS.history") &&
       !includes("src/features/routing/queryParams.ts", "DEMO_IDS.template") &&

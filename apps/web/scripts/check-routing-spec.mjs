@@ -150,9 +150,18 @@ function findPageFiles() {
 
 const expected15Screens = [CREATE_PAGE, ...TAB_PAGES, ...STACK_PAGES];
 
-check("RT-01", "root route redirects to /wardrobes/new", () => {
-  const ok = includes(ROOT_PAGE, "redirect(ROUTES.wardrobeNew);");
-  return { ok, detail: `${ROOT_PAGE} must call redirect(ROUTES.wardrobeNew)` };
+check("RT-01", "root route resolves startup destination from saved wardrobe context", () => {
+  const ok = containsAll(ROOT_PAGE, [
+    '"use client";',
+    "const savedWardrobeId = readLastWardrobeId();",
+    "await getWardrobe(savedWardrobeId);",
+    "router.replace(ROUTES.home(savedWardrobeId));",
+    "router.replace(ROUTES.wardrobeNew);",
+  ]);
+  return {
+    ok,
+    detail: `${ROOT_PAGE} must restore saved wardrobe home or fallback to ROUTES.wardrobeNew`,
+  };
 });
 
 check("RT-02", "wardrobe create page exists at /wardrobes/new", () => {
@@ -346,7 +355,7 @@ check("RT-19", "all in-wardrobe route calls use wardrobeId as first argument", (
   const files = routeFiles
     .filter((file) => file.endsWith(".ts") || file.endsWith(".tsx"))
     .map((file) => path.relative(webRoot, file).replaceAll(path.sep, "/"))
-    .filter((file) => file !== CREATE_SCREEN);
+    .filter((file) => file !== CREATE_SCREEN && file !== ROOT_PAGE);
 
   const pattern =
     /ROUTES\.(home|histories|templates|clothings|recordMethod|recordByTemplate|recordByCombination|templateNew|templateDetail|templateEdit|clothingNew|clothingDetail|clothingEdit|historyDetail)\(\s*(?!wardrobeId\b)/;
