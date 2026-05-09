@@ -5,6 +5,7 @@ import { useRouter, useSearchParams, type ReadonlyURLSearchParams } from "next/n
 
 import { isWardrobeId } from "@/api/schemas/wardrobe";
 import { ROUTES } from "@/constants/routes";
+import { writeLastWardrobeId } from "@/features/routing/lastWardrobeStorage";
 
 function resolveQueryParam(searchParams: ReadonlyURLSearchParams, key: string) {
   const value = searchParams.get(key);
@@ -25,31 +26,49 @@ function resolveWardrobeId(searchParams: ReadonlyURLSearchParams) {
   return isWardrobeId(wardrobeId) ? wardrobeId : null;
 }
 
+function usePersistWardrobeId(wardrobeId: string | null) {
+  useEffect(() => {
+    if (!wardrobeId) {
+      return;
+    }
+
+    writeLastWardrobeId(wardrobeId);
+  }, [wardrobeId]);
+}
+
 export function useWardrobeIdFromQuery() {
   const searchParams = useSearchParams();
-  return resolveWardrobeId(searchParams) ?? "";
+  const wardrobeId = resolveWardrobeId(searchParams);
+  usePersistWardrobeId(wardrobeId);
+  return wardrobeId ?? "";
 }
 
 export function useHistoryRouteIdsFromQuery() {
   const searchParams = useSearchParams();
+  const wardrobeId = resolveWardrobeId(searchParams);
+  usePersistWardrobeId(wardrobeId);
   return {
-    wardrobeId: resolveWardrobeId(searchParams) ?? "",
+    wardrobeId: wardrobeId ?? "",
     historyId: resolveQueryParam(searchParams, "historyId") ?? "",
   };
 }
 
 export function useTemplateRouteIdsFromQuery() {
   const searchParams = useSearchParams();
+  const wardrobeId = resolveWardrobeId(searchParams);
+  usePersistWardrobeId(wardrobeId);
   return {
-    wardrobeId: resolveWardrobeId(searchParams) ?? "",
+    wardrobeId: wardrobeId ?? "",
     templateId: resolveQueryParam(searchParams, "templateId") ?? "",
   };
 }
 
 export function useClothingRouteIdsFromQuery() {
   const searchParams = useSearchParams();
+  const wardrobeId = resolveWardrobeId(searchParams);
+  usePersistWardrobeId(wardrobeId);
   return {
-    wardrobeId: resolveWardrobeId(searchParams) ?? "",
+    wardrobeId: wardrobeId ?? "",
     clothingId: resolveQueryParam(searchParams, "clothingId") ?? "",
   };
 }
