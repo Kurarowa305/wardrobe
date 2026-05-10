@@ -3,7 +3,7 @@
   "name": "Wardrobe",
   "short_name": "Wardrobe",
   "description": "Wardrobe app routing skeleton",
-  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#000000",

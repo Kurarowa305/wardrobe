@@ -72,6 +72,7 @@
     "test:web-production-config": "node scripts/check-web-production-config-spec.mjs",
     "test:pwa-home-icon": "node scripts/check-pwa-home-icon-spec.mjs",
     "test:pwa-startup-home-restore": "node scripts/check-pwa-startup-home-restore-spec.mjs",
+    "test:pwa-start-url-current-page": "node scripts/check-pwa-start-url-current-page-spec.mjs",
     "test:tab-bar-fixed": "node scripts/check-tab-bar-fixed-spec.mjs",
     "test:tab-bar-icons": "node scripts/check-tab-bar-icons-spec.mjs",
     "test:tab-bar-icon-svg": "node scripts/check-tab-bar-icon-svg-spec.mjs",

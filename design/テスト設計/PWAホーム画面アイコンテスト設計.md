@@ -27,10 +27,11 @@
 - `layout.tsx` の `viewport` に `themeColor` が定義されていること
 - `manifest.webmanifest` の `theme_color` と整合していること
 
-### 3. manifest アイコン定義
+### 3. manifest アイコン定義と起動範囲
 
 - `manifest.webmanifest` に `192x192` / `512x512` の PNG アイコンが定義されていること
-- `start_url` / `display` / `id` がホーム画面起動向けに維持されていること
+- `scope` / `display` / `id` がホーム画面起動向けに維持されていること
+- `start_url` は定義せず、標準PWA追加時にインストール元ページURLを起動URLにできること
 - 各アイコンが `purpose: "any"` を持ち、ホーム画面アイコンとして利用可能な状態であること
 
 ### 4. CI組み込み
@@ -44,7 +45,7 @@
 | --- | --- | --- | --- |
 | PHI-01 | Next.js metadata 公開 | `layout.tsx` を確認する | `manifest` / `icon` / `shortcut` / `apple` / `appleWebApp` が定義されている |
 | PHI-02 | Viewport / theme color | `layout.tsx` と `manifest.webmanifest` を確認する | `viewport.themeColor` と `manifest.theme_color` が `#000000` で整合している |
-| PHI-03 | manifest アイコン定義 | `manifest.webmanifest` を確認する | `192x192` と `512x512` の PNG アイコン、および `id` / `start_url` / `display` が定義されている |
+| PHI-03 | manifest アイコン定義 | `manifest.webmanifest` を確認する | `192x192` と `512x512` の PNG アイコン、および `id` / `scope` / `display` が定義され、`start_url` が存在しない |
 | PHI-04 | CI組み込み | `package.json` と `ci.yml` を確認する | `test:pwa-home-icon` が npm script と CI に登録されている |
 
 ## 実装方針
@@ -56,5 +57,5 @@
 
 - PHI-01 `layout.tsx` が `manifest` / `icon` / `shortcut` / `apple` / `appleWebApp` を公開
 - PHI-02 `viewport.themeColor` と `manifest.theme_color` の整合
-- PHI-03 `manifest.webmanifest` の `192x192` / `512x512` アイコン定義と PWA 起動設定
+- PHI-03 `manifest.webmanifest` の `192x192` / `512x512` アイコン定義、`scope`、`start_url` 未定義の PWA 起動設定
 - PHI-04 `test:pwa-home-icon` の package.json / CI 登録
