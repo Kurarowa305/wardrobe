@@ -1,10 +1,12 @@
 import type { ClothingDto, ClothingGenreDto, ClothingListItemDto } from "@/api/schemas/clothing";
+import type { ItemTagIdDto } from "@/api/schemas/itemTag";
 
 export type ClothingListItem = {
   clothingId: string;
   name: string;
   genre: ClothingGenreDto;
   imageKey: string | null;
+  tagIds: ItemTagIdDto[];
 };
 
 export type Clothing = {
@@ -12,6 +14,7 @@ export type Clothing = {
   name: string;
   genre: ClothingGenreDto;
   imageKey: string | null;
+  tagIds: ItemTagIdDto[];
   wearCount: number;
   lastWornAt: number | null;
   deleted: boolean;
@@ -23,6 +26,7 @@ export function toClothingListItem(dto: ClothingListItemDto): ClothingListItem {
     name: dto.name,
     genre: dto.genre,
     imageKey: dto.imageKey,
+    tagIds: dto.tagIds,
   };
 }
 
@@ -32,6 +36,7 @@ export function toClothing(dto: ClothingDto): Clothing {
     name: dto.name,
     genre: dto.genre,
     imageKey: dto.imageKey,
+    tagIds: dto.tagIds,
     wearCount: dto.wearCount,
     lastWornAt: dto.lastWornAt > 0 ? dto.lastWornAt : null,
     deleted: dto.status === "DELETED",

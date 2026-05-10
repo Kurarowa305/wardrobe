@@ -49,6 +49,7 @@ export async function updateTemplateHandler(input: UpdateTemplateHandlerInput) {
     templateId: parsed.path.templateId,
     name: parsed.body.name,
     clothingIds: parsed.body.clothingIds,
+    tagIds: parsed.body.tagIds,
   });
 
   return createNoContentResponse();

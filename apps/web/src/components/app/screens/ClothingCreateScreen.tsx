@@ -6,7 +6,9 @@ import { useRouter } from "next/navigation";
 import { uploadImageWithPresign } from "@/api/endpoints/image";
 import { useCreateClothingMutation } from "@/api/hooks/clothing";
 import type { ClothingGenreDto } from "@/api/schemas/clothing";
+import type { ItemTagIdDto } from "@/api/schemas/itemTag";
 import { AppLayout } from "@/components/app/layout/AppLayout";
+import { ItemTagSelector } from "@/components/app/tags/ItemTagSelector";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ROUTES } from "@/constants/routes";
@@ -20,6 +22,7 @@ export function ClothingCreateScreen({ wardrobeId }: ClothingCreateScreenProps) 
   const router = useRouter();
   const [name, setName] = useState("");
   const [genre, setGenre] = useState<ClothingGenreDto | "">("");
+  const [selectedTagIds, setSelectedTagIds] = useState<ItemTagIdDto[]>([]);
   const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
@@ -67,7 +70,7 @@ export function ClothingCreateScreen({ wardrobeId }: ClothingCreateScreenProps) 
       try { uploadedImageKey = await uploadImage(selectedImageFile); } catch { return; }
     }
 
-    await createMutation.mutateAsync({ name: trimmedName, genre: genre as ClothingGenreDto, imageKey: uploadedImageKey });
+    await createMutation.mutateAsync({ name: trimmedName, genre: genre as ClothingGenreDto, imageKey: uploadedImageKey, tagIds: selectedTagIds });
     router.push(appendOperationToast(ROUTES.clothings(wardrobeId), OPERATION_TOAST_IDS.clothingCreated));
   };
 
@@ -106,6 +109,12 @@ export function ClothingCreateScreen({ wardrobeId }: ClothingCreateScreenProps) 
           </span>
         </label>
         {showGenreError ? <p id="clothing-genre-error" className="m-0 text-sm text-red-700">{CLOTHING_STRINGS.create.messages.genreRequired}</p> : null}
+
+        <ItemTagSelector
+          label={CLOTHING_STRINGS.create.labels.tags}
+          selectedTagIds={selectedTagIds}
+          onChange={setSelectedTagIds}
+        />
 
         {createMutation.isError ? <p className="m-0 text-sm text-red-700">{CLOTHING_STRINGS.create.messages.submitError}</p> : null}
         {uploadError ? <div className="grid gap-2"><p className="m-0 text-sm text-red-700">{uploadError}</p><Button type="button" variant="outline" onClick={handleRetryUpload} disabled={isUploadingImage}>{CLOTHING_STRINGS.create.actions.retryUpload}</Button></div> : null}

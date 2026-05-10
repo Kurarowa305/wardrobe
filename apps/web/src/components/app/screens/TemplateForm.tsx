@@ -6,7 +6,9 @@ import { useRouter } from "next/navigation";
 import { useClothingList } from "@/api/hooks/clothing";
 import { useCreateTemplateMutation, useTemplate, useUpdateTemplateMutation } from "@/api/hooks/template";
 import type { ClothingGenreDto } from "@/api/schemas/clothing";
+import type { ItemTagIdDto } from "@/api/schemas/itemTag";
 import { ClothingGenreSection } from "@/components/app/screens/ClothingGenreSection";
+import { ItemTagSelector } from "@/components/app/tags/ItemTagSelector";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ROUTES } from "@/constants/routes";
@@ -42,6 +44,7 @@ export function TemplateForm({ wardrobeId, mode, templateId, submitLabel }: Temp
 
   const [name, setName] = useState("");
   const [nameTouched, setNameTouched] = useState(false);
+  const [selectedTagIds, setSelectedTagIds] = useState<ItemTagIdDto[]>([]);
   const [selectedClothingIds, setSelectedClothingIds] = useState<string[]>([]);
   const [loadedClothingNameById, setLoadedClothingNameById] = useState<Record<string, string>>({});
   const [genreStates, setGenreStates] = useState<Record<ClothingGenreDto, GenreState>>(createInitialGenreState);
@@ -68,6 +71,7 @@ export function TemplateForm({ wardrobeId, mode, templateId, submitLabel }: Temp
   useEffect(() => {
     if (mode !== "edit" || !templateQuery.data || hasInitializedEditValues) return;
     setName(templateQuery.data.name);
+    setSelectedTagIds(templateQuery.data.tagIds);
     setSelectedClothingIds(templateQuery.data.clothingItems.map((item) => item.clothingId));
     setHasInitializedEditValues(true);
   }, [hasInitializedEditValues, mode, templateQuery.data]);
@@ -128,7 +132,7 @@ export function TemplateForm({ wardrobeId, mode, templateId, submitLabel }: Temp
     setNameTouched(true);
     if (isNameEmpty || isSelectionEmpty || isPending || showTemplateLoading || showTemplateError) return;
 
-    const payload = { name: trimmedName, clothingIds: selectedClothingIds };
+    const payload = { name: trimmedName, clothingIds: selectedClothingIds, tagIds: selectedTagIds };
     if (mode === "create") {
       await createMutation.mutateAsync(payload);
       router.push(appendOperationToast(ROUTES.templates(wardrobeId), OPERATION_TOAST_IDS.templateCreated));
@@ -165,6 +169,12 @@ export function TemplateForm({ wardrobeId, mode, templateId, submitLabel }: Temp
           ) : null}
 
           {showNameError ? <p id="template-name-error" className="m-0 text-sm text-red-700">{mode === "create" ? TEMPLATE_STRINGS.create.messages.nameRequired : TEMPLATE_STRINGS.edit.messages.nameRequired}</p> : null}
+
+          <ItemTagSelector
+            label={mode === "create" ? TEMPLATE_STRINGS.create.labels.tags : TEMPLATE_STRINGS.edit.labels.tags}
+            selectedTagIds={selectedTagIds}
+            onChange={setSelectedTagIds}
+          />
 
           <fieldset className="grid gap-3 border-0 p-0">
             <legend className="px-0 text-sm font-medium text-slate-900">{mode === "create" ? TEMPLATE_STRINGS.create.labels.selectClothing : TEMPLATE_STRINGS.edit.labels.selectClothing}</legend>

@@ -25,11 +25,13 @@ const createRequest = schemaModule.createClothingRequestSchema.parse({
   name: "白シャツ",
   genre: "tops",
   imageKey: "clothing/white-shirt.png",
+  tagIds: ["season:summer", "season:all"],
 });
 
 const updateRequest = schemaModule.updateClothingRequestSchema.parse({
   genre: "bottoms",
   imageKey: null,
+  tagIds: [],
 });
 
 const listParams = schemaModule.clothingListParamsSchema.parse({
@@ -44,6 +46,7 @@ const detail = schemaModule.clothingDetailResponseSchema.parse({
   name: "黒Tシャツ",
   genre: "tops",
   imageKey: null,
+  tagIds: ["season:summer"],
   status: "ACTIVE",
   wearCount: 12,
   lastWornAt: 1735690000123,
@@ -55,6 +58,7 @@ const entity = schemaModule.clothingEntitySchema.parse({
   name: "黒Tシャツ",
   genre: "tops",
   imageKey: "clothing/black-t.png",
+  tagIds: ["season:winter"],
   status: "DELETED",
   wearCount: 12,
   lastWornAt: 1735690000123,
@@ -67,6 +71,7 @@ const createdEntity = entityModule.createClothingEntity({
   clothingId: "cl_01HZZBBB",
   name: "白シャツ",
   genre: "tops",
+  tagIds: ["season:all"],
   now: 1735600000000,
 });
 
@@ -102,8 +107,10 @@ const checks = [
       createRequest.name === "白シャツ" &&
       createRequest.genre === "tops" &&
       createRequest.imageKey === "clothing/white-shirt.png" &&
+      createRequest.tagIds.join(",") === "season:summer,season:all" &&
       updateRequest.genre === "bottoms" &&
       updateRequest.imageKey === null &&
+      updateRequest.tagIds.length === 0 &&
       listParams.order === "desc" &&
       listParams.genre === "others" &&
       listParams.limit === 20 &&
@@ -114,10 +121,12 @@ const checks = [
     name: "detail response and entity schemas cover required clothing fields including createdAt and deletedAt",
     ok:
       detail.status === "ACTIVE" &&
+      detail.tagIds.join(",") === "season:summer" &&
       detail.wearCount === 12 &&
       detail.lastWornAt === 1735690000123 &&
       entity.createdAt === 1735600000000 &&
       entity.deletedAt === 1735700000000 &&
+      entity.tagIds.join(",") === "season:winter" &&
       entity.status === "DELETED",
     detail: { detail, entity },
   },
@@ -125,6 +134,7 @@ const checks = [
     name: "entity helpers create ACTIVE clothing defaults and support logical delete",
     ok:
       createdEntity.status === "ACTIVE" &&
+      createdEntity.tagIds.join(",") === "season:all" &&
       createdEntity.wearCount === 0 &&
       createdEntity.lastWornAt === 0 &&
       createdEntity.createdAt === 1735600000000 &&
@@ -139,6 +149,7 @@ const checks = [
       dtoSource.includes("export type ClothingStatusDto") &&
       dtoSource.includes("export type CreateClothingRequestDto") &&
       dtoSource.includes("export type ClothingListResponseDto") &&
+      schemaSource.includes("tagIds: itemTagIdsSchema") &&
       schemaSource.includes("export const clothingEntitySchema") &&
       entitySource.includes("export function createClothingEntity") &&
       entitySource.includes("export function markClothingDeleted"),

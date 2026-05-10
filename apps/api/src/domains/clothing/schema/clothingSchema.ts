@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { itemTagIdsSchema } from "../../tags/itemTagSchema.js";
+
 export const clothingStatusValues = ["ACTIVE", "DELETED"] as const;
 export const clothingGenreValues = ["tops", "bottoms", "others"] as const;
 export const clothingListOrderValues = ["asc", "desc"] as const;
@@ -30,12 +32,14 @@ export const createClothingRequestSchema = z.object({
   name: clothingNameSchema,
   genre: clothingGenreSchema,
   imageKey: clothingImageKeySchema.nullable().optional(),
+  tagIds: itemTagIdsSchema.optional(),
 }).strict();
 
 export const updateClothingRequestSchema = z.object({
   name: clothingNameSchema.optional(),
   genre: clothingGenreSchema.optional(),
   imageKey: clothingImageKeySchema.nullable().optional(),
+  tagIds: itemTagIdsSchema.optional(),
 }).strict();
 
 export const clothingListItemSchema = z.object({
@@ -43,6 +47,7 @@ export const clothingListItemSchema = z.object({
   name: clothingNameSchema,
   genre: clothingGenreSchema,
   imageKey: clothingImageKeySchema.nullable(),
+  tagIds: itemTagIdsSchema,
 }).strict();
 
 export const clothingDetailResponseSchema = z.object({
@@ -50,6 +55,7 @@ export const clothingDetailResponseSchema = z.object({
   name: clothingNameSchema,
   genre: clothingGenreSchema,
   imageKey: clothingImageKeySchema.nullable(),
+  tagIds: itemTagIdsSchema,
   status: clothingStatusSchema,
   wearCount: clothingWearCountSchema,
   lastWornAt: clothingTimestampSchema,
@@ -75,6 +81,7 @@ export const clothingEntitySchema = z.object({
   name: clothingNameSchema,
   genre: clothingGenreSchema,
   imageKey: clothingImageKeySchema.nullable(),
+  tagIds: itemTagIdsSchema,
   status: clothingStatusSchema,
   wearCount: clothingWearCountSchema,
   lastWornAt: clothingTimestampSchema,

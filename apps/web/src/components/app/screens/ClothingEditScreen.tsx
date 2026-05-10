@@ -6,7 +6,9 @@ import { useRouter } from "next/navigation";
 import { uploadImageWithPresign } from "@/api/endpoints/image";
 import { useClothing, useUpdateClothingMutation } from "@/api/hooks/clothing";
 import type { ClothingGenreDto } from "@/api/schemas/clothing";
+import type { ItemTagIdDto } from "@/api/schemas/itemTag";
 import { AppLayout } from "@/components/app/layout/AppLayout";
+import { ItemTagSelector } from "@/components/app/tags/ItemTagSelector";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ROUTES } from "@/constants/routes";
@@ -28,6 +30,7 @@ export function ClothingEditScreen({ wardrobeId, clothingId }: ClothingEditScree
   const updateMutation = useUpdateClothingMutation(wardrobeId, clothingId);
   const [name, setName] = useState("");
   const [genre, setGenre] = useState<ClothingGenreDto | "">("");
+  const [selectedTagIds, setSelectedTagIds] = useState<ItemTagIdDto[]>([]);
   const [imageKey, setImageKey] = useState("");
   const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -40,6 +43,7 @@ export function ClothingEditScreen({ wardrobeId, clothingId }: ClothingEditScree
     if (!clothingQuery.data) return;
     setName(clothingQuery.data.name);
     setGenre(clothingQuery.data.genre);
+    setSelectedTagIds(clothingQuery.data.tagIds);
     setImageKey(clothingQuery.data.imageKey ?? "");
   }, [clothingQuery.data]);
 
@@ -82,7 +86,7 @@ export function ClothingEditScreen({ wardrobeId, clothingId }: ClothingEditScree
       try { nextImageKey = await uploadImage(selectedImageFile); } catch { return; }
     }
 
-    await updateMutation.mutateAsync({ name: trimmedName, genre: genre as ClothingGenreDto, imageKey: nextImageKey });
+    await updateMutation.mutateAsync({ name: trimmedName, genre: genre as ClothingGenreDto, imageKey: nextImageKey, tagIds: selectedTagIds });
     router.push(appendOperationToast(ROUTES.clothingDetail(wardrobeId, clothingId), OPERATION_TOAST_IDS.clothingUpdated));
   };
 
@@ -119,6 +123,12 @@ export function ClothingEditScreen({ wardrobeId, clothingId }: ClothingEditScree
             </span>
           </label>
           {showGenreError ? <p id="clothing-genre-error" className="m-0 text-sm text-red-700">{CLOTHING_STRINGS.edit.messages.genreRequired}</p> : null}
+
+          <ItemTagSelector
+            label={CLOTHING_STRINGS.edit.labels.tags}
+            selectedTagIds={selectedTagIds}
+            onChange={setSelectedTagIds}
+          />
 
           {updateMutation.isError ? <p className="m-0 text-sm text-red-700">{CLOTHING_STRINGS.edit.messages.submitError}</p> : null}
           {uploadError ? <div className="grid gap-2"><p className="m-0 text-sm text-red-700">{uploadError}</p><Button type="button" variant="outline" onClick={handleRetryUpload} disabled={isUploadingImage}>{CLOTHING_STRINGS.edit.actions.retryUpload}</Button></div> : null}

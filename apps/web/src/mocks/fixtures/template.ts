@@ -4,6 +4,7 @@ import type {
   TemplateListResponseDto,
   TemplateStatusDto,
 } from "@/api/schemas/template";
+import type { ItemTagIdDto } from "@/api/schemas/itemTag";
 import { CLOTHING_FIXTURE_WARDROBE_ID, clothingDetailFixtureById } from "@/mocks/fixtures/clothing";
 
 export const TEMPLATE_FIXTURE_WARDROBE_ID = CLOTHING_FIXTURE_WARDROBE_ID;
@@ -16,6 +17,7 @@ type TemplateDetailFixtureSeed = {
   templateId: string;
   name: string;
   status: TemplateStatusDto;
+  tagIds: ItemTagIdDto[];
   wearCount: number;
   lastWornAt: number;
   clothingIds: string[];
@@ -30,6 +32,7 @@ const templateDetailFixtureSeeds: TemplateDetailFixtureSeed[] = [
     templateId: "tp_01HZZBBB",
     name: "普段着",
     status: "ACTIVE",
+    tagIds: ["season:all"],
     wearCount: 8,
     lastWornAt: 1735600000000,
     clothingIds: ["cl_top_001", "cl_bottom_001", "cl_other_001", createGeneratedClothingId("top", 1), createGeneratedClothingId("bottom", 1)],
@@ -38,6 +41,7 @@ const templateDetailFixtureSeeds: TemplateDetailFixtureSeed[] = [
     templateId: "tp_01HZZBBC",
     name: "週末コーデ",
     status: "ACTIVE",
+    tagIds: ["season:summer"],
     wearCount: 3,
     lastWornAt: 1735610000000,
     clothingIds: ["cl_top_002", "cl_bottom_002", createGeneratedClothingId("other", 2)],
@@ -46,6 +50,7 @@ const templateDetailFixtureSeeds: TemplateDetailFixtureSeed[] = [
     templateId: "tp_01HZZBBD",
     name: "冬の外出",
     status: "DELETED",
+    tagIds: ["season:winter"],
     wearCount: 1,
     lastWornAt: 1735500000000,
     clothingIds: ["cl_top_003", "cl_bottom_003", "cl_other_003"],
@@ -60,6 +65,7 @@ const templateDetailFixtureSeeds: TemplateDetailFixtureSeed[] = [
       templateId: `tp_auto_${padded}`,
       name: `fixtureテンプレ${padded}`,
       status,
+      tagIds: sequence % 2 === 0 ? ["season:all"] : [],
       wearCount,
       lastWornAt: wearCount === 0 ? 0 : GENERATED_TEMPLATE_FIXTURE_BASE_TIMESTAMP + sequence * 10_000,
       clothingIds: [
@@ -83,6 +89,7 @@ export const templateDetailFixtures: TemplateDetailFixture[] = templateDetailFix
   templateId: seed.templateId,
   name: seed.name,
   status: seed.status,
+  tagIds: seed.tagIds,
   wearCount: seed.wearCount,
   lastWornAt: seed.lastWornAt,
   clothingItems: seed.clothingIds.map(toTemplateClothingItem),
@@ -94,6 +101,7 @@ export const templateListFixture: TemplateListResponseDto = {
     .map((fixture) => ({
       templateId: fixture.templateId,
       name: fixture.name,
+      tagIds: fixture.tagIds,
       clothingItems: fixture.clothingItems.map((clothingItem) => ({
         clothingId: clothingItem.clothingId,
         imageKey: clothingItem.imageKey,

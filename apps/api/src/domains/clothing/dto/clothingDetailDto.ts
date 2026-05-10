@@ -1,5 +1,6 @@
 import type { ClothingDetailResponseDto } from "./clothingDto.js";
 import type { ClothingGenre, ClothingStatus } from "../schema/clothingSchema.js";
+import { normalizeItemTagIds } from "../../tags/itemTagSchema.js";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return !!value && typeof value === "object" && !Array.isArray(value);
@@ -37,6 +38,7 @@ export function toClothingDetailResponseDto(value: unknown): ClothingDetailRespo
     name: value.name,
     genre: isClothingGenre(value.genre) ? value.genre : "others",
     imageKey: value.imageKey,
+    tagIds: normalizeItemTagIds(detailCandidate.tagIds),
     status: isClothingStatus(detailCandidate.status) ? detailCandidate.status : "ACTIVE",
     wearCount: typeof detailCandidate.wearCount === "number" ? detailCandidate.wearCount : 0,
     lastWornAt: typeof detailCandidate.lastWornAt === "number" ? detailCandidate.lastWornAt : 0,
