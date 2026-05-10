@@ -33,12 +33,12 @@ const checks = [
     name: "manifest.webmanifest がホーム画面用アイコンを保持している",
     ok: includesAll("public/manifest.webmanifest", [
       '"id": "/"',
-      '"start_url": "/"',
+      '"scope": "/"',
       '"display": "standalone"',
       '"theme_color": "#000000"',
       '{ "src": "/icons/192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" }',
       '{ "src": "/icons/512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }',
-    ]),
+    ]) && !includes("public/manifest.webmanifest", '"start_url"'),
     detail: "public/manifest.webmanifest のアイコン定義またはPWA設定が不足しています",
   },
   {

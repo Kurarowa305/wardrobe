@@ -413,6 +413,9 @@ jobs:
       - name: PWA startup home restore spec test
         run: pnpm --filter web test:pwa-startup-home-restore
 
+      - name: PWA start URL current page spec test
+        run: pnpm --filter web test:pwa-start-url-current-page
+
       - name: Clothing types spec test
         run: pnpm --filter web test:clothing-types
 
