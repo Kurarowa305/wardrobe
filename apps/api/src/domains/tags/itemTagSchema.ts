@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const itemTagIdValues = ["season:summer", "season:winter", "season:all"] as const;
+export const itemTagIdValues = ["season:spring", "season:summer", "season:autumn", "season:winter", "season:all"] as const;
 export const itemTagIdsMax = itemTagIdValues.length;
 
 export const itemTagIdSchema = z.enum(itemTagIdValues);

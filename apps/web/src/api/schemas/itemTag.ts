@@ -1,1 +1,1 @@
-export type ItemTagIdDto = "season:summer" | "season:winter" | "season:all";
+export type ItemTagIdDto = "season:spring" | "season:summer" | "season:autumn" | "season:winter" | "season:all";

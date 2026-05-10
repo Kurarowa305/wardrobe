@@ -22,7 +22,7 @@
 
 | ID | 観点 | 確認内容 |
 | --- | --- | --- |
-| ITA-01 | タグID正本 | API側の許可IDが `season:summer` / `season:winter` / `season:all` で定義されている |
+| ITA-01 | タグID正本 | API側の許可IDが `season:spring` / `season:summer` / `season:autumn` / `season:winter` / `season:all` で定義されている |
 | ITA-02 | schema検証 | 服・テンプレートの作成/更新schemaが `tagIds` を受理する |
 | ITA-03 | 不正入力 | 未定義タグIDと重複タグIDを `VALIDATION_ERROR` 相当で拒否する |
 | ITA-04 | 初期値 | 作成時に `tagIds` 未指定なら空配列でEntity化される |

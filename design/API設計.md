@@ -30,7 +30,9 @@
 
 | tagId | 表示名 |
 | --- | --- |
+| `season:spring` | 春 |
 | `season:summer` | 夏 |
+| `season:autumn` | 秋 |
 | `season:winter` | 冬 |
 | `season:all` | オールシーズン |
 

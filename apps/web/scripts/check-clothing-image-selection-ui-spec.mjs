@@ -86,10 +86,8 @@ check(
   includes(createScreen, "const uploadImage = async (file: File): Promise<string> => {") &&
     includes(createScreen, "const presigned = await uploadImageWithPresign(wardrobeId, \"clothing\", file);") &&
     includes(createScreen, "return presigned.imageKey;") &&
-    includes(
-      createScreen,
-      "await createMutation.mutateAsync({ name: trimmedName, genre: genre as ClothingGenreDto, imageKey: uploadedImageKey });",
-    ),
+    includes(createScreen, "imageKey: uploadedImageKey") &&
+    includes(createScreen, "tagIds: selectedTagIds"),
   "服追加時の imageKey 設定が presign返却キー連携になっていません",
 );
 

@@ -33,7 +33,7 @@ const templateRepoSource = readFileSync(path.join(root, "src/domains/template/re
 const packageJson = readFileSync(packageJsonPath, "utf8");
 const ciSource = readFileSync(ciPath, "utf8");
 
-const expectedTagIds = ["season:summer", "season:winter", "season:all"];
+const expectedTagIds = ["season:spring", "season:summer", "season:autumn", "season:winter", "season:all"];
 
 const clothingCreate = clothingSchema.createClothingRequestSchema.parse({
   name: "白シャツ",

@@ -147,7 +147,11 @@ function normalizeTagIds(value: unknown): ItemTagIdDto[] | null {
   if (value === undefined) return [];
   if (!Array.isArray(value)) return null;
   const normalized = value.filter((entry): entry is ItemTagIdDto =>
-    entry === "season:summer" || entry === "season:winter" || entry === "season:all",
+    entry === "season:spring" ||
+    entry === "season:summer" ||
+    entry === "season:autumn" ||
+    entry === "season:winter" ||
+    entry === "season:all",
   );
   if (normalized.length !== value.length || new Set(normalized).size !== normalized.length) return null;
   return normalized;

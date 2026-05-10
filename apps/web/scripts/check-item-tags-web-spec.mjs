@@ -44,7 +44,7 @@ const templateDetailSource = read("src/components/app/screens/TemplateDetailScre
 const packageJson = read("package.json");
 const ciSource = fs.readFileSync(path.join(repoRoot, ".github/workflows/ci.yml"), "utf8");
 
-const tagIds = ["season:summer", "season:winter", "season:all"];
+const tagIds = ["season:spring", "season:summer", "season:autumn", "season:winter", "season:all"];
 
 check(
   "ITW-01",
@@ -66,7 +66,9 @@ check(
 check(
   "ITW-03",
   "web display catalog defines Japanese labels and stable order",
-  webTagSource.includes('{ id: "season:summer", label: "夏" }') &&
+  webTagSource.includes('{ id: "season:spring", label: "春" }') &&
+    webTagSource.includes('{ id: "season:summer", label: "夏" }') &&
+    webTagSource.includes('{ id: "season:autumn", label: "秋" }') &&
     webTagSource.includes('{ id: "season:winter", label: "冬" }') &&
     webTagSource.includes('{ id: "season:all", label: "オールシーズン" }') &&
     webTagSource.includes("sortItemTagIds"),
