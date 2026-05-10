@@ -43,6 +43,7 @@ export function TemplateForm({ wardrobeId, mode, templateId, submitLabel }: Temp
   const [name, setName] = useState("");
   const [nameTouched, setNameTouched] = useState(false);
   const [selectedClothingIds, setSelectedClothingIds] = useState<string[]>([]);
+  const [loadedClothingNameById, setLoadedClothingNameById] = useState<Record<string, string>>({});
   const [genreStates, setGenreStates] = useState<Record<ClothingGenreDto, GenreState>>(createInitialGenreState);
   const [hasInitializedEditValues, setHasInitializedEditValues] = useState(mode === "create");
 
@@ -53,6 +54,7 @@ export function TemplateForm({ wardrobeId, mode, templateId, submitLabel }: Temp
 
   useEffect(() => {
     setGenreStates(createInitialGenreState());
+    setLoadedClothingNameById({});
   }, [wardrobeId]);
 
   useEffect(() => {
@@ -70,7 +72,36 @@ export function TemplateForm({ wardrobeId, mode, templateId, submitLabel }: Temp
     setHasInitializedEditValues(true);
   }, [hasInitializedEditValues, mode, templateQuery.data]);
 
+  useEffect(() => {
+    const clothingItems = [
+      ...(templateQuery.data?.clothingItems ?? []),
+      ...(topsQuery.data?.items ?? []),
+      ...(bottomsQuery.data?.items ?? []),
+      ...(othersQuery.data?.items ?? []),
+    ];
+    if (clothingItems.length === 0) return;
+
+    setLoadedClothingNameById((previous) => {
+      let hasChanged = false;
+      const next = { ...previous };
+      for (const item of clothingItems) {
+        if (next[item.clothingId] === item.name) continue;
+        next[item.clothingId] = item.name;
+        hasChanged = true;
+      }
+      return hasChanged ? next : previous;
+    });
+  }, [bottomsQuery.data?.items, othersQuery.data?.items, templateQuery.data?.clothingItems, topsQuery.data?.items]);
+
   const trimmedName = useMemo(() => name.trim(), [name]);
+  const clothingNameById = useMemo(() => new Map(Object.entries(loadedClothingNameById)), [loadedClothingNameById]);
+  const suggestedTemplateName = useMemo(
+    () => selectedClothingIds
+      .map((clothingId) => clothingNameById.get(clothingId))
+      .filter((clothingName): clothingName is string => Boolean(clothingName))
+      .join("+"),
+    [clothingNameById, selectedClothingIds],
+  );
   const isNameEmpty = trimmedName.length === 0;
   const isSelectionEmpty = selectedClothingIds.length === 0;
   const showNameError = nameTouched && isNameEmpty;
@@ -119,6 +150,19 @@ export function TemplateForm({ wardrobeId, mode, templateId, submitLabel }: Temp
             <span>{mode === "create" ? TEMPLATE_STRINGS.create.labels.name : TEMPLATE_STRINGS.edit.labels.name}</span>
             <Input id="template-name" name="name" type="text" value={name} onBlur={() => setNameTouched(true)} onChange={(event) => setName(event.target.value)} placeholder={TEMPLATE_STRINGS.placeholders.name} autoComplete="off" aria-invalid={showNameError} aria-describedby={showNameError ? "template-name-error" : undefined} />
           </label>
+
+          {suggestedTemplateName ? (
+            <div className="grid gap-1">
+              <span className="text-xs font-medium text-slate-600">{TEMPLATE_STRINGS.labels.suggestedName}</span>
+              <button
+                type="button"
+                className="w-full rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-left text-sm font-medium text-slate-900 transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-1"
+                onClick={() => setName(suggestedTemplateName)}
+              >
+                <span className="block break-words">{suggestedTemplateName}</span>
+              </button>
+            </div>
+          ) : null}
 
           {showNameError ? <p id="template-name-error" className="m-0 text-sm text-red-700">{mode === "create" ? TEMPLATE_STRINGS.create.messages.nameRequired : TEMPLATE_STRINGS.edit.messages.nameRequired}</p> : null}
 

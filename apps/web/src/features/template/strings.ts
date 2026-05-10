@@ -1,4 +1,5 @@
 export const TEMPLATE_STRINGS = {
+  labels: { suggestedName: "候補名" },
   placeholders: { name: "例: 通勤コーデ" },
   actions: { loadMoreClothings: "服をさらに読み込む" },
   messages: {
