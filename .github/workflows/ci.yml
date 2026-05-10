@@ -104,6 +104,9 @@ jobs:
       - name: API template schema spec test
         run: pnpm --filter api test:template-schema
 
+      - name: API item tags spec test
+        run: pnpm --filter api test:item-tags-api
+
       - name: API clothing key builder spec test
         run: pnpm --filter api test:clothing-key-builder
 
@@ -493,6 +496,9 @@ jobs:
 
       - name: Template Query/Mutation hooks spec test
         run: pnpm --filter web test:template-query-mutation-hooks
+
+      - name: Item tags web spec test
+        run: pnpm --filter web test:item-tags-web
 
       - name: Clothing fixtures spec test
         run: pnpm --filter web test:clothing-fixtures

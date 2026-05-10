@@ -7,6 +7,7 @@ import { toClothingDetailResponseDto } from "../../clothing/dto/clothingDetailDt
 import type { ClothingStatus } from "../../clothing/schema/clothingSchema.js";
 import { createTemplateEntity } from "../entities/template.js";
 import { generateUuidV7 } from "../../wardrobe/usecases/wardrobeUsecase.js";
+import { normalizeItemTagIds, type ItemTagId } from "../../tags/itemTagSchema.js";
 
 const templateListResource = "template-list";
 
@@ -34,6 +35,7 @@ export type CreateTemplateUsecaseInput = {
   wardrobeId: string;
   name: string;
   clothingIds: string[];
+  tagIds?: ItemTagId[] | undefined;
 };
 
 export type CreateTemplateUsecaseOutput = {
@@ -52,6 +54,7 @@ export type UpdateTemplateUsecaseInput = {
   templateId: string;
   name?: string | undefined;
   clothingIds?: string[] | undefined;
+  tagIds?: ItemTagId[] | undefined;
 };
 
 export type DeleteTemplateUsecaseInput = {
@@ -83,6 +86,7 @@ type TemplateDetailItem = {
   name: string;
   status: "ACTIVE" | "DELETED";
   clothingIds: string[];
+  tagIds: ItemTagId[];
   wearCount: number;
   lastWornAt: number;
   createdAt: number;
@@ -129,6 +133,7 @@ function extractTemplateItemFromGetResult(result: unknown): TemplateDetailItem |
     name: candidate.name,
     status: isTemplateStatus(templateCandidate.status) ? templateCandidate.status : "ACTIVE",
     clothingIds: candidate.clothingIds,
+    tagIds: normalizeItemTagIds(templateCandidate.tagIds),
     wearCount: typeof templateCandidate.wearCount === "number" ? templateCandidate.wearCount : 0,
     lastWornAt: typeof templateCandidate.lastWornAt === "number" ? templateCandidate.lastWornAt : 0,
     createdAt: typeof templateCandidate.createdAt === "number" ? templateCandidate.createdAt : 0,
@@ -289,6 +294,7 @@ function toTemplateListItem(item: TemplateItem, clothingItemsById: Map<string, {
   return {
     templateId: item.templateId,
     name: item.name,
+    tagIds: normalizeItemTagIds(item.tagIds),
     clothingItems,
   };
 }
@@ -339,6 +345,7 @@ export function createTemplateUsecase(dependencies: TemplateUsecaseDependencies 
         templateId,
         name: input.name,
         clothingIds: input.clothingIds,
+        ...(input.tagIds !== undefined ? { tagIds: input.tagIds } : {}),
         now: now(),
       }));
 
@@ -405,6 +412,7 @@ export function createTemplateUsecase(dependencies: TemplateUsecaseDependencies 
         name: input.name ?? currentTemplate.name,
         status: currentTemplate.status,
         clothingIds: nextClothingIds,
+        tagIds: input.tagIds !== undefined ? input.tagIds : currentTemplate.tagIds,
         wearCount: currentTemplate.wearCount,
         lastWornAt: currentTemplate.lastWornAt,
         createdAt: currentTemplate.createdAt,
@@ -459,6 +467,7 @@ export function createTemplateUsecase(dependencies: TemplateUsecaseDependencies 
 
       return {
         name: templateItem.name,
+        tagIds: templateItem.tagIds,
         status: templateItem.status,
         wearCount: templateItem.wearCount,
         lastWornAt: templateItem.lastWornAt,

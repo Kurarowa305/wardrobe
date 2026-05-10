@@ -63,8 +63,9 @@ check(
   includes("src/api/schemas/template.ts", "export type CreateTemplateRequestDto = {") &&
     includes("src/api/schemas/template.ts", "export type UpdateTemplateRequestDto = {") &&
     includes("src/api/schemas/template.ts", "clothingIds: string[];") &&
-    includes("src/api/schemas/template.ts", "clothingIds?: string[];"),
-  "CreateTemplateRequestDto / UpdateTemplateRequestDto の clothingIds 定義が不足しています",
+    includes("src/api/schemas/template.ts", "clothingIds?: string[];") &&
+    includes("src/api/schemas/template.ts", "tagIds?: ItemTagIdDto[];"),
+  "CreateTemplateRequestDto / UpdateTemplateRequestDto の clothingIds または tagIds 定義が不足しています",
 );
 
 check(
@@ -74,6 +75,7 @@ check(
     includes("src/api/schemas/template.ts", 'export type TemplateDetailClothingItemDto = ClothingDto;') &&
     includes("src/api/schemas/template.ts", "clothingItems: TemplateListClothingItemDto[];") &&
     includes("src/api/schemas/template.ts", "clothingItems: TemplateDetailClothingItemDto[];") &&
+    includes("src/api/schemas/template.ts", "tagIds: ItemTagIdDto[];") &&
     includes("src/api/schemas/template.ts", "export type TemplateListResponseDto = {") &&
     includes("src/api/schemas/template.ts", "nextCursor: string | null;"),
   "Template 一覧/詳細DTOの clothingItems またはレスポンスDTO定義が不足しています",

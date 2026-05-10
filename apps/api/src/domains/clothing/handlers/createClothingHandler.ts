@@ -50,6 +50,7 @@ export async function createClothingHandler(input: CreateClothingHandlerInput): 
     name: parsed.body.name,
     genre: parsed.body.genre,
     imageKey: parsed.body.imageKey,
+    tagIds: parsed.body.tagIds,
   });
 
   return createSuccessResponse({

@@ -24,10 +24,12 @@ const ciSource = readFileSync(ciPath, "utf8");
 const createRequest = schemaModule.createTemplateRequestSchema.parse({
   name: "仕事用",
   clothingIds: ["cl_01", "cl_02", "cl_03"],
+  tagIds: ["season:all"],
 });
 
 const updateRequest = schemaModule.updateTemplateRequestSchema.parse({
   clothingIds: ["cl_10", "cl_11"],
+  tagIds: ["season:summer", "season:winter"],
 });
 
 const listParams = schemaModule.templateListParamsSchema.parse({
@@ -38,6 +40,7 @@ const listParams = schemaModule.templateListParamsSchema.parse({
 
 const detail = schemaModule.templateDetailResponseSchema.parse({
   name: "普段着",
+  tagIds: ["season:all"],
   status: "ACTIVE",
   wearCount: 12,
   lastWornAt: 1735690000123,
@@ -47,6 +50,7 @@ const detail = schemaModule.templateDetailResponseSchema.parse({
       name: "黒Tシャツ",
       genre: "tops",
       imageKey: null,
+      tagIds: ["season:summer"],
       status: "ACTIVE",
       wearCount: 12,
       lastWornAt: 1735690000123,
@@ -60,6 +64,7 @@ const entity = schemaModule.templateEntitySchema.parse({
   name: "普段着",
   status: "DELETED",
   clothingIds: ["cl_01HZZAAA", "cl_01HZZBBB"],
+  tagIds: ["season:winter"],
   wearCount: 12,
   lastWornAt: 1735690000123,
   createdAt: 1735600000000,
@@ -71,6 +76,7 @@ const createdEntity = entityModule.createTemplateEntity({
   templateId: "tp_01HZZBBB",
   name: "仕事用",
   clothingIds: ["cl_10", "cl_11"],
+  tagIds: ["season:all"],
   now: 1735600000000,
 });
 
@@ -105,7 +111,9 @@ const checks = [
     ok:
       createRequest.name === "仕事用" &&
       createRequest.clothingIds.join(",") === "cl_01,cl_02,cl_03" &&
+      createRequest.tagIds.join(",") === "season:all" &&
       updateRequest.clothingIds.join(",") === "cl_10,cl_11" &&
+      updateRequest.tagIds.join(",") === "season:summer,season:winter" &&
       listParams.order === "desc" &&
       listParams.limit === 20 &&
       listParams.cursor === "CURSOR#001",
@@ -115,11 +123,13 @@ const checks = [
     name: "detail response and entity schemas cover template fields including clothingItems and clothingIds max constraints",
     ok:
       detail.status === "ACTIVE" &&
+      detail.tagIds.join(",") === "season:all" &&
       detail.wearCount === 12 &&
       detail.clothingItems.length === 1 &&
       entity.clothingIds.length === 2 &&
       entity.createdAt === 1735600000000 &&
       entity.deletedAt === 1735700000000 &&
+      entity.tagIds.join(",") === "season:winter" &&
       entity.status === "DELETED",
     detail: { detail, entity },
   },
@@ -127,6 +137,7 @@ const checks = [
     name: "entity helpers create ACTIVE template defaults and support logical delete",
     ok:
       createdEntity.status === "ACTIVE" &&
+      createdEntity.tagIds.join(",") === "season:all" &&
       createdEntity.wearCount === 0 &&
       createdEntity.lastWornAt === 0 &&
       createdEntity.createdAt === 1735600000000 &&
@@ -141,6 +152,7 @@ const checks = [
       dtoSource.includes("export type TemplateStatusDto") &&
       dtoSource.includes("export type CreateTemplateRequestDto") &&
       dtoSource.includes("export type TemplateListResponseDto") &&
+      schemaSource.includes("tagIds: itemTagIdsSchema") &&
       schemaSource.includes("export const templateEntitySchema") &&
       entitySource.includes("export function createTemplateEntity") &&
       entitySource.includes("export function markTemplateDeleted"),

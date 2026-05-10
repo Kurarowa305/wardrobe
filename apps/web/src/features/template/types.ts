@@ -4,6 +4,7 @@ import type {
   TemplateListClothingItemDto,
   TemplateListItemDto,
 } from "@/api/schemas/template";
+import type { ItemTagIdDto } from "@/api/schemas/itemTag";
 
 export type TemplateListClothingItem = {
   clothingId: string;
@@ -14,6 +15,7 @@ export type TemplateListClothingItem = {
 export type TemplateListItem = {
   templateId: string;
   name: string;
+  tagIds: ItemTagIdDto[];
   clothingItems: TemplateListClothingItem[];
 };
 
@@ -28,6 +30,7 @@ export type TemplateClothingItem = {
 
 export type Template = {
   name: string;
+  tagIds: ItemTagIdDto[];
   wearCount: number;
   lastWornAt: number | null;
   deleted: boolean;
@@ -48,6 +51,7 @@ export function toTemplateListItem(dto: TemplateListItemDto): TemplateListItem {
   return {
     templateId: dto.templateId,
     name: dto.name,
+    tagIds: dto.tagIds,
     clothingItems: dto.clothingItems.map(toTemplateListClothingItem),
   };
 }
@@ -66,6 +70,7 @@ export function toTemplateClothingItem(dto: TemplateDetailClothingItemDto): Temp
 export function toTemplate(dto: TemplateDetailResponseDto): Template {
   return {
     name: dto.name,
+    tagIds: dto.tagIds,
     wearCount: dto.wearCount,
     lastWornAt: dto.lastWornAt > 0 ? dto.lastWornAt : null,
     deleted: dto.status === "DELETED",

@@ -6,14 +6,14 @@
 | API-01 | POST   | `/wardrobes`                                     | ワードローブ新規作成  | `name`                                                       | `wardrobeId`                                                              |  |
 | API-02 | GET    | `/wardrobes/{wardrobeId}`                        | ワードローブ取得    | —                                                            | `name`                                                         |                                    |
 | API-03 | GET    | `/wardrobes/{wardrobeId}/clothing`               | 服一覧（登録順）    | `order`(asc/desc), `genre`(tops/bottoms/others), `limit`, `cursor`                         | `items[]`, `nextCursor`                                        | ACTIVEのみ / レスポンス詳細は以下                                       |
-| API-04 | POST   | `/wardrobes/{wardrobeId}/clothing`               | 服の追加        | `name`, `genre`, `imageKey?`                                          | —                                                              |                                    |
-| API-05 | GET    | `/wardrobes/{wardrobeId}/clothing/{clothingId}`  | 服詳細取得       | —                                                            | `clothingId`, `name`, `genre`, `imageKey?`, `status`, `wearCount`, `lastWornAt`       | レスポンス詳細は以下                                          |
-| API-06 | PATCH  | `/wardrobes/{wardrobeId}/clothing/{clothingId}`  | 服の編集        | `name?`, `genre?`, `imageKey?`                                         | —                                                              |                                         |
+| API-04 | POST   | `/wardrobes/{wardrobeId}/clothing`               | 服の追加        | `name`, `genre`, `imageKey?`, `tagIds?[]`                                          | —                                                              |                                    |
+| API-05 | GET    | `/wardrobes/{wardrobeId}/clothing/{clothingId}`  | 服詳細取得       | —                                                            | `clothingId`, `name`, `genre`, `imageKey?`, `tagIds[]`, `status`, `wearCount`, `lastWornAt`       | レスポンス詳細は以下                                          |
+| API-06 | PATCH  | `/wardrobes/{wardrobeId}/clothing/{clothingId}`  | 服の編集        | `name?`, `genre?`, `imageKey?`, `tagIds?[]`                                         | —                                                              |                                         |
 | API-07 | DELETE | `/wardrobes/{wardrobeId}/clothing/{clothingId}`  | 服の削除（論理）    | —                                                            | —                                                              | 内部で `status=DELETED`                           |
 | API-08 | GET    | `/wardrobes/{wardrobeId}/templates`              | テンプレ一覧（登録順） | `order`(asc/desc), `genre`(tops/bottoms/others), `limit`, `cursor`                         | `items[]`, `nextCursor`                                        | ACTIVEのみ / レスポンス詳細は以下                                       |
-| API-09 | POST   | `/wardrobes/{wardrobeId}/templates`              | テンプレ追加      | `name`, `clothingIds[]`                                      | —                                                              |                           |
-| API-10 | GET    | `/wardrobes/{wardrobeId}/templates/{templateId}` | テンプレ詳細取得    | —                                                            | `name`, `status`, `wearCount`, `lastWornAt`, `clothingItems[]` |     |
-| API-11 | PATCH  | `/wardrobes/{wardrobeId}/templates/{templateId}` | テンプレ編集      | `name?`, `clothingIds?[]`                                    | —                                                              |                                            |
+| API-09 | POST   | `/wardrobes/{wardrobeId}/templates`              | テンプレ追加      | `name`, `clothingIds[]`, `tagIds?[]`                                      | —                                                              |                           |
+| API-10 | GET    | `/wardrobes/{wardrobeId}/templates/{templateId}` | テンプレ詳細取得    | —                                                            | `name`, `tagIds[]`, `status`, `wearCount`, `lastWornAt`, `clothingItems[]` |     |
+| API-11 | PATCH  | `/wardrobes/{wardrobeId}/templates/{templateId}` | テンプレ編集      | `name?`, `clothingIds?[]`, `tagIds?[]`                                    | —                                                              |                                            |
 | API-12 | DELETE | `/wardrobes/{wardrobeId}/templates/{templateId}` | テンプレ削除（論理）  | —                                                            | —                                                              | 内部で `status=DELETED`                               |
 | API-13 | GET    | `/wardrobes/{wardrobeId}/histories`              | 履歴一覧（日付順）   | `from`(yyyymmdd), `to`(yyyymmdd), `order`, `limit`, `cursor` | `items[]`, `nextCursor`                                        | 並びは `date` / レスポンス詳細は以下                                   |
 | API-14 | POST   | `/wardrobes/{wardrobeId}/histories`              | 履歴作成（今日着た）  | `date`, `templateId?`, `clothingIds?[]`                  | —                                                              |                                |
@@ -21,6 +21,20 @@
 | API-16 | DELETE | `/wardrobes/{wardrobeId}/histories/{historyId}`  | 履歴削除（物理）    | —                                                            | —                                                              |                                           |
 | API-17 | POST   | `/wardrobes/{wardrobeId}/images/presign` | 画像アップロード用の署名付きURL発行 | `contentType`, `category`, `extension?` | `imageKey`, `uploadUrl`, `expiresAt`, `method` | クライアントがS3へ直接PUTするためのURL |
 
+
+---
+
+# タグID
+
+服・テンプレートの `tagIds` は以下の固定IDを受け付ける。タグマスタAPIは持たず、API側の許可IDを正本とする。
+
+| tagId | 表示名 |
+| --- | --- |
+| `season:spring` | 春 |
+| `season:summer` | 夏 |
+| `season:autumn` | 秋 |
+| `season:winter` | 冬 |
+| `season:all` | オールシーズン |
 
 ---
 
@@ -120,6 +134,7 @@
 | name       | string  | 服名             |
 | genre      | string  | `tops` / `bottoms` / `others` |
 | imageKey   | string? | 画像キー           |
+| tagIds     | string[] | タグID配列          |
 
 ```json
 {
@@ -128,7 +143,8 @@
       "clothingId": "cl_01HZZAAA",
       "name": "黒Tシャツ",
       "genre": "tops",
-      "imageKey": "clothing/black_t.png"
+      "imageKey": "clothing/black_t.png",
+      "tagIds": ["season:summer"]
     }
   ],
   "nextCursor": "CREATED#1735600000000#cl_01HZZAAA"
@@ -158,11 +174,13 @@
 | name     | string  | 服名 / 上限40字   |
 | genre    | string  | `tops` / `bottoms` / `others` |
 | imageKey | string? | 画像キー |
+| tagIds   | string[]? | タグID配列 |
 
 ```json
 {
   "name": "白シャツ",
-  "imageKey": "clothing/white_shirt.png"
+  "imageKey": "clothing/white_shirt.png",
+  "tagIds": ["season:all"]
 }
 ```
 
@@ -190,6 +208,7 @@
 | name       | string  | 服名                   |
 | genre      | string  | `tops` / `bottoms` / `others` |
 | imageKey   | string? | 画像キー                 |
+| tagIds     | string[] | タグID配列                |
 | status     | string  | `ACTIVE` / `DELETED`　※削除済みでも取得可能 |
 | wearCount  | number  | 着用回数                 |
 | lastWornAt | number  | 最終着用日時（未着用は 0）       |
@@ -199,6 +218,7 @@
   "clothingId": "cl_01HZZAAA",
   "name": "黒Tシャツ",
   "imageKey": "clothing/black_t.png",
+  "tagIds": ["season:summer"],
   "status": "ACTIVE",
   "wearCount": 12,
   "lastWornAt": 1735690000123
@@ -225,11 +245,13 @@
 | name     | string? | 服名   |
 | genre    | string? | `tops` / `bottoms` / `others` |
 | imageKey | string? | 画像キー |
+| tagIds   | string[]? | タグID配列 |
 
 ```json
 {
   "name": "黒Tシャツ（夏用）",
-  "genre": "tops"
+  "genre": "tops",
+  "tagIds": ["season:summer"]
 }
 ```
 
@@ -282,6 +304,7 @@
 | ------------- | -------------- | -------------- |
 | templateId    | string         | テンプレID         |
 | name          | string         | テンプレ名          |
+| tagIds        | string[]       | タグID配列          |
 | clothingItems | [] | 構成服（順序付き・全件）   |
 
 ### template
@@ -305,6 +328,7 @@
     {
       "templateId": "tp_01HZZBBB",
       "name": "普段着",
+      "tagIds": ["season:all"],
       "clothingItems": [
         {
           "clothingId": "cl_01",
@@ -344,11 +368,13 @@
 | ----------- | -------- | ----------- |
 | name        | string   | テンプレ名 / 上限40字       |
 | clothingIds | string[] | 構成服ID（順序付き） |
+| tagIds      | string[]? | タグID配列 |
 
 ```json
 {
   "name": "仕事用",
-  "clothingIds": ["cl_01", "cl_02"]
+  "clothingIds": ["cl_01", "cl_02"],
+  "tagIds": ["season:all"]
 }
 ```
 
@@ -374,6 +400,7 @@
 | フィールド         | 型              | 説明                   |
 | ------------- | -------------- | -------------------- |
 | name          | string         | テンプレ名                |
+| tagIds        | string[]       | タグID配列                |
 | status        | string         | `ACTIVE` / `DELETED`　※服削除済みでも取得可能 |
 | wearCount     | number         | 着用回数                 |
 | lastWornAt    | number         | 最終着用                 |
@@ -401,6 +428,7 @@
 ```json
 {
   "name": "普段着",
+  "tagIds": ["season:all"],
   "status": "ACTIVE",
   "wearCount": 8,
   "lastWornAt": 1735600000000,
@@ -436,11 +464,13 @@
 | ----------- | --------- | ----------- |
 | name        | string?   | テンプレ名       |
 | clothingIds | string[]? | 構成服ID（順序付き） |
+| tagIds      | string[]? | タグID配列 |
 
 ```json
 {
   "name": "普段着（夏）",
-  "clothingIds": ["cl_01", "cl_03"]
+  "clothingIds": ["cl_01", "cl_03"],
+  "tagIds": ["season:summer"]
 }
 ```
 

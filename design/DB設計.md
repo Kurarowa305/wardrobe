@@ -104,6 +104,7 @@
 | genre          | String        | `tops` / `bottoms` / `others` |
 | status         | String        | ACTIVE / DELETED     |
 | imageKey       | String        | 画像キー（任意）             |
+| tagIds         | String[]      | タグID配列（任意） / 初期値は空配列 |
 | wearCount      | Number        | 着用回数                 |
 | lastWornAt     | Number        | 最終着用（未着用は0）          |
 | createdAt      | Number        | 登録日時                 |
@@ -136,6 +137,7 @@
 | name         | String        | テンプレ名 / 上限40字                      |
 | status       | String        | ACTIVE / DELETED            |
 | clothingIds  | String[]      | 構成服ID（順序付き・全件） / 上限20件              |
+| tagIds       | String[]      | タグID配列（任意） / 初期値は空配列 |
 | wearCount    | Number        | 着用回数                        |
 | lastWornAt   | Number        | 最終着用（未着用は0）                 |
 | createdAt    | Number        | 登録日時                        |

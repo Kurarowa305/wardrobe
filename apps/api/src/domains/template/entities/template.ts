@@ -1,4 +1,5 @@
 import type { TemplateEntityShape, TemplateStatus } from "../schema/templateSchema.js";
+import type { ItemTagId } from "../../tags/itemTagSchema.js";
 
 export type TemplateEntity = TemplateEntityShape;
 
@@ -11,6 +12,7 @@ export type TemplateCoreAttributes = {
   name: string;
   status: TemplateStatus;
   clothingIds: string[];
+  tagIds: ItemTagId[];
   wearCount: number;
   lastWornAt: number;
   createdAt: number;
@@ -20,6 +22,7 @@ export type TemplateCoreAttributes = {
 export type CreateTemplateEntityInput = TemplateEntityKey & {
   name: string;
   clothingIds: string[];
+  tagIds?: ItemTagId[] | undefined;
   now: number;
 };
 
@@ -30,6 +33,7 @@ export function createTemplateEntity(input: CreateTemplateEntityInput): Template
     name: input.name,
     status: "ACTIVE",
     clothingIds: input.clothingIds,
+    tagIds: input.tagIds ?? [],
     wearCount: 0,
     lastWornAt: 0,
     createdAt: input.now,

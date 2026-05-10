@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useClothing, useDeleteClothingMutation } from "@/api/hooks/clothing";
 import { ConfirmDialog } from "@/components/app/dialogs/ConfirmDialog";
 import { AppLayout } from "@/components/app/layout/AppLayout";
+import { ItemTagChips } from "@/components/app/tags/ItemTagChips";
 import { useToast } from "@/components/ui/use-toast";
 import { COMMON_STRINGS } from "@/constants/commonStrings";
 import { ROUTES } from "@/constants/routes";
@@ -104,6 +105,14 @@ export function ClothingDetailScreen({ wardrobeId, clothingId }: ClothingDetailS
           </div>
 
           <dl className="m-0 grid gap-2 rounded-md border border-slate-200 bg-slate-50 p-3 sm:grid-cols-2">
+            <div className="grid gap-1 sm:col-span-2">
+              <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                {CLOTHING_STRINGS.detail.labels.tags}
+              </dt>
+              <dd className="m-0">
+                <ItemTagChips tagIds={clothingQuery.data.tagIds} emptyLabel={CLOTHING_STRINGS.detail.messages.noTags} />
+              </dd>
+            </div>
             <div className="grid gap-1">
               <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">
                 {CLOTHING_STRINGS.detail.labels.wearCount}

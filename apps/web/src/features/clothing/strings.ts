@@ -27,6 +27,7 @@ export const CLOTHING_STRINGS = {
       imageFile: "画像ファイル（任意）",
       name: "服の名前",
       genre: "服のジャンル",
+      tags: "タグ（任意）",
     },
     placeholders: {
       name: "例: 白シャツ",
@@ -54,6 +55,7 @@ export const CLOTHING_STRINGS = {
       imageFile: "画像ファイル",
       name: "服の名前",
       genre: "服のジャンル",
+      tags: "タグ（任意）",
     },
     placeholders: {
       name: "例: 白シャツ",
@@ -83,6 +85,7 @@ export const CLOTHING_STRINGS = {
       wearCount: "着た回数",
       lastWornAt: "最後に着た日",
       genre: "ジャンル",
+      tags: "タグ",
     },
     menu: {
       edit: "編集",
@@ -96,6 +99,7 @@ export const CLOTHING_STRINGS = {
       deleteSuccess: "服を削除しました",
       deleteError: "服の削除に失敗しました。",
       neverWorn: "未着用",
+      noTags: "タグなし",
     },
   },
 } as const;

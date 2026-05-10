@@ -7,6 +7,7 @@ import { toClothingDetailResponseDto } from "../dto/clothingDetailDto.js";
 import type { ClothingItem } from "../repo/clothingRepo.js";
 import { createClothingEntity } from "../entities/clothing.js";
 import type { ClothingGenre } from "../schema/clothingSchema.js";
+import { normalizeItemTagIds, type ItemTagId } from "../../tags/itemTagSchema.js";
 
 const clothingListResource = "clothing-list";
 
@@ -36,6 +37,7 @@ export type CreateClothingUsecaseInput = {
   name: string;
   genre: ClothingGenre;
   imageKey?: string | null | undefined;
+  tagIds?: ItemTagId[] | undefined;
 };
 
 export type CreateClothingUsecaseOutput = {
@@ -54,6 +56,7 @@ export type UpdateClothingUsecaseInput = {
   name?: string | undefined;
   genre?: ClothingGenre | undefined;
   imageKey?: string | null | undefined;
+  tagIds?: ItemTagId[] | undefined;
 };
 export type DeleteClothingUsecaseInput = {
   wardrobeId: string;
@@ -103,6 +106,7 @@ function toClothingListItem(item: ClothingItem): ClothingListItemDto {
     name: item.name,
     genre: item.genre,
     imageKey: item.imageKey,
+    tagIds: normalizeItemTagIds(item.tagIds),
   };
 }
 
@@ -231,6 +235,7 @@ function toClothingDetail(item: ClothingItem): ClothingDetailResponseDto {
     name: item.name,
     genre: item.genre,
     imageKey: item.imageKey,
+    tagIds: normalizeItemTagIds(item.tagIds),
     status: item.status,
     wearCount: item.wearCount,
     lastWornAt: item.lastWornAt,
@@ -251,6 +256,7 @@ export function createClothingUsecase(dependencies: ClothingUsecaseDependencies 
         name: input.name,
         genre: input.genre,
         ...(input.imageKey !== undefined ? { imageKey: input.imageKey } : {}),
+        ...(input.tagIds !== undefined ? { tagIds: input.tagIds } : {}),
         now: now(),
       }));
 
@@ -330,6 +336,7 @@ export function createClothingUsecase(dependencies: ClothingUsecaseDependencies 
         name: input.name ?? currentItem.name,
         genre: input.genre ?? currentItem.genre,
         imageKey: input.imageKey !== undefined ? input.imageKey : currentItem.imageKey,
+        tagIds: input.tagIds !== undefined ? input.tagIds : normalizeItemTagIds(currentItem.tagIds),
       });
     },
     async delete(input: DeleteClothingUsecaseInput): Promise<void> {

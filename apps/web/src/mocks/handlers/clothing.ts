@@ -7,6 +7,7 @@ import type {
   CreateClothingRequestDto,
   UpdateClothingRequestDto,
 } from "@/api/schemas/clothing";
+import type { ItemTagIdDto } from "@/api/schemas/itemTag";
 import { CLOTHING_FIXTURE_WARDROBE_ID, clothingDetailFixtures } from "@/mocks/fixtures/clothing";
 import { DEMO_IDS } from "@/constants/routes";
 import { HttpResponse, http } from "msw";
@@ -98,6 +99,20 @@ function normalizeImageKey(value: unknown): string | null | undefined {
   return trimmed.length > 0 ? trimmed : null;
 }
 
+function normalizeTagIds(value: unknown): ItemTagIdDto[] | null {
+  if (value === undefined) return [];
+  if (!Array.isArray(value)) return null;
+  const normalized = value.filter((entry): entry is ItemTagIdDto =>
+    entry === "season:spring" ||
+    entry === "season:summer" ||
+    entry === "season:autumn" ||
+    entry === "season:winter" ||
+    entry === "season:all",
+  );
+  if (normalized.length !== value.length || new Set(normalized).size !== normalized.length) return null;
+  return normalized;
+}
+
 function hasOwnRecordKey(record: Record<string, unknown>, key: string): boolean {
   return Object.prototype.hasOwnProperty.call(record, key);
 }
@@ -119,7 +134,9 @@ function parseCreateRequest(body: unknown): CreateClothingRequestDto | null {
   if (body.imageKey !== undefined && normalizedImageKey === undefined) {
     return null;
   }
-  return { name, genre, imageKey: normalizedImageKey ?? null };
+  const tagIds = normalizeTagIds(body.tagIds);
+  if (tagIds === null) return null;
+  return { name, genre, imageKey: normalizedImageKey ?? null, tagIds };
 }
 
 function parseUpdateRequest(body: unknown): UpdateClothingRequestDto | null {
@@ -143,6 +160,11 @@ function parseUpdateRequest(body: unknown): UpdateClothingRequestDto | null {
     if (normalizedImageKey === undefined) return null;
     next.imageKey = normalizedImageKey;
   }
+  if (hasOwnRecordKey(body, "tagIds")) {
+    const tagIds = normalizeTagIds(body.tagIds);
+    if (tagIds === null) return null;
+    next.tagIds = tagIds;
+  }
   return next;
 }
 
@@ -155,6 +177,7 @@ function buildListItems(order: ClothingListOrderDto, genre?: ClothingGenreDto): 
       name: clothing.name,
       genre: clothing.genre,
       imageKey: clothing.imageKey,
+      tagIds: clothing.tagIds,
     }));
 
   return order === "desc" ? [...activeItems].reverse() : activeItems;
@@ -228,6 +251,7 @@ export const clothingHandlers = [
       name: payload.name,
       genre: payload.genre,
       imageKey: payload.imageKey ?? null,
+      tagIds: payload.tagIds ?? [],
       status: "ACTIVE",
       wearCount: 0,
       lastWornAt: 0,
@@ -254,6 +278,7 @@ export const clothingHandlers = [
     if (payload.name !== undefined) target.name = payload.name;
     if (payload.genre !== undefined) target.genre = payload.genre;
     if (payload.imageKey !== undefined) target.imageKey = payload.imageKey;
+    if (payload.tagIds !== undefined) target.tagIds = payload.tagIds;
 
     return new HttpResponse(null, { status: 204 });
   }),

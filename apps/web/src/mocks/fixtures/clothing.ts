@@ -1,4 +1,5 @@
 import type { ClothingDetailResponseDto, ClothingGenreDto, ClothingListResponseDto } from "@/api/schemas/clothing";
+import type { ItemTagIdDto } from "@/api/schemas/itemTag";
 
 export const CLOTHING_FIXTURE_WARDROBE_ID = "wd_01HZZ8ABCDEF1234567890";
 const GENERATED_FIXTURES_PER_GENRE = 49;
@@ -11,18 +12,19 @@ const CLOTHING_FIXTURE_SEEDS: Array<{
   genre: ClothingGenreDto;
   imageKey: string | null;
   status: ClothingDetailResponseDto["status"];
+  tagIds: ItemTagIdDto[];
   wearCount: number;
   lastWornAt: number;
 }> = [
-  { clothingId: "cl_top_001", name: "黒Tシャツ", genre: "tops", imageKey: "clothing/black_t.png", status: "ACTIVE", wearCount: 12, lastWornAt: 1735690000123 },
-  { clothingId: "cl_top_002", name: "白シャツ", genre: "tops", imageKey: null, status: "ACTIVE", wearCount: 0, lastWornAt: 0 },
-  { clothingId: "cl_top_003", name: "デニムジャケット", genre: "tops", imageKey: "clothing/denim_jacket.png", status: "DELETED", wearCount: 4, lastWornAt: 1735600000456 },
-  { clothingId: "cl_bottom_001", name: "ネイビースラックス", genre: "bottoms", imageKey: "clothing/navy_slacks.png", status: "ACTIVE", wearCount: 8, lastWornAt: 1735680000000 },
-  { clothingId: "cl_bottom_002", name: "ブラックデニム", genre: "bottoms", imageKey: null, status: "ACTIVE", wearCount: 2, lastWornAt: 1735610000000 },
-  { clothingId: "cl_bottom_003", name: "カーゴパンツ", genre: "bottoms", imageKey: "clothing/cargo_pants.png", status: "DELETED", wearCount: 5, lastWornAt: 1735620000000 },
-  { clothingId: "cl_other_001", name: "グレーニット帽", genre: "others", imageKey: "clothing/gray_beanie.png", status: "ACTIVE", wearCount: 6, lastWornAt: 1735670000000 },
-  { clothingId: "cl_other_002", name: "レザーベルト", genre: "others", imageKey: null, status: "ACTIVE", wearCount: 1, lastWornAt: 1735605000000 },
-  { clothingId: "cl_other_003", name: "キャンバストート", genre: "others", imageKey: "clothing/canvas_tote.png", status: "DELETED", wearCount: 3, lastWornAt: 1735595000000 },
+  { clothingId: "cl_top_001", name: "黒Tシャツ", genre: "tops", imageKey: "clothing/black_t.png", status: "ACTIVE", tagIds: ["season:summer"], wearCount: 12, lastWornAt: 1735690000123 },
+  { clothingId: "cl_top_002", name: "白シャツ", genre: "tops", imageKey: null, status: "ACTIVE", tagIds: ["season:all"], wearCount: 0, lastWornAt: 0 },
+  { clothingId: "cl_top_003", name: "デニムジャケット", genre: "tops", imageKey: "clothing/denim_jacket.png", status: "DELETED", tagIds: ["season:winter"], wearCount: 4, lastWornAt: 1735600000456 },
+  { clothingId: "cl_bottom_001", name: "ネイビースラックス", genre: "bottoms", imageKey: "clothing/navy_slacks.png", status: "ACTIVE", tagIds: ["season:all"], wearCount: 8, lastWornAt: 1735680000000 },
+  { clothingId: "cl_bottom_002", name: "ブラックデニム", genre: "bottoms", imageKey: null, status: "ACTIVE", tagIds: ["season:winter"], wearCount: 2, lastWornAt: 1735610000000 },
+  { clothingId: "cl_bottom_003", name: "カーゴパンツ", genre: "bottoms", imageKey: "clothing/cargo_pants.png", status: "DELETED", tagIds: ["season:summer"], wearCount: 5, lastWornAt: 1735620000000 },
+  { clothingId: "cl_other_001", name: "グレーニット帽", genre: "others", imageKey: "clothing/gray_beanie.png", status: "ACTIVE", tagIds: ["season:winter"], wearCount: 6, lastWornAt: 1735670000000 },
+  { clothingId: "cl_other_002", name: "レザーベルト", genre: "others", imageKey: null, status: "ACTIVE", tagIds: [], wearCount: 1, lastWornAt: 1735605000000 },
+  { clothingId: "cl_other_003", name: "キャンバストート", genre: "others", imageKey: "clothing/canvas_tote.png", status: "DELETED", tagIds: ["season:all"], wearCount: 3, lastWornAt: 1735595000000 },
 ];
 
 const GENERATED_CLOTHING_FIXTURE_COUNT = GENERATED_FIXTURES_PER_GENRE * FIXTURE_GENRE_ORDER.length;
@@ -45,6 +47,7 @@ function createGeneratedFixtures(): ClothingDetailResponseDto[] {
         genre,
         imageKey: hasImage ? `clothing/${prefix}_fixture_${padded}.png` : null,
         status: isDeleted ? "DELETED" : "ACTIVE",
+        tagIds: sequence % 2 === 0 ? ["season:all"] : [],
         wearCount,
         lastWornAt: wearCount === 0 ? 0 : GENERATED_CLOTHING_FIXTURE_BASE_TIMESTAMP + globalIndex * 10_000,
       };
@@ -65,6 +68,7 @@ export const clothingListFixture: ClothingListResponseDto = {
       name: fixture.name,
       genre: fixture.genre,
       imageKey: fixture.imageKey,
+      tagIds: fixture.tagIds,
     })),
   nextCursor: null,
 };

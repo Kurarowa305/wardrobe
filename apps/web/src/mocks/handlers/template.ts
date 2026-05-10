@@ -7,6 +7,7 @@ import type {
   TemplateListResponseDto,
   UpdateTemplateRequestDto,
 } from "@/api/schemas/template";
+import type { ItemTagIdDto } from "@/api/schemas/itemTag";
 import { DEMO_IDS } from "@/constants/routes";
 import {
   TEMPLATE_FIXTURE_WARDROBE_ID,
@@ -29,6 +30,7 @@ function initializeTemplateStore(): TemplateRecord[] {
   return templateDetailFixtures.map((fixture) => ({
     templateId: fixture.templateId,
     name: fixture.name,
+    tagIds: fixture.tagIds,
     status: fixture.status,
     wearCount: fixture.wearCount,
     lastWornAt: fixture.lastWornAt,
@@ -141,6 +143,20 @@ function normalizeClothingIds(value: unknown): string[] | null {
   return normalized;
 }
 
+function normalizeTagIds(value: unknown): ItemTagIdDto[] | null {
+  if (value === undefined) return [];
+  if (!Array.isArray(value)) return null;
+  const normalized = value.filter((entry): entry is ItemTagIdDto =>
+    entry === "season:spring" ||
+    entry === "season:summer" ||
+    entry === "season:autumn" ||
+    entry === "season:winter" ||
+    entry === "season:all",
+  );
+  if (normalized.length !== value.length || new Set(normalized).size !== normalized.length) return null;
+  return normalized;
+}
+
 function resolveClothingItems(clothingIds: string[]): TemplateDetailClothingItemDto[] | null {
   const clothingItems = clothingIds
     .map((clothingId) => clothingDetailFixtureById[clothingId])
@@ -169,9 +185,15 @@ function parseCreateRequest(body: unknown): CreateTemplateRequestDto | null {
     return null;
   }
 
+  const tagIds = normalizeTagIds(body.tagIds);
+  if (tagIds === null) {
+    return null;
+  }
+
   return {
     name,
     clothingIds,
+    tagIds,
   };
 }
 
@@ -204,6 +226,15 @@ function parseUpdateRequest(body: unknown): UpdateTemplateRequestDto | null {
     next.clothingIds = clothingIds;
   }
 
+  if (hasOwnRecordKey(body, "tagIds")) {
+    const tagIds = normalizeTagIds(body.tagIds);
+    if (tagIds === null) {
+      return null;
+    }
+
+    next.tagIds = tagIds;
+  }
+
   return next;
 }
 
@@ -213,6 +244,7 @@ function buildListItems(order: TemplateListOrderDto): TemplateListItemDto[] {
     .map((template) => ({
       templateId: template.templateId,
       name: template.name,
+      tagIds: template.tagIds,
       clothingItems: template.clothingItems.map((clothingItem) => ({
         clothingId: clothingItem.clothingId,
         imageKey: clothingItem.imageKey,
@@ -320,6 +352,7 @@ export const templateHandlers = [
 
     return HttpResponse.json<TemplateDetailResponseDto>({
       name: template.name,
+      tagIds: template.tagIds,
       status: template.status,
       wearCount: template.wearCount,
       lastWornAt: template.lastWornAt,
@@ -358,6 +391,7 @@ export const templateHandlers = [
       {
         templateId: createMockTemplateId(),
         name: payload.name,
+        tagIds: payload.tagIds ?? [],
         status: "ACTIVE",
         wearCount: 0,
         lastWornAt: 0,
@@ -412,6 +446,7 @@ export const templateHandlers = [
       return {
         ...template,
         name: payload.name ?? template.name,
+        tagIds: payload.tagIds ?? template.tagIds,
         clothingItems: nextClothingItems,
       };
     });

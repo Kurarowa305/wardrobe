@@ -1,4 +1,5 @@
 import type { ClothingDto } from "@/api/schemas/clothing";
+import type { ItemTagIdDto } from "@/api/schemas/itemTag";
 
 export type TemplateStatusDto = "ACTIVE" | "DELETED";
 export type TemplateListOrderDto = "asc" | "desc";
@@ -12,11 +13,13 @@ export type TemplateListParamsDto = {
 export type CreateTemplateRequestDto = {
   name: string;
   clothingIds: string[];
+  tagIds?: ItemTagIdDto[];
 };
 
 export type UpdateTemplateRequestDto = {
   name?: string;
   clothingIds?: string[];
+  tagIds?: ItemTagIdDto[];
 };
 
 export type TemplateListClothingItemDto = Pick<ClothingDto, "clothingId" | "imageKey" | "status">;
@@ -24,6 +27,7 @@ export type TemplateListClothingItemDto = Pick<ClothingDto, "clothingId" | "imag
 export type TemplateListItemDto = {
   templateId: string;
   name: string;
+  tagIds: ItemTagIdDto[];
   clothingItems: TemplateListClothingItemDto[];
 };
 
@@ -31,6 +35,7 @@ export type TemplateDetailClothingItemDto = ClothingDto;
 
 export type TemplateDto = {
   name: string;
+  tagIds: ItemTagIdDto[];
   status: TemplateStatusDto;
   wearCount: number;
   lastWornAt: number;

@@ -8,6 +8,7 @@ import {
   clothingTimestampSchema,
   clothingWearCountSchema,
 } from "../../clothing/schema/clothingSchema.js";
+import { itemTagIdsSchema } from "../../tags/itemTagSchema.js";
 
 export const templateStatusValues = ["ACTIVE", "DELETED"] as const;
 export const templateListOrderValues = ["asc", "desc"] as const;
@@ -33,11 +34,13 @@ export const templateListParamsSchema = z.object({
 export const createTemplateRequestSchema = z.object({
   name: templateNameSchema,
   clothingIds: templateClothingIdsSchema,
+  tagIds: itemTagIdsSchema.optional(),
 }).strict();
 
 export const updateTemplateRequestSchema = z.object({
   name: templateNameSchema.optional(),
   clothingIds: templateClothingIdsSchema.optional(),
+  tagIds: itemTagIdsSchema.optional(),
 }).strict();
 
 export const templateListClothingItemSchema = z.object({
@@ -49,11 +52,13 @@ export const templateListClothingItemSchema = z.object({
 export const templateListItemSchema = z.object({
   templateId: templateIdSchema,
   name: templateNameSchema,
+  tagIds: itemTagIdsSchema,
   clothingItems: z.array(templateListClothingItemSchema),
 }).strict();
 
 export const templateDetailResponseSchema = z.object({
   name: templateNameSchema,
+  tagIds: itemTagIdsSchema,
   status: templateStatusSchema,
   wearCount: clothingWearCountSchema,
   lastWornAt: clothingTimestampSchema,
@@ -78,6 +83,7 @@ export const templateEntitySchema = z.object({
   wardrobeId: wardrobeIdSchema,
   templateId: templateIdSchema,
   name: templateNameSchema,
+  tagIds: itemTagIdsSchema,
   status: templateStatusSchema,
   clothingIds: templateClothingIdsSchema,
   wearCount: clothingWearCountSchema,

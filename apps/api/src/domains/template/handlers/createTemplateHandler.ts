@@ -49,6 +49,7 @@ export async function createTemplateHandler(input: CreateTemplateHandlerInput): 
     wardrobeId: parsed.path.wardrobeId,
     name: parsed.body.name,
     clothingIds: parsed.body.clothingIds,
+    tagIds: parsed.body.tagIds,
   });
 
   return createSuccessResponse({

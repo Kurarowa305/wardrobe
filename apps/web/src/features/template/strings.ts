@@ -29,7 +29,7 @@ export const TEMPLATE_STRINGS = {
       submitSuccess: "テンプレートを追加しました",
       submitError: "テンプレートの追加に失敗しました。",
     },
-    labels: { name: "テンプレート名", selectClothing: "服を選択" },
+    labels: { name: "テンプレート名", tags: "タグ（任意）", selectClothing: "服を選択" },
     actions: { submit: "追加" },
   },
   edit: {
@@ -42,7 +42,7 @@ export const TEMPLATE_STRINGS = {
       submitSuccess: "テンプレートを更新しました",
       submitError: "テンプレートの更新に失敗しました。",
     },
-    labels: { name: "テンプレート名", selectClothing: "服を選択" },
+    labels: { name: "テンプレート名", tags: "タグ（任意）", selectClothing: "服を選択" },
     actions: { submit: "保存" },
   },
   detail: {
@@ -51,6 +51,7 @@ export const TEMPLATE_STRINGS = {
     labels: {
       wearCount: "着た回数",
       lastWornAt: "最後に着た日",
+      tags: "タグ",
       clothingItems: "構成アイテム",
       clothingWearCount: "着た回数",
       clothingLastWornAt: "最後に着た日",
@@ -63,6 +64,7 @@ export const TEMPLATE_STRINGS = {
       deleted: "削除済みのテンプレートです。",
       clothingDeleted: "削除済みの服です",
       neverWorn: "未着用",
+      noTags: "タグなし",
     },
   },
 } as const;
