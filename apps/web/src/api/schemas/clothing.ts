@@ -3,6 +3,7 @@ import type { ItemTagIdDto } from "@/api/schemas/itemTag";
 export type ClothingStatusDto = "ACTIVE" | "DELETED";
 export type ClothingListOrderDto = "asc" | "desc";
 export type ClothingGenreDto = "tops" | "bottoms" | "others";
+export type ClothingRecommendationSeasonDto = "spring" | "summer" | "autumn" | "winter";
 
 export type ClothingListParamsDto = {
   order?: ClothingListOrderDto;
@@ -44,3 +45,15 @@ export type ClothingListResponseDto = {
 };
 
 export type ClothingDetailResponseDto = ClothingDto;
+export type ClothingRecommendationItemDto = ClothingDto & {
+  genre: "tops" | "bottoms";
+};
+
+export type ClothingRecommendationResponseDto = {
+  season: ClothingRecommendationSeasonDto;
+  seasonTagIds: ItemTagIdDto[];
+  items: {
+    tops: ClothingRecommendationItemDto[];
+    bottoms: ClothingRecommendationItemDto[];
+  };
+};

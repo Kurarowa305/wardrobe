@@ -77,6 +77,7 @@ export const queryKeys = {
     details: (wardrobeId: string) => clothingDetailScope(wardrobeId),
     detail: (wardrobeId: string, clothingId: string) =>
       [...clothingDetailScope(wardrobeId), clothingId] as const,
+    recommendation: (wardrobeId: string) => [...clothingScope(wardrobeId), "recommendation"] as const,
   },
   template: {
     all: ["template"] as const,

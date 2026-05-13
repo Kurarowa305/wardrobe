@@ -20,6 +20,7 @@
 | API-15 | GET    | `/wardrobes/{wardrobeId}/histories/{historyId}`  | 履歴詳細取得      | —                                                            | `date`, `templateName?`, `clothingItems[]`                     |     |
 | API-16 | DELETE | `/wardrobes/{wardrobeId}/histories/{historyId}`  | 履歴削除（物理）    | —                                                            | —                                                              |                                           |
 | API-17 | POST   | `/wardrobes/{wardrobeId}/images/presign` | 画像アップロード用の署名付きURL発行 | `contentType`, `category`, `extension?` | `imageKey`, `uploadUrl`, `expiresAt`, `method` | クライアントがS3へ直接PUTするためのURL |
+| API-18 | GET    | `/wardrobes/{wardrobeId}/recommendations/clothing` | おすすめ服取得 | — | `season`, `seasonTagIds`, `items.tops[]`, `items.bottoms[]` | 季節タグと最終着用日が古い順で抽出 |
 
 
 ---
@@ -742,6 +743,72 @@
 |  415 | UNSUPPORTED_MEDIA_TYPE | `Content-Type` が `application/json` でない           |
 |  429 | RATE_LIMITED           | 短時間の過剰リクエスト                                       |
 |  500 | INTERNAL_ERROR         | サーバー内部エラー                                         |
+
+---
+
+# API-18 おすすめ服取得
+
+### GET `/wardrobes/{wardrobeId}/recommendations/clothing`
+
+現在季節に対応するタグ、または `season:all` を持つ `ACTIVE` の服から、最終着用日が古い順にトップス2件、ボトムス2件を返す。
+
+季節判定は JST 基準で行う。
+
+| 季節 | 月 |
+| --- | --- |
+| 春 | 3〜5月 |
+| 夏 | 6〜8月 |
+| 秋 | 9〜11月 |
+| 冬 | 12〜2月 |
+
+## Response
+
+| フィールド | 型 | 説明 |
+| --- | --- | --- |
+| season | string | `spring` / `summer` / `autumn` / `winter` |
+| seasonTagIds | string[] | 推薦対象にした季節タグ。現在季節タグ + `season:all` |
+| items.tops | object[] | おすすめトップス。最大2件 |
+| items.bottoms | object[] | おすすめボトムス。最大2件 |
+
+### items.tops[] / items.bottoms[]
+
+| フィールド | 型 | 説明 |
+| --- | --- | --- |
+| clothingId | string | 服ID |
+| name | string | 服名 |
+| genre | string | `tops` / `bottoms` |
+| imageKey | string? | 画像キー |
+| tagIds | string[] | タグID配列 |
+| wearCount | number | 着用回数 |
+| lastWornAt | number | 最終着用日時（未着用は 0） |
+
+```json
+{
+  "season": "spring",
+  "seasonTagIds": ["season:spring", "season:all"],
+  "items": {
+    "tops": [
+      {
+        "clothingId": "cl_01HZZAAA",
+        "name": "白シャツ",
+        "genre": "tops",
+        "imageKey": null,
+        "tagIds": ["season:spring"],
+        "wearCount": 3,
+        "lastWornAt": 1735600000000
+      }
+    ],
+    "bottoms": []
+  }
+}
+```
+
+## Error
+| HTTP | error.code     | 発生条件                |
+| ---: | -------------- | ------------------- |
+|  404 | NOT_FOUND      | `wardrobeId` が存在しない |
+|  429 | RATE_LIMITED   | 短時間の過剰リクエスト         |
+|  500 | INTERNAL_ERROR | サーバー内部エラー           |
 
 ---
 

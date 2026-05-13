@@ -1,4 +1,10 @@
-import type { ClothingDto, ClothingGenreDto, ClothingListItemDto } from "@/api/schemas/clothing";
+import type {
+  ClothingDto,
+  ClothingGenreDto,
+  ClothingListItemDto,
+  ClothingRecommendationResponseDto,
+  ClothingRecommendationSeasonDto,
+} from "@/api/schemas/clothing";
 import type { ItemTagIdDto } from "@/api/schemas/itemTag";
 
 export type ClothingListItem = {
@@ -18,6 +24,15 @@ export type Clothing = {
   wearCount: number;
   lastWornAt: number | null;
   deleted: boolean;
+};
+
+export type ClothingRecommendation = {
+  season: ClothingRecommendationSeasonDto;
+  seasonTagIds: ItemTagIdDto[];
+  items: {
+    tops: ClothingListItem[];
+    bottoms: ClothingListItem[];
+  };
 };
 
 export function toClothingListItem(dto: ClothingListItemDto): ClothingListItem {
@@ -40,5 +55,16 @@ export function toClothing(dto: ClothingDto): Clothing {
     wearCount: dto.wearCount,
     lastWornAt: dto.lastWornAt > 0 ? dto.lastWornAt : null,
     deleted: dto.status === "DELETED",
+  };
+}
+
+export function toClothingRecommendation(dto: ClothingRecommendationResponseDto): ClothingRecommendation {
+  return {
+    season: dto.season,
+    seasonTagIds: dto.seasonTagIds,
+    items: {
+      tops: dto.items.tops.map(toClothingListItem),
+      bottoms: dto.items.bottoms.map(toClothingListItem),
+    },
   };
 }

@@ -2,7 +2,15 @@ import { decodeCursor, encodeCursor, type CursorPrimitive } from "../../../core/
 import { createAppError } from "../../../core/errors/index.js";
 import { generateUuidV7 } from "../../wardrobe/usecases/wardrobeUsecase.js";
 import { createClothingRepo, clothingListIndexNames, type ClothingRepo } from "../repo/clothingRepo.js";
-import type { ClothingDetailResponseDto, ClothingListItemDto, ClothingListOrderDto, ClothingListParamsDto } from "../dto/clothingDto.js";
+import type {
+  ClothingDetailResponseDto,
+  ClothingListItemDto,
+  ClothingListOrderDto,
+  ClothingListParamsDto,
+  ClothingRecommendationItemDto,
+  ClothingRecommendationsResponseDto,
+  ClothingRecommendationSeasonDto,
+} from "../dto/clothingDto.js";
 import { toClothingDetailResponseDto } from "../dto/clothingDetailDto.js";
 import type { ClothingItem } from "../repo/clothingRepo.js";
 import { createClothingEntity } from "../entities/clothing.js";
@@ -10,6 +18,16 @@ import type { ClothingGenre } from "../schema/clothingSchema.js";
 import { normalizeItemTagIds, type ItemTagId } from "../../tags/itemTagSchema.js";
 
 const clothingListResource = "clothing-list";
+const clothingRecommendationPageSize = 50;
+const clothingRecommendationLimitPerGenre = 2;
+const jstOffsetMs = 9 * 60 * 60 * 1000;
+
+const seasonTagBySeason: Record<ClothingRecommendationSeasonDto, ItemTagId> = {
+  spring: "season:spring",
+  summer: "season:summer",
+  autumn: "season:autumn",
+  winter: "season:winter",
+};
 
 export type ClothingListCursorPosition = {
   PK: string;
@@ -50,6 +68,10 @@ export type GetClothingUsecaseInput = {
 };
 
 export type GetClothingUsecaseOutput = ClothingDetailResponseDto;
+export type GetClothingRecommendationsUsecaseInput = {
+  wardrobeId: string;
+};
+export type GetClothingRecommendationsUsecaseOutput = ClothingRecommendationsResponseDto;
 export type UpdateClothingUsecaseInput = {
   wardrobeId: string;
   clothingId: string;
@@ -136,6 +158,15 @@ function extractItems(result: ClothingListQueryResult): ClothingItem[] {
   }
 
     return candidates.filter(isClothingListItem) as ClothingItem[];
+}
+
+function extractRecommendationItems(result: ClothingListQueryResult): ClothingItem[] {
+  const candidates = result.Items ?? result.items;
+  if (!Array.isArray(candidates)) {
+    return [];
+  }
+
+  return candidates.filter(isClothingDetailItem) as ClothingItem[];
 }
 
 function extractLastEvaluatedKey(result: ClothingListQueryResult): ClothingListCursorPosition | null {
@@ -242,6 +273,63 @@ function toClothingDetail(item: ClothingItem): ClothingDetailResponseDto {
   };
 }
 
+function getJstMonth(epochMs: number): number {
+  return new Date(epochMs + jstOffsetMs).getUTCMonth() + 1;
+}
+
+export function resolveClothingRecommendationSeason(epochMs: number): ClothingRecommendationSeasonDto {
+  const month = getJstMonth(epochMs);
+
+  if (month >= 3 && month <= 5) {
+    return "spring";
+  }
+
+  if (month >= 6 && month <= 8) {
+    return "summer";
+  }
+
+  if (month >= 9 && month <= 11) {
+    return "autumn";
+  }
+
+  return "winter";
+}
+
+function buildRecommendationSeasonTagIds(season: ClothingRecommendationSeasonDto): ItemTagId[] {
+  return [seasonTagBySeason[season], "season:all"];
+}
+
+function isRecommendationGenre(genre: ClothingGenre): genre is "tops" | "bottoms" {
+  return genre === "tops" || genre === "bottoms";
+}
+
+function toClothingRecommendationItem(item: ClothingItem): ClothingRecommendationItemDto | null {
+  if (!isRecommendationGenre(item.genre)) {
+    return null;
+  }
+
+  return {
+    clothingId: item.clothingId,
+    name: item.name,
+    genre: item.genre,
+    imageKey: item.imageKey,
+    tagIds: normalizeItemTagIds(item.tagIds),
+    status: item.status,
+    wearCount: item.wearCount,
+    lastWornAt: item.lastWornAt,
+  };
+}
+
+function hasEnoughRecommendations(items: { tops: unknown[]; bottoms: unknown[] }): boolean {
+  return items.tops.length >= clothingRecommendationLimitPerGenre
+    && items.bottoms.length >= clothingRecommendationLimitPerGenre;
+}
+
+function matchesAnySeasonTag(item: ClothingItem, seasonTagIds: ItemTagId[]): boolean {
+  const tagSet = new Set(seasonTagIds);
+  return normalizeItemTagIds(item.tagIds).some((tagId) => tagSet.has(tagId));
+}
+
 export function createClothingUsecase(dependencies: ClothingUsecaseDependencies = {}) {
   const repo = dependencies.repo ?? createClothingRepo();
   const now = dependencies.now ?? Date.now;
@@ -312,6 +400,60 @@ export function createClothingUsecase(dependencies: ClothingUsecaseDependencies 
       }
 
       return item;
+    },
+    async getRecommendations(
+      input: GetClothingRecommendationsUsecaseInput,
+    ): Promise<GetClothingRecommendationsUsecaseOutput> {
+      const season = resolveClothingRecommendationSeason(now());
+      const seasonTagIds = buildRecommendationSeasonTagIds(season);
+      const items: GetClothingRecommendationsUsecaseOutput["items"] = {
+        tops: [],
+        bottoms: [],
+      };
+      let exclusiveStartKey: ClothingListCursorPosition | undefined;
+
+      while (!hasEnoughRecommendations(items)) {
+        const result = extractListResult(await repo.list({
+          wardrobeId: input.wardrobeId,
+          indexName: clothingListIndexNames.lastWornAt,
+          status: "ACTIVE",
+          limit: clothingRecommendationPageSize,
+          ...(exclusiveStartKey ? { exclusiveStartKey } : {}),
+          scanIndexForward: true,
+        }));
+
+        for (const item of extractRecommendationItems(result)) {
+          if (!matchesAnySeasonTag(item, seasonTagIds)) {
+            continue;
+          }
+
+          const recommendationItem = toClothingRecommendationItem(item);
+          if (!recommendationItem) {
+            continue;
+          }
+
+          const genreItems = items[recommendationItem.genre];
+          if (genreItems.length < clothingRecommendationLimitPerGenre) {
+            genreItems.push(recommendationItem);
+          }
+
+          if (hasEnoughRecommendations(items)) {
+            break;
+          }
+        }
+
+        const nextPosition = extractLastEvaluatedKey(result);
+        if (!nextPosition) {
+          break;
+        }
+        exclusiveStartKey = nextPosition;
+      }
+
+      return {
+        season,
+        seasonTagIds,
+        items,
+      };
     },
     async update(input: UpdateClothingUsecaseInput): Promise<void> {
       const currentResult = await repo.get({

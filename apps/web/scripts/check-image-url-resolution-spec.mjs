@@ -35,7 +35,7 @@ function check(id, description, passed, detail) {
 }
 
 const resolverTarget = "src/features/clothing/imageUrl.ts";
-const listScreen = "src/components/app/screens/ClothingGenreSection.tsx";
+const listScreen = "src/components/app/screens/ClothingListCard.tsx";
 const detailScreen = "src/components/app/screens/ClothingDetailScreen.tsx";
 
 check(

@@ -17,6 +17,7 @@ locals {
       "ANY /wardrobes/{wardrobeId}"
     ]
     clothing = [
+      "ANY /wardrobes/{wardrobeId}/recommendations/clothing",
       "ANY /wardrobes/{wardrobeId}/clothing",
       "ANY /wardrobes/{wardrobeId}/clothing/{clothingId}"
     ]
