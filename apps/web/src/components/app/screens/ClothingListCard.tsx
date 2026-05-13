@@ -22,12 +22,15 @@ export function ClothingListCard({
   onSelectToggle,
 }: ClothingListCardProps) {
   const imageUrl = resolveImageUrl(item.imageKey);
+  const isLink = !selectable && href !== undefined;
   const baseClassName = [
     "grid w-full items-center gap-3 rounded-md border border-slate-300 bg-white p-3 text-left transition-colors",
     selectable ? "grid-cols-[56px_minmax(0,1fr)_40px]" : "grid-cols-[56px_minmax(0,1fr)]",
     selectable && checked
       ? "border-[var(--primary)] bg-[color:color-mix(in_srgb,var(--primary)_10%,white)]"
-      : "hover:bg-slate-50",
+      : selectable || isLink
+        ? "hover:bg-slate-50"
+        : "",
   ].join(" ");
 
   const body = (
@@ -72,8 +75,12 @@ export function ClothingListCard({
     );
   }
 
+  if (href === undefined) {
+    return <div className={baseClassName}>{body}</div>;
+  }
+
   return (
-    <Link href={href ?? "#"} className={baseClassName}>
+    <Link href={href} className={baseClassName}>
       {body}
     </Link>
   );

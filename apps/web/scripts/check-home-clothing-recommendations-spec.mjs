@@ -55,22 +55,24 @@ check(
 
 check(
   "HCR-04",
-  "トップス/ボトムスをジャンル別に表示する",
+  "トップス/ボトムスをアイコンなしのジャンル別見出しで表示する",
   includes("src/components/app/screens/HomeTabScreen.tsx", '(["tops", "bottoms"] as const).map((genre) =>') &&
     includes("src/components/app/screens/HomeTabScreen.tsx", "CLOTHING_GENRE_LABELS[genre]") &&
-    includes("src/components/app/screens/HomeTabScreen.tsx", "ClothingGenreIcon genre={genre}"),
-  "ジャンル別表示が不足しています",
+    !homeSource.includes("ClothingGenreIcon"),
+  "ジャンル別表示、またはアイコンなし見出しの保証が不足しています",
 );
 
 check(
   "HCR-05",
-  "itemカードは服一覧と共通のサムネイル + 服名カードを使い、服詳細リンクを持つ",
+  "itemカードは服一覧と共通のサムネイル + 服名カードを使い、服詳細リンクを持たない",
   includes("src/components/app/screens/HomeTabScreen.tsx", "ClothingListCard") &&
-    includes("src/components/app/screens/HomeTabScreen.tsx", "ROUTES.clothingDetail(wardrobeId, item.clothingId)") &&
+    !homeSource.includes("ROUTES.clothingDetail(wardrobeId, item.clothingId)") &&
+    includes("src/components/app/screens/ClothingListCard.tsx", "if (href === undefined)") &&
+    includes("src/components/app/screens/ClothingListCard.tsx", "<div className={baseClassName}>{body}</div>") &&
     includes("src/components/app/screens/ClothingListCard.tsx", "resolveImageUrl(item.imageKey)") &&
     includes("src/components/app/screens/ClothingListCard.tsx", "COMMON_STRINGS.placeholders.noImage") &&
     includes("src/components/app/screens/ClothingListCard.tsx", "{item.name}"),
-  "共通カード、サムネイル/no image、服詳細リンクのいずれかが不足しています",
+  "共通カード、サムネイル/no image、または非リンクカード表示のいずれかが不足しています",
 );
 
 check(
