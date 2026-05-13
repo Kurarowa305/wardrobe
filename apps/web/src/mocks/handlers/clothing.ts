@@ -4,6 +4,8 @@ import type {
   ClothingListItemDto,
   ClothingListOrderDto,
   ClothingListResponseDto,
+  ClothingRecommendationResponseDto,
+  ClothingRecommendationSeasonDto,
   CreateClothingRequestDto,
   UpdateClothingRequestDto,
 } from "@/api/schemas/clothing";
@@ -18,6 +20,8 @@ const DEFAULT_PAGE_SIZE = 20;
 const MAX_PAGE_SIZE = 50;
 const CURSOR_PREFIX = "offset:";
 const CLOTHING_ID_PREFIX = "cl_mock_";
+const JST_OFFSET_MS = 9 * 60 * 60 * 1000;
+const RECOMMENDATION_LIMIT_PER_GENRE = 2;
 
 let mockClothingIdSequence = 1;
 let clothingStore = initializeClothingStore();
@@ -183,6 +187,45 @@ function buildListItems(order: ClothingListOrderDto, genre?: ClothingGenreDto): 
   return order === "desc" ? [...activeItems].reverse() : activeItems;
 }
 
+function getCurrentRecommendationSeason(now = Date.now()): ClothingRecommendationSeasonDto {
+  const month = new Date(now + JST_OFFSET_MS).getUTCMonth() + 1;
+  if (month >= 3 && month <= 5) return "spring";
+  if (month >= 6 && month <= 8) return "summer";
+  if (month >= 9 && month <= 11) return "autumn";
+  return "winter";
+}
+
+function getSeasonTagIds(season: ClothingRecommendationSeasonDto): ItemTagIdDto[] {
+  return [`season:${season}`, "season:all"] as ItemTagIdDto[];
+}
+
+function buildRecommendationItems(
+  genre: "tops" | "bottoms",
+  seasonTagIds: ItemTagIdDto[],
+): ClothingRecommendationResponseDto["items"]["tops"] {
+  const targetTags = new Set(seasonTagIds);
+
+  return clothingStore
+    .filter((clothing) => clothing.status === "ACTIVE")
+    .filter((clothing) => clothing.genre === genre)
+    .filter((clothing) => {
+      const tagIds = normalizeTagIds(clothing.tagIds) ?? [];
+      return tagIds.some((tagId) => targetTags.has(tagId));
+    })
+    .sort((left, right) => left.lastWornAt - right.lastWornAt)
+    .slice(0, RECOMMENDATION_LIMIT_PER_GENRE)
+    .map((clothing) => ({
+      clothingId: clothing.clothingId,
+      name: clothing.name,
+      genre,
+      imageKey: clothing.imageKey,
+      tagIds: clothing.tagIds,
+      status: clothing.status,
+      wearCount: clothing.wearCount,
+      lastWornAt: clothing.lastWornAt,
+    }));
+}
+
 function createMockClothingId() {
   const nextId = `${CLOTHING_ID_PREFIX}${String(mockClothingIdSequence).padStart(4, "0")}`;
   mockClothingIdSequence += 1;
@@ -219,6 +262,26 @@ export const clothingHandlers = [
     const nextCursor = nextOffset < items.length ? encodeCursor(nextOffset) : null;
 
     return HttpResponse.json<ClothingListResponseDto>({ items: pagedItems, nextCursor });
+  }),
+
+  http.get("*/wardrobes/:wardrobeId/recommendations/clothing", async ({ params, request }) => {
+    const scenarioResponse = await applyMockScenario(request);
+    if (scenarioResponse) return scenarioResponse;
+
+    const wardrobeId = String(params.wardrobeId ?? "");
+    if (!isSupportedWardrobeId(wardrobeId)) return createNotFoundResponse("wardrobe");
+
+    const season = getCurrentRecommendationSeason();
+    const seasonTagIds = getSeasonTagIds(season);
+
+    return HttpResponse.json<ClothingRecommendationResponseDto>({
+      season,
+      seasonTagIds,
+      items: {
+        tops: buildRecommendationItems("tops", seasonTagIds),
+        bottoms: buildRecommendationItems("bottoms", seasonTagIds),
+      },
+    });
   }),
 
   http.get("*/wardrobes/:wardrobeId/clothing/:clothingId", async ({ params, request }) => {

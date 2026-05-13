@@ -40,6 +40,7 @@ const clothingSchema = "src/api/schemas/clothing.ts";
 const mutationHooks = "src/api/hooks/clothing.ts";
 const clothingHandler = "src/mocks/handlers/clothing.ts";
 const listScreen = "src/components/app/screens/ClothingGenreSection.tsx";
+const listCard = "src/components/app/screens/ClothingListCard.tsx";
 const detailScreen = "src/components/app/screens/ClothingDetailScreen.tsx";
 
 check(
@@ -110,8 +111,9 @@ check(
 check(
   "IKP-08",
   "一覧/詳細画面が imageKey を resolveImageUrl で表示に反映する",
-  includes(listScreen, "const imageUrl = resolveImageUrl(item.imageKey);") &&
-    includes(listScreen, "COMMON_STRINGS.placeholders.noImage") &&
+  includes(listScreen, "<ClothingListCard") &&
+    includes(listCard, "const imageUrl = resolveImageUrl(item.imageKey);") &&
+    includes(listCard, "COMMON_STRINGS.placeholders.noImage") &&
     includes(detailScreen, "const imageUrl = resolveImageUrl(clothingQuery.data?.imageKey);") &&
     includes(detailScreen, "COMMON_STRINGS.placeholders.noImage"),
   "一覧/詳細画面の imageKey 反映（resolveImageUrl/no image）が不足しています",

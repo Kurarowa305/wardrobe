@@ -17,6 +17,7 @@ import { getWardrobeHandler } from "../../domains/wardrobe/handlers/getWardrobeH
 import { listClothingHandler } from "../../domains/clothing/handlers/listClothingHandler.js";
 import { createClothingHandler } from "../../domains/clothing/handlers/createClothingHandler.js";
 import { getClothingHandler } from "../../domains/clothing/handlers/getClothingHandler.js";
+import { getClothingRecommendationsHandler } from "../../domains/clothing/handlers/getClothingRecommendationsHandler.js";
 import { updateClothingHandler } from "../../domains/clothing/handlers/updateClothingHandler.js";
 import { deleteClothingHandler } from "../../domains/clothing/handlers/deleteClothingHandler.js";
 import { listTemplateHandler } from "../../domains/template/handlers/listTemplateHandler.js";
@@ -80,6 +81,13 @@ export const sharedDomainHandlers: Record<LocalDomain, LocalRouteHandler> = {
     return createDefaultDomainHandler("wardrobe")(request);
   },
   clothing(request) {
+    if (request.method === "GET" && request.pathname === `/wardrobes/${request.path.wardrobeId}/recommendations/clothing`) {
+      return getClothingRecommendationsHandler({
+        path: request.path,
+        requestId: request.requestId,
+      });
+    }
+
     if (request.method === "POST" && request.pathname === `/wardrobes/${request.path.wardrobeId}/clothing`) {
       return createClothingHandler({
         path: request.path,

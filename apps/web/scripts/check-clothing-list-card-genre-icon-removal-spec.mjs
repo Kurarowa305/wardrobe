@@ -24,18 +24,19 @@ function check(id, description, passed, detail) {
 }
 
 const target = "src/components/app/screens/ClothingGenreSection.tsx";
+const cardTarget = "src/components/app/screens/ClothingListCard.tsx";
 
 check("CLGI-01", "服一覧カードの共通セクション実装が存在する", exists(target), `${target} が存在しません`);
 check(
   "CLGI-02",
   "非選択時の一覧カードは右端列を持たない2カラム構成である",
-  includes(target, 'selectable ? "grid-cols-[56px_minmax(0,1fr)_40px]" : "grid-cols-[56px_minmax(0,1fr)]"'),
+  includes(cardTarget, 'selectable ? "grid-cols-[56px_minmax(0,1fr)_40px]" : "grid-cols-[56px_minmax(0,1fr)]"'),
   "非選択時のカードレイアウトが2カラム化されていません",
 );
 check(
   "CLGI-03",
   "一覧カード右端のジャンルアイコンは選択UI時にのみ表示領域を持つ",
-  includes(target, '{selectable ? (') && excludes(target, '<ClothingGenreIcon genre={genre} className="h-5 w-5 text-slate-400" />'),
+  includes(cardTarget, '{selectable ? (') && excludes(cardTarget, '<ClothingGenreIcon genre={genre} className="h-5 w-5 text-slate-400" />'),
   "非選択カードにジャンルアイコン描画が残っています",
 );
 check(

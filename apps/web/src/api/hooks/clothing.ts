@@ -5,6 +5,7 @@ import {
   createClothing,
   deleteClothing,
   getClothing,
+  getClothingRecommendations,
   listClothings,
   updateClothing,
 } from "@/api/endpoints/clothing";
@@ -14,7 +15,7 @@ import type {
   CreateClothingRequestDto,
   UpdateClothingRequestDto,
 } from "@/api/schemas/clothing";
-import { toClothing, toClothingListItem } from "@/features/clothing/types";
+import { toClothing, toClothingListItem, toClothingRecommendation } from "@/features/clothing/types";
 
 const CLOTHING_LIST_STALE_TIME_MS = 60_000;
 
@@ -24,9 +25,14 @@ type ClothingIdentity = {
 };
 
 async function invalidateClothingListQueries(queryClient: QueryClient, wardrobeId: string) {
-  await queryClient.invalidateQueries({
-    queryKey: queryKeys.clothing.lists(wardrobeId),
-  });
+  await Promise.all([
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.clothing.lists(wardrobeId),
+    }),
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.clothing.recommendation(wardrobeId),
+    }),
+  ]);
 }
 
 async function invalidateClothingRelatedQueries(
@@ -39,6 +45,9 @@ async function invalidateClothingRelatedQueries(
     }),
     queryClient.invalidateQueries({
       queryKey: queryKeys.clothing.lists(wardrobeId),
+    }),
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.clothing.recommendation(wardrobeId),
     }),
     queryClient.invalidateQueries({
       queryKey: queryKeys.template.byWardrobe(wardrobeId),
@@ -68,6 +77,16 @@ export function useClothing(wardrobeId: string, clothingId: string) {
     queryFn: () => getClothing(wardrobeId, clothingId),
     enabled: wardrobeId.length > 0 && clothingId.length > 0,
     select: toClothing,
+  });
+}
+
+export function useClothingRecommendations(wardrobeId: string) {
+  return useQuery({
+    queryKey: queryKeys.clothing.recommendation(wardrobeId),
+    queryFn: () => getClothingRecommendations(wardrobeId),
+    staleTime: CLOTHING_LIST_STALE_TIME_MS,
+    enabled: wardrobeId.length > 0,
+    select: toClothingRecommendation,
   });
 }
 

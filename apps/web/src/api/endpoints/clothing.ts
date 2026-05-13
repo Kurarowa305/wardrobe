@@ -3,6 +3,7 @@ import type {
   ClothingDetailResponseDto,
   ClothingListParamsDto,
   ClothingListResponseDto,
+  ClothingRecommendationResponseDto,
   CreateClothingRequestDto,
   UpdateClothingRequestDto,
 } from "@/api/schemas/clothing";
@@ -13,6 +14,10 @@ function buildClothingCollectionPath(wardrobeId: string) {
 
 function buildClothingDetailPath(wardrobeId: string, clothingId: string) {
   return `${buildClothingCollectionPath(wardrobeId)}/${clothingId}`;
+}
+
+function buildClothingRecommendationsPath(wardrobeId: string) {
+  return `/wardrobes/${wardrobeId}/recommendations/clothing`;
 }
 
 export function listClothings(
@@ -29,6 +34,12 @@ export function getClothing(
   clothingId: string,
 ): Promise<ClothingDetailResponseDto> {
   return apiClient.get<ClothingDetailResponseDto>(buildClothingDetailPath(wardrobeId, clothingId));
+}
+
+export function getClothingRecommendations(
+  wardrobeId: string,
+): Promise<ClothingRecommendationResponseDto> {
+  return apiClient.get<ClothingRecommendationResponseDto>(buildClothingRecommendationsPath(wardrobeId));
 }
 
 export function createClothing(

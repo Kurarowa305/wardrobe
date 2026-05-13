@@ -212,6 +212,9 @@ jobs:
       - name: API clothing MS2 unit spec test
         run: pnpm --filter api test:clothing-ms2-unit
 
+      - name: API clothing recommendations spec test
+        run: pnpm --filter api test:clothing-recommendations-api
+
       - name: API history schema spec test
         run: pnpm --filter api test:history-schema
 
@@ -479,6 +482,9 @@ jobs:
       - name: Home recent histories hook spec test
         run: pnpm --filter web test:home-recent-histories-hook
 
+      - name: Home clothing recommendations spec test
+        run: pnpm --filter web test:home-clothing-recommendations
+
       - name: Accent color spec test
         run: pnpm --filter web test:accent-color
 
@@ -505,6 +511,9 @@ jobs:
 
       - name: Clothing API client spec test
         run: pnpm --filter web test:clothing-api-client
+
+      - name: Clothing recommendation API client spec test
+        run: pnpm --filter web test:clothing-recommendation-api-client
 
       - name: Image presign API client spec test
         run: pnpm --filter web test:image-presign-api-client
@@ -599,6 +608,9 @@ jobs:
 
       - name: Clothing MSW handlers spec test
         run: pnpm --filter web test:clothing-msw-handlers
+
+      - name: Clothing recommendation MSW spec test
+        run: pnpm --filter web test:clothing-recommendation-msw
 
       - name: Build web
         env:

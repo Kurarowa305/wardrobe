@@ -1,6 +1,9 @@
 import type {
   ClothingDetailResponse,
   ClothingGenre,
+  ClothingRecommendationItem,
+  ClothingRecommendationSeason,
+  ClothingRecommendationsResponse,
   ClothingListItem,
   ClothingListOrder,
   ClothingListParams,
@@ -19,5 +22,8 @@ export type UpdateClothingRequestDto = UpdateClothingRequest;
 export type ClothingListItemDto = ClothingListItem;
 export type ClothingDetailResponseDto = ClothingDetailResponse;
 export type ClothingListResponseDto = ClothingListResponse;
+export type ClothingRecommendationSeasonDto = ClothingRecommendationSeason;
+export type ClothingRecommendationItemDto = ClothingRecommendationItem;
+export type ClothingRecommendationsResponseDto = ClothingRecommendationsResponse;
 
 export type ClothingDto = ClothingDetailResponseDto;

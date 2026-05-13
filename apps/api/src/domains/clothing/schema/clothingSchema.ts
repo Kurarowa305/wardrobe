@@ -5,6 +5,7 @@ import { itemTagIdsSchema } from "../../tags/itemTagSchema.js";
 export const clothingStatusValues = ["ACTIVE", "DELETED"] as const;
 export const clothingGenreValues = ["tops", "bottoms", "others"] as const;
 export const clothingListOrderValues = ["asc", "desc"] as const;
+export const clothingRecommendationSeasonValues = ["spring", "summer", "autumn", "winter"] as const;
 
 export const clothingNameMaxLength = 40;
 export const clothingImageKeyMaxLength = 2048;
@@ -13,6 +14,7 @@ export const clothingListLimitMax = 50;
 export const clothingStatusSchema = z.enum(clothingStatusValues);
 export const clothingGenreSchema = z.enum(clothingGenreValues);
 export const clothingListOrderSchema = z.enum(clothingListOrderValues);
+export const clothingRecommendationSeasonSchema = z.enum(clothingRecommendationSeasonValues);
 export const clothingIdSchema = z.string().trim().min(1);
 export const wardrobeIdSchema = z.string().trim().min(1);
 export const clothingNameSchema = z.string().trim().min(1).max(clothingNameMaxLength);
@@ -66,6 +68,19 @@ export const clothingListResponseSchema = z.object({
   nextCursor: z.string().trim().min(1).nullable(),
 }).strict();
 
+export const clothingRecommendationItemSchema = clothingDetailResponseSchema.extend({
+  genre: z.enum(["tops", "bottoms"]),
+}).strict();
+
+export const clothingRecommendationsResponseSchema = z.object({
+  season: clothingRecommendationSeasonSchema,
+  seasonTagIds: itemTagIdsSchema,
+  items: z.object({
+    tops: z.array(clothingRecommendationItemSchema),
+    bottoms: z.array(clothingRecommendationItemSchema),
+  }).strict(),
+}).strict();
+
 export const clothingPathParamsSchema = z.object({
   wardrobeId: wardrobeIdSchema,
   clothingId: clothingIdSchema,
@@ -92,12 +107,15 @@ export const clothingEntitySchema = z.object({
 export type ClothingStatus = z.infer<typeof clothingStatusSchema>;
 export type ClothingGenre = z.infer<typeof clothingGenreSchema>;
 export type ClothingListOrder = z.infer<typeof clothingListOrderSchema>;
+export type ClothingRecommendationSeason = z.infer<typeof clothingRecommendationSeasonSchema>;
 export type ClothingListParams = z.infer<typeof clothingListParamsSchema>;
 export type CreateClothingRequest = z.infer<typeof createClothingRequestSchema>;
 export type UpdateClothingRequest = z.infer<typeof updateClothingRequestSchema>;
 export type ClothingListItem = z.infer<typeof clothingListItemSchema>;
 export type ClothingDetailResponse = z.infer<typeof clothingDetailResponseSchema>;
 export type ClothingListResponse = z.infer<typeof clothingListResponseSchema>;
+export type ClothingRecommendationItem = z.infer<typeof clothingRecommendationItemSchema>;
+export type ClothingRecommendationsResponse = z.infer<typeof clothingRecommendationsResponseSchema>;
 export type ClothingPathParams = z.infer<typeof clothingPathParamsSchema>;
 export type ClothingWardrobePathParams = z.infer<typeof clothingWardrobePathParamsSchema>;
 export type ClothingEntityShape = z.infer<typeof clothingEntitySchema>;

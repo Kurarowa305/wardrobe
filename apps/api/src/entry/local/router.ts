@@ -8,6 +8,7 @@ import { sharedDomainHandlers } from "../lambda/adapter.js";
 export const localRoutePatterns = [
   "/wardrobes",
   "/wardrobes/:wardrobeId",
+  "/wardrobes/:wardrobeId/recommendations/clothing",
   "/wardrobes/:wardrobeId/clothing",
   "/wardrobes/:wardrobeId/clothing/:clothingId",
   "/wardrobes/:wardrobeId/templates",
@@ -53,6 +54,7 @@ export type LocalRouteHandler = (
 export const localRoutes: readonly LocalRouteDefinition[] = [
   { method: "POST", pattern: "/wardrobes", domain: "wardrobe" },
   { method: "GET", pattern: "/wardrobes/:wardrobeId", domain: "wardrobe" },
+  { method: "GET", pattern: "/wardrobes/:wardrobeId/recommendations/clothing", domain: "clothing" },
   { method: "GET", pattern: "/wardrobes/:wardrobeId/clothing", domain: "clothing" },
   { method: "POST", pattern: "/wardrobes/:wardrobeId/clothing", domain: "clothing" },
   { method: "GET", pattern: "/wardrobes/:wardrobeId/clothing/:clothingId", domain: "clothing" },
