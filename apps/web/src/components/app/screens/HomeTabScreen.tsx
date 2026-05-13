@@ -13,7 +13,7 @@ import { AppLayout } from "@/components/app/layout/AppLayout";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { ROUTES } from "@/constants/routes";
-import { CLOTHING_GENRE_LABELS, ClothingGenreIcon } from "@/features/clothing/genre";
+import { CLOTHING_GENRE_LABELS } from "@/features/clothing/genre";
 import { HOME_STRINGS } from "@/features/home/strings";
 import { OPERATION_TOAST_IDS, consumeOperationToast } from "@/features/toast/operationToast";
 type HomeTabScreenProps = {
@@ -99,18 +99,11 @@ export function HomeTabScreen({ wardrobeId }: HomeTabScreenProps) {
             <div className="grid gap-3">
               {(["tops", "bottoms"] as const).map((genre) => (
                 <section key={genre} className="grid gap-2">
-                  <h3 className="m-0 flex items-center gap-2 text-sm font-semibold text-slate-900">
-                    <ClothingGenreIcon genre={genre} className="h-5 w-5 text-slate-700" />
-                    {CLOTHING_GENRE_LABELS[genre]}
-                  </h3>
+                  <h3 className="m-0 text-sm font-semibold text-slate-900">{CLOTHING_GENRE_LABELS[genre]}</h3>
                   {clothingRecommendationsQuery.data.items[genre].length > 0 ? (
                     <div className="grid gap-2">
                       {clothingRecommendationsQuery.data.items[genre].map((item) => (
-                        <ClothingListCard
-                          key={item.clothingId}
-                          item={item}
-                          href={ROUTES.clothingDetail(wardrobeId, item.clothingId)}
-                        />
+                        <ClothingListCard key={item.clothingId} item={item} />
                       ))}
                     </div>
                   ) : (
