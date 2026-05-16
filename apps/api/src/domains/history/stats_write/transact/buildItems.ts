@@ -1,13 +1,19 @@
 import type { TransactWriteItem } from "../../../../clients/dynamodb.js";
-import { buildClothingBaseKey } from "../../../clothing/repo/clothingKeys.js";
-import { buildTemplateBaseKey } from "../../../template/repo/templateKeys.js";
+import { buildClothingBaseKey, buildClothingLastWornAtSk, buildClothingWearCountSk } from "../../../clothing/repo/clothingKeys.js";
+import { buildTemplateBaseKey, buildTemplateLastWornAtSk, buildTemplateWearCountSk } from "../../../template/repo/templateKeys.js";
 import { buildWearDailyKey } from "../keys.js";
 import type { DailyStatsCacheUpdateFact } from "../aggregations/daily.js";
 import type { WearDailyFact } from "../types.js";
 
+export type StatsCacheSnapshot = {
+  wearCount: number;
+  lastWornAt: number;
+};
+
 export type BuildHistoryStatsWriteItemsInput = {
   wearDailyFacts: WearDailyFact[];
   cacheUpdateFacts: DailyStatsCacheUpdateFact[];
+  resolveCurrentStats?: ((fact: DailyStatsCacheUpdateFact) => StatsCacheSnapshot | undefined) | undefined;
   resolveRecomputedLastWornAt?: ((fact: DailyStatsCacheUpdateFact) => number) | undefined;
 };
 
@@ -22,6 +28,34 @@ const buildStatsTargetBaseKey = (fact: DailyStatsCacheUpdateFact) => {
   return buildTemplateBaseKey({
     wardrobeId: fact.wardrobeId,
     templateId: fact.target.id,
+  });
+};
+
+const buildStatsTargetWearCountSk = (fact: DailyStatsCacheUpdateFact, wearCount: number) => {
+  if (fact.target.kind === "clothing") {
+    return buildClothingWearCountSk({
+      clothingId: fact.target.id,
+      value: wearCount,
+    });
+  }
+
+  return buildTemplateWearCountSk({
+    templateId: fact.target.id,
+    value: wearCount,
+  });
+};
+
+const buildStatsTargetLastWornAtSk = (fact: DailyStatsCacheUpdateFact, lastWornAt: number) => {
+  if (fact.target.kind === "clothing") {
+    return buildClothingLastWornAtSk({
+      clothingId: fact.target.id,
+      value: lastWornAt,
+    });
+  }
+
+  return buildTemplateLastWornAtSk({
+    templateId: fact.target.id,
+    value: lastWornAt,
   });
 };
 
@@ -49,28 +83,44 @@ const buildWearDailyUpdateItem = (fact: WearDailyFact): TransactWriteItem => ({
 
 const buildCacheUpdateItem = (
   fact: DailyStatsCacheUpdateFact,
+  resolveCurrentStats?: ((fact: DailyStatsCacheUpdateFact) => StatsCacheSnapshot | undefined) | undefined,
   resolveRecomputedLastWornAt?: ((fact: DailyStatsCacheUpdateFact) => number) | undefined,
 ): TransactWriteItem => {
+  const currentStats = resolveCurrentStats?.(fact);
+  if (currentStats === undefined) {
+    throw new Error("current stats is required for cache update");
+  }
+
+  const nextWearCount = currentStats.wearCount + fact.wearCountDelta;
+  if (nextWearCount < 0) {
+    throw new Error("wearCount cache update result must not be negative");
+  }
+
   const nextLastWornAt = fact.lastWornAt.mode === "max"
-    ? fact.lastWornAt.epochMs
+    ? Math.max(currentStats.lastWornAt, fact.lastWornAt.epochMs)
     : resolveRecomputedLastWornAt?.(fact);
 
   if (nextLastWornAt === undefined) {
     throw new Error("lastWornAt recompute result is required for delete cache update");
   }
 
+  const nextWearCountSk = buildStatsTargetWearCountSk(fact, nextWearCount);
+  const nextLastWornAtSk = buildStatsTargetLastWornAtSk(fact, nextLastWornAt);
+
   return {
     Update: {
       Key: buildStatsTargetBaseKey(fact),
       UpdateExpression:
-        "SET wearCount = if_not_exists(wearCount, :zero) + :wearCountDelta, lastWornAt = :lastWornAt",
+        "SET wearCount = :wearCount, lastWornAt = :lastWornAt, wearCountSk = :wearCountSk, lastWornAtSk = :lastWornAtSk",
       ConditionExpression: fact.wearCountDelta < 0
-        ? "attribute_exists(PK) AND wearCount >= :requiredWearCount"
-        : "attribute_exists(PK)",
+        ? "attribute_exists(PK) AND (attribute_not_exists(wearCount) OR wearCount = :currentWearCount) AND wearCount >= :requiredWearCount"
+        : "attribute_exists(PK) AND (attribute_not_exists(wearCount) OR wearCount = :currentWearCount)",
       ExpressionAttributeValues: {
-        ":zero": 0,
-        ":wearCountDelta": fact.wearCountDelta,
+        ":currentWearCount": currentStats.wearCount,
+        ":wearCount": nextWearCount,
         ":lastWornAt": nextLastWornAt,
+        ":wearCountSk": nextWearCountSk,
+        ":lastWornAtSk": nextLastWornAtSk,
         ...(fact.wearCountDelta < 0 ? { ":requiredWearCount": Math.abs(fact.wearCountDelta) } : {}),
       },
     },
@@ -81,7 +131,9 @@ export const buildHistoryStatsWriteItems = (
   input: BuildHistoryStatsWriteItemsInput,
 ): TransactWriteItem[] => {
   const wearDailyItems = input.wearDailyFacts.map(buildWearDailyUpdateItem);
-  const cacheItems = input.cacheUpdateFacts.map((fact) => buildCacheUpdateItem(fact, input.resolveRecomputedLastWornAt));
+  const cacheItems = input.cacheUpdateFacts.map((fact) =>
+    buildCacheUpdateItem(fact, input.resolveCurrentStats, input.resolveRecomputedLastWornAt)
+  );
 
   return [...wearDailyItems, ...cacheItems];
 };

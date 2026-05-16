@@ -26,8 +26,21 @@ const usecase = createHistoryWithStatsWriteUsecase({
       Item: {
         templateId: "tp_001",
         clothingIds: ["cl_010", "cl_011"],
+        wearCount: 2,
+        lastWornAt: 1767139200000,
       },
     };
+  },
+  async batchGetClothingByIds({ clothingIds }) {
+    return [{
+      Responses: {
+        WardrobeTable: clothingIds.map((clothingId, index) => ({
+          clothingId,
+          wearCount: index + 1,
+          lastWornAt: 1767139200000,
+        })),
+      },
+    }];
   },
   async transactWriteItems(items) {
     transactCalls.push(items);
@@ -78,10 +91,18 @@ const findDuplicateOperationKeys = (items) => {
 const hasNoConditionChecks = (items) => items.every((item) => item?.ConditionCheck === undefined);
 
 const hasTemplateExistenceGuardOnUpdate = (items) =>
-  items.some((item) => item?.Update?.Key?.SK === "TPL#tp_001" && item?.Update?.ConditionExpression === "attribute_exists(PK)");
+  items.some((item) =>
+    item?.Update?.Key?.SK === "TPL#tp_001"
+    && item?.Update?.ConditionExpression?.includes("attribute_exists(PK)")
+    && item?.Update?.ConditionExpression?.includes("wearCount = :currentWearCount")
+  );
 
 const hasClothingExistenceGuardsOnUpdate = (items) =>
-  items.filter((item) => item?.Update?.Key?.SK?.startsWith("CLOTH#") && item?.Update?.ConditionExpression === "attribute_exists(PK)")
+  items.filter((item) =>
+    item?.Update?.Key?.SK?.startsWith("CLOTH#")
+    && item?.Update?.ConditionExpression?.includes("attribute_exists(PK)")
+    && item?.Update?.ConditionExpression?.includes("wearCount = :currentWearCount")
+  )
     .length === 2;
 
 const templateDuplicateKeys = findDuplicateOperationKeys(templateCall);

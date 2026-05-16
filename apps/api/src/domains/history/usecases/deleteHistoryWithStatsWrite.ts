@@ -334,6 +334,10 @@ export function createDeleteHistoryWithStatsWriteUsecase(
         ...buildHistoryStatsWriteItems({
           wearDailyFacts: [],
           cacheUpdateFacts: cacheFacts,
+          resolveCurrentStats: (fact) => {
+            const key = `${fact.target.kind}:${fact.target.id}`;
+            return targetStatsMap.get(key);
+          },
           resolveRecomputedLastWornAt: (fact) => {
             const key = `${fact.target.kind}:${fact.target.id}`;
             return nextLastWornAtByTarget.get(key) ?? 0;
