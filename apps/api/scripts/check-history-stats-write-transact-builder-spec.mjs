@@ -16,6 +16,19 @@ const builderSource = readFileSync(builderPath, "utf8");
 const packageJson = readFileSync(packageJsonPath, "utf8");
 const ciSource = readFileSync(ciPath, "utf8");
 
+const currentStatsByTarget = new Map([
+  ["template:tp_01HZZBBB", {
+    wearCount: 6,
+    lastWornAt: Date.UTC(2026, 0, 6, 0, 0, 0, 0),
+  }],
+  ["clothing:cl_01HZZCCC", {
+    wearCount: 11,
+    lastWornAt: Date.UTC(2026, 0, 6, 0, 0, 0, 0),
+  }],
+]);
+
+const resolveCurrentStats = (fact) => currentStatsByTarget.get(`${fact.target.kind}:${fact.target.id}`);
+
 const createItems = builderModule.buildHistoryStatsWriteItems({
   wearDailyFacts: [
     {
@@ -45,6 +58,7 @@ const createItems = builderModule.buildHistoryStatsWriteItems({
       lastWornAt: { mode: "max", epochMs: Date.UTC(2026, 0, 7, 0, 0, 0, 0) },
     },
   ],
+  resolveCurrentStats,
 });
 
 const deleteItems = builderModule.buildHistoryStatsWriteItems({
@@ -64,6 +78,7 @@ const deleteItems = builderModule.buildHistoryStatsWriteItems({
       lastWornAt: { mode: "recompute" },
     },
   ],
+  resolveCurrentStats,
   resolveRecomputedLastWornAt: () => Date.UTC(2026, 0, 2, 0, 0, 0, 0),
 });
 
@@ -79,9 +94,27 @@ try {
         lastWornAt: { mode: "recompute" },
       },
     ],
+    resolveCurrentStats,
   });
 } catch (error) {
   missingRecomputeError = String(error);
+}
+
+let missingCurrentStatsError = "";
+try {
+  builderModule.buildHistoryStatsWriteItems({
+    wearDailyFacts: [],
+    cacheUpdateFacts: [
+      {
+        wardrobeId: "wd_01HZZAAA",
+        target: { kind: "template", id: "tp_missing_stats" },
+        wearCountDelta: 1,
+        lastWornAt: { mode: "max", epochMs: Date.UTC(2026, 0, 7, 0, 0, 0, 0) },
+      },
+    ],
+  });
+} catch (error) {
+  missingCurrentStatsError = String(error);
 }
 
 const conditionExpressions = [...createItems, ...deleteItems]
@@ -107,11 +140,31 @@ const checks = [
     detail: createItems[0],
   },
   {
-    name: "create 用 cache 更新は item 存在確認のみで加算できる",
+    name: "create 用 cache 更新は現在 wearCount を条件に統計カラムを同期できる",
     ok:
-      createItems[2]?.Update?.ConditionExpression === "attribute_exists(PK)"
-      && createItems[2]?.Update?.ExpressionAttributeValues?.[":requiredWearCount"] === undefined,
+      createItems[2]?.Update?.ConditionExpression ===
+        "attribute_exists(PK) AND (attribute_not_exists(wearCount) OR wearCount = :currentWearCount)"
+      && createItems[2]?.Update?.ExpressionAttributeValues?.[":requiredWearCount"] === undefined
+      && createItems[2]?.Update?.ExpressionAttributeValues?.[":currentWearCount"] === 6
+      && createItems[2]?.Update?.ExpressionAttributeValues?.[":wearCount"] === 7
+      && createItems[2]?.Update?.UpdateExpression.includes("wearCountSk = :wearCountSk")
+      && createItems[2]?.Update?.UpdateExpression.includes("lastWornAtSk = :lastWornAtSk")
+      && createItems[3]?.Update?.ExpressionAttributeValues?.[":currentWearCount"] === 11
+      && createItems[3]?.Update?.ExpressionAttributeValues?.[":wearCount"] === 12
+      && createItems[3]?.Update?.UpdateExpression.includes("wearCountSk = :wearCountSk")
+      && createItems[3]?.Update?.UpdateExpression.includes("lastWornAtSk = :lastWornAtSk"),
     detail: createItems[2],
+  },
+  {
+    name: "create 用 cache 更新は wearCount/lastWornAt と同じ値で GSI sort key を更新できる",
+    ok:
+      createItems[2]?.Update?.ExpressionAttributeValues?.[":wearCountSk"] === "WEAR#0000000007#tp_01HZZBBB"
+      && createItems[2]?.Update?.ExpressionAttributeValues?.[":lastWornAtSk"] ===
+        `LASTWORN#${Date.UTC(2026, 0, 7, 0, 0, 0, 0)}#tp_01HZZBBB`
+      && createItems[3]?.Update?.ExpressionAttributeValues?.[":wearCountSk"] === "WEAR#0000000012#cl_01HZZCCC"
+      && createItems[3]?.Update?.ExpressionAttributeValues?.[":lastWornAtSk"] ===
+        `LASTWORN#${Date.UTC(2026, 0, 7, 0, 0, 0, 0)}#cl_01HZZCCC`,
+    detail: createItems,
   },
   {
     name: "delete 用は減算ガードと再計算済み lastWornAt を同時に反映できる",
@@ -119,10 +172,15 @@ const checks = [
       deleteItems.length === 2
       && deleteItems[0]?.Update?.ConditionExpression === "attribute_exists(#count) AND #count >= :requiredCount"
       && deleteItems[0]?.Update?.ExpressionAttributeValues?.[":requiredCount"] === 1
-      && deleteItems[1]?.Update?.ConditionExpression === "attribute_exists(PK) AND wearCount >= :requiredWearCount"
+      && deleteItems[1]?.Update?.ConditionExpression ===
+        "attribute_exists(PK) AND (attribute_not_exists(wearCount) OR wearCount = :currentWearCount) AND wearCount >= :requiredWearCount"
       && deleteItems[1]?.Update?.ExpressionAttributeValues?.[":requiredWearCount"] === 1
-      && deleteItems[1]?.Update?.ExpressionAttributeValues?.[":wearCountDelta"] === -1
-      && deleteItems[1]?.Update?.ExpressionAttributeValues?.[":lastWornAt"] === Date.UTC(2026, 0, 2, 0, 0, 0, 0),
+      && deleteItems[1]?.Update?.ExpressionAttributeValues?.[":currentWearCount"] === 11
+      && deleteItems[1]?.Update?.ExpressionAttributeValues?.[":wearCount"] === 10
+      && deleteItems[1]?.Update?.ExpressionAttributeValues?.[":lastWornAt"] === Date.UTC(2026, 0, 2, 0, 0, 0, 0)
+      && deleteItems[1]?.Update?.ExpressionAttributeValues?.[":wearCountSk"] === "WEAR#0000000010#cl_01HZZCCC"
+      && deleteItems[1]?.Update?.ExpressionAttributeValues?.[":lastWornAtSk"] ===
+        `LASTWORN#${Date.UTC(2026, 0, 2, 0, 0, 0, 0)}#cl_01HZZCCC`,
     detail: deleteItems,
   },
   {
@@ -134,6 +192,11 @@ const checks = [
     name: "recompute モードで resolver 未指定の場合は明示的に失敗する",
     ok: missingRecomputeError.includes("lastWornAt recompute result is required"),
     detail: missingRecomputeError,
+  },
+  {
+    name: "current stats resolver 未指定の場合は明示的に失敗する",
+    ok: missingCurrentStatsError.includes("current stats is required"),
+    detail: missingCurrentStatsError,
   },
   {
     name: "buildItems.ts が BE-MS5-T05 で必要な helper を export している",

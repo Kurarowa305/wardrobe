@@ -27,8 +27,21 @@ const response = await createHistoryHandler({
         Item: {
           templateId: "tp_001",
           clothingIds: ["cl_001", "cl_002"],
+          wearCount: 2,
+          lastWornAt: 1767139200000,
         },
       };
+    },
+    async batchGetClothingByIds({ clothingIds }) {
+      return [{
+        Responses: {
+          WardrobeTable: clothingIds.map((clothingId, index) => ({
+            clothingId,
+            wearCount: index + 1,
+            lastWornAt: 1767139200000,
+          })),
+        },
+      }];
     },
     async transactWriteItems(items) {
       createCalls.push(items);
@@ -73,6 +86,9 @@ try {
     headers: { "content-type": "application/json" },
     requestId: "req_history_conflict",
     dependencies: {
+      async batchGetClothingByIds() {
+        return [];
+      },
       async transactWriteItems() {
         return { ok: true };
       },
@@ -90,6 +106,17 @@ try {
     headers: { "content-type": "application/json" },
     requestId: "req_history_not_found",
     dependencies: {
+      async batchGetClothingByIds({ clothingIds }) {
+        return [{
+          Responses: {
+            WardrobeTable: clothingIds.map((clothingId) => ({
+              clothingId,
+              wearCount: 0,
+              lastWornAt: 0,
+            })),
+          },
+        }];
+      },
       async transactWriteItems() {
         const error = new Error("Transaction cancelled");
         error.name = "TransactionCanceledException";

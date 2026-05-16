@@ -86,6 +86,17 @@ const createResponse = await createHistoryHandler({
   body: { date: "20260101", clothingIds: ["cl_01", "cl_02"] },
   headers: { "content-type": "application/json" },
   dependencies: {
+    async batchGetClothingByIds({ clothingIds }) {
+      return [{
+        Responses: {
+          WardrobeTable: clothingIds.map((clothingId) => ({
+            clothingId,
+            wearCount: 0,
+            lastWornAt: 0,
+          })),
+        },
+      }];
+    },
     async transactWriteItems() {
       return { ok: true };
     },

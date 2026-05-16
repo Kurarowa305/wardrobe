@@ -124,6 +124,15 @@ const historyHandlerWithDeps = createLambdaHandler({
         dependencies: {
           now: () => 1735689600000,
           generateHistoryId: () => "hs_01JENTRYTEST00000000000000",
+          batchGetClothingByIds: async ({ clothingIds }) => [{
+            Responses: {
+              WardrobeTable: clothingIds.map((clothingId) => ({
+                clothingId,
+                wearCount: 0,
+                lastWornAt: 0,
+              })),
+            },
+          }],
           transactWriteItems: async () => ({ ok: true }),
         },
       });

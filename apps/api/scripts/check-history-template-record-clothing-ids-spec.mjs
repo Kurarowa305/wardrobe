@@ -25,8 +25,21 @@ const usecase = createHistoryWithStatsWriteUsecase({
       Item: {
         templateId: "tp_001",
         clothingIds: ["cl_003", "cl_001", "cl_002"],
+        wearCount: 4,
+        lastWornAt: 1767139200000,
       },
     };
+  },
+  async batchGetClothingByIds({ clothingIds }) {
+    return [{
+      Responses: {
+        WardrobeTable: clothingIds.map((clothingId, index) => ({
+          clothingId,
+          wearCount: index + 1,
+          lastWornAt: 1767139200000,
+        })),
+      },
+    }];
   },
   async transactWriteItems(items) {
     transactCount += 1;
@@ -60,6 +73,9 @@ try {
     async getTemplate() {
       return {};
     },
+    async batchGetClothingByIds() {
+      throw new Error("batchGetClothingByIds should not be called when template is missing");
+    },
     async transactWriteItems() {
       throw new Error("transactWriteItems should not be called when template is missing");
     },
@@ -79,8 +95,13 @@ try {
       return {
         Item: {
           templateId: "tp_invalid",
+          wearCount: 0,
+          lastWornAt: 0,
         },
       };
+    },
+    async batchGetClothingByIds() {
+      throw new Error("batchGetClothingByIds should not be called when template data is invalid");
     },
     async transactWriteItems() {
       throw new Error("transactWriteItems should not be called when template data is invalid");

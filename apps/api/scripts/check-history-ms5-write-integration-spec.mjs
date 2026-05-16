@@ -26,6 +26,9 @@ const toEpochMs = (date) => {
   return Date.UTC(year, month - 1, day, 0, 0, 0, 0);
 };
 
+const buildWearCountSk = (count, id) => `WEAR#${String(count).padStart(10, "0")}#${id}`;
+const buildLastWornAtSk = (lastWornAt, id) => `LASTWORN#${lastWornAt}#${id}`;
+
 const extractTargetFromDailyPk = (pk) => {
   const segments = pk.split("#");
   if (segments.length < 5) {
@@ -71,9 +74,27 @@ const createState = () => {
       clothingIds: ["cl_001", "cl_002"],
       wearCount: 2,
       lastWornAt: toEpochMs("20260103"),
+      wearCountSk: buildWearCountSk(2, "tp_001"),
+      lastWornAtSk: buildLastWornAtSk(toEpochMs("20260103"), "tp_001"),
     }],
-    ["W#wd_001#CLOTH|CLOTH#cl_001", { PK: "W#wd_001#CLOTH", SK: "CLOTH#cl_001", clothingId: "cl_001", wearCount: 3, lastWornAt: toEpochMs("20260104") }],
-    ["W#wd_001#CLOTH|CLOTH#cl_002", { PK: "W#wd_001#CLOTH", SK: "CLOTH#cl_002", clothingId: "cl_002", wearCount: 1, lastWornAt: toEpochMs("20260102") }],
+    ["W#wd_001#CLOTH|CLOTH#cl_001", {
+      PK: "W#wd_001#CLOTH",
+      SK: "CLOTH#cl_001",
+      clothingId: "cl_001",
+      wearCount: 3,
+      lastWornAt: toEpochMs("20260104"),
+      wearCountSk: buildWearCountSk(3, "cl_001"),
+      lastWornAtSk: buildLastWornAtSk(toEpochMs("20260104"), "cl_001"),
+    }],
+    ["W#wd_001#CLOTH|CLOTH#cl_002", {
+      PK: "W#wd_001#CLOTH",
+      SK: "CLOTH#cl_002",
+      clothingId: "cl_002",
+      wearCount: 1,
+      lastWornAt: toEpochMs("20260102"),
+      wearCountSk: buildWearCountSk(1, "cl_002"),
+      lastWornAtSk: buildLastWornAtSk(toEpochMs("20260102"), "cl_002"),
+    }],
   ]);
 
   const wearDaily = new Map([
@@ -232,15 +253,46 @@ const createDependencies = (state) => ({
           throw error;
         }
 
-        const wearCountDelta = item.Update.ExpressionAttributeValues?.[":wearCountDelta"];
-        const lastWornAt = item.Update.ExpressionAttributeValues?.[":lastWornAt"];
+        const values = item.Update.ExpressionAttributeValues ?? {};
+        const currentWearCount = values[":currentWearCount"];
+        const requiredWearCount = values[":requiredWearCount"];
 
-        if (typeof wearCountDelta === "number") {
+        if (typeof currentWearCount === "number" && (existing.wearCount ?? 0) !== currentWearCount) {
+          const error = new Error("Transaction cancelled");
+          error.name = "TransactionCanceledException";
+          error.CancellationReasons = [{ Code: "ConditionalCheckFailed" }];
+          throw error;
+        }
+
+        if (typeof requiredWearCount === "number" && (existing.wearCount ?? 0) < requiredWearCount) {
+          const error = new Error("Transaction cancelled");
+          error.name = "TransactionCanceledException";
+          error.CancellationReasons = [{ Code: "ConditionalCheckFailed" }];
+          throw error;
+        }
+
+        const wearCount = values[":wearCount"];
+        const wearCountDelta = values[":wearCountDelta"];
+        const lastWornAt = values[":lastWornAt"];
+        const wearCountSk = values[":wearCountSk"];
+        const lastWornAtSk = values[":lastWornAtSk"];
+
+        if (typeof wearCount === "number") {
+          existing.wearCount = wearCount;
+        } else if (typeof wearCountDelta === "number") {
           existing.wearCount = (existing.wearCount ?? 0) + wearCountDelta;
         }
 
         if (typeof lastWornAt === "number") {
           existing.lastWornAt = lastWornAt;
+        }
+
+        if (typeof wearCountSk === "string") {
+          existing.wearCountSk = wearCountSk;
+        }
+
+        if (typeof lastWornAtSk === "string") {
+          existing.lastWornAtSk = lastWornAtSk;
         }
 
         localItems.set(updateKey, existing);
@@ -280,6 +332,10 @@ const runScenario = async () => {
   const templateAfterCreate = state.items.get("W#wd_001#TPL|TPL#tp_001");
   assertState(templateAfterCreate?.wearCount === 3, "template wearCount should increase on create", templateAfterCreate);
   assertState(templateAfterCreate?.lastWornAt === toEpochMs("20260105"), "template lastWornAt should become created date", templateAfterCreate);
+  assertState(templateAfterCreate?.wearCountSk === buildWearCountSk(3, "tp_001"),
+    "template wearCountSk should track wearCount on create", templateAfterCreate);
+  assertState(templateAfterCreate?.lastWornAtSk === buildLastWornAtSk(toEpochMs("20260105"), "tp_001"),
+    "template lastWornAtSk should track lastWornAt on create", templateAfterCreate);
 
   assertState(state.wearDaily.get(buildDailyKeyString("wd_001", { kind: "template", id: "tp_001" }, "20260105")) === 1,
     "template wearDaily should be incremented for create date", state.wearDaily);
@@ -298,6 +354,10 @@ const runScenario = async () => {
     "template create should update clothing cl_001 lastWornAt", clothing1AfterTemplateCreate);
   assertState(clothing2AfterTemplateCreate?.lastWornAt === toEpochMs("20260105"),
     "template create should update clothing cl_002 lastWornAt", clothing2AfterTemplateCreate);
+  assertState(clothing1AfterTemplateCreate?.wearCountSk === buildWearCountSk(4, "cl_001"),
+    "template create should update clothing cl_001 wearCountSk", clothing1AfterTemplateCreate);
+  assertState(clothing2AfterTemplateCreate?.wearCountSk === buildWearCountSk(2, "cl_002"),
+    "template create should update clothing cl_002 wearCountSk", clothing2AfterTemplateCreate);
 
   const clothingCreate = await createHistoryHandler({
     path: { wardrobeId: "wd_001" },
@@ -315,6 +375,8 @@ const runScenario = async () => {
   assertState(clothing2AfterCreate?.wearCount === 3, "clothing cl_002 wearCount should increase on create", clothing2AfterCreate);
   assertState(clothing1AfterCreate?.lastWornAt === toEpochMs("20260106"), "clothing cl_001 lastWornAt should become created date", clothing1AfterCreate);
   assertState(clothing2AfterCreate?.lastWornAt === toEpochMs("20260106"), "clothing cl_002 lastWornAt should become created date", clothing2AfterCreate);
+  assertState(clothing1AfterCreate?.wearCountSk === buildWearCountSk(5, "cl_001"), "clothing cl_001 wearCountSk should increase on create", clothing1AfterCreate);
+  assertState(clothing2AfterCreate?.wearCountSk === buildWearCountSk(3, "cl_002"), "clothing cl_002 wearCountSk should increase on create", clothing2AfterCreate);
 
   assertState(state.wearDaily.get(buildDailyKeyString("wd_001", { kind: "clothing", id: "cl_001" }, "20260106")) === 1,
     "clothing cl_001 wearDaily should be incremented for create date", state.wearDaily);
@@ -350,6 +412,8 @@ const runScenario = async () => {
   const templateAfterDelete = state.items.get("W#wd_001#TPL|TPL#tp_001");
   assertState(templateAfterDelete?.wearCount === 2, "template wearCount should return to baseline after delete", templateAfterDelete);
   assertState(templateAfterDelete?.lastWornAt === toEpochMs("20260103"), "template lastWornAt should recompute to previous date", templateAfterDelete);
+  assertState(templateAfterDelete?.wearCountSk === buildWearCountSk(2, "tp_001"), "template wearCountSk should return to baseline after delete", templateAfterDelete);
+  assertState(templateAfterDelete?.lastWornAtSk === buildLastWornAtSk(toEpochMs("20260103"), "tp_001"), "template lastWornAtSk should recompute after delete", templateAfterDelete);
 
   const clothing1AfterDelete = state.items.get("W#wd_001#CLOTH|CLOTH#cl_001");
   const clothing2AfterDelete = state.items.get("W#wd_001#CLOTH|CLOTH#cl_002");
@@ -357,6 +421,8 @@ const runScenario = async () => {
   assertState(clothing2AfterDelete?.wearCount === 1, "clothing cl_002 wearCount should return to baseline after delete", clothing2AfterDelete);
   assertState(clothing1AfterDelete?.lastWornAt === toEpochMs("20260104"), "clothing cl_001 lastWornAt should recompute to previous date", clothing1AfterDelete);
   assertState(clothing2AfterDelete?.lastWornAt === toEpochMs("20260102"), "clothing cl_002 lastWornAt should recompute to previous date", clothing2AfterDelete);
+  assertState(clothing1AfterDelete?.wearCountSk === buildWearCountSk(3, "cl_001"), "clothing cl_001 wearCountSk should return to baseline after delete", clothing1AfterDelete);
+  assertState(clothing2AfterDelete?.wearCountSk === buildWearCountSk(1, "cl_002"), "clothing cl_002 wearCountSk should return to baseline after delete", clothing2AfterDelete);
 
   assertState(!state.wearDaily.has(buildDailyKeyString("wd_001", { kind: "template", id: "tp_001" }, "20260105")),
     "template wearDaily on created date should be removed after delete", state.wearDaily);
@@ -379,13 +445,13 @@ const checks = [];
 try {
   const result = await runScenario();
   checks.push({
-    name: "create/delete 統合で wearCount, wearDaily, lastWornAt の整合を維持できる",
+    name: "create/delete 統合で wearCount, wearDaily, lastWornAt と GSI sort key の整合を維持できる",
     ok: result.transactCount === 4,
     detail: result,
   });
 } catch (error) {
   checks.push({
-    name: "create/delete 統合で wearCount, wearDaily, lastWornAt の整合を維持できる",
+    name: "create/delete 統合で wearCount, wearDaily, lastWornAt と GSI sort key の整合を維持できる",
     ok: false,
     detail: error?.detail ?? error,
   });

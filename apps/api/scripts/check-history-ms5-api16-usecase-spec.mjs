@@ -115,18 +115,29 @@ const hasClothingDailyDecrement = transactItems.some((item) => {
 
 const hasTemplateCacheUpdateWithRecompute = transactItems.some((item) => {
   return item?.Update?.Key?.SK === "TPL#tp_001"
-    && item?.Update?.ExpressionAttributeValues?.[":wearCountDelta"] === -1
+    && item?.Update?.ExpressionAttributeValues?.[":currentWearCount"] === 4
+    && item?.Update?.ExpressionAttributeValues?.[":wearCount"] === 3
+    && item?.Update?.ExpressionAttributeValues?.[":wearCountSk"] === "WEAR#0000000003#tp_001"
     && item?.Update?.ExpressionAttributeValues?.[":lastWornAt"] === Date.UTC(2026, 0, 3, 0, 0, 0, 0);
 });
 
 const hasClothingCacheUpdateWithReset = transactItems.some((item) => {
   return item?.Update?.Key?.SK === "CLOTH#cl_001"
-    && item?.Update?.ExpressionAttributeValues?.[":lastWornAt"] === 0;
+    && item?.Update?.ExpressionAttributeValues?.[":currentWearCount"] === 1
+    && item?.Update?.ExpressionAttributeValues?.[":wearCount"] === 0
+    && item?.Update?.ExpressionAttributeValues?.[":wearCountSk"] === "WEAR#0000000000#cl_001"
+    && item?.Update?.ExpressionAttributeValues?.[":lastWornAt"] === 0
+    && item?.Update?.ExpressionAttributeValues?.[":lastWornAtSk"] === "LASTWORN#0#cl_001";
 });
 
 const hasClothingCacheUpdateWithoutRecompute = transactItems.some((item) => {
   return item?.Update?.Key?.SK === "CLOTH#cl_002"
-    && item?.Update?.ExpressionAttributeValues?.[":lastWornAt"] === Date.UTC(2026, 0, 3, 0, 0, 0, 0);
+    && item?.Update?.ExpressionAttributeValues?.[":currentWearCount"] === 5
+    && item?.Update?.ExpressionAttributeValues?.[":wearCount"] === 4
+    && item?.Update?.ExpressionAttributeValues?.[":wearCountSk"] === "WEAR#0000000004#cl_002"
+    && item?.Update?.ExpressionAttributeValues?.[":lastWornAt"] === Date.UTC(2026, 0, 3, 0, 0, 0, 0)
+    && item?.Update?.ExpressionAttributeValues?.[":lastWornAtSk"] ===
+      `LASTWORN#${Date.UTC(2026, 0, 3, 0, 0, 0, 0)}#cl_002`;
 });
 
 let notFoundCode = null;
