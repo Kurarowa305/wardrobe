@@ -25,6 +25,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Agent skills configuration spec test
+        run: node --test scripts/check-agent-skills-spec.mjs
+
       - name: Lint
         run: pnpm -r --if-present run lint
 
