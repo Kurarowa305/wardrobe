@@ -41,7 +41,7 @@ function TemplateContent({ item }: { item: Template }) {
 }
 const cardClass = "grid w-full min-w-0 gap-3 rounded-md border border-slate-300 bg-white p-3 text-left";
 
-function Modal({ title, variant, busy = false, close, children }: { title: string; variant: Variant; busy?: boolean; close: () => void; children: ReactNode }) {
+function Modal({ title, hideTitle = false, variant, busy = false, close, children }: { title: string; hideTitle?: boolean; variant: Variant; busy?: boolean; close: () => void; children: ReactNode }) {
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
     const opener = document.activeElement as HTMLElement | null;
@@ -50,7 +50,7 @@ function Modal({ title, variant, busy = false, close, children }: { title: strin
     return () => { dialog?.close(); if (opener?.isConnected) opener.focus(); else document.getElementById("recommendation-title")?.focus(); };
   }, []);
   return <dialog ref={ref} className={`prototype-dialog dialog-${variant}`} aria-labelledby="prototype-dialog-title" aria-busy={busy} onCancel={event => { event.preventDefault(); if (!busy) close(); }}>
-    <h2 id="prototype-dialog-title" className="m-0 mb-5 text-lg font-semibold">{title}</h2>
+    <h2 id="prototype-dialog-title" className={hideTitle ? "sr-only" : "m-0 mb-5 text-lg font-semibold"}>{title}</h2>
     {children}
   </dialog>;
 }
@@ -158,7 +158,6 @@ export function HomePrototype({ initialVariant }: { initialVariant: string }) {
           <section aria-label="今日の天気" className={`weather-${variant} text-sm`}>
             <div className="flex items-center justify-between gap-2">{regionButton}<span className="text-xs text-slate-500">{today().slice(5).replace("-", "/")}</span></div>
             {weatherBody}
-            {region && <a href="https://www.qweather.com" target="_blank" rel="noreferrer" className="mt-2 inline-block text-xs text-slate-500 underline">天気情報：QWeather</a>}
           </section>
           <div className="grid grid-cols-5 gap-1" role="group" aria-label="おすすめの季節">
             {modes.map(value => <button key={value} type="button" aria-pressed={mode === value} onClick={() => chooseMode(value)} className={`min-h-11 rounded-md border px-1 text-sm font-medium ${mode === value ? "border-slate-700 bg-[var(--primary)] text-white" : "border-slate-300 bg-white text-slate-700"}`}>{value}</button>)}
@@ -172,7 +171,7 @@ export function HomePrototype({ initialVariant }: { initialVariant: string }) {
       </AppLayout>
     </div>
     {process.env.NODE_ENV !== "production" && <aside className="prototype-switcher" aria-label="試作の比較"><button aria-label="前の案" onClick={() => switchVariant(-1)}>←</button><span title={names[variant]}>{variant} · {variant === "A" ? "コンパクト" : variant === "B" ? "左右の気温" : "予報を大きく"}</span><button aria-label="次の案" onClick={() => switchVariant(1)}>→</button><button onClick={() => setModal("controls")}>検証</button></aside>}
-    {modal === "record" && <Modal title="着用を記録" variant={variant} busy={busy} close={close}>
+    {modal === "record" && <Modal title="着用を記録" hideTitle variant={variant} busy={busy} close={close}>
       <form onSubmit={event => { event.preventDefault(); record(); }} className="grid gap-5">
         <fieldset disabled={busy} className="m-0 grid min-w-0 gap-5 border-0 p-0">
           <div className="grid gap-2"><label htmlFor="record-date" className="text-sm font-medium">日付</label><Input id="record-date" type="date" value={date} onChange={event => setDate(event.target.value)} required aria-describedby={formError ? "record-error" : undefined} /></div>
