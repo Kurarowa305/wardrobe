@@ -1,0 +1,19 @@
+/* THROWAWAY: presentation alternatives for issue #277. */
+.prototype-banner { max-width:420px; margin:auto; background:#e2e8f0; color:#475569; padding:6px 12px; font-size:11px; text-align:center; }
+.prototype-switcher { position:fixed; z-index:25; bottom:calc(64px + env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%); display:flex; gap:6px; align-items:center; padding:4px 8px; border-radius:32px; background:#17212b; color:white; box-shadow:0 3px 12px #0003; font-size:12px; white-space:nowrap; }
+.prototype-switcher button { min-width:38px; min-height:38px; padding:4px 8px; border-radius:20px; }
+.prototype-switcher button:focus-visible { outline:2px solid white; }
+.prototype-dialog { position:fixed; inset:0; margin:auto; width:calc(100% - 32px); max-width:388px; max-height:calc(100dvh - 40px); overflow:auto; border:1px solid #d7dce2; border-radius:12px; background:white; padding:20px; color:#1d2530; }
+.prototype-dialog::backdrop { background:#0f172a80; }
+.prototype-dialog.dialog-B { margin:auto auto 0; width:100%; max-width:420px; border-radius:20px 20px 0 0; padding-bottom:calc(24px + env(safe-area-inset-bottom)); }
+.prototype-dialog.dialog-C { max-width:420px; width:calc(100% - 16px); max-height:calc(100dvh - 16px); }
+.prototype-dialog .prototype-actions { position:sticky; bottom:-20px; background:white; padding:12px 0 8px; }
+.prototype-dialog select { width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; background:white; font-size:16px; }
+.prototype-dialog input[type=date] { min-width:0; }
+.weather-B { border:1px solid #d7dce2; border-radius:8px; padding:12px; }
+.weather-C { padding-bottom:12px; border-bottom:1px solid #d7dce2; }
+/* Reserve a separate strip for review controls; never float them over app actions. */
+.home-prototype { padding-bottom:52px; }
+.home-prototype .app-shell { min-height:calc(100dvh - 52px); }
+.home-prototype .tab-bar { bottom:52px; }
+.home-prototype .prototype-switcher { bottom:6px; }
