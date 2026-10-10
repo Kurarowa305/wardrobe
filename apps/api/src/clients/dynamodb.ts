@@ -48,6 +48,7 @@ export type UpdateItemInput = {
 };
 
 export type QueryInput = {
+  ConsistentRead?: boolean | undefined;
   IndexName?: string | undefined;
   KeyConditionExpression: string;
   ExpressionAttributeNames?: Record<string, string> | undefined;
@@ -73,7 +74,13 @@ export type TransactWriteItem = {
     ExpressionAttributeNames?: Record<string, string> | undefined;
     ExpressionAttributeValues?: Record<string, unknown> | undefined;
   } | undefined;
-  Delete?: { TableName?: string | undefined; Key: DynamoDbKey; ConditionExpression?: string | undefined } | undefined;
+  Delete?: {
+    TableName?: string | undefined;
+    Key: DynamoDbKey;
+    ConditionExpression?: string | undefined;
+    ExpressionAttributeNames?: Record<string, string> | undefined;
+    ExpressionAttributeValues?: Record<string, unknown> | undefined;
+  } | undefined;
   ConditionCheck?: {
     TableName?: string | undefined;
     Key: DynamoDbKey;

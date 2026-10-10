@@ -8,12 +8,14 @@ import { generateUuidV7 } from "../../wardrobe/usecases/wardrobeUsecase.js";
 import { buildDailyStatsCacheUpdateFacts, buildWearDailyFacts } from "../stats_write/aggregations/daily.js";
 import { buildHistoryStatsWriteItems } from "../stats_write/transact/buildItems.js";
 import { assertHistoryStatsWriteItemsWithinLimit } from "../stats_write/transact/guard.js";
+import { writeHistoryStatsItems } from "../stats_write/transact/writeItems.js";
 import type { DailyStatsCacheUpdateFact } from "../stats_write/aggregations/daily.js";
 import type { HistoryStatsWriteCommand } from "../stats_write/types.js";
 
 type TargetStats = {
   wearCount: number;
   lastWornAt: number;
+  statsVersion?: number;
 };
 
 type CreateHistorySource = {
@@ -63,6 +65,7 @@ const extractTargetStats = (item: unknown): TargetStats | null => {
   return {
     wearCount: typeof item.wearCount === "number" ? item.wearCount : 0,
     lastWornAt: typeof item.lastWornAt === "number" ? item.lastWornAt : 0,
+    ...(typeof item.statsVersion === "number" ? { statsVersion: item.statsVersion } : {}),
   };
 };
 
@@ -323,7 +326,7 @@ export function createHistoryWithStatsWriteUsecase(
       ];
 
       assertHistoryStatsWriteItemsWithinLimit(transactItems);
-      await transactWriteItems(transactItems);
+      await writeHistoryStatsItems(transactItems, transactWriteItems);
 
       return { historyId };
     },

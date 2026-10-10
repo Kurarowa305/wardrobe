@@ -25,10 +25,10 @@
   - `:countDelta = 1` が渡される
   - create 用 `ConditionExpression` に `#count + :countDelta` のような算術演算を含めない
 
-### HSWT-03 create 用 cache 更新が item 存在確認のみで加算できる
+### HSWT-03 create 用 cache 更新が 読み取り時の統計を条件に更新できる
 - 観点: template / clothing 統計更新で正の増分時に不要な条件式エラーを起こさないこと
 - 期待結果:
-  - cache 更新 item の `ConditionExpression` が item 存在確認と現在 `wearCount` の一致確認を行う
+  - cache 更新 item の `ConditionExpression` が item 存在確認と現在 `wearCount` / `lastWornAt` / `statsVersion` の一致確認を行う
   - 正の増分時に `:requiredWearCount` のような減算用ガード値を要求しない
   - `wearCount` と同じ値をもとに `wearCountSk` を更新する
   - `lastWornAt` と同じ値をもとに `lastWornAtSk` を更新する
@@ -37,7 +37,7 @@
 - 観点: 完了条件「delete用 items を生成できる」を満たすこと
 - 期待結果:
   - wearDaily 更新 item の `ConditionExpression` が `attribute_exists(#count) AND #count >= :requiredCount` になる
-  - cache 更新 item の `ConditionExpression` が item 存在確認、現在 `wearCount` の一致確認、減算可能数確認を行う
+  - cache 更新 item の `ConditionExpression` が item 存在確認、現在 `wearCount` / `lastWornAt` / `statsVersion` の一致確認、減算可能数確認を行う
   - cache 更新 item で現在 `wearCount` から減算済みの `:wearCount` を設定する
   - 再計算済み `:lastWornAt` が反映される
   - 減算済み `wearCount` と同じ値をもとに `wearCountSk` を更新する

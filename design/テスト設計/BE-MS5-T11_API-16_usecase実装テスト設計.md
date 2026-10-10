@@ -27,8 +27,9 @@
 - 観点: 完了条件「必要時 lastWornAt 再計算」の正当性
 - 期待結果:
   - `wearCountDelta = -1` の統計更新を行う
-  - 削除日が最新日の対象は WearDaily 降順Query結果で `lastWornAt` を更新する
+  - 削除日が最新日で同日の最後の1件を削除する対象は WearDaily 強整合・降順Query結果で `lastWornAt` を更新する
   - 該当日が存在しない場合は `lastWornAt = 0` を設定する
+  - 同日2件以上の対象は最終着用日を維持する
   - 削除日が最新日でない対象は `lastWornAt` を維持する
 
 ### HMS5API16-04 履歴未存在を NOT_FOUND として扱える

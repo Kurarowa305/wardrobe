@@ -36,9 +36,11 @@ export function createClothingStatsRepo(client: DynamoDbClient = createDynamoDbC
       return client.updateItem({
         Key: buildClothingBaseKey(input),
         UpdateExpression:
-          "SET wearCount = :wearCount, lastWornAt = :lastWornAt, wearCountSk = :wearCountSk, lastWornAtSk = :lastWornAtSk",
+          "SET wearCount = :wearCount, lastWornAt = :lastWornAt, wearCountSk = :wearCountSk, lastWornAtSk = :lastWornAtSk, statsVersion = if_not_exists(statsVersion, :zero) + :one",
         ConditionExpression: "attribute_exists(PK)",
         ExpressionAttributeValues: {
+          ":zero": 0,
+          ":one": 1,
           ":wearCount": input.wearCount,
           ":lastWornAt": input.lastWornAt,
           ":wearCountSk": sortKeys.wearCountSk,

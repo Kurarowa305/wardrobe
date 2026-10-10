@@ -54,6 +54,7 @@ export function createWearDailyQueryRepo(client: DynamoDbClient = createDynamoDb
           ":PK": buildWearDailyPartitionKey(input),
           ":beforeDateSk": buildHistoryStatsDateKey({ date: input.beforeDate }),
         },
+        ConsistentRead: true,
         ScanIndexForward: false,
         Limit: 1,
       });

@@ -143,7 +143,7 @@ const checks = [
     name: "create 用 cache 更新は現在 wearCount を条件に統計カラムを同期できる",
     ok:
       createItems[2]?.Update?.ConditionExpression ===
-        "attribute_exists(PK) AND (attribute_not_exists(wearCount) OR wearCount = :currentWearCount)"
+        "attribute_exists(PK) AND (attribute_not_exists(wearCount) OR wearCount = :currentWearCount) AND (attribute_not_exists(lastWornAt) OR lastWornAt = :currentLastWornAt) AND attribute_not_exists(statsVersion)"
       && createItems[2]?.Update?.ExpressionAttributeValues?.[":requiredWearCount"] === undefined
       && createItems[2]?.Update?.ExpressionAttributeValues?.[":currentWearCount"] === 6
       && createItems[2]?.Update?.ExpressionAttributeValues?.[":wearCount"] === 7
@@ -173,7 +173,7 @@ const checks = [
       && deleteItems[0]?.Update?.ConditionExpression === "attribute_exists(#count) AND #count >= :requiredCount"
       && deleteItems[0]?.Update?.ExpressionAttributeValues?.[":requiredCount"] === 1
       && deleteItems[1]?.Update?.ConditionExpression ===
-        "attribute_exists(PK) AND (attribute_not_exists(wearCount) OR wearCount = :currentWearCount) AND wearCount >= :requiredWearCount"
+        "attribute_exists(PK) AND (attribute_not_exists(wearCount) OR wearCount = :currentWearCount) AND (attribute_not_exists(lastWornAt) OR lastWornAt = :currentLastWornAt) AND attribute_not_exists(statsVersion) AND wearCount >= :requiredWearCount"
       && deleteItems[1]?.Update?.ExpressionAttributeValues?.[":requiredWearCount"] === 1
       && deleteItems[1]?.Update?.ExpressionAttributeValues?.[":currentWearCount"] === 11
       && deleteItems[1]?.Update?.ExpressionAttributeValues?.[":wearCount"] === 10
