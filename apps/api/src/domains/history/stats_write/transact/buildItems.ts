@@ -8,6 +8,7 @@ import type { WearDailyFact } from "../types.js";
 export type StatsCacheSnapshot = {
   wearCount: number;
   lastWornAt: number;
+  statsVersion?: number;
 };
 
 export type BuildHistoryStatsWriteItemsInput = {
@@ -111,12 +112,22 @@ const buildCacheUpdateItem = (
     Update: {
       Key: buildStatsTargetBaseKey(fact),
       UpdateExpression:
-        "SET wearCount = :wearCount, lastWornAt = :lastWornAt, wearCountSk = :wearCountSk, lastWornAtSk = :lastWornAtSk",
-      ConditionExpression: fact.wearCountDelta < 0
-        ? "attribute_exists(PK) AND (attribute_not_exists(wearCount) OR wearCount = :currentWearCount) AND wearCount >= :requiredWearCount"
-        : "attribute_exists(PK) AND (attribute_not_exists(wearCount) OR wearCount = :currentWearCount)",
+        "SET wearCount = :wearCount, lastWornAt = :lastWornAt, wearCountSk = :wearCountSk, lastWornAtSk = :lastWornAtSk, statsVersion = :nextStatsVersion",
+      // A monotonic version also detects create/delete pairs that restore the old count/date.
+      ConditionExpression: [
+        "attribute_exists(PK)",
+        "(attribute_not_exists(wearCount) OR wearCount = :currentWearCount)",
+        "(attribute_not_exists(lastWornAt) OR lastWornAt = :currentLastWornAt)",
+        currentStats.statsVersion === undefined
+          ? "attribute_not_exists(statsVersion)"
+          : "statsVersion = :currentStatsVersion",
+        ...(fact.wearCountDelta < 0 ? ["wearCount >= :requiredWearCount"] : []),
+      ].join(" AND "),
       ExpressionAttributeValues: {
         ":currentWearCount": currentStats.wearCount,
+        ":currentLastWornAt": currentStats.lastWornAt,
+        ":nextStatsVersion": (currentStats.statsVersion ?? 0) + 1,
+        ...(currentStats.statsVersion !== undefined ? { ":currentStatsVersion": currentStats.statsVersion } : {}),
         ":wearCount": nextWearCount,
         ":lastWornAt": nextLastWornAt,
         ":wearCountSk": nextWearCountSk,

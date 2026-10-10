@@ -113,12 +113,12 @@ const hasClothingDailyDecrement = transactItems.some((item) => {
     && item?.Update?.Key?.SK === "DATE#20260105";
 });
 
-const hasTemplateCacheUpdateWithRecompute = transactItems.some((item) => {
+const hasTemplateCacheUpdateWithSameDateRemaining = transactItems.some((item) => {
   return item?.Update?.Key?.SK === "TPL#tp_001"
     && item?.Update?.ExpressionAttributeValues?.[":currentWearCount"] === 4
     && item?.Update?.ExpressionAttributeValues?.[":wearCount"] === 3
     && item?.Update?.ExpressionAttributeValues?.[":wearCountSk"] === "WEAR#0000000003#tp_001"
-    && item?.Update?.ExpressionAttributeValues?.[":lastWornAt"] === Date.UTC(2026, 0, 3, 0, 0, 0, 0);
+    && item?.Update?.ExpressionAttributeValues?.[":lastWornAt"] === Date.UTC(2026, 0, 5, 0, 0, 0, 0);
 });
 
 const hasClothingCacheUpdateWithReset = transactItems.some((item) => {
@@ -169,13 +169,12 @@ const checks = [
   },
   {
     name: "API-16 usecase applies wearCount decrement and recomputed lastWornAt per target",
-    ok: hasTemplateCacheUpdateWithRecompute && hasClothingCacheUpdateWithReset && hasClothingCacheUpdateWithoutRecompute,
+    ok: hasTemplateCacheUpdateWithSameDateRemaining && hasClothingCacheUpdateWithReset && hasClothingCacheUpdateWithoutRecompute,
     detail: transactItems,
   },
   {
-    name: "API-16 usecase recomputes only when deleted date was current lastWornAt",
-    ok: findLatestCalls.length === 2
-      && findLatestCalls.some((call) => call.target.kind === "template")
+    name: "API-16 usecase recomputes only when the last history on the latest date is deleted",
+    ok: findLatestCalls.length === 1
       && findLatestCalls.some((call) => call.target.id === "cl_001"),
     detail: findLatestCalls,
   },

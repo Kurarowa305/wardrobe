@@ -7,6 +7,7 @@ import { createHistoryRepo, type HistoryItem } from "../repo/historyRepo.js";
 import { buildDailyStatsCacheUpdateFacts, buildWearDailyFacts } from "../stats_write/aggregations/daily.js";
 import { buildHistoryStatsWriteItems } from "../stats_write/transact/buildItems.js";
 import { assertHistoryStatsWriteItemsWithinLimit } from "../stats_write/transact/guard.js";
+import { writeHistoryStatsItems } from "../stats_write/transact/writeItems.js";
 import type { DailyStatsCacheUpdateFact } from "../stats_write/aggregations/daily.js";
 import type { HistoryStatsWriteCommand, StatsWriteTargetFact } from "../stats_write/types.js";
 import { buildWearDailyKey } from "../stats_write/keys.js";
@@ -18,6 +19,7 @@ type HistoryDeleteSource = Pick<HistoryItem, "wardrobeId" | "historyId" | "date"
 type TargetStats = {
   wearCount: number;
   lastWornAt: number;
+  statsVersion?: number;
 };
 
 export type DeleteHistoryWithStatsWriteInput = {
@@ -94,6 +96,7 @@ const extractTemplateStats = (result: unknown): TargetStats | null => {
   return {
     wearCount: item.wearCount,
     lastWornAt: item.lastWornAt,
+    ...(typeof item.statsVersion === "number" ? { statsVersion: item.statsVersion } : {}),
   };
 };
 
@@ -123,7 +126,11 @@ const extractBatchClothingMap = (results: unknown[]): Map<string, TargetStats> =
       return [];
     }
 
-    return [[item.clothingId, { wearCount: item.wearCount, lastWornAt: item.lastWornAt }] as const];
+    return [[item.clothingId, {
+      wearCount: item.wearCount,
+      lastWornAt: item.lastWornAt,
+      ...(typeof item.statsVersion === "number" ? { statsVersion: item.statsVersion } : {}),
+    }] as const];
   });
 
   return new Map(clothingEntries);
@@ -147,6 +154,7 @@ const resolveNextLastWornAtByTarget = async (input: {
   deletedDate: string;
   cacheFacts: DailyStatsCacheUpdateFact[];
   targetStatsMap: Map<string, TargetStats>;
+  dailyCounts: Map<string, number>;
   findLatestBeforeDate: DeleteHistoryWithStatsWriteDependencies["findLatestBeforeDate"];
 }): Promise<Map<string, number>> => {
   const result = new Map<string, number>();
@@ -157,6 +165,12 @@ const resolveNextLastWornAtByTarget = async (input: {
 
     if (!stats || !input.findLatestBeforeDate) {
       result.set(key, 0);
+      continue;
+    }
+
+    // The deleted date still contributes while another history remains on that date.
+    if ((input.dailyCounts.get(key) ?? 0) > 1) {
+      result.set(key, stats.lastWornAt);
       continue;
     }
 
@@ -190,7 +204,9 @@ const buildDailyDeleteOrDecrementItem = (input: {
     return {
       Delete: {
         Key: key,
-        ConditionExpression: "attribute_exists(PK)",
+        ConditionExpression: "attribute_exists(PK) AND #count = :currentCount",
+        ExpressionAttributeNames: { "#count": "count" },
+        ExpressionAttributeValues: { ":currentCount": input.currentCount },
       },
     };
   }
@@ -199,12 +215,13 @@ const buildDailyDeleteOrDecrementItem = (input: {
     Update: {
       Key: key,
       UpdateExpression: "SET #count = #count - :one",
-      ConditionExpression: "attribute_exists(PK) AND #count >= :one",
+      ConditionExpression: "attribute_exists(PK) AND #count = :currentCount",
       ExpressionAttributeNames: {
         "#count": "count",
       },
       ExpressionAttributeValues: {
         ":one": 1,
+        ":currentCount": input.currentCount,
       },
     },
   };
@@ -292,13 +309,6 @@ export function createDeleteHistoryWithStatsWriteUsecase(
         targetStatsMap.set(`clothing:${clothingId}`, stats);
       }
 
-      const nextLastWornAtByTarget = await resolveNextLastWornAtByTarget({
-        wardrobeId: input.wardrobeId,
-        deletedDate: history.date,
-        cacheFacts,
-        targetStatsMap,
-        findLatestBeforeDate,
-      });
       const dailyCounts = new Map<string, number>();
       for (const fact of wearDailyFacts) {
         const key = `${fact.target.kind}:${fact.target.id}`;
@@ -307,9 +317,20 @@ export function createDeleteHistoryWithStatsWriteUsecase(
           target: fact.target,
           date: fact.date,
         });
-        dailyCounts.set(key, count ?? 0);
+        if (count === null || !Number.isSafeInteger(count) || count < 1) {
+          throw createAppError("CONFLICT", { message: "Wear daily count is inconsistent. Audit is required." });
+        }
+        dailyCounts.set(key, count);
       }
 
+      const nextLastWornAtByTarget = await resolveNextLastWornAtByTarget({
+        wardrobeId: input.wardrobeId,
+        deletedDate: history.date,
+        cacheFacts,
+        targetStatsMap,
+        dailyCounts,
+        findLatestBeforeDate,
+      });
       const deleteAndStatsItems: TransactWriteItem[] = [
         {
           Delete: {
@@ -346,7 +367,7 @@ export function createDeleteHistoryWithStatsWriteUsecase(
       ];
 
       assertHistoryStatsWriteItemsWithinLimit(deleteAndStatsItems);
-      await transactWriteItems(deleteAndStatsItems);
+      await writeHistoryStatsItems(deleteAndStatsItems, transactWriteItems);
     },
   };
 }

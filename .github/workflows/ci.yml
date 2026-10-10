@@ -35,6 +35,11 @@ jobs:
         run: pnpm --filter web test:home-header-wardrobe-title
 
 
+      - name: Wear statistics integrity and audit tests
+        run: |
+          pnpm --filter api test:wear-stats-integrity
+          pnpm --filter api test:wear-stats-audit
+
       - name: API bootstrap spec test
         run: pnpm --filter api test:bootstrap
 

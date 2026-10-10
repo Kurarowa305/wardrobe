@@ -132,16 +132,16 @@ const checks = [
     detail: genreListResult,
   },
   {
-    name: "repo update rewrites editable fields and all GSI attributes in one UpdateItem",
+    name: "repo update rewrites editable fields without overwriting statistics in one UpdateItem",
     ok:
       updateResult.operation === "UpdateItem" &&
       updateResult.request.input.ConditionExpression === "attribute_exists(PK)" &&
       updateResult.request.input.ReturnValues === "ALL_NEW" &&
       updateResult.request.input.UpdateExpression.includes("statusListPk = :statusListPk") &&
       updateResult.request.input.UpdateExpression.includes("statusGenreListPk = :statusGenreListPk") &&
-      updateResult.request.input.UpdateExpression.includes("wearCountSk = :wearCountSk") &&
-      updateResult.request.input.ExpressionAttributeValues[":wearCount"] === 13 &&
-      updateResult.request.input.ExpressionAttributeValues[":lastWornAtSk"] === "LASTWORN#1735700000000#cl_01HZZBBB",
+      !updateResult.request.input.UpdateExpression.includes("wearCountSk = :wearCountSk") &&
+      updateResult.request.input.ExpressionAttributeValues[":wearCount"] === undefined &&
+      updateResult.request.input.ExpressionAttributeValues[":lastWornAtSk"] === undefined,
     detail: updateResult,
   },
   {

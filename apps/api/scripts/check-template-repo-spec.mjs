@@ -101,17 +101,17 @@ const checks = [
     detail: listResult,
   },
   {
-    name: "repo update rewrites clothingIds and all GSI attributes in one UpdateItem",
+    name: "repo update rewrites clothingIds without overwriting statistics in one UpdateItem",
     ok:
       updateResult.operation === "UpdateItem" &&
       updateResult.request.input.ConditionExpression === "attribute_exists(PK)" &&
       updateResult.request.input.ReturnValues === "ALL_NEW" &&
       updateResult.request.input.UpdateExpression.includes("clothingIds = :clothingIds") &&
       updateResult.request.input.UpdateExpression.includes("statusListPk = :statusListPk") &&
-      updateResult.request.input.UpdateExpression.includes("wearCountSk = :wearCountSk") &&
-      updateResult.request.input.ExpressionAttributeValues[":wearCount"] === 13 &&
+      !updateResult.request.input.UpdateExpression.includes("wearCountSk = :wearCountSk") &&
+      updateResult.request.input.ExpressionAttributeValues[":wearCount"] === undefined &&
       Array.isArray(updateResult.request.input.ExpressionAttributeValues[":clothingIds"]) &&
-      updateResult.request.input.ExpressionAttributeValues[":lastWornAtSk"] === "LASTWORN#1735700000000#tpl_01HZZBBB",
+      updateResult.request.input.ExpressionAttributeValues[":lastWornAtSk"] === undefined,
     detail: updateResult,
   },
   {
