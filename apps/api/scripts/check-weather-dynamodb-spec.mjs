@@ -88,6 +88,57 @@ try {
   );
   assert.equal(requests, 1);
   assert.equal((await repository.readUsage(signal)).dayCount, 1);
+  // Region #279's public save/clear operations feed weather without a parallel schema.
+  const { saveWardrobeRegionHandler } =
+    await import("../src/domains/region/handlers/regionHandlers.ts");
+  const { datasetVersion } =
+    await import("../src/domains/region/dictionary.ts");
+  await document.send(
+    new PutCommand({
+      TableName: process.env.TABLE_NAME,
+      Item: { PK: "W#wd_saved", SK: "META", name: "shared integration" },
+    }),
+  );
+  await saveWardrobeRegionHandler({
+    path: { wardrobeId: "wd_saved" },
+    headers: { "content-type": "application/json" },
+    body: { regionId: "abr:lg:131041", datasetVersion, expectedRevision: 0 },
+  });
+  assert.equal(
+    (
+      await service.get({
+        wardrobeId: "wd_saved",
+        date: "2026-10-11",
+        regionRevision: 1,
+      })
+    ).status,
+    "available",
+  );
+  await saveWardrobeRegionHandler({
+    path: { wardrobeId: "wd_saved" },
+    headers: { "content-type": "application/json" },
+    body: { regionId: null, expectedRevision: 1 },
+  });
+  const callsBeforeClear = requests;
+  assert.equal(
+    (
+      await service.get({
+        wardrobeId: "wd_saved",
+        date: "2026-10-11",
+        regionRevision: 2,
+      })
+    ).status,
+    "region_required",
+  );
+  assert.equal(requests, callsBeforeClear);
+  await assert.rejects(
+    service.get({
+      wardrobeId: "wd_saved",
+      date: "2026-10-11",
+      regionRevision: 1,
+    }),
+    (error) => error.details.reason === "REGION_CHANGED",
+  );
   // Lease ownership must fence stale completion even after a subsequent owner acquires.
   assert.equal(
     await repository.acquire("fencing", "old", now + 100, now, signal),
@@ -138,7 +189,7 @@ try {
     ).delivery,
     "cache",
   );
-  assert.equal(requests, 1);
+  assert.equal(requests, callsBeforeClear);
   // Each scenario uses a fresh location, while every service instance shares provider state.
   await document.send(
     new PutCommand({

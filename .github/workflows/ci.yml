@@ -34,6 +34,14 @@ jobs:
       - name: Region weather recommendation API contract examples
         run: node scripts/check-api-contract-276-examples.mjs
 
+      - name: Bundled ABR region dictionary
+        run: python3 scripts/generate-region-dictionary.py --check
+
+      - name: Region API and Web contracts
+        run: |
+          pnpm --filter api test:region
+          pnpm --filter api test:region-web
+
       - name: Lint
         run: pnpm -r --if-present run lint
 

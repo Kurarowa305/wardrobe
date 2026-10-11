@@ -394,3 +394,8 @@ Clothing / Template に内部属性 `statsVersion: Number` を持つ。未付与
 - `PK=PROVIDER#OPEN_METEO`, `SK=USAGE`。revision/gateUntilと秒61・分61・時25・日32バケット、UTC暦日/月件数を共有保存。強整合取得後revision一致更新で枠を予約。429ゲート延長は期限を短縮せずrevisionも原子的に増やすため、旧予約はゲート・件数を巻き戻せない。
 - 60/分・600/時・5,000/日・150,000/月の保守的移動窓と暦窓を満たす場合のみ予約。失敗した送信も計数し、未送信の予約も戻さない。予約DB書込が秒境界を跨いだ場合は送信せず、送信時刻より古いバケットへの過小計数を防ぐ。
 - TerraformのTTL属性は `ttl`。provider USAGEと履歴操作記録には付けず、利用量・重複抑止の記録を意図せず消さない。
+## 地域設定 (#279)
+
+`PK=W#<wardrobeId>, SK=META` に `regionRevision` と `region` を追加する。属性欠損は0/null。`region` はregionId/label/datasetVersion/source=abr/lgCode/pref/county/city/ward/latitude/longitude/sourceSrid=EPSG:6668/coordinatePolicy=jgd2011-as-wgs84-for-weather/timezone=Asia/Tokyo。緯度経度は固定辞書で再解決し、クライアント入力を採用しない。
+
+UpdateItemはMETA存在とexpectedRevision一致を条件とし、revision=0のみ欠損を許す。名前と作成日時に触れず、地域解除もrevisionを増やす。GETは強整合。モードは保存しない。辞書生成元と固定SHAは `design/調査データ/japan-municipality-274/manifest.json`。
