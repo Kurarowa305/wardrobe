@@ -1,0 +1,2 @@
+# Preserve upstream CSV bytes for SHA-256 checks; CRLF is intentional.
+*.csv -text whitespace=cr-at-eol
