@@ -412,21 +412,25 @@ export function createTemplateUsecase(dependencies: TemplateUsecaseDependencies 
         || JSON.stringify(nextClothingIds) !== JSON.stringify(currentTemplate.clothingIds)
         || JSON.stringify([...(input.tagIds ?? currentTemplate.tagIds)].sort()) !== JSON.stringify([...currentTemplate.tagIds].sort());
       if (changed && currentTemplate.revision >= Number.MAX_SAFE_INTEGER) throw createAppError("CONFLICT");
-      try { await repo.update({
-        expectedRevision: currentTemplate.revision,
-        revision: currentTemplate.revision + (changed ? 1 : 0),
-        wardrobeId: input.wardrobeId,
-        templateId: input.templateId,
-        name: input.name ?? currentTemplate.name,
-        status: currentTemplate.status,
-        clothingIds: nextClothingIds,
-        tagIds: input.tagIds !== undefined ? input.tagIds : currentTemplate.tagIds,
-        wearCount: currentTemplate.wearCount,
-        lastWornAt: currentTemplate.lastWornAt,
-        createdAt: currentTemplate.createdAt,
-        deletedAt: currentTemplate.deletedAt,
-      }); } catch (error) {
-        if (error instanceof Error && error.name === "ConditionalCheckFailedException") throw createAppError("CONFLICT", {details:{reason:"TEMPLATE_CHANGED"}});
+      try {
+        await repo.update({
+          expectedRevision: currentTemplate.revision,
+          revision: currentTemplate.revision + (changed ? 1 : 0),
+          wardrobeId: input.wardrobeId,
+          templateId: input.templateId,
+          name: input.name ?? currentTemplate.name,
+          status: currentTemplate.status,
+          clothingIds: nextClothingIds,
+          tagIds: input.tagIds !== undefined ? input.tagIds : currentTemplate.tagIds,
+          wearCount: currentTemplate.wearCount,
+          lastWornAt: currentTemplate.lastWornAt,
+          createdAt: currentTemplate.createdAt,
+          deletedAt: currentTemplate.deletedAt,
+        });
+      } catch (error) {
+        if (error instanceof Error && error.name === "ConditionalCheckFailedException") {
+          throw createAppError("CONFLICT", { details: { reason: "TEMPLATE_CHANGED" } });
+        }
         throw error;
       }
     },
@@ -448,13 +452,17 @@ export function createTemplateUsecase(dependencies: TemplateUsecaseDependencies 
       }
 
       if (currentTemplate.revision >= Number.MAX_SAFE_INTEGER) throw createAppError("CONFLICT");
-      try { await repo.delete({
-        expectedRevision: currentTemplate.revision,
-        wardrobeId: input.wardrobeId,
-        templateId: input.templateId,
-        deletedAt: now(),
-      }); } catch (error) {
-        if (error instanceof Error && error.name === "ConditionalCheckFailedException") throw createAppError("CONFLICT", {details:{reason:"TEMPLATE_CHANGED"}});
+      try {
+        await repo.delete({
+          expectedRevision: currentTemplate.revision,
+          wardrobeId: input.wardrobeId,
+          templateId: input.templateId,
+          deletedAt: now(),
+        });
+      } catch (error) {
+        if (error instanceof Error && error.name === "ConditionalCheckFailedException") {
+          throw createAppError("CONFLICT", { details: { reason: "TEMPLATE_CHANGED" } });
+        }
         throw error;
       }
     },

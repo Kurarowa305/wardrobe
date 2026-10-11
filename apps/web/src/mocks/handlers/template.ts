@@ -30,7 +30,8 @@ let templateStore = initializeTemplateStore();
 export function getMockTemplates() { return templateStore; }
 
 function initializeTemplateStore(): TemplateRecord[] {
-  return templateDetailFixtures.map((fixture) => ({
+  return templateDetailFixtures.map((fixture, index) => ({
+    createdAt: index,
     revision: fixture.revision,
     templateId: fixture.templateId,
     name: fixture.name,
@@ -43,6 +44,7 @@ function initializeTemplateStore(): TemplateRecord[] {
 }
 
 type TemplateRecord = TemplateDetailResponseDto & {
+  createdAt: number;
   templateId: string;
 };
 
@@ -394,6 +396,7 @@ export const templateHandlers = [
     templateStore = [
       ...templateStore,
       {
+        createdAt: Date.now(),
         revision: 1,
         templateId: createMockTemplateId(),
         name: payload.name,

@@ -225,8 +225,17 @@ export function createRecommendationService(
               : ["season:summer"];
       }
       const items = await budget.run("db", async (signal) => {
-        try { return await readCandidates(repository, input.wardrobeId, seasons, signal); }
-        catch (error) { if (isAppError(error)) throw error; throw unavailable("RECOMMENDATION_READ_FAILED"); }
+        try {
+          return await readCandidates(
+            repository,
+            input.wardrobeId,
+            seasons,
+            signal,
+          );
+        } catch (error) {
+          if (isAppError(error)) throw error;
+          throw unavailable("RECOMMENDATION_READ_FAILED");
+        }
       });
       return finish({ status: items.length ? "ready" : "empty", basis, items });
     },

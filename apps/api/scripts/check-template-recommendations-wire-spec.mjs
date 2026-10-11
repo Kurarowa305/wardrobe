@@ -119,11 +119,23 @@ try {
   console.log(
     `Read benchmark: total templates=1000 (deleted=500), unique clothing=500, Query=5 BatchGet=7 maxConcurrent=${maxActive} META=2 elapsedMs=${Math.round(performance.now() - started)}`,
   );
-  const { handler } = await import('../src/entry/lambda/template_server.ts');
-  const today = new Date(Date.now()+9*3600000).toISOString().slice(0,10);
-  const lambda = await handler({rawPath:'/wardrobes/wd_wire/recommendations/templates',pathParameters:{wardrobeId:'wd_wire'},rawQueryString:`mode=summer&date=${today}&regionRevision=0`,requestContext:{http:{method:'GET'}}});
-  assert.equal(lambda.statusCode,200);assert.equal(JSON.parse(lambda.body).items.length,3);
-  const duplicate = await handler({rawPath:'/wardrobes/wd_wire/recommendations/templates',pathParameters:{wardrobeId:'wd_wire'},rawQueryString:`mode=summer&mode=winter&date=${today}&regionRevision=0`,requestContext:{http:{method:'GET'}}});assert.equal(duplicate.statusCode,400);
+  const { handler } = await import("../src/entry/lambda/template_server.ts");
+  const today = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
+  const lambda = await handler({
+    rawPath: "/wardrobes/wd_wire/recommendations/templates",
+    pathParameters: { wardrobeId: "wd_wire" },
+    rawQueryString: `mode=summer&date=${today}&regionRevision=0`,
+    requestContext: { http: { method: "GET" } },
+  });
+  assert.equal(lambda.statusCode, 200);
+  assert.equal(JSON.parse(lambda.body).items.length, 3);
+  const duplicate = await handler({
+    rawPath: "/wardrobes/wd_wire/recommendations/templates",
+    pathParameters: { wardrobeId: "wd_wire" },
+    rawQueryString: `mode=summer&mode=winter&date=${today}&regionRevision=0`,
+    requestContext: { http: { method: "GET" } },
+  });
+  assert.equal(duplicate.statusCode, 400);
   fail = true;
   const prior = queries;
   await assert.rejects(

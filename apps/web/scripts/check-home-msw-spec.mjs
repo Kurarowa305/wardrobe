@@ -5,6 +5,8 @@ process.env.NEXT_PUBLIC_API_BASE_URL = "http://localhost";
 const require = createRequire(import.meta.url);
 const { setupServer } = require("msw/node");
 const { http, HttpResponse } = require("msw");
+const { templateHandlers } = load("mocks/handlers/template");
+const { updateTemplate } = load("api/endpoints/template");
 const { homeHandlers } = load("mocks/handlers/home");
 const { regionHandlers } = load("mocks/handlers/region");
 const { wardrobeHandlers } = load("mocks/handlers/wardrobe");
@@ -19,6 +21,7 @@ const context = {
 };
 const server = setupServer(
   ...homeHandlers,
+  ...templateHandlers,
   ...regionHandlers,
   ...wardrobeHandlers,
 );
@@ -34,6 +37,14 @@ try {
   assert.equal(manual.basis, "manual");
   assert.equal(manual.status, "ready");
   assert(manual.items.length <= 3);
+  const first = manual.items[0];
+  await updateTemplate(context.wardrobeId, first.templateId, { name: "推薦版更新" });
+  const updated = await getTemplateRecommendations(context, "summer");
+  assert.equal(updated.items.find(item => item.templateId === first.templateId).revision, first.revision + 1);
+  for (const suffix of ["&mode=winter", "&limit=3", "&date=2026-01-01"]) {
+    const response = await fetch(`http://localhost/wardrobes/${context.wardrobeId}/recommendations/templates?mode=summer&date=${context.targetDate}&regionRevision=0${suffix}`);
+    assert.equal(response.status, 400);
+  }
   const result = await searchRegions("新宿");
   await saveWardrobeRegion(context.wardrobeId, {
     regionId: result.items[0].regionId,
