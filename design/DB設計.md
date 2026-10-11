@@ -385,3 +385,9 @@ Clothing / Template に内部属性 `statsVersion: Number` を持つ。未付与
 
 そのため、
 **単一テーブル設計の利点（アクセスパターンが明確・低コスト）を損なわずに統計要件を満たせる**。
+
+## 地域設定 (#279)
+
+`PK=W#<wardrobeId>, SK=META` に `regionRevision` と `region` を追加する。属性欠損は0/null。`region` はregionId/label/datasetVersion/source=abr/lgCode/pref/county/city/ward/latitude/longitude/sourceSrid=EPSG:6668/coordinatePolicy=jgd2011-as-wgs84-for-weather/timezone=Asia/Tokyo。緯度経度は固定辞書で再解決し、クライアント入力を採用しない。
+
+UpdateItemはMETA存在とexpectedRevision一致を条件とし、revision=0のみ欠損を許す。名前と作成日時に触れず、地域解除もrevisionを増やす。GETは強整合。モードは保存しない。辞書生成元と固定SHAは `design/調査データ/japan-municipality-274/manifest.json`。
