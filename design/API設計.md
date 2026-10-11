@@ -3,9 +3,9 @@
 
 ## 地域と天気とテンプレート推薦の確定契約
 
-2026-10-11、[#276](https://github.com/Kurarowa305/wardrobe/issues/276)で[API契約と状態管理](タスク設計/地域天気テンプレート推薦_API契約と状態管理判断.md)を確定した。地域検索・取得・PUT更新、当日天気、5モードのテンプレート推薦、API-14の確認版・再送キー拡張は同契約に従う。機能実装は#279〜#283、結合検証は#284で行い、以下の既存API仕様表への詳細統合も各実装に含める。
+2026-10-11、[#276](https://github.com/Kurarowa305/wardrobe/issues/276)で[API契約と状態管理](タスク設計/地域天気テンプレート推薦_API契約と状態管理判断.md)を確定した。地域検索・取得・PUT更新、当日天気、5モードのテンプレート推薦、API-14の確認版・再送キー拡張は同契約に従う。実装は#279〜#283に対応する。#284の結合検証は実Webクライアント・HTTP API・DynamoDB Localを接続する。検証範囲は[結合テスト設計](テスト設計/ホーム改修_結合検証284.md)を参照する。
 
-#282のWebクライアントは地域APIに加え、`GET /wardrobes/:wardrobeId/weather?date=<ISO JST日>&regionRevision=<版>` と `GET /wardrobes/:wardrobeId/recommendations/templates?mode=<5モード>&date=<ISO JST日>&regionRevision=<版>` を利用する。DTO型は`apps/web/src/api/schemas/home.ts`。天気と推薦は別要求でAbortSignalを受け取り、共通APIエラーをそのまま扱い、自動再試行しない。MSWは地域revisionと対象日を照合する契約fixtureであり、本番の天気取得/候補ランキングは#280/#281、最終結合確認は#284の担当範囲。
+#282のWebクライアントは地域APIに加え、`GET /wardrobes/:wardrobeId/weather?date=<ISO JST日>&regionRevision=<版>` と `GET /wardrobes/:wardrobeId/recommendations/templates?mode=<5モード>&date=<ISO JST日>&regionRevision=<版>` を利用する。DTO型は`apps/web/src/api/schemas/home.ts`。天気と推薦は別要求でAbortSignalを受け取り、共通APIエラーをそのまま扱い、自動再試行しない。MSWは地域revisionと対象日を照合し、現在の構成服から推薦を計算する開発用fixture。実APIは共有天気サービスと強整合読取を使用し、結合テストで両者の接続を確認する。
 
 既存の服推薦API-18と従来の履歴作成bodyは維持する。新ホームはテンプレート推薦APIを使用する。手動モードの保存・復元は行わず、ホーム再入場等では自動を初期値とする。
 
@@ -25,11 +25,17 @@
 | API-11 | PATCH  | `/wardrobes/{wardrobeId}/templates/{templateId}` | テンプレ編集      | `name?`, `clothingIds?[]`, `tagIds?[]`                                    | —                                                              |                                            |
 | API-12 | DELETE | `/wardrobes/{wardrobeId}/templates/{templateId}` | テンプレ削除（論理）  | —                                                            | —                                                              | 内部で `status=DELETED`                               |
 | API-13 | GET    | `/wardrobes/{wardrobeId}/histories`              | 履歴一覧（日付順）   | `from`(yyyymmdd), `to`(yyyymmdd), `order`, `limit`, `cursor` | `items[]`, `nextCursor`                                        | 並びは `date` / レスポンス詳細は以下                                   |
-| API-14 | POST   | `/wardrobes/{wardrobeId}/histories`              | 履歴作成（今日着た）  | `date`, `templateId?`, `clothingIds?[]`                  | —                                                              |                                |
+| API-14 | POST   | `/wardrobes/{wardrobeId}/histories`              | 履歴作成（今日着た）  | `date`, `templateId?`, `clothingIds?[]`, `expectedTemplateRevision?` / `Idempotency-Key?` | `{historyId}` | 初回201・成功再送200。確認版には操作キー必須 |
 | API-15 | GET    | `/wardrobes/{wardrobeId}/histories/{historyId}`  | 履歴詳細取得      | —                                                            | `date`, `templateName?`, `clothingItems[]`                     |     |
 | API-16 | DELETE | `/wardrobes/{wardrobeId}/histories/{historyId}`  | 履歴削除（物理）    | —                                                            | —                                                              |                                           |
 | API-17 | POST   | `/wardrobes/{wardrobeId}/images/presign` | 画像アップロード用の署名付きURL発行 | `contentType`, `category`, `extension?` | `imageKey`, `uploadUrl`, `expiresAt`, `method` | クライアントがS3へ直接PUTするためのURL |
 | API-18 | GET    | `/wardrobes/{wardrobeId}/recommendations/clothing` | おすすめ服取得 | — | `season`, `seasonTagIds`, `items.tops[]`, `items.bottoms[]` | 季節タグと最終着用日が古い順で抽出 |
+| REGION-SEARCH | GET | `/regions` | 地域検索 | `q` | `datasetVersion`, `items`, `hasMore` | ABR固定辞書 |
+| REGION-GET | GET | `/wardrobes/{wardrobeId}/region` | 保存地域 | — | `revision`, `region` | 未設定0/null |
+| REGION-PUT | PUT | `/wardrobes/{wardrobeId}/region` | 地域設定・解除 | `regionId`, `datasetVersion?`, `expectedRevision` | `revision`, `region` | CAS更新 |
+| WEATHER | GET | `/wardrobes/{wardrobeId}/weather` | JST当日予報 | `date`, `regionRevision` | 下記「当日天気API」参照 | 翌00:00まで再利用 |
+| TEMPLATE-RECOMMENDATIONS | GET | `/wardrobes/{wardrobeId}/recommendations/templates` | おすすめテンプレート | `date`, `regionRevision`, `mode?` | `status`, `basis`, `items`ほか | 最大3件、retryなし |
+
 
 
 ---
@@ -883,7 +889,7 @@ DTOは[契約Q9](タスク設計/地域天気テンプレート推薦_API契約�
 
 `GET /wardrobes/:wardrobeId/region` と `PUT /wardrobes/:wardrobeId/region` の成功DTOは `{revision,region:{regionId,label,datasetVersion}|null}`。既存未設定は0/null。PUTは `{regionId,datasetVersion,expectedRevision}`、解除は `{regionId:null,expectedRevision}`。JSONのみ、未知属性・不正整数は拒否。未知コードは400 UNKNOWN_REGION、辞書版変更と保存版競合は409 REGION_DATASET_CHANGED/REGION_CHANGED（details.reason）。PUT結果不明の再送も古い版では409。未知wardrobeは404。
 
-経路は既存wardrobe Lambdaとlocal共通handler。既存wardrobe IAMのGetItem/UpdateItemを使い追加権限・環境変数不要。Web共通clientにPUTとAbortSignal対応endpoint、DTO検証とMSWを追加。画面側の明示検索・応答世代管理は#282。
+経路は既存wardrobe Lambdaとlocal共通handler。既存wardrobe IAMのGetItem/UpdateItemを使い追加権限・環境変数不要。Web共通clientにPUTとAbortSignal対応endpoint、DTO検証とMSWを追加。画面側の明示検索・応答世代管理は`features/home/useRegionDialog`が担当する。
 
 ## ホーム確認記録・再送（#283）
 

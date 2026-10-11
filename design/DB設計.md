@@ -4,7 +4,7 @@
 
 2026-10-11、[#276](https://github.com/Kurarowa305/wardrobe/issues/276)で[保存先と更新条件](タスク設計/地域天気テンプレート推薦_API契約と状態管理判断.md)を確定した。METAの地域・地域revision、テンプレート確認revision、共有天気・取得lease・provider利用量、履歴操作記録は同契約に従う。操作記録にはTTLを付けず、履歴・統計と原子的に保存し、削除済み履歴の再送でも再作成しない。
 
-以下は既存モデルの資料。追加属性・物理キー・TTL/IAMと確認条件の実装、および各表への詳細統合は#279〜#283で行う。天気キャッシュの論理期限と物理削除を分け、手動モードはDBに保存しない。
+以下は既存モデルと追加した地域・天気・履歴操作記録を合わせた資料。追加属性・物理キー・更新条件は本資料末尾の各節を参照する。天気キャッシュの論理期限と物理削除を分け、手動モードはDBに保存しない。
 
 ## 1. 目的
 
@@ -79,7 +79,10 @@
 
 | エンティティ | PK                     | SK                   | 値の例                           |
 | ------ | ---------------------- | -------------------- | ----------------------------- |
-| ワードローブ | `W#<wardrobeId>`       | `META`               | `W#wd_01HZZ... / META`        |
+| ワードローブ | `W#<wardrobeId>` | `META` | nameと地域・regionRevisionを保持 |
+| 履歴操作記録 | `W#<wardrobeId>#HISTORY_OP` | `<小文字UUID>` | payload/historyId、削除後deletedAt、TTLなし |
+| 共有天気 | `WEATHER#<provider/model/地域/座標/JST/単位/日>` | `STATE` | cache/lease/cooldown/ttl（末尾参照） |
+| 天気提供元利用量 | `PROVIDER#OPEN_METEO` | `USAGE` | revision/gateUntil/counters、TTLなし |
 | 服      | `W#<wardrobeId>#CLOTH` | `CLOTH#<clothingId>` | `W#wd...#CLOTH / CLOTH#cl...` |
 | テンプレート | `W#<wardrobeId>#TPL`   | `TPL#<templateId>`   | `W#wd...#TPL / TPL#tp...`     |
 | 履歴     | `W#<wardrobeId>#HIST`  | `HIST#<historyId>`   | `W#wd...#HIST / HIST#hs...`   |
@@ -240,13 +243,15 @@
 
 ## 10. アクセスパターン
 
+新ホームは履歴一覧と旧服推薦を取得しない。地域はMETAの強整合Get/条件付きUpdate、天気は共有STATE/USAGE、テンプレート推薦はTPL全ページ強整合Query＋構成服BatchGet（80件、最大4並行）を使う。履歴タブと旧APIの取得経路は互換維持する。
+
 | AP    | 画面/操作               | DynamoDB操作                               | 対象                                        | キー／条件（値の形式・例）                                                                                                                                                                                                                                                                                                                                                     | 備考                                        |
 | ----- | ------------------- | ---------------------------------------- | ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
 | AP-01 | ワードローブ新規作成          | PutItem                                  | Wardrobe                                  | PK=`W#<wardrobeId>` / SK=`META`                                                                                                                                                                                                                                                                                                                                   |                                           |
 | AP-02 | ワードローブを開く（URL）      | GetItem                                  | Wardrobe                                  | PK=`W#<wardrobeId>` / SK=`META`                                                                                                                                                                                                                                                                                                                                   | ヘッダー表示                                    |
-| AP-03 | ホーム：直近1週間の履歴        | Query（GSI: HistoryByDate）                | History                                   | PK=`W#<wardrobeId>#HIST`、SK=`DATE#<from>..DATE#<to>`                                                                                                                                                                                                                                                                                                              |                                           |
+| AP-03 | 履歴タブ：日付範囲の履歴        | Query（GSI: HistoryByDate）                | History                                   | PK=`W#<wardrobeId>#HIST`、SK=`DATE#<from>..DATE#<to>`                                                                                                                                                                                                                                                                                                              |                                           |
 | AP-04 | 服一覧（登録順、genre任意）    | Query（GSI）                               | Clothing                                  | genre未指定: GSI=`StatusListByCreatedAt`, PK=`W#<wardrobeId>#CLOTH#ACTIVE` / genre指定: GSI=`StatusGenreListByCreatedAt`, PK=`W#<wardrobeId>#CLOTH#ACTIVE#GENRE#<genre>` / SK=`CREATED#...`                                                                                                                                                                                                                          | `genre` 指定時も DB で絞り込み後にページングする            |
-| AP-04a | ホーム：おすすめ服           | Query（GSI: StatusListByLastWornAt）       | Clothing                                  | PK=`W#<wardrobeId>#CLOTH#ACTIVE`、SK=`LASTWORN#...`、`ScanIndexForward=true`                                                                                                                                                                                                                                                                                         | 季節タグとgenreはAPI側で判定し、トップス/ボトムス各2件まで取得 |
+| AP-04a | 旧互換API：おすすめ服           | Query（GSI: StatusListByLastWornAt）       | Clothing                                  | PK=`W#<wardrobeId>#CLOTH#ACTIVE`、SK=`LASTWORN#...`、`ScanIndexForward=true`                                                                                                                                                                                                                                                                                         | 季節タグとgenreはAPI側で判定し、トップス/ボトムス各2件まで取得 |
 | AP-05 | 服詳細表示               | GetItem                                  | Clothing                                  | PK=`W#<wardrobeId>#CLOTH` / SK=`CLOTH#<clothingId>`                                                                                                                                                                                                                                                                                                               |                                           |
 | AP-06 | 服の追加                | PutItem                                  | Clothing                                  | PK=`W#<wardrobeId>#CLOTH` / SK=`CLOTH#<clothingId>`                                                                                                                                                                                                                                                                                                               | `status=ACTIVE`                           |
 | AP-07 | 服の編集                | UpdateItem                               | Clothing                                  | PK=`W#<wardrobeId>#CLOTH` / SK=`CLOTH#<clothingId>`                                                                                                                                                                                                                                                                                                               | `genre` 更新時は `statusGenreListPk` も更新                   |
@@ -409,6 +414,6 @@ UpdateItemはMETA存在とexpectedRevision一致を条件とし、revision=0の�
 DynamoDBの100項目上限へアプリguardを合わせ、20服テンプレートの作成・削除はそれぞれ44項目（履歴1＋21対象×日別/統計2＋操作1）で成功する。確認時はtemplate ACTIVE/revisionと全服ACTIVEを各統計Updateに組み込み、削除時にはACTIVE条件を追加しない。
 ## テンプレート確認版と推薦 (#281)
 
-TPL本体にrevisionを追加（新規1、既存欠損0）。通常編集は読取版とACTIVEをUpdateItemの条件に含め、内容が変わった場合だけ+1。削除もACTIVE/読取版を条件に+1。同一アイテムの統計は通常編集で書き戻さない。履歴統計更新はrevisionに触れない。確認記録でのrevision条件は#283が既存統計Updateへ組み込む。
+TPL本体にrevisionを追加（新規1、既存欠損0）。通常編集は読取版とACTIVEをUpdateItemの条件に含め、内容が変わった場合だけ+1。削除もACTIVE/読取版を条件に+1。同一アイテムの統計は通常編集で書き戻さない。履歴統計更新はrevisionに触れない。確認記録でのrevision条件は既存統計Updateに含める（#283）。
 
 推薦は `PK=W#<wardrobeId>#TPL` の全ページ強整合Queryを使い、季節内ACTIVE候補に必要な `PK=W#<wardrobeId>#CLOTH,SK=CLOTH#<clothingId>` を強整合BatchGetする。新GSI/集計itemなし。完了済み更新を反映するが読取中の全体スナップショットは保証しない。

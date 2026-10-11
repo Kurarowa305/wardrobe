@@ -95,7 +95,9 @@
     "test:home-dialogs": "node scripts/check-home-dialogs-spec.mjs",
     "test:home-mutations": "node scripts/check-home-mutations-spec.mjs",
     "test:home-msw": "node scripts/check-home-msw-spec.mjs",
-    "test:confirm-record": "node scripts/check-confirm-record-controller-spec.mjs && node scripts/check-confirm-record-dialog-spec.mjs && node scripts/check-confirm-record-msw-spec.mjs"
+    "test:confirm-record": "node scripts/check-confirm-record-controller-spec.mjs && node scripts/check-confirm-record-dialog-spec.mjs && node scripts/check-confirm-record-msw-spec.mjs",
+    "test:home-record-integration": "node scripts/check-home-record-integration.mjs",
+    "test:legacy-web-integration": "node scripts/check-legacy-web-integration.mjs"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.4",

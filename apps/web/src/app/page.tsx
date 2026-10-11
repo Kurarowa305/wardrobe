@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 import { getWardrobe } from "@/api/endpoints/wardrobe";
@@ -13,14 +13,8 @@ import {
 
 export default function RootPage() {
   const router = useRouter();
-  const hasResolvedRef = useRef(false);
 
   useEffect(() => {
-    if (hasResolvedRef.current) {
-      return;
-    }
-
-    hasResolvedRef.current = true;
     let active = true;
 
     const savedWardrobeId = readLastWardrobeId();
