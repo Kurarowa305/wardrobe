@@ -14,8 +14,6 @@ import {
   HISTORY_FIXTURE_WARDROBE_ID,
   historyDetailFixtures,
 } from "@/mocks/fixtures/history";
-import { clothingDetailFixtureById } from "@/mocks/fixtures/clothing";
-import { templateDetailFixtureById } from "@/mocks/fixtures/template";
 import { HttpResponse, http, passthrough } from "msw";
 
 import { applyMockScenario } from "./scenario";
@@ -28,20 +26,79 @@ const DATE_PATTERN = /^\d{8}$/;
 
 let mockHistoryIdSequence = 1;
 let historyStore = initializeHistoryStore();
-const operationStore = new Map<string, { payload: string; historyId: string; deleted: boolean }>();
-const statsBaselines = new Map<string, { wearCount: number; lastWornAt: number }>();
+const operationStore = new Map<
+  string,
+  { payload: string; historyId: string; deleted: boolean }
+>();
+const statsBaselines = new Map<
+  string,
+  { wearCount: number; lastWornAt: number }
+>();
 const addedHistoryIds = new Set<string>();
-const operationPayload = (body: CreateHistoryRequestDto) => JSON.stringify({ date: body.date, ...(body.templateId ? { templateId: body.templateId, ...(body.expectedTemplateRevision !== undefined ? { expectedTemplateRevision: body.expectedTemplateRevision } : {}) } : { clothingIds: [...body.clothingIds!].sort() }) });
-const conflict = (reason: string) => HttpResponse.json({ error: { code: "CONFLICT", message: reason, details: { reason } } }, { status: 409 });
+const operationPayload = (body: CreateHistoryRequestDto) =>
+  JSON.stringify({
+    date: body.date,
+    ...(body.templateId
+      ? {
+          templateId: body.templateId,
+          ...(body.expectedTemplateRevision !== undefined
+            ? { expectedTemplateRevision: body.expectedTemplateRevision }
+            : {}),
+        }
+      : { clothingIds: [...body.clothingIds!].sort() }),
+  });
+const conflict = (reason: string) =>
+  HttpResponse.json(
+    { error: { code: "CONFLICT", message: reason, details: { reason } } },
+    { status: 409 },
+  );
 function recomputeMockStats(history: HistoryRecord) {
-  const targets = [ ...history.clothingItems.map(item => ({ key: `clothing:${item.clothingId}`, record: getMockClothingItems().find(candidate => candidate.clothingId === item.clothingId) })), ...(history.template ? [{ key: `template:${history.template.templateId}`, record: getMockTemplates().find(item => item.templateId === history.template!.templateId) }] : []) ];
+  const targets = [
+    ...history.clothingItems.map((item) => ({
+      key: `clothing:${item.clothingId}`,
+      record: getMockClothingItems().find(
+        (candidate) => candidate.clothingId === item.clothingId,
+      ),
+    })),
+    ...(history.template
+      ? [
+          {
+            key: `template:${history.template.templateId}`,
+            record: getMockTemplates().find(
+              (item) => item.templateId === history.template!.templateId,
+            ),
+          },
+        ]
+      : []),
+  ];
   for (const target of targets) {
     if (!target.record) continue;
     let baseline = statsBaselines.get(target.key);
-    if (!baseline) { baseline = { wearCount: target.record.wearCount, lastWornAt: target.record.lastWornAt }; statsBaselines.set(target.key, baseline); }
-    const added = historyStore.filter(item => addedHistoryIds.has(item.historyId) && (target.key.startsWith('template:') ? item.template?.templateId === target.key.slice(9) : item.clothingItems.some(clothing => clothing.clothingId === target.key.slice(9))));
+    if (!baseline) {
+      baseline = {
+        wearCount: target.record.wearCount,
+        lastWornAt: target.record.lastWornAt,
+      };
+      statsBaselines.set(target.key, baseline);
+    }
+    const added = historyStore.filter(
+      (item) =>
+        addedHistoryIds.has(item.historyId) &&
+        (target.key.startsWith("template:")
+          ? item.template?.templateId === target.key.slice(9)
+          : item.clothingItems.some(
+              (clothing) => clothing.clothingId === target.key.slice(9),
+            )),
+    );
     target.record.wearCount = baseline.wearCount + added.length;
-    target.record.lastWornAt = Math.max(baseline.lastWornAt, ...added.map(item => Date.parse(`${item.date.slice(0,4)}-${item.date.slice(4,6)}-${item.date.slice(6,8)}T00:00:00Z`)));
+    target.record.lastWornAt = Math.max(
+      baseline.lastWornAt,
+      ...added.map((item) =>
+        Date.parse(
+          `${item.date.slice(0, 4)}-${item.date.slice(4, 6)}-${item.date.slice(6, 8)}T00:00:00Z`,
+        ),
+      ),
+    );
   }
 }
 
@@ -61,7 +118,10 @@ function initializeHistoryStore(): HistoryRecord[] {
 }
 
 function isSupportedWardrobeId(wardrobeId: string) {
-  return wardrobeId === HISTORY_FIXTURE_WARDROBE_ID || wardrobeId === DEMO_IDS.wardrobe;
+  return (
+    wardrobeId === HISTORY_FIXTURE_WARDROBE_ID ||
+    wardrobeId === DEMO_IDS.wardrobe
+  );
 }
 
 function createErrorResponse(status: number, code: string, message: string) {
@@ -131,7 +191,12 @@ function parseDate(value: string | null): string | null {
     return null;
   }
 
-  return DATE_PATTERN.test(value) && validRecordDate(`${value.slice(0,4)}-${value.slice(4,6)}-${value.slice(6,8)}`) ? value : null;
+  return DATE_PATTERN.test(value) &&
+    validRecordDate(
+      `${value.slice(0, 4)}-${value.slice(4, 6)}-${value.slice(6, 8)}`,
+    )
+    ? value
+    : null;
 }
 
 function parseBody<TBody>(request: Request): Promise<TBody | null> {
@@ -165,10 +230,17 @@ function normalizeClothingIds(value: unknown): string[] | null {
   return normalized;
 }
 
-function resolveClothingItems(clothingIds: string[]): HistoryDetailClothingItemDto[] | null {
+function resolveClothingItems(
+  clothingIds: string[],
+): HistoryDetailClothingItemDto[] | null {
   const clothingItems = clothingIds
-    .map((clothingId) => getMockClothingItems().find(item => item.clothingId === clothingId))
-    .filter((clothing): clothing is NonNullable<typeof clothing> => clothing !== undefined)
+    .map((clothingId) =>
+      getMockClothingItems().find((item) => item.clothingId === clothingId),
+    )
+    .filter(
+      (clothing): clothing is NonNullable<typeof clothing> =>
+        clothing !== undefined,
+    )
     .map((clothing) => ({
       clothingId: clothing.clothingId,
       name: clothing.name,
@@ -186,13 +258,35 @@ function resolveClothingItems(clothingIds: string[]): HistoryDetailClothingItemD
 }
 
 function parseCreateRequest(body: unknown): CreateHistoryRequestDto | null {
-  if (!isRecord(body) || typeof body.date !== "string" || !parseDate(body.date)) {
+  if (
+    !isRecord(body) ||
+    typeof body.date !== "string" ||
+    !parseDate(body.date)
+  ) {
     return null;
   }
 
-  if (Object.keys(body).some(key => !['date','templateId','clothingIds','expectedTemplateRevision'].includes(key))) return null;
-  if (body.expectedTemplateRevision !== undefined && (!Number.isSafeInteger(body.expectedTemplateRevision) || Number(body.expectedTemplateRevision) < 0 || typeof body.templateId !== 'string')) return null;
-  const templateId = typeof body.templateId === "string" ? body.templateId.trim() : undefined;
+  if (
+    Object.keys(body).some(
+      (key) =>
+        ![
+          "date",
+          "templateId",
+          "clothingIds",
+          "expectedTemplateRevision",
+        ].includes(key),
+    )
+  )
+    return null;
+  if (
+    body.expectedTemplateRevision !== undefined &&
+    (!Number.isSafeInteger(body.expectedTemplateRevision) ||
+      Number(body.expectedTemplateRevision) < 0 ||
+      typeof body.templateId !== "string")
+  )
+    return null;
+  const templateId =
+    typeof body.templateId === "string" ? body.templateId.trim() : undefined;
   const clothingIds = normalizeClothingIds(body.clothingIds);
 
   if (templateId && clothingIds) {
@@ -203,7 +297,9 @@ function parseCreateRequest(body: unknown): CreateHistoryRequestDto | null {
     return {
       date: body.date,
       templateId,
-      ...(body.expectedTemplateRevision !== undefined ? { expectedTemplateRevision: Number(body.expectedTemplateRevision) } : {}),
+      ...(body.expectedTemplateRevision !== undefined
+        ? { expectedTemplateRevision: Number(body.expectedTemplateRevision) }
+        : {}),
     };
   }
 
@@ -300,12 +396,20 @@ export const historyHandlers = [
     const url = new URL(request.url);
     const order = parseOrder(url.searchParams.get("order"));
     if (order === null) {
-      return createErrorResponse(400, "VALIDATION_ERROR", "order must be asc or desc");
+      return createErrorResponse(
+        400,
+        "VALIDATION_ERROR",
+        "order must be asc or desc",
+      );
     }
 
     const limit = parseLimit(url.searchParams.get("limit"));
     if (limit === null) {
-      return createErrorResponse(400, "VALIDATION_ERROR", "limit must be 1..30");
+      return createErrorResponse(
+        400,
+        "VALIDATION_ERROR",
+        "limit must be 1..30",
+      );
     }
 
     const cursor = parseCursor(url.searchParams.get("cursor"));
@@ -315,26 +419,43 @@ export const historyHandlers = [
 
     const from = parseDate(url.searchParams.get("from"));
     if (url.searchParams.has("from") && from === null) {
-      return createErrorResponse(400, "VALIDATION_ERROR", "from must be yyyymmdd");
+      return createErrorResponse(
+        400,
+        "VALIDATION_ERROR",
+        "from must be yyyymmdd",
+      );
     }
 
     const to = parseDate(url.searchParams.get("to"));
     if (url.searchParams.has("to") && to === null) {
-      return createErrorResponse(400, "VALIDATION_ERROR", "to must be yyyymmdd");
+      return createErrorResponse(
+        400,
+        "VALIDATION_ERROR",
+        "to must be yyyymmdd",
+      );
     }
 
     if (from !== null && to !== null && from > to) {
-      return createErrorResponse(400, "VALIDATION_ERROR", "from must be less than or equal to to");
+      return createErrorResponse(
+        400,
+        "VALIDATION_ERROR",
+        "from must be less than or equal to to",
+      );
     }
 
     const items = buildListItems(historyStore, order, from, to);
     if (cursor > items.length) {
-      return createErrorResponse(400, "INVALID_CURSOR", "cursor is out of range");
+      return createErrorResponse(
+        400,
+        "INVALID_CURSOR",
+        "cursor is out of range",
+      );
     }
 
     const pagedItems = items.slice(cursor, cursor + limit);
     const nextOffset = cursor + pagedItems.length;
-    const nextCursor = nextOffset < items.length ? encodeCursor(nextOffset) : null;
+    const nextCursor =
+      nextOffset < items.length ? encodeCursor(nextOffset) : null;
 
     return HttpResponse.json<HistoryListResponseDto>({
       items: pagedItems,
@@ -342,135 +463,205 @@ export const historyHandlers = [
     });
   }),
 
-  http.get("*/wardrobes/:wardrobeId/histories/:historyId", async ({ params, request }) => {
-    if (shouldBypassHistoryApiMock(request)) {
-      return passthrough();
-    }
-
-    const scenarioResponse = await applyMockScenario(request);
-    if (scenarioResponse) {
-      return scenarioResponse;
-    }
-
-    const wardrobeId = String(params.wardrobeId ?? "");
-    if (!isSupportedWardrobeId(wardrobeId)) {
-      return createNotFoundResponse("wardrobe");
-    }
-
-    const historyId = String(params.historyId ?? "");
-    const history = historyStore.find((item) => item.historyId === historyId);
-    if (!history) {
-      return createNotFoundResponse("history");
-    }
-
-    return HttpResponse.json<HistoryDetailResponseDto>({
-      date: history.date,
-      templateName: history.templateName,
-      template: history.template ? { ...history.template } : null,
-      clothingItems: history.clothingItems.map((item) => ({ ...item })),
-    });
-  }),
-
-  http.post("*/wardrobes/:wardrobeId/histories", async ({ params, request }) => {
-    if (shouldBypassHistoryApiMock(request)) {
-      return passthrough();
-    }
-
-    const scenarioResponse = await applyMockScenario(request);
-    if (scenarioResponse) {
-      return scenarioResponse;
-    }
-
-    const wardrobeId = String(params.wardrobeId ?? "");
-    if (!isSupportedWardrobeId(wardrobeId)) {
-      return createNotFoundResponse("wardrobe");
-    }
-
-    const body = await parseBody<unknown>(request);
-    const payload = parseCreateRequest(body);
-    if (!payload) {
-      return createErrorResponse(400, "VALIDATION_ERROR", "request body is invalid");
-    }
-
-    const operationId = request.headers.get("idempotency-key")?.toLowerCase();
-    if ((operationId !== undefined && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(operationId)) || (payload.templateId && payload.expectedTemplateRevision !== undefined && !operationId)) return createErrorResponse(400, "VALIDATION_ERROR", "operation key required");
-    const opKey = operationId ? `${wardrobeId}:${operationId}` : undefined;
-    const prior = opKey ? operationStore.get(opKey) : undefined;
-    if (prior) {
-      if (prior.payload !== operationPayload(payload)) return conflict("IDEMPOTENCY_KEY_REUSED");
-      if (prior.deleted) return conflict("HISTORY_ALREADY_DELETED");
-      return HttpResponse.json({ historyId: prior.historyId }, { status: 200 });
-    }
-    let nextHistory: HistoryRecord | null = null;
-
-    if ("templateId" in payload && typeof payload.templateId === "string") {
-      const template = getMockTemplates().find(item => item.templateId === payload.templateId);
-      const currentClothing = template ? resolveClothingItems(template.clothingItems.map(item => item.clothingId)) : null;
-      if (payload.expectedTemplateRevision !== undefined && (!template || template.status !== 'ACTIVE' || ('revision' in template ? template.revision : 0) !== payload.expectedTemplateRevision || !currentClothing || currentClothing.some(item => item.status !== 'ACTIVE'))) return conflict('CONFIRMATION_STALE');
-      if (template) {
-        nextHistory = {
-          historyId: createMockHistoryId(),
-          date: payload.date,
-          templateName: template.name,
-          template: {
-            templateId: payload.templateId,
-            name: template.name,
-            wearCount: template.wearCount,
-            lastWornAt: template.lastWornAt,
-          },
-          clothingItems: currentClothing ?? template.clothingItems.map((item: HistoryDetailClothingItemDto) => ({ ...item })),
-        };
+  http.get(
+    "*/wardrobes/:wardrobeId/histories/:historyId",
+    async ({ params, request }) => {
+      if (shouldBypassHistoryApiMock(request)) {
+        return passthrough();
       }
-    } else {
-      const clothingItems = resolveClothingItems(payload.clothingIds);
-      if (clothingItems) {
-        nextHistory = {
-          historyId: createMockHistoryId(),
-          date: payload.date,
-          templateName: null,
-          template: null,
-          clothingItems,
-        };
+
+      const scenarioResponse = await applyMockScenario(request);
+      if (scenarioResponse) {
+        return scenarioResponse;
       }
-    }
 
-    if (!nextHistory) {
-      return createErrorResponse(404, "NOT_FOUND", "template or clothing is not found");
-    }
+      const wardrobeId = String(params.wardrobeId ?? "");
+      if (!isSupportedWardrobeId(wardrobeId)) {
+        return createNotFoundResponse("wardrobe");
+      }
 
-    if (opKey) { nextHistory.operationKey = opKey; operationStore.set(opKey, { payload: operationPayload(payload), historyId: nextHistory.historyId, deleted: false }); }
-    addedHistoryIds.add(nextHistory.historyId);
-    historyStore = [nextHistory, ...historyStore];
-    recomputeMockStats(nextHistory);
-    return HttpResponse.json({ historyId: nextHistory.historyId }, { status: 201 });
-  }),
+      const historyId = String(params.historyId ?? "");
+      const history = historyStore.find((item) => item.historyId === historyId);
+      if (!history) {
+        return createNotFoundResponse("history");
+      }
 
-  http.delete("*/wardrobes/:wardrobeId/histories/:historyId", async ({ params, request }) => {
-    if (shouldBypassHistoryApiMock(request)) {
-      return passthrough();
-    }
+      return HttpResponse.json<HistoryDetailResponseDto>({
+        date: history.date,
+        templateName: history.templateName,
+        template: history.template ? { ...history.template } : null,
+        clothingItems: history.clothingItems.map((item) => ({ ...item })),
+      });
+    },
+  ),
 
-    const scenarioResponse = await applyMockScenario(request);
-    if (scenarioResponse) {
-      return scenarioResponse;
-    }
+  http.post(
+    "*/wardrobes/:wardrobeId/histories",
+    async ({ params, request }) => {
+      if (shouldBypassHistoryApiMock(request)) {
+        return passthrough();
+      }
 
-    const wardrobeId = String(params.wardrobeId ?? "");
-    if (!isSupportedWardrobeId(wardrobeId)) {
-      return createNotFoundResponse("wardrobe");
-    }
+      const scenarioResponse = await applyMockScenario(request);
+      if (scenarioResponse) {
+        return scenarioResponse;
+      }
 
-    const historyId = String(params.historyId ?? "");
-    const historyIndex = historyStore.findIndex((item) => item.historyId === historyId);
-    if (historyIndex === -1) {
-      return createNotFoundResponse("history");
-    }
+      const wardrobeId = String(params.wardrobeId ?? "");
+      if (!isSupportedWardrobeId(wardrobeId)) {
+        return createNotFoundResponse("wardrobe");
+      }
 
-    const removed = historyStore[historyIndex]!;
-    historyStore = historyStore.filter((history) => history.historyId !== historyId);
-    if (removed.operationKey) { const operation = operationStore.get(removed.operationKey); if (operation) operation.deleted = true; }
-    recomputeMockStats(removed);
+      const body = await parseBody<unknown>(request);
+      const payload = parseCreateRequest(body);
+      if (!payload) {
+        return createErrorResponse(
+          400,
+          "VALIDATION_ERROR",
+          "request body is invalid",
+        );
+      }
 
-    return new HttpResponse(null, { status: 204 });
-  }),
+      const operationId = request.headers.get("idempotency-key")?.toLowerCase();
+      if (
+        (operationId !== undefined &&
+          !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(
+            operationId,
+          )) ||
+        (payload.templateId &&
+          payload.expectedTemplateRevision !== undefined &&
+          !operationId)
+      )
+        return createErrorResponse(
+          400,
+          "VALIDATION_ERROR",
+          "operation key required",
+        );
+      const opKey = operationId ? `${wardrobeId}:${operationId}` : undefined;
+      const prior = opKey ? operationStore.get(opKey) : undefined;
+      if (prior) {
+        if (prior.payload !== operationPayload(payload))
+          return conflict("IDEMPOTENCY_KEY_REUSED");
+        if (prior.deleted) return conflict("HISTORY_ALREADY_DELETED");
+        return HttpResponse.json(
+          { historyId: prior.historyId },
+          { status: 200 },
+        );
+      }
+      let nextHistory: HistoryRecord | null = null;
+
+      if ("templateId" in payload && typeof payload.templateId === "string") {
+        const template = getMockTemplates().find(
+          (item) => item.templateId === payload.templateId,
+        );
+        const currentClothing = template
+          ? resolveClothingItems(
+              template.clothingItems.map((item) => item.clothingId),
+            )
+          : null;
+        if (
+          payload.expectedTemplateRevision !== undefined &&
+          (!template ||
+            template.status !== "ACTIVE" ||
+            ("revision" in template ? template.revision : 0) !==
+              payload.expectedTemplateRevision ||
+            !currentClothing ||
+            currentClothing.some((item) => item.status !== "ACTIVE"))
+        )
+          return conflict("CONFIRMATION_STALE");
+        if (template) {
+          nextHistory = {
+            historyId: createMockHistoryId(),
+            date: payload.date,
+            templateName: template.name,
+            template: {
+              templateId: payload.templateId,
+              name: template.name,
+              wearCount: template.wearCount,
+              lastWornAt: template.lastWornAt,
+            },
+            clothingItems:
+              currentClothing ??
+              template.clothingItems.map(
+                (item: HistoryDetailClothingItemDto) => ({ ...item }),
+              ),
+          };
+        }
+      } else {
+        const clothingItems = resolveClothingItems(payload.clothingIds);
+        if (clothingItems) {
+          nextHistory = {
+            historyId: createMockHistoryId(),
+            date: payload.date,
+            templateName: null,
+            template: null,
+            clothingItems,
+          };
+        }
+      }
+
+      if (!nextHistory) {
+        return createErrorResponse(
+          404,
+          "NOT_FOUND",
+          "template or clothing is not found",
+        );
+      }
+
+      if (opKey) {
+        nextHistory.operationKey = opKey;
+        operationStore.set(opKey, {
+          payload: operationPayload(payload),
+          historyId: nextHistory.historyId,
+          deleted: false,
+        });
+      }
+      addedHistoryIds.add(nextHistory.historyId);
+      historyStore = [nextHistory, ...historyStore];
+      recomputeMockStats(nextHistory);
+      return HttpResponse.json(
+        { historyId: nextHistory.historyId },
+        { status: 201 },
+      );
+    },
+  ),
+
+  http.delete(
+    "*/wardrobes/:wardrobeId/histories/:historyId",
+    async ({ params, request }) => {
+      if (shouldBypassHistoryApiMock(request)) {
+        return passthrough();
+      }
+
+      const scenarioResponse = await applyMockScenario(request);
+      if (scenarioResponse) {
+        return scenarioResponse;
+      }
+
+      const wardrobeId = String(params.wardrobeId ?? "");
+      if (!isSupportedWardrobeId(wardrobeId)) {
+        return createNotFoundResponse("wardrobe");
+      }
+
+      const historyId = String(params.historyId ?? "");
+      const historyIndex = historyStore.findIndex(
+        (item) => item.historyId === historyId,
+      );
+      if (historyIndex === -1) {
+        return createNotFoundResponse("history");
+      }
+
+      const removed = historyStore[historyIndex]!;
+      historyStore = historyStore.filter(
+        (history) => history.historyId !== historyId,
+      );
+      if (removed.operationKey) {
+        const operation = operationStore.get(removed.operationKey);
+        if (operation) operation.deleted = true;
+      }
+      recomputeMockStats(removed);
+
+      return new HttpResponse(null, { status: 204 });
+    },
+  ),
 ];

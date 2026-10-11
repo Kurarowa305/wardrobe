@@ -14,7 +14,10 @@ import {
 import { createHistoryHandler } from "../src/domains/history/handlers/createHistoryHandler.ts";
 import { deleteHistoryHandler } from "../src/domains/history/handlers/deleteHistoryHandler.ts";
 process.env.DDB_ENDPOINT = process.env.DDB_ENDPOINT ?? "http://127.0.0.1:8765";
-assert.match(process.env.DDB_ENDPOINT, /^http:\/\/(127\.0\.0\.1|localhost):\d+$/);
+assert.match(
+  process.env.DDB_ENDPOINT,
+  /^http:\/\/(127\.0\.0\.1|localhost):\d+$/,
+);
 process.env.TABLE_NAME = `ConfirmRecord${Date.now()}`;
 const client = new DynamoDBClient({
   endpoint: process.env.DDB_ENDPOINT,
@@ -152,15 +155,40 @@ try {
   );
   assert.equal((await get(templateKey)).wearCount, 3);
   // Lost commit responses are resolved through the same durable operation record.
-  const lostKey=randomUUID();
-  const lost=await createHistoryHandler({...request,body:{...body,expectedTemplateRevision:3},headers:{...request.headers,'idempotency-key':lostKey.toUpperCase()},dependencies:{transactWriteItems:async items=>{await operations.write(items);throw new Error('response lost');}}});
-  assert.equal(lost.statusCode,200);
-  const recovered=await createHistoryHandler({...request,body:{...body,expectedTemplateRevision:3},headers:{...request.headers,'idempotency-key':lostKey}});assert.equal(recovered.body,lost.body);
-  const sameKey=randomUUID();const concurrentRequest={...request,body:{...body,expectedTemplateRevision:3},headers:{...request.headers,'idempotency-key':sameKey}};
-  const beforeConcurrent=(await get(templateKey)).wearCount;
-  const concurrent=await Promise.allSettled([createHistoryHandler(concurrentRequest),createHistoryHandler(concurrentRequest)]);
-  assert(concurrent.some(result=>result.status==='fulfilled'));
-  const afterConcurrent=await createHistoryHandler(concurrentRequest);assert.equal(afterConcurrent.statusCode,200);assert.equal((await get(templateKey)).wearCount,beforeConcurrent+1);
+  const lostKey = randomUUID();
+  const lost = await createHistoryHandler({
+    ...request,
+    body: { ...body, expectedTemplateRevision: 3 },
+    headers: { ...request.headers, "idempotency-key": lostKey.toUpperCase() },
+    dependencies: {
+      transactWriteItems: async (items) => {
+        await operations.write(items);
+        throw new Error("response lost");
+      },
+    },
+  });
+  assert.equal(lost.statusCode, 200);
+  const recovered = await createHistoryHandler({
+    ...request,
+    body: { ...body, expectedTemplateRevision: 3 },
+    headers: { ...request.headers, "idempotency-key": lostKey },
+  });
+  assert.equal(recovered.body, lost.body);
+  const sameKey = randomUUID();
+  const concurrentRequest = {
+    ...request,
+    body: { ...body, expectedTemplateRevision: 3 },
+    headers: { ...request.headers, "idempotency-key": sameKey },
+  };
+  const beforeConcurrent = (await get(templateKey)).wearCount;
+  const concurrent = await Promise.allSettled([
+    createHistoryHandler(concurrentRequest),
+    createHistoryHandler(concurrentRequest),
+  ]);
+  assert(concurrent.some((result) => result.status === "fulfilled"));
+  const afterConcurrent = await createHistoryHandler(concurrentRequest);
+  assert.equal(afterConcurrent.statusCode, 200);
+  assert.equal((await get(templateKey)).wearCount, beforeConcurrent + 1);
   // Deleted clothing invalidates a fresh confirmation; deleting existing histories still succeeds.
   await document.send(
     new UpdateCommand({

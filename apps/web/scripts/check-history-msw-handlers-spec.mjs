@@ -22,7 +22,8 @@ function read(relPath) {
 }
 
 function includes(relPath, expected) {
-  return read(relPath).includes(expected);
+  const normalize = (source) => source.replace(/\s+/g, "").replace(/,\)/g, ")");
+  return normalize(read(relPath)).includes(normalize(expected));
 }
 
 function check(id, description, passed, detail) {
@@ -89,9 +90,9 @@ check(
 
 check(
   "HM-06",
-  "作成 handler が templateId / clothingIds の両入力を fixture から解決する",
-  includes(target, 'import { templateDetailFixtureById } from "@/mocks/fixtures/template";') &&
-    includes(target, 'const template = templateDetailFixtureById[payload.templateId];') &&
+  "作成 handler が templateId / clothingIds の両入力を 現在のストアから解決する",
+  includes(target, 'import { getMockTemplates } from "./template";') &&
+    includes(target, 'const template = getMockTemplates().find(') &&
     includes(target, 'const clothingItems = resolveClothingItems(payload.clothingIds);') &&
     includes(target, 'templateName: template.name,') &&
     includes(target, 'templateName: null,'),
@@ -119,7 +120,7 @@ check(
   "HM-08",
   "History handler がデモ遷移用 wardrobeId（DEMO_IDS.wardrobe）を許可し、handlers 集約へ追加される",
   includes(target, 'import { DEMO_IDS } from "@/constants/routes";') &&
-    includes(target, 'return wardrobeId === HISTORY_FIXTURE_WARDROBE_ID || wardrobeId === DEMO_IDS.wardrobe;') &&
+    includes(target, 'wardrobeId === HISTORY_FIXTURE_WARDROBE_ID || wardrobeId === DEMO_IDS.wardrobe') &&
     includes("src/mocks/handlers/index.ts", 'import { historyHandlers } from "./history";') &&
     includes("src/mocks/handlers/index.ts", 'handlers.push(...historyHandlers);'),
   "historyHandlers の wardrobeId 対応または handlers 集約が不足しています",
