@@ -41,23 +41,35 @@ globalThis.fetch = async (url, options = {}) => {
     return Response.json({ historyId: "hi_confirmed" });
   }
   if (u.pathname.endsWith("/region"))
-    return Response.json({ revision: 0, region: null });
+    return Response.json({
+      revision: 1,
+      region: {
+        regionId: "abr:lg:131016",
+        label: "東京都 千代田区",
+        datasetVersion: "abr-2026-01",
+      },
+    });
   const context = {
     wardrobeId: "wd_test",
-    regionRevision: 0,
+    regionRevision: 1,
     targetDate: u.searchParams.get("date"),
   };
   if (u.pathname.endsWith("/weather"))
     return Response.json({
       ...context,
       status: "unavailable",
-      reason: "UPSTREAM_UNAVAILABLE",
-      region: null,
+      reason: "fetch_failed",
+      retryAfter: null,
     });
   if (u.pathname.endsWith("/recommendations/templates")) {
     if (saved)
       return Response.json(
-        { code: "INTERNAL_ERROR", message: "Temporary recommendation failure" },
+        {
+          error: {
+            code: "SERVICE_UNAVAILABLE",
+            message: "Temporary recommendation failure",
+          },
+        },
         { status: 503 },
       );
     const mode = u.searchParams.get("mode");
@@ -66,6 +78,7 @@ globalThis.fetch = async (url, options = {}) => {
       mode,
       status: mode === "auto" ? "weather_required" : "ready",
       basis: mode === "auto" ? "none" : "manual",
+      ...(mode === "auto" ? { reason: "fetch_failed", retryAfter: null } : {}),
       items:
         mode === "auto"
           ? []

@@ -129,7 +129,12 @@ globalThis.fetch = async (url, options = {}) => {
   return Response.json(
     status === 200
       ? { name: "既存ワードローブ" }
-      : { code: "ERROR", message: "unavailable" },
+      : {
+          error: {
+            code: status === 404 ? "NOT_FOUND" : "SERVICE_UNAVAILABLE",
+            message: "unavailable",
+          },
+        },
     { status },
   );
 };
