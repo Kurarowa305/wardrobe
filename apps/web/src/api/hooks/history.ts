@@ -23,7 +23,7 @@ type HistoryIdentity = {
   historyId: string;
 };
 
-async function invalidateHistoryQueries(queryClient: QueryClient, wardrobeId: string, recordCreated = false) {
+export async function invalidateHistoryQueries(queryClient: QueryClient, wardrobeId: string, recordCreated = false) {
   await invalidateRecommendations(queryClient, wardrobeId, recordCreated);
   await Promise.all([
     queryClient.invalidateQueries({

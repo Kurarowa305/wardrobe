@@ -885,6 +885,13 @@ DTOは[契約Q9](タスク設計/地域天気テンプレート推薦_API契約�
 
 経路は既存wardrobe Lambdaとlocal共通handler。既存wardrobe IAMのGetItem/UpdateItemを使い追加権限・環境変数不要。Web共通clientにPUTとAbortSignal対応endpoint、DTO検証とMSWを追加。画面側の明示検索・応答世代管理は#282。
 
+## ホーム確認記録・再送（#283）
+
+既存 `POST /wardrobes/:wardrobeId/histories` に `Idempotency-Key: UUID` とtemplate bodyの `expectedTemplateRevision`（安全な非負整数）を追加。確認版を送る場合は操作キー必須。既存bodyは互換維持。dateは実在するyyyymmddを検証し、過去・未来の制限は設けない。
+
+初回201 `{historyId}`、同キー同内容の成功再送200で元のID。操作記録を先に強整合確認するため、その後のテンプレート編集は再送を妨げない。異なる内容は409 `IDEMPOTENCY_KEY_REUSED`、保存済み履歴を削除した後は409 `HISTORY_ALREADY_DELETED`。確認版・ACTIVE不一致は409 `CONFIRMATION_STALE`。確認時の構成服が消えた場合も同じ。未処理BatchGetは503。statsVersion競合は既存CONFLICTを保持する。
+
+履歴・全服/テンプレートの日別/統計・操作記録を同一transactionで保存する。確認条件は既存統計Updateへ追加し、同一アイテムのConditionCheckを別に作らない。書込SDKはmaxAttempts=1で自動再送なし。結果不明時は同じ操作キーとbodyで明示再送する。
 ## テンプレート推薦 API (#281)
 
 `GET /wardrobes/:wardrobeId/recommendations/templates?date=YYYY-MM-DD&regionRevision=0&mode=auto`。modeは省略auto、spring/summer/autumn/winter。厳密な実在日と安全整数、未知/重複queryは400。応答前にもJST日・地域版を検査し409 TARGET_DATE_CHANGED/REGION_CHANGEDを返す。
@@ -894,3 +901,5 @@ DTOは契約Q9のwardrobeId/regionRevision/targetDate/mode/status/basis/items。
 入口10秒の共通WeatherBudgetで、META/天気共有状態/全候補のDB読取を合計5秒に収める。SDK maxAttempts=1。ベースQuery全ページ強整合→必要服IDを重複排除し80件/最大4並行BatchGet強整合。候補間の共通服は除去しない。欠落・削除服を含む候補は除外、未処理キー/期限/読取失敗は503。local/Lambdaはtemplate domain、既存IAMのtable Get/Query/BatchGet/Updateを利用する。
 
 テンプレート詳細GETへrevisionを追加。作成1、旧データ0、名前/構成服/タグの内容変更と削除で増加、同内容・統計更新では維持する。同時編集/削除の条件不成立は409 TEMPLATE_CHANGED。
+
+#283 同一操作の競合: 初回の操作照合後に別要求が確定する場合があるため、テンプレート・構成服の事前検証失敗時にも操作を再照合する。既存の成功結果・削除墓標・同キー内容不一致を優先し、成功済み操作を確認版の変化によって新操作へ置き換えない。

@@ -90,7 +90,7 @@ check(
   "作成APIは排他的入力DTO（CreateHistoryRequestDto）をbodyで送る",
   includes("src/api/schemas/history.ts", "export type CreateHistoryRequestDto =") &&
     includes("src/api/endpoints/history.ts", "body: CreateHistoryRequestDto") &&
-    includes("src/api/endpoints/history.ts", "apiClient.post<void, CreateHistoryRequestDto>"),
+    includes("src/api/endpoints/history.ts", "apiClient.post<{ historyId: string }, CreateHistoryRequestDto>"),
   "作成リクエストDTO定義または body 送信実装が不足しています",
 );
 

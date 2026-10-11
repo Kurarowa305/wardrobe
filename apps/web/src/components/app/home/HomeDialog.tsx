@@ -8,11 +8,13 @@ export function HomeDialog({
   children,
   onClose,
   busy = false,
+  hideTitle = false,
 }: {
   title: string;
   children: ReactNode;
   onClose: () => void;
   busy?: boolean;
+  hideTitle?: boolean;
 }) {
   const titleId = useId();
   const panel = useRef<HTMLDivElement>(null);
@@ -75,7 +77,8 @@ export function HomeDialog({
       siblings.forEach((child, index) => {
         child.inert = inert[index];
       });
-      previous?.focus();
+      if (previous?.isConnected) previous.focus();
+      else document.querySelector<HTMLElement>("[data-record-focus-fallback]")?.focus();
     };
   }, []);
   return createPortal(
@@ -89,7 +92,7 @@ export function HomeDialog({
         tabIndex={-1}
         className="grid max-h-[85dvh] w-full max-w-md gap-4 overflow-y-auto rounded-xl bg-white p-5 shadow-xl"
       >
-        <h2 id={titleId} className="text-lg font-semibold">
+        <h2 id={titleId} className={hideTitle ? "sr-only" : "text-lg font-semibold"}>
           {title}
         </h2>
         {children}

@@ -1,3 +1,4 @@
+import { createOperationRepo, operationKey } from "../repo/operationRepo.js";
 import { createDynamoDbClient, type TransactWriteItem } from "../../../clients/dynamodb.js";
 import { createAppError } from "../../../core/errors/index.js";
 import { createClothingBatchGetRepo } from "../../clothing/repo/clothingBatchGetRepo.js";
@@ -14,7 +15,7 @@ import { buildWearDailyKey } from "../stats_write/keys.js";
 import { createWearDailyQueryRepo, type WearDailyLatestBeforeDateResult } from "../stats_write/repo/wearDailyQueryRepo.js";
 import { recomputeLastWornAt } from "../stats_write/recompute/lastWornAt.js";
 
-type HistoryDeleteSource = Pick<HistoryItem, "wardrobeId" | "historyId" | "date" | "templateId" | "clothingIds" | "createdAt">;
+type HistoryDeleteSource = Pick<HistoryItem, "wardrobeId" | "historyId" | "date" | "templateId" | "clothingIds" | "createdAt" | "operationId">;
 
 type TargetStats = {
   wearCount: number;
@@ -254,7 +255,7 @@ export function createDeleteHistoryWithStatsWriteUsecase(
       return extractWearDailyCount(daily);
     });
   const transactWriteItems = dependencies.transactWriteItems
-    ?? ((items: TransactWriteItem[]) => createDynamoDbClient().transactWriteItems({ TransactItems: items }));
+    ?? createOperationRepo().write;
 
   return {
     async delete(input: DeleteHistoryWithStatsWriteInput): Promise<void> {
@@ -366,6 +367,12 @@ export function createDeleteHistoryWithStatsWriteUsecase(
         }),
       ];
 
+      if (history.operationId) deleteAndStatsItems.push({ Update: {
+        Key: operationKey(history.wardrobeId, history.operationId),
+        UpdateExpression: "SET deletedAt = :deletedAt",
+        ConditionExpression: "historyId = :historyId AND attribute_not_exists(deletedAt)",
+        ExpressionAttributeValues: { ":deletedAt": Date.now(), ":historyId": history.historyId },
+      } });
       assertHistoryStatsWriteItemsWithinLimit(deleteAndStatsItems);
       await writeHistoryStatsItems(deleteAndStatsItems, transactWriteItems);
     },

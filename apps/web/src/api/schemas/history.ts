@@ -14,6 +14,7 @@ export type CreateHistoryRequestDto =
   | {
       date: string;
       templateId: string;
+      expectedTemplateRevision?: number;
       clothingIds?: never;
     }
   | {

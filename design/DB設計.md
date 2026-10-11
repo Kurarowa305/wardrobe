@@ -400,6 +400,13 @@ Clothing / Template に内部属性 `statsVersion: Number` を持つ。未付与
 
 UpdateItemはMETA存在とexpectedRevision一致を条件とし、revision=0のみ欠損を許す。名前と作成日時に触れず、地域解除もrevisionを増やす。GETは強整合。モードは保存しない。辞書生成元と固定SHAは `design/調査データ/japan-municipality-274/manifest.json`。
 
+## 履歴操作記録（#283）
+
+`PK=W#<wardrobeId>#HISTORY_OP`, `SK=<小文字UUID>` に正規化payload、historyId、createdAtを履歴と原子的に保存。payloadはdateとtemplateId/expectedTemplateRevision、または整列したclothingIds。TTLなし。履歴にはoperationIdを保持し、削除transactionで操作記録へdeletedAtを付ける。削除済み操作の再送は履歴を復活させない。
+
+同じ操作の並行書込は条件付きPutと既存statsVersion条件で一つだけ成功する。失敗後は強整合で操作結果を照合し、既知の成功なら元IDを返す。旧所有者や同時統計変更を無条件に上書きしない。既存履歴の操作キー欠損はそのまま扱う。
+
+DynamoDBの100項目上限へアプリguardを合わせ、20服テンプレートの作成・削除はそれぞれ44項目（履歴1＋21対象×日別/統計2＋操作1）で成功する。確認時はtemplate ACTIVE/revisionと全服ACTIVEを各統計Updateに組み込み、削除時にはACTIVE条件を追加しない。
 ## テンプレート確認版と推薦 (#281)
 
 TPL本体にrevisionを追加（新規1、既存欠損0）。通常編集は読取版とACTIVEをUpdateItemの条件に含め、内容が変わった場合だけ+1。削除もACTIVE/読取版を条件に+1。同一アイテムの統計は通常編集で書き戻さない。履歴統計更新はrevisionに触れない。確認記録でのrevision条件は#283が既存統計Updateへ組み込む。
