@@ -23,6 +23,10 @@ try {
     revision: 0,
     region: null,
   });
+  for (const query of ["東京都新宿区", "とうきょうと しんじゅく", "東京都　ｼﾝｼﾞｭｸ"]) {
+    assert.equal((await searchRegions(query)).items[0]?.regionId, "abr:lg:131041");
+  }
+  assert.deepEqual((await searchRegions("府中")).items.map(item => item.regionId), ["abr:lg:132063", "abr:lg:342084"]);
   const body = {
     regionId: search.items[0].regionId,
     datasetVersion: search.datasetVersion,
