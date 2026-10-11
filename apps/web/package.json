@@ -92,6 +92,7 @@
     "test:card-thumbnail-layout": "node scripts/check-card-thumbnail-layout-spec.mjs",
     "test:clothing-list-card-genre-icon-removal": "node scripts/check-clothing-list-card-genre-icon-removal-spec.mjs",
     "test:home-runtime": "node scripts/check-home-runtime-spec.mjs",
+    "test:home-ui": "node scripts/check-home-ui-spec.mjs",
     "test:home-dialogs": "node scripts/check-home-dialogs-spec.mjs",
     "test:home-mutations": "node scripts/check-home-mutations-spec.mjs",
     "test:home-msw": "node scripts/check-home-msw-spec.mjs",

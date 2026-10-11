@@ -1,4 +1,5 @@
 "use client";
+import { WeatherIcon } from "../home/WeatherIcon";
 import Link from "next/link";
 import { useConfirmation } from "@/features/record/useConfirmation";
 import { RecordConfirmationDialog } from "@/components/app/home/RecordConfirmationDialog";
@@ -88,7 +89,7 @@ export function HomeTabScreen({
         <div className="flex items-center justify-between gap-2">
           <button
             type="button"
-            className="min-w-0 truncate text-left font-semibold underline"
+            className="min-w-0 truncate text-left text-sm font-normal underline"
             disabled={!home.region.data}
             onClick={() => setRegionOpen(true)}
           >
@@ -125,7 +126,10 @@ export function HomeTabScreen({
           <p>{HOME_STRINGS.messages.weatherRegionRequired}</p>
         ) : weather?.status === "available" ? (
           <>
-            <p>{weatherLabel(weather.daily.weatherCode)}</p>
+            <p className="flex items-center gap-2">
+              <WeatherIcon code={weather.daily.weatherCode} />
+              {weatherLabel(weather.daily.weatherCode)}
+            </p>
             <p className="text-sm">
               {HOME_STRINGS.labels.temperatureRange(
                 temperatureLabel(weather.daily.temperatureMax),
@@ -147,7 +151,7 @@ export function HomeTabScreen({
             type="button"
             aria-pressed={home.mode === mode}
             onClick={() => void home.selectMode(mode)}
-            className={`min-w-0 rounded-md border py-2 text-sm ${home.mode === mode ? "border-slate-900 bg-slate-900 font-semibold text-white" : "border-slate-300 bg-white text-slate-900"}`}
+            className={`min-w-0 rounded-md border py-2 text-sm ${home.mode === mode ? "border-[var(--primary)] bg-[var(--primary)] font-semibold text-white" : "border-slate-300 bg-white text-slate-900"}`}
           >
             {label}
           </button>

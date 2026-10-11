@@ -39,7 +39,7 @@ export function WeatherSources() {
         href="https://open-meteo.com/"
         aria-label={HOME_STRINGS.dialogs.sources.labels.trigger}
         aria-haspopup="dialog"
-        className="ml-auto flex h-8 w-8 items-center justify-center rounded-full border text-sm"
+        className="ml-auto flex h-8 w-8 items-center justify-center text-sm"
         onClick={(event) => {
           if (
             event.button === 0 &&
