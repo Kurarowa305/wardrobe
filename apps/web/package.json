@@ -34,9 +34,6 @@
     "test:home-header-wardrobe-title": "node scripts/check-home-header-wardrobe-title-spec.mjs",
     "test:cursor-auto-load": "node scripts/check-cursor-auto-load-spec.mjs",
     "test:home-history-card-presentation": "node scripts/check-home-history-card-presentation-spec.mjs",
-    "test:home-recent-history-heading-icon": "node scripts/check-home-recent-history-heading-icon-spec.mjs",
-    "test:home-recent-histories-hook": "node scripts/check-home-recent-histories-hook-spec.mjs",
-    "test:home-clothing-recommendations": "node scripts/check-home-clothing-recommendations-spec.mjs",
     "test:template-fixtures": "node scripts/check-template-fixtures-spec.mjs",
     "test:template-api-client": "node scripts/check-template-api-client-spec.mjs",
     "test:template-msw-handlers": "node scripts/check-template-msw-handlers-spec.mjs",
@@ -93,7 +90,11 @@
     "test:operation-toast": "node scripts/check-operation-toast-spec.mjs",
     "test:custom-delete-dialog": "node scripts/check-custom-delete-dialog-spec.mjs",
     "test:card-thumbnail-layout": "node scripts/check-card-thumbnail-layout-spec.mjs",
-    "test:clothing-list-card-genre-icon-removal": "node scripts/check-clothing-list-card-genre-icon-removal-spec.mjs"
+    "test:clothing-list-card-genre-icon-removal": "node scripts/check-clothing-list-card-genre-icon-removal-spec.mjs",
+    "test:home-runtime": "node scripts/check-home-runtime-spec.mjs",
+    "test:home-dialogs": "node scripts/check-home-dialogs-spec.mjs",
+    "test:home-mutations": "node scripts/check-home-mutations-spec.mjs",
+    "test:home-msw": "node scripts/check-home-msw-spec.mjs"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.4",
@@ -112,7 +113,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "jsdom": "^30.1.2",
+    "jsdom": "^26.1.0",
     "msw": "^2.12.10",
     "tailwindcss": "^4",
     "typescript": "^5"

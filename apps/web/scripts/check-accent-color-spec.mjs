@@ -41,11 +41,11 @@ const checks = [
       "globals.css に a の color 上書きが残っており、text-white を打ち消す可能性があります",
   },
   {
-    name: "対象導線が現行仕様の default Button（非太字）を利用している",
+    name: "ホームの白背景・枠線と既存導線の default Button を保持する",
     ok:
-      includes(
+      includesNormalized(
         "src/components/app/screens/HomeTabScreen.tsx",
-        '<Button asChild className="w-full justify-start text-left text-base text-white">',
+        '<Button asChild variant="outline" className="w-full border bg-white">',
       ) &&
       excludesNormalized(
         "src/components/app/screens/HomeTabScreen.tsx",

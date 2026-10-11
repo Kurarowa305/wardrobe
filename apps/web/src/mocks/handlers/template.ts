@@ -26,6 +26,9 @@ const TEMPLATE_ID_PREFIX = "tp_mock_";
 let mockTemplateIdSequence = 1;
 let templateStore = initializeTemplateStore();
 
+// Shared mock state lets home recommendations reflect template create/edit/delete.
+export function getMockTemplates() { return templateStore; }
+
 function initializeTemplateStore(): TemplateRecord[] {
   return templateDetailFixtures.map((fixture) => ({
     templateId: fixture.templateId,

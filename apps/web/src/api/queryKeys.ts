@@ -65,7 +65,7 @@ const imageScope = (wardrobeId: string) => wardrobeScope("image", wardrobeId);
 
 export const queryKeys = {
   regions: { search: (datasetVersion: string, normalizedSearch: string) => ["regions", datasetVersion, normalizedSearch] as const },
-  weather: { detail: (wardrobeId: string, regionRevision: number, targetDate: string) => ["weather", wardrobeId, regionRevision, targetDate] as const },
+  weather: { byWardrobe: (wardrobeId: string) => ["weather", wardrobeId] as const, detail: (wardrobeId: string, regionRevision: number, targetDate: string) => ["weather", wardrobeId, regionRevision, targetDate] as const },
   wardrobe: {
     region: (wardrobeId: string) => ["wardrobe", wardrobeId, "region"] as const,
     all: ["wardrobe"] as const,
