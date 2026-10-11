@@ -97,7 +97,7 @@ check(
   "create/delete mutation が history/clothing/template を invalidate する",
   includes(target, "mutationFn: (body: CreateHistoryRequestDto) => createHistory(wardrobeId, body),") &&
     includes(target, "mutationFn: () => deleteHistory(wardrobeId, historyId),") &&
-    includes(target, "await invalidateHistoryQueries(queryClient, wardrobeId);") &&
+    includes(target, "await invalidateHistoryQueries(queryClient, wardrobeId, true);") &&
     includes(target, "queryKey: queryKeys.history.byWardrobe(wardrobeId),") &&
     includes(target, "queryKey: queryKeys.clothing.byWardrobe(wardrobeId),") &&
     includes(target, "queryKey: queryKeys.template.byWardrobe(wardrobeId),"),

@@ -4,7 +4,26 @@
 
 2026-10-11、[#276](https://github.com/Kurarowa305/wardrobe/issues/276)で[query keyと状態遷移](タスク設計/地域天気テンプレート推薦_API契約と状態管理判断.md)を確定した。天気キーはwardrobe・地域revision・JST対象日、推薦キーはさらにmodeを含む。履歴・テンプレート・構成服の更新成功後は同wardrobeの全モード推薦を無効化し、更新前の応答を現在表示へ採用しない。
 
-手動モードを保存・復元せず、ホーム再入場・復帰・地域変更成功・跨日・記録成功後は自動へ戻す。確認中の記録日入力は跨日でも維持する。天気の当日キャッシュは推薦と独立し、記録後も再利用する。新しい地域・天気・推薦queryのretryは0とし、#282で本契約を実装して以下の詳細へ統合する。
+手動モードを保存・復元せず、ホーム再入場・復帰・地域変更成功・跨日・記録成功後は自動へ戻す。確認中の記録日入力は跨日でも維持する。天気の当日キャッシュは推薦と独立し、記録後も再利用する。新しい地域・天気・推薦queryのretryは0。#282では以下の取得境界で制御する。
+
+### #282 Webの取得境界
+
+`useHome`はホーム表示中の`HomeController`を生成する。`fetchQuery`がサーバーデータを保存し、controllerの公開操作（入場・モード選択・地域保存・明示再取得）が要求世代と表示状態を管理する。ホームは旧履歴・服推薦hookを呼ばない。
+
+| 用途 | query key |
+| --- | --- |
+| 明示地域検索の成功結果 | `['regions', datasetVersion, normalizedSearch]` |
+| 保存地域 | `['wardrobe', wardrobeId, 'region']` |
+| 天気 | `['weather', wardrobeId, regionRevision, targetDate]` |
+| 推薦 | `['template', wardrobeId, 'recommendation', mode, regionRevision, targetDate]` |
+
+- 取得をイベントで制御し、focus/reconnect/intervalの自動取得とretryを無効にする。地域検索は`features/home/useRegionDialog`が成功responseの辞書版でquery cacheへ保存し、明示検索自体は毎回送信する。地域保存の失敗理由と競合時の読直しも同hookで扱い、ダイアログはUI操作と表示を担う。
+- 成功した天気は`expiresAt`とJST対象日を明示検査してcacheから再利用する。queryの暗黙stale判定で再送しない。失敗・未設定は成功天気cacheと混同しない。
+- 各要求にAbortSignalを渡し、表示反映前にwardrobe・regionRevision・JST日・mode・要求世代を照合する。モード切替、地域変更、跨日、更新前の結果をplaceholderに使わない。
+- JST翌00:00のタイマー、visibility復帰・BFCache復帰、送信前/応答時の日付検査を併用する。React再描画、ダイアログ開閉だけではモードを消さない。離脱時は進行中要求を中断する。
+- `REGION_CHANGED`/`TARGET_DATE_CHANGED`の409では地域を読み直し、新コンテキストを取得する。同じ古いコンテキストでの409ループを抑止し、明示再取得を案内する。
+- `invalidateRecommendations`はQueryClient/wardrobe単位の購読へ世代変更を通知し、全モードprefixの進行中要求をcancel、無効化、その後表示中controllerへ再取得を通知する。履歴作成/削除、template作成/編集/削除、構成服編集/削除の全既存mutation hookに接続する。天気cacheは無効化しない。
+- 記録成功フラグと推薦エラーを分離し、「記録しました。おすすめの更新に失敗しました」を表示可能にする。#283は成功通知とダイアログをこの境界へ接続する。
 
 ## 1. 目的
 
@@ -312,7 +331,7 @@ query再取得
 
 | 画面       | 利用Query                          |
 | -------- | -------------------------------- |
-| ホーム      | WardrobeDetail / RecentHistories |
+| ホーム      | WardrobeDetail / Region / Weather / TemplateRecommendations |
 | 履歴一覧     | HistoryList                      |
 | 履歴詳細     | HistoryDetail                    |
 | テンプレート一覧 | TemplateList                     |

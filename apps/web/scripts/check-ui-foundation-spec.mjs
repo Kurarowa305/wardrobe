@@ -135,7 +135,8 @@ check(
   "ホーム画面で wardrobeId query を解決しつつ、共通トーストクエリを判定して表示後にURLを正規化する",
   includes("src/app/home/page.tsx", "useWardrobeIdFromQuery") &&
     includes("src/app/home/page.tsx", "<Suspense") &&
-    includes("src/components/app/screens/HomeTabScreen.tsx", "consumeOperationToast(window.location.search)") &&
+    includes("src/components/app/screens/HomeTabScreen.tsx", "consumeOperationToast(") &&
+    includes("src/components/app/screens/HomeTabScreen.tsx", "window.location.search") &&
     includes("src/components/app/screens/HomeTabScreen.tsx", "OPERATION_TOAST_IDS.wardrobeCreated") &&
     includes("src/components/app/screens/HomeTabScreen.tsx", "HOME_STRINGS.toasts.wardrobeCreated") &&
     includes("src/components/app/screens/HomeTabScreen.tsx", "window.history.replaceState"),
@@ -156,7 +157,7 @@ check(
           : file.endsWith("TemplatesTabScreen.tsx")
             ? source.includes("TEMPLATE_STRINGS.list.actions.add")
             : file.endsWith("HomeTabScreen.tsx")
-              ? source.includes("HOME_STRINGS.sections.recentWeekHistories") && source.includes("useRecentHistories")
+              ? source.includes("useHome") && source.includes("RecommendationCard")
               : file.endsWith("RecordMethodScreen.tsx")
                 ? source.includes("RECORD_STRINGS.method.descriptions.byTemplate") &&
                   source.includes("RECORD_STRINGS.method.descriptions.byCombination")

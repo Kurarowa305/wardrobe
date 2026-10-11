@@ -1,158 +1,240 @@
 "use client";
-
 import Link from "next/link";
-import { createElement, useEffect, useRef } from "react";
-
-import { useClothingRecommendations } from "@/api/hooks/clothing";
-import { useRecentHistories } from "@/api/hooks/history";
+import { useRouter } from "next/navigation";
+import { createElement, useEffect, useRef, useState } from "react";
+import { useHome } from "@/api/hooks/home";
 import { useWardrobeDetail } from "@/api/hooks/wardrobe";
-import { SharedHistoryCard } from "@/components/app/history/HistoryCard";
-import { ClothingListCard } from "@/components/app/screens/ClothingListCard";
-import { TabBarIcon } from "@/components/ui/tab-bar-icon";
+import type { RecommendedTemplate } from "@/api/schemas/home";
+import { RegionDialog } from "@/components/app/home/RegionDialog";
+import { WeatherSources } from "@/components/app/home/WeatherSources";
+import { RecommendationCard } from "@/components/app/home/RecommendationCard";
 import { AppLayout } from "@/components/app/layout/AppLayout";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { ROUTES } from "@/constants/routes";
-import { CLOTHING_GENRE_LABELS } from "@/features/clothing/genre";
 import { HOME_STRINGS } from "@/features/home/strings";
-import { OPERATION_TOAST_IDS, consumeOperationToast } from "@/features/toast/operationToast";
+import { weatherLabel, temperatureLabel } from "@/features/home/presentation";
+import {
+  OPERATION_TOAST_IDS,
+  consumeOperationToast,
+} from "@/features/toast/operationToast";
 type HomeTabScreenProps = {
   wardrobeId: string;
+  /** #283 replaces the existing recording route with the confirmation dialog at this seam. */
+  onRecordTemplate?: (item: RecommendedTemplate) => void;
 };
-
-const HOME_RECENT_HISTORY_LIMIT = 7;
-
-export function HomeTabScreen({ wardrobeId }: HomeTabScreenProps) {
+const modes = HOME_STRINGS.labels.modes;
+export function HomeTabScreen({
+  wardrobeId,
+  onRecordTemplate,
+}: HomeTabScreenProps) {
   const { toast } = useToast();
+  const router = useRouter();
   const hasShownToastRef = useRef(false);
   const wardrobeQuery = useWardrobeDetail(wardrobeId);
-  const clothingRecommendationsQuery = useClothingRecommendations(wardrobeId);
-  const recentHistoriesQuery = useRecentHistories(wardrobeId, HOME_RECENT_HISTORY_LIMIT);
-
+  const home = useHome(wardrobeId);
+  const [regionOpen, setRegionOpen] = useState(false);
   useEffect(() => {
     if (hasShownToastRef.current || typeof window === "undefined") {
       return;
     }
 
-    const { toastId, nextSearch } = consumeOperationToast(window.location.search);
+    const { toastId, nextSearch } = consumeOperationToast(
+      window.location.search,
+    );
 
     if (toastId === OPERATION_TOAST_IDS.wardrobeCreated) {
       hasShownToastRef.current = true;
       toast({ title: HOME_STRINGS.toasts.wardrobeCreated.title });
-      window.history.replaceState(window.history.state, "", `${window.location.pathname}${nextSearch}`);
+      window.history.replaceState(
+        window.history.state,
+        "",
+        `${window.location.pathname}${nextSearch}`,
+      );
       return;
     }
 
     if (toastId === OPERATION_TOAST_IDS.historyCreated) {
       hasShownToastRef.current = true;
       toast({ title: HOME_STRINGS.toasts.historyCreated.title });
-      window.history.replaceState(window.history.state, "", `${window.location.pathname}${nextSearch}`);
+      window.history.replaceState(
+        window.history.state,
+        "",
+        `${window.location.pathname}${nextSearch}`,
+      );
       return;
     }
 
     if (toastId === OPERATION_TOAST_IDS.historyDeleted) {
       hasShownToastRef.current = true;
       toast({ title: HOME_STRINGS.toasts.historyDeleted.title });
-      window.history.replaceState(window.history.state, "", `${window.location.pathname}${nextSearch}`);
+      window.history.replaceState(
+        window.history.state,
+        "",
+        `${window.location.pathname}${nextSearch}`,
+      );
     }
   }, [toast, wardrobeId]);
 
+  const weather = home.weather.data;
+  const recommendations = home.recommendations.data;
   const content = (
     <div className="grid gap-4">
-      <Button asChild className="w-full justify-start text-left text-base text-white">
-        <Link href={ROUTES.recordMethod(wardrobeId)}>{HOME_STRINGS.actions.addRecord}</Link>
-      </Button>
-
-      <section className="grid gap-2" aria-labelledby="home-clothing-recommendations-heading">
-        <h2
-          id="home-clothing-recommendations-heading"
-          className="m-0 flex items-center gap-2 text-sm font-semibold text-slate-900"
-        >
-          <TabBarIcon icon="clothings" active={false} strokeColor="#000000" className="h-5 w-5" />
-          <span>{HOME_STRINGS.sections.clothingRecommendations}</span>
-          {clothingRecommendationsQuery.data ? (
-            <span className="text-xs font-medium text-slate-500">
-              {HOME_STRINGS.seasons[clothingRecommendationsQuery.data.season]}のおすすめ
-            </span>
-          ) : null}
-        </h2>
-
-        {clothingRecommendationsQuery.isPending ? (
-          <p className="m-0 text-sm text-slate-600">{HOME_STRINGS.messages.loadingClothingRecommendations}</p>
+      <section
+        aria-label={HOME_STRINGS.labels.weather}
+        className="grid gap-2 rounded-lg border border-slate-200 bg-white p-3"
+      >
+        <div className="flex items-center justify-between gap-2">
+          <button
+            type="button"
+            className="min-w-0 truncate text-left font-semibold underline"
+            disabled={!home.region.data}
+            onClick={() => setRegionOpen(true)}
+          >
+            {home.region.data?.region?.label ??
+              HOME_STRINGS.dialogs.region.title}
+          </button>
+          <time className="shrink-0 text-xs text-slate-600">
+            {home.targetDate}
+          </time>
+        </div>
+        {home.region.status === "error" ? (
+          <p role="alert">
+            {HOME_STRINGS.messages.regionFailed}
+            <button className="underline" onClick={() => void home.refresh()}>
+              {HOME_STRINGS.actions.refresh}
+            </button>
+          </p>
         ) : null}
-
-        {clothingRecommendationsQuery.isError ? (
-          <p className="m-0 text-sm text-red-700">{HOME_STRINGS.messages.errorClothingRecommendations}</p>
-        ) : null}
-
-        {clothingRecommendationsQuery.data
-          && clothingRecommendationsQuery.data.items.tops.length === 0
-          && clothingRecommendationsQuery.data.items.bottoms.length === 0 ? (
-            <p className="m-0 text-sm text-slate-600">{HOME_STRINGS.messages.emptyClothingRecommendations}</p>
-          ) : null}
-
-        {clothingRecommendationsQuery.data
-          && (
-            clothingRecommendationsQuery.data.items.tops.length > 0
-            || clothingRecommendationsQuery.data.items.bottoms.length > 0
-          ) ? (
-            <div className="grid gap-3">
-              {(["tops", "bottoms"] as const).map((genre) => (
-                <section key={genre} className="grid gap-2">
-                  <h3 className="m-0 text-sm font-semibold text-slate-900">{CLOTHING_GENRE_LABELS[genre]}</h3>
-                  {clothingRecommendationsQuery.data.items[genre].length > 0 ? (
-                    <div className="grid gap-2">
-                      {clothingRecommendationsQuery.data.items[genre].map((item) => (
-                        <ClothingListCard key={item.clothingId} item={item} />
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="m-0 text-sm text-slate-600">{HOME_STRINGS.messages.emptyClothingRecommendationGenre}</p>
-                  )}
-                </section>
-              ))}
-            </div>
-          ) : null}
-      </section>
-
-      <section className="grid gap-2" aria-labelledby="home-recent-histories-heading">
-        <h2
-          id="home-recent-histories-heading"
-          className="m-0 flex items-center gap-2 text-sm font-semibold text-slate-900"
-        >
-          <TabBarIcon icon="histories" active={false} strokeColor="#000000" className="h-5 w-5" />
-          <span>{HOME_STRINGS.sections.recentWeekHistories}</span>
-        </h2>
-
-        {recentHistoriesQuery.isPending ? (
-          <p className="m-0 text-sm text-slate-600">{HOME_STRINGS.messages.loadingRecentHistories}</p>
-        ) : null}
-
-        {recentHistoriesQuery.isError ? (
-          <p className="m-0 text-sm text-red-700">{HOME_STRINGS.messages.errorRecentHistories}</p>
-        ) : null}
-
-        {recentHistoriesQuery.data && recentHistoriesQuery.data.items.length === 0 ? (
-          <p className="m-0 text-sm text-slate-600">{HOME_STRINGS.messages.emptyRecentHistories}</p>
-        ) : null}
-
-        {recentHistoriesQuery.data && recentHistoriesQuery.data.items.length > 0 ? (
+        {home.weather.status === "loading" ? (
+          <p role="status">{HOME_STRINGS.messages.weatherLoading}</p>
+        ) : home.weather.status === "error" ||
+          weather?.status === "unavailable" ? (
+          <p role="status">
+            {HOME_STRINGS.messages.weatherFailed}
+            <button
+              type="button"
+              className="underline"
+              onClick={() => void home.retryWeather()}
+            >
+              {HOME_STRINGS.actions.retryWeather}
+            </button>
+          </p>
+        ) : weather?.status === "region_required" ? (
+          <p>{HOME_STRINGS.messages.weatherRegionRequired}</p>
+        ) : weather?.status === "available" ? (
           <>
-            <ul className="m-0 grid list-none gap-2 p-0">
-              {recentHistoriesQuery.data.items.map((item) => (
-                <SharedHistoryCard key={item.historyId} wardrobeId={wardrobeId} item={item} from="home" />
-              ))}
-            </ul>
+            <p>{weatherLabel(weather.daily.weatherCode)}</p>
+            <p className="text-sm">
+              {HOME_STRINGS.labels.temperatureRange(
+                temperatureLabel(weather.daily.temperatureMax),
+                temperatureLabel(weather.daily.temperatureMin),
+              )}
+            </p>
           </>
         ) : null}
+        <WeatherSources />
       </section>
-
-      <Button asChild variant="outline" className="w-full justify-start text-left text-sm font-medium">
-        <Link href={ROUTES.histories(wardrobeId)}>{HOME_STRINGS.actions.viewAllHistories}</Link>
+      <div
+        className="grid grid-cols-5 gap-1"
+        role="group"
+        aria-label={HOME_STRINGS.labels.recommendationMode}
+      >
+        {modes.map(([mode, label]) => (
+          <button
+            key={mode}
+            type="button"
+            aria-pressed={home.mode === mode}
+            onClick={() => void home.selectMode(mode)}
+            className={`min-w-0 rounded-md border py-2 text-sm ${home.mode === mode ? "border-slate-900 bg-slate-900 font-semibold text-white" : "border-slate-300 bg-white text-slate-900"}`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+      <section
+        className="grid gap-2"
+        aria-label={HOME_STRINGS.labels.recommendations}
+        aria-live="polite"
+        aria-busy={home.recommendations.status === "loading"}
+      >
+        <h2 className="text-sm font-semibold">
+          {HOME_STRINGS.labels.recommendations}
+        </h2>
+        {home.recommendations.status === "loading" ? (
+          <p>{HOME_STRINGS.messages.recommendationsLoading}</p>
+        ) : home.recommendations.status === "error" ? (
+          <p role="alert">
+            {home.recorded
+              ? HOME_STRINGS.messages.recordedRecommendationsFailed
+              : HOME_STRINGS.messages.recommendationsFailed}
+            <button
+              type="button"
+              className="underline"
+              onClick={() => void home.retryRecommendations()}
+            >
+              {HOME_STRINGS.actions.retryRecommendations}
+            </button>
+          </p>
+        ) : recommendations?.status === "region_required" ? (
+          <p>{HOME_STRINGS.messages.regionRequired}</p>
+        ) : recommendations?.status === "weather_required" ? (
+          <p>{HOME_STRINGS.messages.weatherRequired}</p>
+        ) : recommendations?.status === "empty" ? (
+          <p>{HOME_STRINGS.messages.recommendationsEmpty}</p>
+        ) : recommendations?.status === "ready" ? (
+          <>
+            <ul className="m-0 grid list-none gap-2 p-0">
+              {recommendations.items.slice(0, 3).map((item) => (
+                <li key={item.templateId}>
+                  <RecommendationCard
+                    item={item}
+                    onClick={() =>
+                      onRecordTemplate
+                        ? onRecordTemplate(item)
+                        : router.push(ROUTES.recordByTemplate(wardrobeId))
+                    }
+                  />
+                </li>
+              ))}
+            </ul>
+            {recommendations.items.length < 3 ? (
+              <p className="text-sm text-slate-600">
+                {HOME_STRINGS.messages.recommendationsShort(
+                  recommendations.items.length,
+                )}
+              </p>
+            ) : null}
+          </>
+        ) : null}
+        {recommendations &&
+        (recommendations.status === "empty" ||
+          (recommendations.status === "ready" &&
+            recommendations.items.length < 3)) ? (
+          <Link
+            className="text-sm underline"
+            href={ROUTES.templates(wardrobeId)}
+          >
+            {HOME_STRINGS.actions.viewTemplates}
+          </Link>
+        ) : null}
+      </section>
+      <Button asChild variant="outline" className="w-full border bg-white">
+        <Link href={ROUTES.recordMethod(wardrobeId)}>
+          {HOME_STRINGS.actions.addRecord}
+        </Link>
       </Button>
+      {regionOpen && home.region.data ? (
+        <RegionDialog
+          key={wardrobeId}
+          wardrobeId={wardrobeId}
+          current={home.region.data}
+          onSaved={(region) => void home.regionSaved(region)}
+          onClose={() => setRegionOpen(false)}
+        />
+      ) : null}
     </div>
   );
-
   return createElement(AppLayout, {
     title: wardrobeQuery.data?.name ?? "",
     tabKey: "home",

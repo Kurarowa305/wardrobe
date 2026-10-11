@@ -64,7 +64,10 @@ const historyDetailScope = (wardrobeId: string) => [...historyScope(wardrobeId),
 const imageScope = (wardrobeId: string) => wardrobeScope("image", wardrobeId);
 
 export const queryKeys = {
+  regions: { search: (datasetVersion: string, normalizedSearch: string) => ["regions", datasetVersion, normalizedSearch] as const },
+  weather: { byWardrobe: (wardrobeId: string) => ["weather", wardrobeId] as const, detail: (wardrobeId: string, regionRevision: number, targetDate: string) => ["weather", wardrobeId, regionRevision, targetDate] as const },
   wardrobe: {
+    region: (wardrobeId: string) => ["wardrobe", wardrobeId, "region"] as const,
     all: ["wardrobe"] as const,
     detail: (wardrobeId: string) => ["wardrobe", wardrobeId, "detail"] as const,
   },
@@ -80,6 +83,8 @@ export const queryKeys = {
     recommendation: (wardrobeId: string) => [...clothingScope(wardrobeId), "recommendation"] as const,
   },
   template: {
+    recommendations: (wardrobeId: string) => [...templateScope(wardrobeId), "recommendation"] as const,
+    recommendation: (wardrobeId: string, mode: string, regionRevision: number, targetDate: string) => [...templateScope(wardrobeId), "recommendation", mode, regionRevision, targetDate] as const,
     all: ["template"] as const,
     byWardrobe: (wardrobeId: string) => templateScope(wardrobeId),
     lists: (wardrobeId: string) => templateListScope(wardrobeId),

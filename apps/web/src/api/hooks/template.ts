@@ -1,3 +1,4 @@
+import { invalidateRecommendations } from "@/features/home/invalidation";
 import type { QueryClient } from "@tanstack/react-query";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -23,6 +24,7 @@ type TemplateIdentity = {
 };
 
 async function invalidateTemplateListQueries(queryClient: QueryClient, wardrobeId: string) {
+  await invalidateRecommendations(queryClient, wardrobeId);
   await queryClient.invalidateQueries({
     queryKey: queryKeys.template.lists(wardrobeId),
   });
@@ -32,6 +34,7 @@ async function invalidateTemplateRelatedQueries(
   queryClient: QueryClient,
   { wardrobeId, templateId }: TemplateIdentity,
 ) {
+  await invalidateRecommendations(queryClient, wardrobeId);
   await Promise.all([
     queryClient.invalidateQueries({
       queryKey: queryKeys.template.detail(wardrobeId, templateId),

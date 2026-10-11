@@ -35,10 +35,10 @@ const homeTarget = "src/components/app/screens/HomeTabScreen.tsx";
 
 check(
   "HHCP-01",
-  "ホーム画面が履歴一覧と共通の履歴カードコンポーネントを利用する",
-  includes(homeTarget, 'import { SharedHistoryCard } from "@/components/app/history/HistoryCard";') &&
-    includes(homeTarget, '<SharedHistoryCard key={item.historyId} wardrobeId={wardrobeId} item={item} from="home" />'),
-  "ホーム画面で共通履歴カードコンポーネントの利用が不足しています",
+  "ホームは履歴表示を撤去し、履歴一覧に共通カードを保持する",
+  !includes(homeTarget, "SharedHistoryCard") &&
+    includes("src/components/app/screens/HistoriesTabScreen.tsx", "SharedHistoryCard"),
+  "ホーム撤去または履歴一覧の共通カードが期待と異なります",
 );
 
 check(

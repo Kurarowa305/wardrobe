@@ -1,3 +1,4 @@
+import { invalidateRecommendations } from "@/features/home/invalidation";
 import type { QueryClient } from "@tanstack/react-query";
 import { useQuery } from "@tanstack/react-query";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -39,6 +40,7 @@ async function invalidateClothingRelatedQueries(
   queryClient: QueryClient,
   { wardrobeId, clothingId }: ClothingIdentity,
 ) {
+  await invalidateRecommendations(queryClient, wardrobeId);
   await Promise.all([
     queryClient.invalidateQueries({
       queryKey: queryKeys.clothing.detail(wardrobeId, clothingId),
