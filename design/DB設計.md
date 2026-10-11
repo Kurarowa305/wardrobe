@@ -399,3 +399,9 @@ Clothing / Template に内部属性 `statsVersion: Number` を持つ。未付与
 `PK=W#<wardrobeId>, SK=META` に `regionRevision` と `region` を追加する。属性欠損は0/null。`region` はregionId/label/datasetVersion/source=abr/lgCode/pref/county/city/ward/latitude/longitude/sourceSrid=EPSG:6668/coordinatePolicy=jgd2011-as-wgs84-for-weather/timezone=Asia/Tokyo。緯度経度は固定辞書で再解決し、クライアント入力を採用しない。
 
 UpdateItemはMETA存在とexpectedRevision一致を条件とし、revision=0のみ欠損を許す。名前と作成日時に触れず、地域解除もrevisionを増やす。GETは強整合。モードは保存しない。辞書生成元と固定SHAは `design/調査データ/japan-municipality-274/manifest.json`。
+
+## テンプレート確認版と推薦 (#281)
+
+TPL本体にrevisionを追加（新規1、既存欠損0）。通常編集は読取版とACTIVEをUpdateItemの条件に含め、内容が変わった場合だけ+1。削除もACTIVE/読取版を条件に+1。同一アイテムの統計は通常編集で書き戻さない。履歴統計更新はrevisionに触れない。確認記録でのrevision条件は#283が既存統計Updateへ組み込む。
+
+推薦は `PK=W#<wardrobeId>#TPL` の全ページ強整合Queryを使い、季節内ACTIVE候補に必要な `PK=W#<wardrobeId>#CLOTH,SK=CLOTH#<clothingId>` を強整合BatchGetする。新GSI/集計itemなし。完了済み更新を反映するが読取中の全体スナップショットは保証しない。

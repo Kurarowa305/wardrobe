@@ -42,6 +42,12 @@ jobs:
           pnpm --filter api test:region
           pnpm --filter api test:region-web
 
+      - name: Template recommendation and revision contracts
+        run: |
+          pnpm --filter api test:template-recommendations
+          pnpm --filter api test:template-revision
+          pnpm --filter api test:template-revision-web
+
       - name: Lint
         run: pnpm -r --if-present run lint
 

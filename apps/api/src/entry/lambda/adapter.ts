@@ -1,3 +1,4 @@
+import { getTemplateRecommendationsHandler } from "../../domains/template/recommendations/handler.js";
 import { getWeatherHandler } from '../../domains/weather/handler.js';
 import { searchRegionsHandler, getWardrobeRegionHandler, saveWardrobeRegionHandler } from "../../domains/region/handlers/regionHandlers.js";
 import { createAppError, isErrorCode, type ErrorCode } from "../../core/errors/index.js";
@@ -142,6 +143,7 @@ export const sharedDomainHandlers: Record<LocalDomain, LocalRouteHandler> = {
     return createDefaultDomainHandler("clothing")(request);
   },
   template(request) {
+    if (request.method === "GET" && request.pathname === `/wardrobes/${request.path.wardrobeId}/recommendations/templates`) return getTemplateRecommendationsHandler(request);
     if (request.method === "POST" && request.pathname === `/wardrobes/${request.path.wardrobeId}/templates`) {
       return createTemplateHandler({
         path: request.path,

@@ -104,7 +104,7 @@ const checks = [
     name: "repo update rewrites clothingIds without overwriting statistics in one UpdateItem",
     ok:
       updateResult.operation === "UpdateItem" &&
-      updateResult.request.input.ConditionExpression === "attribute_exists(PK)" &&
+      updateResult.request.input.ConditionExpression === "attribute_exists(PK) AND #status = :active AND (attribute_not_exists(#revision) OR #revision = :expectedRevision)" &&
       updateResult.request.input.ReturnValues === "ALL_NEW" &&
       updateResult.request.input.UpdateExpression.includes("clothingIds = :clothingIds") &&
       updateResult.request.input.UpdateExpression.includes("statusListPk = :statusListPk") &&
@@ -118,7 +118,7 @@ const checks = [
     name: "repo delete performs logical deletion by switching status, deletedAt, and statusListPk",
     ok:
       deleteResult.operation === "UpdateItem" &&
-      deleteResult.request.input.UpdateExpression === "SET #status = :status, deletedAt = :deletedAt, statusListPk = :statusListPk" &&
+      deleteResult.request.input.UpdateExpression === "SET #status = :status, deletedAt = :deletedAt, statusListPk = :statusListPk, #revision = :revision" &&
       deleteResult.request.input.ExpressionAttributeValues[":status"] === "DELETED" &&
       deleteResult.request.input.ExpressionAttributeValues[":deletedAt"] === 1735800000000 &&
       deleteResult.request.input.ExpressionAttributeValues[":statusListPk"] === "W#wd_01HZZAAA#TPL#DELETED",

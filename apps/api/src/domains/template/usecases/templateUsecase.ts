@@ -82,6 +82,7 @@ type TemplateListQueryResult = {
 };
 
 type TemplateDetailItem = {
+  revision: number;
   templateId: string;
   name: string;
   status: "ACTIVE" | "DELETED";
@@ -129,6 +130,7 @@ function extractTemplateItemFromGetResult(result: unknown): TemplateDetailItem |
   const templateCandidate = candidate as Record<string, unknown>;
 
   return {
+    revision: candidate.revision ?? 0,
     templateId: candidate.templateId,
     name: candidate.name,
     status: isTemplateStatus(templateCandidate.status) ? templateCandidate.status : "ACTIVE",
@@ -406,7 +408,13 @@ export function createTemplateUsecase(dependencies: TemplateUsecaseDependencies 
         }
       }
 
-      await repo.update({
+      const changed = (input.name ?? currentTemplate.name) !== currentTemplate.name
+        || JSON.stringify(nextClothingIds) !== JSON.stringify(currentTemplate.clothingIds)
+        || JSON.stringify([...(input.tagIds ?? currentTemplate.tagIds)].sort()) !== JSON.stringify([...currentTemplate.tagIds].sort());
+      if (changed && currentTemplate.revision >= Number.MAX_SAFE_INTEGER) throw createAppError("CONFLICT");
+      try { await repo.update({
+        expectedRevision: currentTemplate.revision,
+        revision: currentTemplate.revision + (changed ? 1 : 0),
         wardrobeId: input.wardrobeId,
         templateId: input.templateId,
         name: input.name ?? currentTemplate.name,
@@ -417,7 +425,10 @@ export function createTemplateUsecase(dependencies: TemplateUsecaseDependencies 
         lastWornAt: currentTemplate.lastWornAt,
         createdAt: currentTemplate.createdAt,
         deletedAt: currentTemplate.deletedAt,
-      });
+      }); } catch (error) {
+        if (error instanceof Error && error.name === "ConditionalCheckFailedException") throw createAppError("CONFLICT", {details:{reason:"TEMPLATE_CHANGED"}});
+        throw error;
+      }
     },
     async delete(input: DeleteTemplateUsecaseInput): Promise<void> {
       const currentTemplate = extractTemplateItemFromGetResult(await repo.get({
@@ -436,11 +447,16 @@ export function createTemplateUsecase(dependencies: TemplateUsecaseDependencies 
         });
       }
 
-      await repo.delete({
+      if (currentTemplate.revision >= Number.MAX_SAFE_INTEGER) throw createAppError("CONFLICT");
+      try { await repo.delete({
+        expectedRevision: currentTemplate.revision,
         wardrobeId: input.wardrobeId,
         templateId: input.templateId,
         deletedAt: now(),
-      });
+      }); } catch (error) {
+        if (error instanceof Error && error.name === "ConditionalCheckFailedException") throw createAppError("CONFLICT", {details:{reason:"TEMPLATE_CHANGED"}});
+        throw error;
+      }
     },
     async get(input: GetTemplateUsecaseInput): Promise<GetTemplateUsecaseOutput> {
       const templateItem = extractTemplateItemFromGetResult(await repo.get({
@@ -466,6 +482,7 @@ export function createTemplateUsecase(dependencies: TemplateUsecaseDependencies 
       const clothingMap = new Map(clothingItems.map((item) => [item.clothingId, item]));
 
       return {
+        revision: templateItem.revision,
         name: templateItem.name,
         tagIds: templateItem.tagIds,
         status: templateItem.status,

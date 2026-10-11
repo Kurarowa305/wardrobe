@@ -21,9 +21,9 @@ export type TemplateItem = TemplateEntity & {
 };
 
 export type CreateTemplateInput = TemplateEntity;
-export type UpdateTemplateInput = TemplateEntity;
+export type UpdateTemplateInput = TemplateEntity & { expectedRevision?: number };
 export type GetTemplateInput = TemplateEntityKey;
-export type DeleteTemplateInput = TemplateEntityKey & { deletedAt: number };
+export type DeleteTemplateInput = TemplateEntityKey & { deletedAt: number; expectedRevision?: number };
 export type ListTemplateInput = {
   wardrobeId: string;
   indexName: TemplateListIndexName;
@@ -47,6 +47,10 @@ export function buildTemplateListKey(input: { wardrobeId: string; status?: Templ
     wardrobeId: input.wardrobeId,
     status: input.status ?? "ACTIVE",
   });
+}
+
+function revisionCondition(revision: number) {
+  return `attribute_exists(PK) AND #status = :active AND ${revision === 0 ? '(attribute_not_exists(#revision) OR #revision = :expectedRevision)' : '#revision = :expectedRevision'}`;
 }
 
 export function createTemplateRepo(client: DynamoDbClient = createDynamoDbClient()) {
@@ -86,6 +90,7 @@ export function createTemplateRepo(client: DynamoDbClient = createDynamoDbClient
         Key: buildTemplateBaseKey(input),
         UpdateExpression: [
           "SET #name = :name",
+          "#revision = :revision",
           "#status = :status",
           "clothingIds = :clothingIds",
           "tagIds = :tagIds",
@@ -94,12 +99,16 @@ export function createTemplateRepo(client: DynamoDbClient = createDynamoDbClient
           "statusListPk = :statusListPk",
           "createdAtSk = :createdAtSk",
         ].join(", "),
-        ConditionExpression: "attribute_exists(PK)",
+        ConditionExpression: revisionCondition(input.expectedRevision ?? 0),
         ExpressionAttributeNames: {
           "#name": "name",
           "#status": "status",
+          "#revision": "revision",
         },
         ExpressionAttributeValues: {
+          ":revision": item.revision ?? 0,
+          ":expectedRevision": input.expectedRevision ?? 0,
+          ":active": "ACTIVE",
           ":name": item.name,
           ":status": item.status,
           ":clothingIds": item.clothingIds,
@@ -115,12 +124,16 @@ export function createTemplateRepo(client: DynamoDbClient = createDynamoDbClient
     async delete(input: DeleteTemplateInput) {
       return client.updateItem({
         Key: buildTemplateBaseKey(input),
-        UpdateExpression: "SET #status = :status, deletedAt = :deletedAt, statusListPk = :statusListPk",
-        ConditionExpression: "attribute_exists(PK)",
+        UpdateExpression: "SET #status = :status, deletedAt = :deletedAt, statusListPk = :statusListPk, #revision = :revision",
+        ConditionExpression: revisionCondition(input.expectedRevision ?? 0),
         ExpressionAttributeNames: {
           "#status": "status",
+          "#revision": "revision",
         },
         ExpressionAttributeValues: {
+          ":revision": (input.expectedRevision ?? 0) + 1,
+          ":expectedRevision": input.expectedRevision ?? 0,
+          ":active": "ACTIVE",
           ":status": "DELETED",
           ":deletedAt": input.deletedAt,
           ":statusListPk": buildTemplateStatusListPk({
