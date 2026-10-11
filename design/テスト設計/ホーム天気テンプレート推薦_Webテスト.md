@@ -27,3 +27,9 @@ MSWはAPI契約と操作確認のための簡略データで、本番の順位�
 2026-10-11: Node 20.20.2で全Web script 89/89成功。新規5 suitesはNode 24でも成功。TypeScript、production build、`pnpm install --frozen-lockfile`成功。
 
 production exportをChromiumの320×760 viewportで開き、横方向overflowなし、5モード同一行、長い名前/20服のカード3件、情報リンクのEnter起動/Escape閉鎖とfocus復帰、pageerrorなしを確認した。API応答は契約fixtureをHTTP境界で供給し、実プロバイダーへ接続していない。
+
+## 独立レビューの修正
+
+- 文言設計§2.1–2.2に合わせ、新規ホーム/地域/出典/推薦カードの表示・aria文言を`features/home/strings.ts`へ集約した。キャンセル・閉じる・画像なしは共通文言を利用する。
+- UIコンポーネント設計§2.1–2.2に合わせ、地域検索・保存・query cache・409時の読直しを`features/home/useRegionDialog.ts`へ分離した。既存のダイアログDOM操作テストは同じ公開境界で維持する。
+- `UNKNOWN_REGION` (400) は一般の保存失敗と区別し、再検索して選び直す案内を表示する。選択内容は保持する。HTTPの未知コード応答を返す回帰ケースでREDを確認してから分岐を追加しGREENにした。

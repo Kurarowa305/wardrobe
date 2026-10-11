@@ -1,31 +1,33 @@
 "use client";
+import { HOME_STRINGS } from "@/features/home/strings";
+import { COMMON_STRINGS } from "@/constants/commonStrings";
 import { useState } from "react";
 import { HomeDialog } from "./HomeDialog";
 export function RegionSources() {
   return (
     <p className="text-xs text-slate-600">
-      地域データ: デジタル庁{" "}
+      {HOME_STRINGS.dialogs.sources.labels.regionProvider}{" "}
       <a
         className="underline"
         href="https://www.digital.go.jp/policies/base_registry_address"
       >
-        アドレス・ベース・レジストリ
+        {HOME_STRINGS.dialogs.sources.labels.regionDataset}
       </a>
-      （
+      (
       <a
         className="underline"
         href="https://www.digital.go.jp/policies/base_registry_address_tos"
       >
-        利用規約
+        {HOME_STRINGS.dialogs.sources.labels.regionTerms}
       </a>{" "}
       /{" "}
       <a
         className="underline"
         href="https://www.digital.go.jp/resources/open_data/public_data_license_v1.0"
       >
-        PDL1.0
+        {HOME_STRINGS.dialogs.sources.labels.regionLicense}
       </a>
-      ）。全国市区町村マスター・位置参照拡張等をwardrobeが結合・検索用に加工しています。
+      ) {HOME_STRINGS.dialogs.sources.messages.regionProcessing}
     </p>
   );
 }
@@ -35,7 +37,7 @@ export function WeatherSources() {
     <>
       <a
         href="https://open-meteo.com/"
-        aria-label="天気情報の出典（Open-Meteo）"
+        aria-label={HOME_STRINGS.dialogs.sources.labels.trigger}
         aria-haspopup="dialog"
         className="ml-auto flex h-8 w-8 items-center justify-center rounded-full border text-sm"
         onClick={(event) => {
@@ -54,24 +56,26 @@ export function WeatherSources() {
         ⓘ
       </a>
       {open ? (
-        <HomeDialog title="天気・地域情報の出典" onClose={() => setOpen(false)}>
+        <HomeDialog
+          title={HOME_STRINGS.dialogs.sources.title}
+          onClose={() => setOpen(false)}
+        >
           <p className="text-sm">
-            天気データ:{" "}
+            {HOME_STRINGS.dialogs.sources.labels.weatherData}{" "}
             <a className="underline" href="https://open-meteo.com/">
-              Open-Meteo
+              {HOME_STRINGS.dialogs.sources.labels.weatherProvider}
             </a>{" "}
             /{" "}
             <a
               className="underline"
               href="https://creativecommons.org/licenses/by/4.0/"
             >
-              CC BY 4.0
+              {HOME_STRINGS.dialogs.sources.labels.weatherLicense}
             </a>
-            。当日のモデル予報を使用しています。
+            {HOME_STRINGS.dialogs.sources.messages.forecast}
           </p>
           <p className="text-sm">
-            wardrobeによる加工:
-            市区町村の代表座標で予報を取得し、気温の表示を丸め、体感温度から独自指数とおすすめテンプレートを判定しています。最高実気温を代用する場合があります。提供元の公式服装指数ではありません。
+            {HOME_STRINGS.dialogs.sources.messages.weatherProcessing}
           </p>
           <RegionSources />
           <button
@@ -79,7 +83,7 @@ export function WeatherSources() {
             className="rounded border p-2"
             onClick={() => setOpen(false)}
           >
-            閉じる
+            {COMMON_STRINGS.actions.close}
           </button>
         </HomeDialog>
       ) : null}

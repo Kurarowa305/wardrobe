@@ -17,7 +17,7 @@
 | 天気 | `['weather', wardrobeId, regionRevision, targetDate]` |
 | 推薦 | `['template', wardrobeId, 'recommendation', mode, regionRevision, targetDate]` |
 
-- 取得をイベントで制御し、focus/reconnect/intervalの自動取得とretryを無効にする。地域検索は成功responseの辞書版でquery cacheへ保存し、明示検索自体は毎回送信する。
+- 取得をイベントで制御し、focus/reconnect/intervalの自動取得とretryを無効にする。地域検索は`features/home/useRegionDialog`が成功responseの辞書版でquery cacheへ保存し、明示検索自体は毎回送信する。地域保存の失敗理由と競合時の読直しも同hookで扱い、ダイアログはUI操作と表示を担う。
 - 成功した天気は`expiresAt`とJST対象日を明示検査してcacheから再利用する。queryの暗黙stale判定で再送しない。失敗・未設定は成功天気cacheと混同しない。
 - 各要求にAbortSignalを渡し、表示反映前にwardrobe・regionRevision・JST日・mode・要求世代を照合する。モード切替、地域変更、跨日、更新前の結果をplaceholderに使わない。
 - JST翌00:00のタイマー、visibility復帰・BFCache復帰、送信前/応答時の日付検査を併用する。React再描画、ダイアログ開閉だけではモードを消さない。離脱時は進行中要求を中断する。

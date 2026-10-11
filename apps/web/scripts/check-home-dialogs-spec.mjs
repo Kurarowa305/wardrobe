@@ -64,9 +64,21 @@ console.log(
 const { RegionDialog } = load("components/app/home/RegionDialog");
 const requests = [];
 let saveFails = true;
+let unknownRegion = false;
 let saved;
 globalThis.fetch = async (url, options = {}) => {
   requests.push({ url: String(url), ...options });
+  if (options.method === "PUT" && unknownRegion)
+    return Response.json(
+      {
+        error: {
+          code: "VALIDATION_ERROR",
+          message: "unknown",
+          details: { reason: "UNKNOWN_REGION" },
+        },
+      },
+      { status: 400 },
+    );
   if (options.method === "PUT")
     return saveFails
       ? new Response(
@@ -128,6 +140,20 @@ assert.equal(
   "failed save preserves selection",
 );
 assert.match(screen.getByRole("alert").textContent, /保存に失敗/);
+unknownRegion = true;
+fireEvent.click(screen.getByRole("button", { name: "この地域に設定" }));
+await waitFor(() =>
+  assert.match(
+    screen.getByRole("alert").textContent,
+    /もう一度検索して地域を選び直して/,
+  ),
+);
+assert.equal(
+  screen.getByRole("radio").checked,
+  true,
+  "unknown code retains selection while guiding re-search",
+);
+unknownRegion = false;
 saveFails = false;
 fireEvent.click(screen.getByRole("button", { name: "この地域に設定" }));
 await waitFor(() => assert.equal(saved?.revision, 1));

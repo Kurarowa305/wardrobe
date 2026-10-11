@@ -23,13 +23,7 @@ type HomeTabScreenProps = {
   /** #283 replaces the existing recording route with the confirmation dialog at this seam. */
   onRecordTemplate?: (item: RecommendedTemplate) => void;
 };
-const modes = [
-  ["auto", "自動"],
-  ["spring", "春"],
-  ["summer", "夏"],
-  ["autumn", "秋"],
-  ["winter", "冬"],
-] as const;
+const modes = HOME_STRINGS.labels.modes;
 export function HomeTabScreen({
   wardrobeId,
   onRecordTemplate,
@@ -87,7 +81,7 @@ export function HomeTabScreen({
   const content = (
     <div className="grid gap-4">
       <section
-        aria-label="今日の天気"
+        aria-label={HOME_STRINGS.labels.weather}
         className="grid gap-2 rounded-lg border border-slate-200 bg-white p-3"
       >
         <div className="flex items-center justify-between gap-2">
@@ -97,7 +91,8 @@ export function HomeTabScreen({
             disabled={!home.region.data}
             onClick={() => setRegionOpen(true)}
           >
-            {home.region.data?.region?.label ?? "地域を設定"}
+            {home.region.data?.region?.label ??
+              HOME_STRINGS.dialogs.region.title}
           </button>
           <time className="shrink-0 text-xs text-slate-600">
             {home.targetDate}
@@ -105,34 +100,36 @@ export function HomeTabScreen({
         </div>
         {home.region.status === "error" ? (
           <p role="alert">
-            地域を取得できませんでした。
+            {HOME_STRINGS.messages.regionFailed}
             <button className="underline" onClick={() => void home.refresh()}>
-              再読み込み
+              {HOME_STRINGS.actions.refresh}
             </button>
           </p>
         ) : null}
         {home.weather.status === "loading" ? (
-          <p role="status">天気を取得中</p>
+          <p role="status">{HOME_STRINGS.messages.weatherLoading}</p>
         ) : home.weather.status === "error" ||
           weather?.status === "unavailable" ? (
           <p role="status">
-            天気を取得できませんでした。季節を選んでおすすめを表示できます。
+            {HOME_STRINGS.messages.weatherFailed}
             <button
               type="button"
               className="underline"
               onClick={() => void home.retryWeather()}
             >
-              天気を再取得
+              {HOME_STRINGS.actions.retryWeather}
             </button>
           </p>
         ) : weather?.status === "region_required" ? (
-          <p>地域を設定すると今日の天気と自動のおすすめを表示できます。</p>
+          <p>{HOME_STRINGS.messages.weatherRegionRequired}</p>
         ) : weather?.status === "available" ? (
           <>
             <p>{weatherLabel(weather.daily.weatherCode)}</p>
             <p className="text-sm">
-              最高 {temperatureLabel(weather.daily.temperatureMax)} / 最低{" "}
-              {temperatureLabel(weather.daily.temperatureMin)}
+              {HOME_STRINGS.labels.temperatureRange(
+                temperatureLabel(weather.daily.temperatureMax),
+                temperatureLabel(weather.daily.temperatureMin),
+              )}
             </p>
           </>
         ) : null}
@@ -141,7 +138,7 @@ export function HomeTabScreen({
       <div
         className="grid grid-cols-5 gap-1"
         role="group"
-        aria-label="推薦モード"
+        aria-label={HOME_STRINGS.labels.recommendationMode}
       >
         {modes.map(([mode, label]) => (
           <button
@@ -157,32 +154,34 @@ export function HomeTabScreen({
       </div>
       <section
         className="grid gap-2"
-        aria-label="おすすめテンプレート"
+        aria-label={HOME_STRINGS.labels.recommendations}
         aria-live="polite"
         aria-busy={home.recommendations.status === "loading"}
       >
-        <h2 className="text-sm font-semibold">おすすめテンプレート</h2>
+        <h2 className="text-sm font-semibold">
+          {HOME_STRINGS.labels.recommendations}
+        </h2>
         {home.recommendations.status === "loading" ? (
-          <p>おすすめを取得中</p>
+          <p>{HOME_STRINGS.messages.recommendationsLoading}</p>
         ) : home.recommendations.status === "error" ? (
           <p role="alert">
             {home.recorded
-              ? "記録しました。おすすめの更新に失敗しました。"
-              : "おすすめの取得に失敗しました。"}
+              ? HOME_STRINGS.messages.recordedRecommendationsFailed
+              : HOME_STRINGS.messages.recommendationsFailed}
             <button
               type="button"
               className="underline"
               onClick={() => void home.retryRecommendations()}
             >
-              おすすめを再取得
+              {HOME_STRINGS.actions.retryRecommendations}
             </button>
           </p>
         ) : recommendations?.status === "region_required" ? (
-          <p>地域を設定するか、季節を選んでください。</p>
+          <p>{HOME_STRINGS.messages.regionRequired}</p>
         ) : recommendations?.status === "weather_required" ? (
-          <p>自動判定に必要な天気情報がありません。季節を選んでください。</p>
+          <p>{HOME_STRINGS.messages.weatherRequired}</p>
         ) : recommendations?.status === "empty" ? (
-          <p>おすすめできるテンプレートがありません。</p>
+          <p>{HOME_STRINGS.messages.recommendationsEmpty}</p>
         ) : recommendations?.status === "ready" ? (
           <>
             <ul className="m-0 grid list-none gap-2 p-0">
@@ -201,8 +200,9 @@ export function HomeTabScreen({
             </ul>
             {recommendations.items.length < 3 ? (
               <p className="text-sm text-slate-600">
-                おすすめは{recommendations.items.length}
-                件です。別の季節を選ぶか、テンプレートを追加できます。
+                {HOME_STRINGS.messages.recommendationsShort(
+                  recommendations.items.length,
+                )}
               </p>
             ) : null}
           </>
@@ -215,7 +215,7 @@ export function HomeTabScreen({
             className="text-sm underline"
             href={ROUTES.templates(wardrobeId)}
           >
-            テンプレート一覧へ
+            {HOME_STRINGS.actions.viewTemplates}
           </Link>
         ) : null}
       </section>

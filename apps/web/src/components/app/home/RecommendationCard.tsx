@@ -1,3 +1,5 @@
+import { HOME_STRINGS } from "@/features/home/strings";
+import { COMMON_STRINGS } from "@/constants/commonStrings";
 import type { RecommendedTemplate } from "@/api/schemas/home";
 import { resolveImageUrl } from "@/features/clothing/imageUrl";
 export function RecommendationCard({
@@ -27,12 +29,12 @@ export function RecommendationCard({
               {url ? (
                 <img
                   src={url}
-                  alt="テンプレート構成服のサムネイル"
+                  alt={HOME_STRINGS.labels.thumbnail}
                   className="h-full w-full object-cover"
                 />
               ) : (
                 <span className="flex h-full items-center justify-center text-[10px] text-slate-600">
-                  画像なし
+                  {COMMON_STRINGS.placeholders.noImage}
                 </span>
               )}
             </span>
