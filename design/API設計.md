@@ -870,6 +870,13 @@ API-14 / API-16 は記録時の全構成服を対象に、履歴・日別件数�
 
 API-06 / API-11 の通常編集は統計を保持する。内部の `statsVersion` は公開リクエスト・レスポンスに追加しない。
 
+## 当日天気 API（#280）
+
+`GET /wardrobes/:wardrobeId/weather?date=YYYY-MM-DD&regionRevision=非負整数` は wardrobe Lambda が処理する。date/revision は必須で、重複・未知query・実在しない日付・安全整数外は400。入口と応答前にJST当日/地域版を照合し、変更時は409（`TARGET_DATE_CHANGED` / `REGION_CHANGED`）。未知wardrobeは404、共有DB失敗は503。
+
+DTOは[契約Q9](タスク設計/地域天気テンプレート推薦_API契約と状態管理判断.md)に一致し、`region_required` / `available` / `unavailable` を返す。日次個別値は有限数またはnull。指数は丸め前の最高体感温度15/25°C境界、最高実気温fallbackでは指数null。自動季節名は返さない。外部失敗・不正構造はunavailable、前日データは使わない。
+
+入口から10秒（DB読取合計5秒、外部取得・同キー待機合計4秒）。SDK retry=0、外部fetch retry=0、AbortSignalを下位I/Oへ渡す。内部呼出側の推薦も `createWeatherService().resolveForecast(region,date,budget)` と同じ `WeatherBudget` を共有する。当日成功キャッシュを外部呼出より優先する。
 ## 地域設定 API (#279)
 
 `GET /regions?q=` は固定ABR辞書（1,918件）をNFKC・かな統一で検索し、完全一致→前方一致→部分一致、同点コード順で10件まで返す。空・64コードポイント超・重複query・未知queryは400。DTOは `{datasetVersion,items:[{regionId,label}],hasMore}`。

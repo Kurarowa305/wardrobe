@@ -4,6 +4,12 @@ resource "aws_dynamodb_table" "wardrobe" {
   hash_key     = "PK"
   range_key    = "SK"
 
+  # Only short-lived weather STATE items carry ttl; history operation records do not.
+  ttl {
+    attribute_name = "ttl"
+    enabled        = true
+  }
+
   attribute {
     name = "PK"
     type = "S"
