@@ -31,6 +31,9 @@ jobs:
       - name: Japan municipality research evidence
         run: python3 scripts/check-japan-municipality-274-evidence.py
 
+      - name: Region weather recommendation API contract examples
+        run: node scripts/check-api-contract-276-examples.mjs
+
       - name: Lint
         run: pnpm -r --if-present run lint
 
