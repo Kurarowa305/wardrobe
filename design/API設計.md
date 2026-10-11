@@ -5,6 +5,8 @@
 
 2026-10-11、[#276](https://github.com/Kurarowa305/wardrobe/issues/276)で[API契約と状態管理](タスク設計/地域天気テンプレート推薦_API契約と状態管理判断.md)を確定した。地域検索・取得・PUT更新、当日天気、5モードのテンプレート推薦、API-14の確認版・再送キー拡張は同契約に従う。機能実装は#279〜#283、結合検証は#284で行い、以下の既存API仕様表への詳細統合も各実装に含める。
 
+#282のWebクライアントは地域APIに加え、`GET /wardrobes/:wardrobeId/weather?date=<ISO JST日>&regionRevision=<版>` と `GET /wardrobes/:wardrobeId/recommendations/templates?mode=<5モード>&date=<ISO JST日>&regionRevision=<版>` を利用する。DTO型は`apps/web/src/api/schemas/home.ts`。天気と推薦は別要求でAbortSignalを受け取り、共通APIエラーをそのまま扱い、自動再試行しない。MSWは地域revisionと対象日を照合する契約fixtureであり、本番の天気取得/候補ランキングは#280/#281、最終結合確認は#284の担当範囲。
+
 既存の服推薦API-18と従来の履歴作成bodyは維持する。新ホームはテンプレート推薦APIを使用する。手動モードの保存・復元は行わず、ホーム再入場等では自動を初期値とする。
 
 # API仕様

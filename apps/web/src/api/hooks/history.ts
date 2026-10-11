@@ -1,3 +1,4 @@
+import { invalidateRecommendations } from "@/features/home/invalidation";
 import type { QueryClient } from "@tanstack/react-query";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -22,7 +23,8 @@ type HistoryIdentity = {
   historyId: string;
 };
 
-async function invalidateHistoryQueries(queryClient: QueryClient, wardrobeId: string) {
+async function invalidateHistoryQueries(queryClient: QueryClient, wardrobeId: string, recordCreated = false) {
+  await invalidateRecommendations(queryClient, wardrobeId, recordCreated);
   await Promise.all([
     queryClient.invalidateQueries({
       queryKey: queryKeys.history.byWardrobe(wardrobeId),
@@ -81,7 +83,7 @@ export function useCreateHistoryMutation(wardrobeId: string) {
     mutationKey: queryKeys.history.byWardrobe(wardrobeId),
     mutationFn: (body: CreateHistoryRequestDto) => createHistory(wardrobeId, body),
     onSuccess: async () => {
-      await invalidateHistoryQueries(queryClient, wardrobeId);
+      await invalidateHistoryQueries(queryClient, wardrobeId, true);
     },
   });
 }

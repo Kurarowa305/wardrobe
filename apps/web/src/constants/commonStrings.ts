@@ -6,6 +6,7 @@ export const COMMON_STRINGS = {
     edit: "編集",
     delete: "削除",
     cancel: "キャンセル",
+    close: "閉じる",
     discard: "破棄",
     viewAll: "全て見る",
   },
