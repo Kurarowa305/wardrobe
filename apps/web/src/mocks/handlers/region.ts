@@ -10,17 +10,17 @@ const candidates = [
   {
     regionId: "abr:lg:131041",
     label: "東京都 新宿区",
-    aliases: ["新宿", "新宿区", "しんじゅく", "しんじゅくく"],
+    aliases: ["新宿", "新宿区", "しんじゅく", "しんじゅくく", "東京都新宿区", "東京新宿区", "とうきょうとしんじゅくく"],
   },
   {
     regionId: "abr:lg:132063",
     label: "東京都 府中市",
-    aliases: ["府中", "府中市", "ふちゅう"],
+    aliases: ["府中", "府中市", "ふちゅう", "東京都府中市", "東京府中市", "とうきょうとふちゅうし"],
   },
   {
     regionId: "abr:lg:342084",
     label: "広島県 府中市",
-    aliases: ["府中", "府中市", "ふちゅう"],
+    aliases: ["府中", "府中市", "ふちゅう", "広島県府中市", "広島府中市", "ひろしまけんふちゅうし"],
   },
 ];
 const states = new Map<string, WardrobeRegionResponseDto>();
@@ -58,15 +58,18 @@ export const regionHandlers = [
       return error(400, "INVALID_QUERY");
     const q = normalizeRegionSearch(query.get("q") ?? "");
     if (!q || [...q].length > 64) return error(400, "INVALID_QUERY");
-    const items = candidates
-      .filter(
-        (item) =>
-          item.aliases.some((alias) =>
-            normalizeRegionSearch(alias).includes(q),
-          ) || normalizeRegionSearch(item.label).includes(q),
-      )
-      .map(({ regionId, label }) => ({ regionId, label }));
-    return HttpResponse.json({ datasetVersion, items, hasMore: false });
+    const tokens = q.split(/[\s,、]+/u).filter(Boolean);
+    const ranked = tokens.length === 0 ? [] : candidates.flatMap((item) => {
+      const aliases = item.aliases.map(normalizeRegionSearch);
+      const scores = tokens.map((token) => Math.min(...aliases
+        .filter((alias) => alias.includes(token))
+        .map((alias) => alias === token ? 0 : alias.startsWith(token) ? 1 : 2)));
+      return scores.every(Number.isFinite)
+        ? [{ item, score: scores.reduce((sum, score) => sum + score, 0) }]
+        : [];
+    }).sort((a, b) => a.score - b.score || a.item.regionId.localeCompare(b.item.regionId));
+    const items = ranked.slice(0, 10).map(({ item: { regionId, label } }) => ({ regionId, label }));
+    return HttpResponse.json({ datasetVersion, items, hasMore: ranked.length > 10 });
   }),
   http.get("*/wardrobes/:wardrobeId/region", async ({ params, request }) => {
     const scenario = await applyMockScenario(request);
