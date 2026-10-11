@@ -301,84 +301,91 @@ export function createHistoryWithStatsWriteUsecase(
       const findReplay = async () => input.operationId ? replayOperation(await getOperation(input.wardrobeId, input.operationId), input) : undefined;
       const replay = await findReplay();
       if (replay) return replay;
-      const source = await createHistorySource(input, { getTemplate });
-      const historyId = generateHistoryId();
-      const history = createHistoryEntity({
-        wardrobeId: input.wardrobeId,
-        historyId,
-        date: input.date,
-        templateId: source.templateId,
-        clothingIds: source.clothingIds,
-        createdAt: now(),
-      });
+      try {
+        const source = await createHistorySource(input, { getTemplate });
+        const historyId = generateHistoryId();
+        const history = createHistoryEntity({
+          wardrobeId: input.wardrobeId,
+          historyId,
+          date: input.date,
+          templateId: source.templateId,
+          clothingIds: source.clothingIds,
+          createdAt: now(),
+        });
 
-      const command: HistoryStatsWriteCommand = {
-        mode: "create",
-        history,
-      };
-      const clothingStatsResults = source.clothingIds.length > 0
-        ? await batchGetClothingByIds({ wardrobeId: input.wardrobeId, clothingIds: [...new Set(source.clothingIds)] })
-        : [];
-      if (clothingStatsResults.some(result => isRecord(result) && isRecord(result.UnprocessedKeys) && Object.values(result.UnprocessedKeys).some(value => isRecord(value) && Array.isArray(value.Keys) && value.Keys.length > 0))) throw createAppError("SERVICE_UNAVAILABLE", { details: { reason: "INCOMPLETE_CLOTHING_READ" } });
-      if (input.expectedTemplateRevision !== undefined) {
-        const received = extractBatchClothingMap(clothingStatsResults);
-        if (source.clothingIds.some(id => received.get(id)?.status !== "ACTIVE")) throw createAppError("CONFLICT", { details: { reason: "CONFIRMATION_STALE" } });
-      }
-      const targetStatsMap = buildTargetStatsMap({
-        wardrobeId: input.wardrobeId,
-        source,
-        clothingStatsResults,
-      });
+        const command: HistoryStatsWriteCommand = {
+          mode: "create",
+          history,
+        };
+        const clothingStatsResults = source.clothingIds.length > 0
+          ? await batchGetClothingByIds({ wardrobeId: input.wardrobeId, clothingIds: [...new Set(source.clothingIds)] })
+          : [];
+        if (clothingStatsResults.some(result => isRecord(result) && isRecord(result.UnprocessedKeys) && Object.values(result.UnprocessedKeys).some(value => isRecord(value) && Array.isArray(value.Keys) && value.Keys.length > 0))) throw createAppError("SERVICE_UNAVAILABLE", { details: { reason: "INCOMPLETE_CLOTHING_READ" } });
+        if (input.expectedTemplateRevision !== undefined) {
+          const received = extractBatchClothingMap(clothingStatsResults);
+          if (source.clothingIds.some(id => received.get(id)?.status !== "ACTIVE")) throw createAppError("CONFLICT", { details: { reason: "CONFIRMATION_STALE" } });
+        }
+        const targetStatsMap = buildTargetStatsMap({
+          wardrobeId: input.wardrobeId,
+          source,
+          clothingStatsResults,
+        });
 
-      if (input.expectedTemplateRevision !== undefined) {
-        for (const clothingId of source.clothingIds) if (targetStatsMap.get(`clothing:${clothingId}`)?.status !== "ACTIVE") throw createAppError("CONFLICT", { details: { reason: "CONFIRMATION_STALE" } });
-      }
-      const statsItems = buildHistoryStatsWriteItems({
-        wearDailyFacts: buildWearDailyFacts(command),
-        cacheUpdateFacts: buildDailyStatsCacheUpdateFacts(command),
-        resolveCurrentStats: (fact) => targetStatsMap.get(resolveStatsKey(fact)),
-      });
+        if (input.expectedTemplateRevision !== undefined) {
+          for (const clothingId of source.clothingIds) if (targetStatsMap.get(`clothing:${clothingId}`)?.status !== "ACTIVE") throw createAppError("CONFLICT", { details: { reason: "CONFIRMATION_STALE" } });
+        }
+        const statsItems = buildHistoryStatsWriteItems({
+          wearDailyFacts: buildWearDailyFacts(command),
+          cacheUpdateFacts: buildDailyStatsCacheUpdateFacts(command),
+          resolveCurrentStats: (fact) => targetStatsMap.get(resolveStatsKey(fact)),
+        });
 
-      if (input.expectedTemplateRevision !== undefined) {
-        for (const item of statsItems) {
-          const update = item.Update;
-          if (!update || !String(update.Key.SK).match(/^(TPL|CLOTH)#/)) continue;
-          update.ConditionExpression += " AND #confirmationStatus = :confirmationActive";
-          update.ExpressionAttributeNames = { ...update.ExpressionAttributeNames, "#confirmationStatus": "status" };
-          update.ExpressionAttributeValues = { ...update.ExpressionAttributeValues, ":confirmationActive": "ACTIVE" };
-          if (String(update.Key.SK).startsWith("TPL#")) {
-            update.ConditionExpression += input.expectedTemplateRevision === 0 ? " AND (attribute_not_exists(revision) OR revision = :confirmedRevision)" : " AND revision = :confirmedRevision";
-            update.ExpressionAttributeValues[":confirmedRevision"] = input.expectedTemplateRevision;
+        if (input.expectedTemplateRevision !== undefined) {
+          for (const item of statsItems) {
+            const update = item.Update;
+            if (!update || !String(update.Key.SK).match(/^(TPL|CLOTH)#/)) continue;
+            update.ConditionExpression += " AND #confirmationStatus = :confirmationActive";
+            update.ExpressionAttributeNames = { ...update.ExpressionAttributeNames, "#confirmationStatus": "status" };
+            update.ExpressionAttributeValues = { ...update.ExpressionAttributeValues, ":confirmationActive": "ACTIVE" };
+            if (String(update.Key.SK).startsWith("TPL#")) {
+              update.ConditionExpression += input.expectedTemplateRevision === 0 ? " AND (attribute_not_exists(revision) OR revision = :confirmedRevision)" : " AND revision = :confirmedRevision";
+              update.ExpressionAttributeValues[":confirmedRevision"] = input.expectedTemplateRevision;
+            }
           }
         }
-      }
-      const transactItems: TransactWriteItem[] = [
-        {
-          Put: {
-            Item: { ...buildHistoryItem(history), ...(input.operationId ? { operationId: input.operationId } : {}) },
-            ConditionExpression: "attribute_not_exists(PK) AND attribute_not_exists(SK)",
+        const transactItems: TransactWriteItem[] = [
+          {
+            Put: {
+              Item: { ...buildHistoryItem(history), ...(input.operationId ? { operationId: input.operationId } : {}) },
+              ConditionExpression: "attribute_not_exists(PK) AND attribute_not_exists(SK)",
+            },
           },
-        },
-        ...statsItems,
-        ...(input.operationId ? [{ Put: { Item: { ...operationKey(input.wardrobeId, input.operationId), payload: operationPayload(input), historyId, createdAt: now() }, ConditionExpression: "attribute_not_exists(PK) AND attribute_not_exists(SK)" } }] : []),
-      ];
+          ...statsItems,
+          ...(input.operationId ? [{ Put: { Item: { ...operationKey(input.wardrobeId, input.operationId), payload: operationPayload(input), historyId, createdAt: now() }, ConditionExpression: "attribute_not_exists(PK) AND attribute_not_exists(SK)" } }] : []),
+        ];
 
-      assertHistoryStatsWriteItemsWithinLimit(transactItems);
-      try {
-        await writeHistoryStatsItems(transactItems, transactWriteItems);
-      } catch (error) {
-        // The transaction may have committed even when its response was lost.
-        const replayAfterFailure = await findReplay();
-        if (replayAfterFailure) return replayAfterFailure;
-        if (input.expectedTemplateRevision !== undefined && (isAppError(error) && error.code === "CONFLICT" || isRecord(error) && error.name === "TransactionCanceledException")) {
-          await createHistorySource(input, { getTemplate });
-          const latest = extractBatchClothingMap(await batchGetClothingByIds({ wardrobeId: input.wardrobeId, clothingIds: source.clothingIds }));
-          if (source.clothingIds.some(id => latest.get(id)?.status !== "ACTIVE")) throw createAppError("CONFLICT", { details: { reason: "CONFIRMATION_STALE" } });
+        assertHistoryStatsWriteItemsWithinLimit(transactItems);
+        try {
+          await writeHistoryStatsItems(transactItems, transactWriteItems);
+        } catch (error) {
+          // The transaction may have committed even when its response was lost.
+          const replayAfterFailure = await findReplay();
+          if (replayAfterFailure) return replayAfterFailure;
+          if (input.expectedTemplateRevision !== undefined && (isAppError(error) && error.code === "CONFLICT" || isRecord(error) && error.name === "TransactionCanceledException")) {
+            await createHistorySource(input, { getTemplate });
+            const latest = extractBatchClothingMap(await batchGetClothingByIds({ wardrobeId: input.wardrobeId, clothingIds: source.clothingIds }));
+            if (source.clothingIds.some(id => latest.get(id)?.status !== "ACTIVE")) throw createAppError("CONFLICT", { details: { reason: "CONFIRMATION_STALE" } });
+          }
+          throw error;
         }
+
+        return { historyId };
+      } catch (error) {
+        // Even pre-write validation can race a concurrent successful operation.
+        const committed = await findReplay();
+        if (committed) return committed;
         throw error;
       }
-
-      return { historyId };
     },
   };
 }

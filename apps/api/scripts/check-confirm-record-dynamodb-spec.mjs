@@ -131,6 +131,24 @@ try {
   const { createOperationRepo } =
     await import("../src/domains/history/repo/operationRepo.ts");
   const operations = createOperationRepo();
+  // A request can miss the operation before another request commits it and edits the template.
+  const lateReplay = await createHistoryHandler({
+    ...request,
+    headers: { ...request.headers, "idempotency-key": stableKey },
+    dependencies: { getOperation: (() => {
+      let reads = 0;
+      return async (...args) => ++reads === 1 ? undefined : operations.get(...args);
+    })() },
+  });
+  assert.equal(lateReplay.statusCode, 200);
+  assert.equal(lateReplay.body, stable.body);
+  await assert.rejects(createHistoryHandler({
+    ...request,
+    dependencies: { getOperation: (() => {
+      let reads = 0;
+      return async (...args) => ++reads === 1 ? undefined : operations.get(...args);
+    })() },
+  }), (error) => error.details.reason === "HISTORY_ALREADY_DELETED");
   const racedRequest = {
     ...request,
     body: { ...body, expectedTemplateRevision: 2 },

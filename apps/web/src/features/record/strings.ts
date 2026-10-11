@@ -1,8 +1,10 @@
+import { COMMON_STRINGS } from "@/constants/commonStrings";
+
 export const RECORD_STRINGS = {
   confirmation: {
     title: "着用の記録確認",
     date: "記録日",
-    cancel: "キャンセル",
+    cancel: COMMON_STRINGS.actions.cancel,
     submit: "記録する",
     submitting: "記録中…",
     replay: "結果を確認・再送",

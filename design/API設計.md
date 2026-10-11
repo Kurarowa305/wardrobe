@@ -901,3 +901,5 @@ DTOは契約Q9のwardrobeId/regionRevision/targetDate/mode/status/basis/items。
 入口10秒の共通WeatherBudgetで、META/天気共有状態/全候補のDB読取を合計5秒に収める。SDK maxAttempts=1。ベースQuery全ページ強整合→必要服IDを重複排除し80件/最大4並行BatchGet強整合。候補間の共通服は除去しない。欠落・削除服を含む候補は除外、未処理キー/期限/読取失敗は503。local/Lambdaはtemplate domain、既存IAMのtable Get/Query/BatchGet/Updateを利用する。
 
 テンプレート詳細GETへrevisionを追加。作成1、旧データ0、名前/構成服/タグの内容変更と削除で増加、同内容・統計更新では維持する。同時編集/削除の条件不成立は409 TEMPLATE_CHANGED。
+
+#283 同一操作の競合: 初回の操作照合後に別要求が確定する場合があるため、テンプレート・構成服の事前検証失敗時にも操作を再照合する。既存の成功結果・削除墓標・同キー内容不一致を優先し、成功済み操作を確認版の変化によって新操作へ置き換えない。

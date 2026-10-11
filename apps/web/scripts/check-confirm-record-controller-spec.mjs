@@ -3,6 +3,8 @@ import { load } from "./home-test-loader.mjs";
 const { ConfirmationController } = load("features/record/confirmation");
 const memory = new Map();
 const storage = {
+  get length() { return memory.size; },
+  key: (index) => [...memory.keys()][index] ?? null,
   getItem: (key) => memory.get(key) ?? null,
   setItem: (key, value) => memory.set(key, value),
   removeItem: (key) => memory.delete(key),
@@ -94,3 +96,19 @@ assert.equal(stale.getSnapshot().phase, "editing");
 console.log(
   "confirmation storage failure, cancel, double submit, frozen input and stale reconfirm passed",
 );
+
+// Two already-mounted tabs must retain independent uncertain operations.
+const tabA = new ConfirmationController("wd_tabs", { ...deps, create: async () => { throw Error("lost A"); } });
+const tabB = new ConfirmationController("wd_tabs", { ...deps, uuid: () => "550e8400-e29b-41d4-a716-446655440001", create: async () => { throw Error("lost B"); } });
+tabA.open(item); tabB.open(item);
+await Promise.all([tabA.submit(), tabB.submit()]);
+assert.equal(memory.size, 2);
+let replayedKey;
+const resume = () => new ConfirmationController("wd_tabs", { ...deps, create: async (_body, key) => { replayedKey = key; return { historyId: key }; } });
+await resume().submit();
+assert.equal(memory.size, 1);
+const firstKey = replayedKey;
+await resume().submit();
+assert.notEqual(replayedKey, firstKey);
+assert.equal(memory.size, 0);
+console.log("independent tab operations survive concurrent writes and individual cleanup");

@@ -25,7 +25,7 @@ export type ConfirmationSnapshot = {
     | "deleted"
     | null;
 };
-type StoragePort = Pick<Storage, "getItem" | "setItem" | "removeItem">;
+type StoragePort = Pick<Storage, "getItem" | "setItem" | "removeItem" | "key" | "length">;
 export type ConfirmationDependencies = {
   storage: () => StoragePort;
   create: (
@@ -87,7 +87,7 @@ export class ConfirmationController {
   ) {
     this.key = `wardrobe:pending-record:${wardrobeId}`;
     try {
-      const saved = dependencies.storage().getItem(this.key);
+      const saved = this.savedOperation();
       if (saved) {
         this.pending = pendingRecord(saved, wardrobeId);
         this.snapshot = {
@@ -103,6 +103,29 @@ export class ConfirmationController {
       this.snapshot.message = "storage";
     }
   }
+  private savedOperation(): string | null {
+    const storage = this.dependencies.storage();
+    // Read the earlier single-operation format, but never write new operations there.
+    const legacy = storage.getItem(this.key);
+    if (legacy) return legacy;
+    const keys: string[] = [];
+    for (let index = 0; index < storage.length; index++) {
+      const key = storage.key(index);
+      if (key?.startsWith(`${this.key}:`)) keys.push(key);
+    }
+    for (const key of keys.sort()) {
+      const value = storage.getItem(key);
+      if (value) return value;
+    }
+    return null;
+  }
+  private removeOperation(operation: PendingRecord) {
+    const storage = this.dependencies.storage();
+    storage.removeItem(`${this.key}:${operation.operationId}`);
+    const legacy = storage.getItem(this.key);
+    if (legacy && pendingRecord(legacy, this.wardrobeId).operationId === operation.operationId)
+      storage.removeItem(this.key);
+  }
   getSnapshot = () => this.snapshot;
   subscribe = (listener: () => void) => {
     this.listeners.add(listener);
@@ -116,6 +139,17 @@ export class ConfirmationController {
   }
   open(template: RecommendedTemplate) {
     if (this.snapshot.phase === "sending") return;
+    if (!this.pending) {
+      try {
+        const saved = this.savedOperation();
+        if (saved) {
+          this.pending = pendingRecord(saved, this.wardrobeId);
+          this.update({ template: this.pending.template, date: iso(this.pending.body.date), phase: "unknown", message: "unknown" });
+        }
+      } catch {
+        this.blocked = true;
+      }
+    }
     if (this.pending) {
       this.update({ open: true });
       return;
@@ -169,7 +203,7 @@ export class ConfirmationController {
       template: this.snapshot.template,
     };
     try {
-      this.dependencies.storage().setItem(this.key, JSON.stringify(operation));
+      this.dependencies.storage().setItem(`${this.key}:${operation.operationId}`, JSON.stringify(operation));
     } catch {
       this.update({ message: "storage" });
       return;
@@ -195,7 +229,7 @@ export class ConfirmationController {
       ) {
         this.pending = null;
         try {
-          this.dependencies.storage().removeItem(this.key);
+          this.removeOperation(operation);
         } catch {
           /* The durable key is safe to replay; never create another record under it. */
         }
@@ -214,7 +248,7 @@ export class ConfirmationController {
     }
     this.pending = null;
     try {
-      this.dependencies.storage().removeItem(this.key);
+      this.removeOperation(operation);
     } catch {
       /* A restored successful key replays the existing history, not a duplicate. */
     }
