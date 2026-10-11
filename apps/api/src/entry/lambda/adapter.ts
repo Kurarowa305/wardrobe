@@ -1,3 +1,4 @@
+import { getWeatherHandler } from '../../domains/weather/handler.js';
 import { searchRegionsHandler, getWardrobeRegionHandler, saveWardrobeRegionHandler } from "../../domains/region/handlers/regionHandlers.js";
 import { createAppError, isErrorCode, type ErrorCode } from "../../core/errors/index.js";
 import {
@@ -64,6 +65,9 @@ function createDefaultDomainHandler(domain: LocalDomain): LocalRouteHandler {
 
 export const sharedDomainHandlers: Record<LocalDomain, LocalRouteHandler> = {
   wardrobe(request) {
+    if (request.method === "GET" && request.pathname === `/wardrobes/${request.path.wardrobeId}/weather`) {
+      return getWeatherHandler({ path: request.path, query: request.query, requestId: request.requestId, startedAt: request.startedAt });
+    }
     if (request.method === "GET" && request.pathname === "/regions") return searchRegionsHandler(request);
     if (request.pathname === `/wardrobes/${request.path.wardrobeId}/region`) {
       if (request.method === "GET") return getWardrobeRegionHandler(request);
@@ -343,6 +347,7 @@ export function createLambdaHandler(options: LambdaAdapterOptions) {
     try {
       const body = method === "GET" || method === "DELETE" ? {} : decodeBody(event);
       const response = await handler({
+        startedAt: startTime,
         requestId,
         method,
         pathname,

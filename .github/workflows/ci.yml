@@ -363,6 +363,9 @@ jobs:
       - name: API terraform CI deploy BE-MS7-T07 spec test
         run: pnpm --filter api test:terraform-ci-deploy-ms7-t07
 
+      - name: API shared weather contract, concurrency and cancellation tests
+        run: pnpm --filter api test:weather
+
       - name: Typecheck api
         run: pnpm --filter api exec tsc --noEmit
 

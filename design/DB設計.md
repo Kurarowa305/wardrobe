@@ -386,6 +386,14 @@ Clothing / Template に内部属性 `statsVersion: Number` を持つ。未付与
 そのため、
 **単一テーブル設計の利点（アクセスパターンが明確・低コスト）を損なわずに統計要件を満たせる**。
 
+## 共有天気 STATE / provider USAGE（#280）
+
+- `PK=WEATHER#open-meteo:forecast:v1:best_match:{regionId}:{latitude}:{longitude}:Asia/Tokyo:celsius:{date}`, `SK=STATE`。座標は保存数値の `String(number)` で正規化し、丸めない。
+- forecast（daily/derivation/fetchedAt/expiresAt ISO）、expiresAt（ms）、cooldownUntil（ms）、leaseOwner、leaseUntil（ms）、ttl（Unix秒）を分離。成功はJST翌00:00まで論理的に有効。ttlは成功期限・cooldown以後の物理削除用で、読取可否は論理期限で決める。
+- lease取得は現lease・成功期限・cooldownの期限条件付き更新。保存はowner一致とlease有効条件付き。leaseは入口+10秒まで、外部4秒と保存0.5秒の余裕がない場合は送信しない。同キー待機は共有結果の強整合読取のみで、取得の自動再試行をしない。
+- `PK=PROVIDER#OPEN_METEO`, `SK=USAGE`。revision/gateUntilと秒61・分61・時25・日32バケット、UTC暦日/月件数を共有保存。強整合取得後revision一致更新で枠を予約。429ゲート延長は期限を短縮せずrevisionも原子的に増やすため、旧予約はゲート・件数を巻き戻せない。
+- 60/分・600/時・5,000/日・150,000/月の保守的移動窓と暦窓を満たす場合のみ予約。失敗した送信も計数し、未送信の予約も戻さない。予約DB書込が秒境界を跨いだ場合は送信せず、送信時刻より古いバケットへの過小計数を防ぐ。
+- TerraformのTTL属性は `ttl`。provider USAGEと履歴操作記録には付けず、利用量・重複抑止の記録を意図せず消さない。
 ## 地域設定 (#279)
 
 `PK=W#<wardrobeId>, SK=META` に `regionRevision` と `region` を追加する。属性欠損は0/null。`region` はregionId/label/datasetVersion/source=abr/lgCode/pref/county/city/ward/latitude/longitude/sourceSrid=EPSG:6668/coordinatePolicy=jgd2011-as-wgs84-for-weather/timezone=Asia/Tokyo。緯度経度は固定辞書で再解決し、クライアント入力を採用しない。
