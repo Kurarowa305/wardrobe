@@ -18,14 +18,14 @@ const ciSource = readFileSync(ciPath, "utf8");
 
 let withinLimitError = "";
 try {
-  guardModule.assertHistoryStatsWriteWithinLimit({ itemCount: 25 });
+  guardModule.assertHistoryStatsWriteWithinLimit({ itemCount: 100 });
 } catch (error) {
   withinLimitError = String(error);
 }
 
 let exceedLimitError = "";
 try {
-  guardModule.assertHistoryStatsWriteWithinLimit({ itemCount: 26 });
+  guardModule.assertHistoryStatsWriteWithinLimit({ itemCount: 101 });
 } catch (error) {
   exceedLimitError = String(error);
 }
@@ -39,25 +39,25 @@ try {
 
 let itemsLimitError = "";
 try {
-  guardModule.assertHistoryStatsWriteItemsWithinLimit(new Array(26).fill({}));
+  guardModule.assertHistoryStatsWriteItemsWithinLimit(new Array(101).fill({}));
 } catch (error) {
   itemsLimitError = String(error);
 }
 
 const checks = [
   {
-    name: "TransactWrite 上限が 25 件で公開される",
-    ok: guardModule.HISTORY_STATS_WRITE_LIMIT === 25,
+    name: "TransactWrite 上限が 100 件で公開される",
+    ok: guardModule.HISTORY_STATS_WRITE_LIMIT === 100,
     detail: guardModule.HISTORY_STATS_WRITE_LIMIT,
   },
   {
-    name: "上限以内（25 件）では失敗しない",
+    name: "上限以内（100 件）では失敗しない",
     ok: withinLimitError === "",
     detail: withinLimitError,
   },
   {
-    name: "上限超過（26 件）で明示的に失敗する",
-    ok: exceedLimitError.includes("history stats write transact items exceed limit: 26 > 25"),
+    name: "上限超過（101 件）で明示的に失敗する",
+    ok: exceedLimitError.includes("history stats write transact items exceed limit: 101 > 100"),
     detail: exceedLimitError,
   },
   {
@@ -67,13 +67,13 @@ const checks = [
   },
   {
     name: "items 配列向け helper でも上限超過を検知できる",
-    ok: itemsLimitError.includes("history stats write transact items exceed limit: 26 > 25"),
+    ok: itemsLimitError.includes("history stats write transact items exceed limit: 101 > 100"),
     detail: itemsLimitError,
   },
   {
     name: "guard.ts が BE-MS5-T06 で必要な helper を export している",
     ok:
-      guardSource.includes("export const HISTORY_STATS_WRITE_LIMIT = 25") &&
+      guardSource.includes("export const HISTORY_STATS_WRITE_LIMIT = 100") &&
       guardSource.includes("export const assertHistoryStatsWriteWithinLimit") &&
       guardSource.includes("export const assertHistoryStatsWriteItemsWithinLimit"),
     detail: guardSource,

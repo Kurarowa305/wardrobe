@@ -7,14 +7,10 @@ export function RecommendationCard({
   onClick,
 }: {
   item: RecommendedTemplate;
-  onClick: () => void;
+  onClick?: () => void;
 }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="grid w-full gap-3 rounded-md border border-slate-300 bg-white p-3 text-left transition-colors hover:bg-slate-50"
-    >
+  const content = (<>
+
       <span className="truncate text-sm font-medium text-slate-900">
         {item.name}
       </span>
@@ -46,6 +42,8 @@ export function RecommendationCard({
           </span>
         ) : null}
       </span>
-    </button>
+    </>
   );
+  const className = "grid w-full gap-3 rounded-md border border-slate-300 bg-white p-3 text-left";
+  return onClick ? <button type="button" onClick={onClick} className={className}>{content}</button> : <div className={className}>{content}</div>;
 }

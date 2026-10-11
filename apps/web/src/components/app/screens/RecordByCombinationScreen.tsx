@@ -1,4 +1,5 @@
 "use client";
+import { jstDate } from "@/features/home/controller";
 
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
@@ -28,7 +29,7 @@ function createInitialGenreState(): Record<ClothingGenreDto, GenreState> {
 }
 
 function createTodayDateString() {
-  return new Date().toISOString().slice(0, 10);
+  return jstDate();
 }
 
 function toHistoryApiDate(dateInputValue: string) {

@@ -366,6 +366,17 @@ jobs:
       - name: API shared weather contract, concurrency and cancellation tests
         run: pnpm --filter api test:weather
 
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Confirmation records and real DynamoDB transactions
+        run: |
+          pnpm --filter api test:confirm-record
+          bash scripts/run-confirm-record-dynamodb-tests.sh
+          pnpm --filter web test:confirm-record
+
       - name: Typecheck api
         run: pnpm --filter api exec tsc --noEmit
 

@@ -884,3 +884,11 @@ DTOは[契約Q9](タスク設計/地域天気テンプレート推薦_API契約�
 `GET /wardrobes/:wardrobeId/region` と `PUT /wardrobes/:wardrobeId/region` の成功DTOは `{revision,region:{regionId,label,datasetVersion}|null}`。既存未設定は0/null。PUTは `{regionId,datasetVersion,expectedRevision}`、解除は `{regionId:null,expectedRevision}`。JSONのみ、未知属性・不正整数は拒否。未知コードは400 UNKNOWN_REGION、辞書版変更と保存版競合は409 REGION_DATASET_CHANGED/REGION_CHANGED（details.reason）。PUT結果不明の再送も古い版では409。未知wardrobeは404。
 
 経路は既存wardrobe Lambdaとlocal共通handler。既存wardrobe IAMのGetItem/UpdateItemを使い追加権限・環境変数不要。Web共通clientにPUTとAbortSignal対応endpoint、DTO検証とMSWを追加。画面側の明示検索・応答世代管理は#282。
+
+## ホーム確認記録・再送（#283）
+
+既存 `POST /wardrobes/:wardrobeId/histories` に `Idempotency-Key: UUID` とtemplate bodyの `expectedTemplateRevision`（安全な非負整数）を追加。確認版を送る場合は操作キー必須。既存bodyは互換維持。dateは実在するyyyymmddを検証し、過去・未来の制限は設けない。
+
+初回201 `{historyId}`、同キー同内容の成功再送200で元のID。操作記録を先に強整合確認するため、その後のテンプレート編集は再送を妨げない。異なる内容は409 `IDEMPOTENCY_KEY_REUSED`、保存済み履歴を削除した後は409 `HISTORY_ALREADY_DELETED`。確認版・ACTIVE不一致は409 `CONFIRMATION_STALE`。確認時の構成服が消えた場合も同じ。未処理BatchGetは503。statsVersion競合は既存CONFLICTを保持する。
+
+履歴・全服/テンプレートの日別/統計・操作記録を同一transactionで保存する。確認条件は既存統計Updateへ追加し、同一アイテムのConditionCheckを別に作らない。書込SDKはmaxAttempts=1で自動再送なし。結果不明時は同じ操作キーとbodyで明示再送する。

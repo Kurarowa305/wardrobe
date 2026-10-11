@@ -1,4 +1,5 @@
 "use client";
+import { jstDate } from "@/features/home/controller";
 
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
@@ -30,7 +31,7 @@ const TEMPLATE_THUMBNAIL_LIMIT = 4;
 const TEMPLATE_THUMBNAIL_GRID_CLASS = "grid grid-cols-5 gap-2";
 
 function createTodayDateString() {
-  return new Date().toISOString().slice(0, 10);
+  return jstDate();
 }
 
 function toHistoryApiDate(dateInputValue: string) {

@@ -18,7 +18,7 @@ export const historyListLimitMax = 30;
 export const historyListOrderSchema = z.enum(historyListOrderValues);
 export const historyIdSchema = z.string().trim().min(1);
 export const wardrobeIdSchema = z.string().trim().min(1);
-export const historyDateSchema = z.string().regex(historyDatePattern, "Expected yyyymmdd format.");
+export const historyDateSchema = z.string().regex(historyDatePattern, "Expected yyyymmdd format.").refine(value => { const iso = `${value.slice(0,4)}-${value.slice(4,6)}-${value.slice(6,8)}`; const time = Date.parse(`${iso}T00:00:00Z`); return Number.isFinite(time) && new Date(time).toISOString().slice(0,10) === iso; }, "Expected a real calendar date.");
 
 export const historyClothingIdsSchema = z.array(clothingIdSchema).min(1);
 
@@ -33,6 +33,7 @@ export const historyListParamsSchema = z.object({
 const templateInputSchema = z.object({
   date: historyDateSchema,
   templateId: z.string().trim().min(1),
+  expectedTemplateRevision: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER).optional(),
   clothingIds: z.never().optional(),
 }).strict();
 
@@ -91,6 +92,7 @@ export const historyEntitySchema = z.object({
   templateId: z.string().trim().min(1).nullable(),
   clothingIds: historyClothingIdsSchema,
   createdAt: clothingTimestampSchema,
+  operationId: z.string().uuid().optional(),
 }).strict();
 
 export type HistoryListOrder = z.infer<typeof historyListOrderSchema>;

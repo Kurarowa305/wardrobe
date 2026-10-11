@@ -1,5 +1,6 @@
+import { createOperationRepo, operationKey, operationPayload, replayOperation, type OperationRecord } from "../repo/operationRepo.js";
 import { createDynamoDbClient, type TransactWriteItem } from "../../../clients/dynamodb.js";
-import { createAppError } from "../../../core/errors/index.js";
+import { createAppError, isAppError } from "../../../core/errors/index.js";
 import { createClothingBatchGetRepo } from "../../clothing/repo/clothingBatchGetRepo.js";
 import { createTemplateRepo } from "../../template/repo/templateRepo.js";
 import { createHistoryEntity } from "../entities/history.js";
@@ -16,6 +17,7 @@ type TargetStats = {
   wearCount: number;
   lastWornAt: number;
   statsVersion?: number;
+  status?: string;
 };
 
 type CreateHistorySource = {
@@ -27,15 +29,19 @@ type CreateHistorySource = {
 export type CreateHistoryWithStatsWriteInput = {
   wardrobeId: string;
   date: string;
+  operationId?: string | undefined;
+  expectedTemplateRevision?: number | undefined;
   templateId?: string | undefined;
   clothingIds?: string[] | undefined;
 };
 
 export type CreateHistoryWithStatsWriteOutput = {
   historyId: string;
+  replayed?: boolean;
 };
 
 export type CreateHistoryWithStatsWriteDependencies = {
+  getOperation?: ((wardrobeId: string, operationId: string) => Promise<OperationRecord | undefined>) | undefined;
   now?: (() => number) | undefined;
   generateHistoryId?: (() => string) | undefined;
   transactWriteItems?: ((items: TransactWriteItem[]) => Promise<unknown>) | undefined;
@@ -63,6 +69,7 @@ const extractTargetStats = (item: unknown): TargetStats | null => {
   }
 
   return {
+    ...(typeof item.status === "string" ? { status: item.status } : {}),
     wearCount: typeof item.wearCount === "number" ? item.wearCount : 0,
     lastWornAt: typeof item.lastWornAt === "number" ? item.lastWornAt : 0,
     ...(typeof item.statsVersion === "number" ? { statsVersion: item.statsVersion } : {}),
@@ -226,6 +233,10 @@ const createHistorySource = async (
       wardrobeId: input.wardrobeId,
       templateId: input.templateId,
     });
+    if (input.expectedTemplateRevision !== undefined) {
+      const item = extractGetItem(templateResult);
+      if (!isRecord(item) || item.status !== "ACTIVE" || (item.revision ?? 0) !== input.expectedTemplateRevision) throw createAppError("CONFLICT", { details: { reason: "CONFIRMATION_STALE" } });
+    }
     const clothingIds = extractTemplateClothingIds(
       templateResult,
       {
@@ -272,6 +283,8 @@ const createHistorySource = async (
 export function createHistoryWithStatsWriteUsecase(
   dependencies: CreateHistoryWithStatsWriteDependencies = {},
 ) {
+  const operations = createOperationRepo();
+  const getOperation = dependencies.getOperation ?? operations.get;
   const now = dependencies.now ?? Date.now;
   const generateHistoryId = dependencies.generateHistoryId ?? (() => `hs_${generateUuidV7()}`);
   const templateRepo = createTemplateRepo();
@@ -281,10 +294,13 @@ export function createHistoryWithStatsWriteUsecase(
   const batchGetClothingByIds = dependencies.batchGetClothingByIds
     ?? ((input: { wardrobeId: string; clothingIds: string[] }) => clothingBatchGetRepo.batchGetByIds(input));
   const transactWriteItems = dependencies.transactWriteItems
-    ?? ((items: TransactWriteItem[]) => createDynamoDbClient().transactWriteItems({ TransactItems: items }));
+    ?? operations.write;
 
   return {
     async create(input: CreateHistoryWithStatsWriteInput): Promise<CreateHistoryWithStatsWriteOutput> {
+      const findReplay = async () => input.operationId ? replayOperation(await getOperation(input.wardrobeId, input.operationId), input) : undefined;
+      const replay = await findReplay();
+      if (replay) return replay;
       const source = await createHistorySource(input, { getTemplate });
       const historyId = generateHistoryId();
       const history = createHistoryEntity({
@@ -303,30 +319,64 @@ export function createHistoryWithStatsWriteUsecase(
       const clothingStatsResults = source.clothingIds.length > 0
         ? await batchGetClothingByIds({ wardrobeId: input.wardrobeId, clothingIds: [...new Set(source.clothingIds)] })
         : [];
+      if (clothingStatsResults.some(result => isRecord(result) && isRecord(result.UnprocessedKeys) && Object.values(result.UnprocessedKeys).some(value => isRecord(value) && Array.isArray(value.Keys) && value.Keys.length > 0))) throw createAppError("SERVICE_UNAVAILABLE", { details: { reason: "INCOMPLETE_CLOTHING_READ" } });
+      if (input.expectedTemplateRevision !== undefined) {
+        const received = extractBatchClothingMap(clothingStatsResults);
+        if (source.clothingIds.some(id => received.get(id)?.status !== "ACTIVE")) throw createAppError("CONFLICT", { details: { reason: "CONFIRMATION_STALE" } });
+      }
       const targetStatsMap = buildTargetStatsMap({
         wardrobeId: input.wardrobeId,
         source,
         clothingStatsResults,
       });
 
+      if (input.expectedTemplateRevision !== undefined) {
+        for (const clothingId of source.clothingIds) if (targetStatsMap.get(`clothing:${clothingId}`)?.status !== "ACTIVE") throw createAppError("CONFLICT", { details: { reason: "CONFIRMATION_STALE" } });
+      }
       const statsItems = buildHistoryStatsWriteItems({
         wearDailyFacts: buildWearDailyFacts(command),
         cacheUpdateFacts: buildDailyStatsCacheUpdateFacts(command),
         resolveCurrentStats: (fact) => targetStatsMap.get(resolveStatsKey(fact)),
       });
 
+      if (input.expectedTemplateRevision !== undefined) {
+        for (const item of statsItems) {
+          const update = item.Update;
+          if (!update || !String(update.Key.SK).match(/^(TPL|CLOTH)#/)) continue;
+          update.ConditionExpression += " AND #confirmationStatus = :confirmationActive";
+          update.ExpressionAttributeNames = { ...update.ExpressionAttributeNames, "#confirmationStatus": "status" };
+          update.ExpressionAttributeValues = { ...update.ExpressionAttributeValues, ":confirmationActive": "ACTIVE" };
+          if (String(update.Key.SK).startsWith("TPL#")) {
+            update.ConditionExpression += input.expectedTemplateRevision === 0 ? " AND (attribute_not_exists(revision) OR revision = :confirmedRevision)" : " AND revision = :confirmedRevision";
+            update.ExpressionAttributeValues[":confirmedRevision"] = input.expectedTemplateRevision;
+          }
+        }
+      }
       const transactItems: TransactWriteItem[] = [
         {
           Put: {
-            Item: buildHistoryItem(history),
+            Item: { ...buildHistoryItem(history), ...(input.operationId ? { operationId: input.operationId } : {}) },
             ConditionExpression: "attribute_not_exists(PK) AND attribute_not_exists(SK)",
           },
         },
         ...statsItems,
+        ...(input.operationId ? [{ Put: { Item: { ...operationKey(input.wardrobeId, input.operationId), payload: operationPayload(input), historyId, createdAt: now() }, ConditionExpression: "attribute_not_exists(PK) AND attribute_not_exists(SK)" } }] : []),
       ];
 
       assertHistoryStatsWriteItemsWithinLimit(transactItems);
-      await writeHistoryStatsItems(transactItems, transactWriteItems);
+      try {
+        await writeHistoryStatsItems(transactItems, transactWriteItems);
+      } catch (error) {
+        // The transaction may have committed even when its response was lost.
+        const replayAfterFailure = await findReplay();
+        if (replayAfterFailure) return replayAfterFailure;
+        if (input.expectedTemplateRevision !== undefined && (isAppError(error) && error.code === "CONFLICT" || isRecord(error) && error.name === "TransactionCanceledException")) {
+          await createHistorySource(input, { getTemplate });
+          const latest = extractBatchClothingMap(await batchGetClothingByIds({ wardrobeId: input.wardrobeId, clothingIds: source.clothingIds }));
+          if (source.clothingIds.some(id => latest.get(id)?.status !== "ACTIVE")) throw createAppError("CONFLICT", { details: { reason: "CONFIRMATION_STALE" } });
+        }
+        throw error;
+      }
 
       return { historyId };
     },

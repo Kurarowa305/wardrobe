@@ -27,9 +27,10 @@ export function getHistory(wardrobeId: string, historyId: string): Promise<Histo
   return apiClient.get<HistoryDetailResponseDto>(buildHistoryDetailPath(wardrobeId, historyId));
 }
 
-export function createHistory(wardrobeId: string, body: CreateHistoryRequestDto): Promise<void> {
-  return apiClient.post<void, CreateHistoryRequestDto>(buildHistoryCollectionPath(wardrobeId), {
+export function createHistory(wardrobeId: string, body: CreateHistoryRequestDto, operationId?: string): Promise<{ historyId: string }> {
+  return apiClient.post<{ historyId: string }, CreateHistoryRequestDto>(buildHistoryCollectionPath(wardrobeId), {
     body,
+    ...(operationId ? { headers: { "Idempotency-Key": operationId } } : {}),
   });
 }
 

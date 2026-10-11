@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { createAppError } from "../../../core/errors/index.js";
 import { createSuccessResponse, type JsonResponse } from "../../../core/response/index.js";
 import { parseRequest } from "../../../core/validation/index.js";
@@ -83,12 +84,18 @@ export async function createHistoryHandler(input: CreateHistoryHandlerInput): Pr
     body: input.body,
   }, input.requestId);
 
+  const rawOperation = input.headers?.["idempotency-key"] ?? input.headers?.["Idempotency-Key"];
+  const operation = rawOperation === undefined ? undefined : z.string().uuid().safeParse(rawOperation);
+  if ((operation && !operation.success) || ("expectedTemplateRevision" in parsed.body && parsed.body.expectedTemplateRevision !== undefined && !operation)) throw createAppError("VALIDATION_ERROR");
+  const operationId = operation?.success ? operation.data.toLowerCase() : undefined;
   const usecase = createHistoryWithStatsWriteUsecase(input.dependencies);
   let result;
   try {
     result = await usecase.create({
       wardrobeId: parsed.path.wardrobeId,
       date: parsed.body.date,
+      operationId,
+      expectedTemplateRevision: "expectedTemplateRevision" in parsed.body ? parsed.body.expectedTemplateRevision : undefined,
       ...(parsed.body.templateId ? { templateId: parsed.body.templateId } : {}),
       ...(parsed.body.clothingIds ? { clothingIds: parsed.body.clothingIds } : {}),
     });
@@ -106,5 +113,5 @@ export async function createHistoryHandler(input: CreateHistoryHandlerInput): Pr
 
   return createSuccessResponse({
     historyId: result.historyId,
-  }, 201);
+  }, result.replayed ? 200 : 201);
 }

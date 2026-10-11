@@ -1,6 +1,6 @@
 import type { TransactWriteItem } from "../../../../clients/dynamodb.js";
 
-export const HISTORY_STATS_WRITE_LIMIT = 25;
+export const HISTORY_STATS_WRITE_LIMIT = 100;
 
 export type HistoryStatsWriteGuardInput = {
   itemCount: number;

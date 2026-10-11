@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useConfirmation } from "@/features/record/useConfirmation";
+import { RecordConfirmationDialog } from "@/components/app/home/RecordConfirmationDialog";
 import { createElement, useEffect, useRef, useState } from "react";
 import { useHome } from "@/api/hooks/home";
 import { useWardrobeDetail } from "@/api/hooks/wardrobe";
@@ -29,7 +30,7 @@ export function HomeTabScreen({
   onRecordTemplate,
 }: HomeTabScreenProps) {
   const { toast } = useToast();
-  const router = useRouter();
+  const confirmation = useConfirmation(wardrobeId, title => toast({ title }));
   const hasShownToastRef = useRef(false);
   const wardrobeQuery = useWardrobeDetail(wardrobeId);
   const home = useHome(wardrobeId);
@@ -154,6 +155,8 @@ export function HomeTabScreen({
       </div>
       <section
         className="grid gap-2"
+        data-record-focus-fallback
+        tabIndex={-1}
         aria-label={HOME_STRINGS.labels.recommendations}
         aria-live="polite"
         aria-busy={home.recommendations.status === "loading"}
@@ -192,7 +195,7 @@ export function HomeTabScreen({
                     onClick={() =>
                       onRecordTemplate
                         ? onRecordTemplate(item)
-                        : router.push(ROUTES.recordByTemplate(wardrobeId))
+                        : confirmation.open(item)
                     }
                   />
                 </li>
@@ -224,6 +227,8 @@ export function HomeTabScreen({
           {HOME_STRINGS.actions.addRecord}
         </Link>
       </Button>
+      <RecordConfirmationDialog snapshot={confirmation.snapshot} strings={confirmation.strings} onClose={confirmation.close} onDate={confirmation.setDate} onSubmit={() => void confirmation.submit()} onRefresh={() => void confirmation.refresh()} />
+      {!confirmation.snapshot.open && confirmation.snapshot.message === "storage" ? <p role="alert">{confirmation.strings.messages.storage}</p> : null}
       {regionOpen && home.region.data ? (
         <RegionDialog
           key={wardrobeId}
