@@ -1,11 +1,13 @@
 import assert from "node:assert/strict";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
-import regionModule from "../src/mocks/handlers/region.ts";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const regionModule = require("../src/mocks/handlers/region.ts");
 const { regionHandlers } = regionModule;
-import wardrobeModule from "../src/mocks/handlers/wardrobe.ts";
+const wardrobeModule = require("../src/mocks/handlers/wardrobe.ts");
 const { wardrobeHandlers } = wardrobeModule;
-import endpointModule from "../src/api/endpoints/region.ts";
+const endpointModule = require("../src/api/endpoints/region.ts");
 const { searchRegions, getWardrobeRegion, saveWardrobeRegion } = endpointModule;
 const server = setupServer(...regionHandlers, ...wardrobeHandlers);
 server.listen({ onUnhandledRequest: "error" });
