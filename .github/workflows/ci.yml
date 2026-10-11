@@ -515,6 +515,7 @@ jobs:
       - name: Home runtime and mutation behavior tests
         run: |
           pnpm --filter web test:home-runtime
+          pnpm --filter web test:home-ui
           pnpm --filter web test:home-dialogs
           pnpm --filter web test:home-mutations
           pnpm --filter web test:home-msw

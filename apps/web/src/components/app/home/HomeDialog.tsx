@@ -9,12 +9,14 @@ export function HomeDialog({
   onClose,
   busy = false,
   hideTitle = false,
+  initialFocus = "first",
 }: {
   title: string;
   children: ReactNode;
   onClose: () => void;
   busy?: boolean;
   hideTitle?: boolean;
+  initialFocus?: "first" | "panel";
 }) {
   const titleId = useId();
   const panel = useRef<HTMLDivElement>(null);
@@ -31,7 +33,7 @@ export function HomeDialog({
           'button:not(:disabled), a[href], input:not(:disabled), [tabindex="0"]',
         ),
       );
-    (focusable()[0] ?? element).focus();
+    (initialFocus === "panel" ? element : (focusable()[0] ?? element)).focus();
     const keydown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         event.preventDefault();
@@ -80,7 +82,7 @@ export function HomeDialog({
       if (previous?.isConnected) previous.focus();
       else document.querySelector<HTMLElement>("[data-record-focus-fallback]")?.focus();
     };
-  }, []);
+  }, [initialFocus]);
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4">
       <div

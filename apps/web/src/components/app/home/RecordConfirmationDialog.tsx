@@ -32,6 +32,7 @@ export function RecordConfirmationDialog({
   return (
     <HomeDialog
       title={strings.title}
+      initialFocus="panel"
       hideTitle
       busy={sending}
       onClose={onClose}
@@ -62,7 +63,7 @@ export function RecordConfirmationDialog({
           {strings.cancel}
         </button>
         <button
-          className="min-h-11 rounded-md bg-slate-900 p-2 text-white disabled:opacity-50"
+          className="min-h-11 rounded-md bg-[var(--primary)] p-2 text-white disabled:opacity-50"
           type="button"
           disabled={sending}
           onClick={snapshot.phase === "stale" ? onRefresh : onSubmit}
