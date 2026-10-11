@@ -1,0 +1,86 @@
+{
+  "records": [
+    {
+      "lgCode": "131041",
+      "sourceSrid": "EPSG:6668",
+      "coordinatePolicy": "jgd2011-as-wgs84-weather-v1",
+      "requestedAt": "2026-10-11T07:31:41.576239+00:00",
+      "url": "https://api.open-meteo.com/v1/forecast?latitude=35.69389&longitude=139.703463&models=best_match&daily=apparent_temperature_max%2Ctemperature_2m_max%2Ctemperature_2m_min%2Cweather_code&timezone=Asia%2FTokyo&temperature_unit=celsius&timeformat=iso8601&start_date=2026-10-11&end_date=2026-10-11",
+      "status": 200,
+      "response": {
+        "latitude": 35.7,
+        "longitude": 139.6875,
+        "generationtime_ms": 0.09930133819580078,
+        "utc_offset_seconds": 32400,
+        "timezone": "Asia/Tokyo",
+        "timezone_abbreviation": "GMT+9",
+        "elevation": 45.0,
+        "daily_units": {
+          "time": "iso8601",
+          "apparent_temperature_max": "°C",
+          "temperature_2m_max": "°C",
+          "temperature_2m_min": "°C",
+          "weather_code": "wmo code"
+        },
+        "daily": {
+          "time": [
+            "2026-10-11"
+          ],
+          "apparent_temperature_max": [
+            27.1
+          ],
+          "temperature_2m_max": [
+            26.0
+          ],
+          "temperature_2m_min": [
+            15.4
+          ],
+          "weather_code": [
+            0
+          ]
+        }
+      }
+    },
+    {
+      "lgCode": "133078",
+      "sourceSrid": "EPSG:6668",
+      "coordinatePolicy": "jgd2011-as-wgs84-weather-v1",
+      "requestedAt": "2026-10-11T07:31:42.999362+00:00",
+      "url": "https://api.open-meteo.com/v1/forecast?latitude=35.72684&longitude=139.148852&models=best_match&daily=apparent_temperature_max%2Ctemperature_2m_max%2Ctemperature_2m_min%2Cweather_code&timezone=Asia%2FTokyo&temperature_unit=celsius&timeformat=iso8601&start_date=2026-10-11&end_date=2026-10-11",
+      "status": 200,
+      "response": {
+        "latitude": 35.7,
+        "longitude": 139.1875,
+        "generationtime_ms": 0.08821487426757812,
+        "utc_offset_seconds": 32400,
+        "timezone": "Asia/Tokyo",
+        "timezone_abbreviation": "GMT+9",
+        "elevation": 311.0,
+        "daily_units": {
+          "time": "iso8601",
+          "apparent_temperature_max": "°C",
+          "temperature_2m_max": "°C",
+          "temperature_2m_min": "°C",
+          "weather_code": "wmo code"
+        },
+        "daily": {
+          "time": [
+            "2026-10-11"
+          ],
+          "apparent_temperature_max": [
+            25.4
+          ],
+          "temperature_2m_max": [
+            24.6
+          ],
+          "temperature_2m_min": [
+            14.1
+          ],
+          "weather_code": [
+            0
+          ]
+        }
+      }
+    }
+  ]
+}
