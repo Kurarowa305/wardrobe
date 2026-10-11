@@ -1,4 +1,4 @@
-import { createAppError } from "../../core/errors/index.js";
+import { createAppError, isAppError } from "../../core/errors/index.js";
 /** A request-scoped budget. All I/O receives a real AbortSignal; no detached retry. */
 export class WeatherBudget {
   readonly deadline: number;
@@ -55,6 +55,7 @@ export class WeatherBudget {
       }
       return result;
     } catch (error) {
+      if (isAppError(error)) throw error;
       if (kind !== "external")
         throw createAppError("SERVICE_UNAVAILABLE", {
           details: { reason: "WEATHER_STORAGE_FAILED" },

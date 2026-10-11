@@ -34,6 +34,7 @@ export type TemplateListItemDto = {
 export type TemplateDetailClothingItemDto = ClothingDto;
 
 export type TemplateDto = {
+  revision: number;
   name: string;
   tagIds: ItemTagIdDto[];
   status: TemplateStatusDto;

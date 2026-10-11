@@ -57,6 +57,7 @@ export const templateListItemSchema = z.object({
 }).strict();
 
 export const templateDetailResponseSchema = z.object({
+  revision: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER).default(0),
   name: templateNameSchema,
   tagIds: itemTagIdsSchema,
   status: templateStatusSchema,
@@ -80,6 +81,7 @@ export const templateWardrobePathParamsSchema = z.object({
 }).strict();
 
 export const templateEntitySchema = z.object({
+  revision: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER).optional(),
   wardrobeId: wardrobeIdSchema,
   templateId: templateIdSchema,
   name: templateNameSchema,

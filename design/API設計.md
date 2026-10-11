@@ -892,3 +892,12 @@ DTOは[契約Q9](タスク設計/地域天気テンプレート推薦_API契約�
 初回201 `{historyId}`、同キー同内容の成功再送200で元のID。操作記録を先に強整合確認するため、その後のテンプレート編集は再送を妨げない。異なる内容は409 `IDEMPOTENCY_KEY_REUSED`、保存済み履歴を削除した後は409 `HISTORY_ALREADY_DELETED`。確認版・ACTIVE不一致は409 `CONFIRMATION_STALE`。確認時の構成服が消えた場合も同じ。未処理BatchGetは503。statsVersion競合は既存CONFLICTを保持する。
 
 履歴・全服/テンプレートの日別/統計・操作記録を同一transactionで保存する。確認条件は既存統計Updateへ追加し、同一アイテムのConditionCheckを別に作らない。書込SDKはmaxAttempts=1で自動再送なし。結果不明時は同じ操作キーとbodyで明示再送する。
+## テンプレート推薦 API (#281)
+
+`GET /wardrobes/:wardrobeId/recommendations/templates?date=YYYY-MM-DD&regionRevision=0&mode=auto`。modeは省略auto、spring/summer/autumn/winter。厳密な実在日と安全整数、未知/重複queryは400。応答前にもJST日・地域版を検査し409 TARGET_DATE_CHANGED/REGION_CHANGEDを返す。
+
+DTOは契約Q9のwardrobeId/regionRevision/targetDate/mode/status/basis/items。region_required、weather_required（reason/retryAfter）、empty、readyを区別。自動は共有天気解決後に候補取得、手動は天気を呼ばない。丸め前15/25度、体感優先・最高実気温fallback、春秋ORと全区分season:all。候補は構成服最終着用日の最大値→createdAt→IDの昇順最大3件。全構成服と確認revisionを返し内部順位/季節を返さない。
+
+入口10秒の共通WeatherBudgetで、META/天気共有状態/全候補のDB読取を合計5秒に収める。SDK maxAttempts=1。ベースQuery全ページ強整合→必要服IDを重複排除し80件/最大4並行BatchGet強整合。候補間の共通服は除去しない。欠落・削除服を含む候補は除外、未処理キー/期限/読取失敗は503。local/Lambdaはtemplate domain、既存IAMのtable Get/Query/BatchGet/Updateを利用する。
+
+テンプレート詳細GETへrevisionを追加。作成1、旧データ0、名前/構成服/タグの内容変更と削除で増加、同内容・統計更新では維持する。同時編集/削除の条件不成立は409 TEMPLATE_CHANGED。

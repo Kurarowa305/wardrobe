@@ -407,3 +407,8 @@ UpdateItemはMETA存在とexpectedRevision一致を条件とし、revision=0の�
 同じ操作の並行書込は条件付きPutと既存statsVersion条件で一つだけ成功する。失敗後は強整合で操作結果を照合し、既知の成功なら元IDを返す。旧所有者や同時統計変更を無条件に上書きしない。既存履歴の操作キー欠損はそのまま扱う。
 
 DynamoDBの100項目上限へアプリguardを合わせ、20服テンプレートの作成・削除はそれぞれ44項目（履歴1＋21対象×日別/統計2＋操作1）で成功する。確認時はtemplate ACTIVE/revisionと全服ACTIVEを各統計Updateに組み込み、削除時にはACTIVE条件を追加しない。
+## テンプレート確認版と推薦 (#281)
+
+TPL本体にrevisionを追加（新規1、既存欠損0）。通常編集は読取版とACTIVEをUpdateItemの条件に含め、内容が変わった場合だけ+1。削除もACTIVE/読取版を条件に+1。同一アイテムの統計は通常編集で書き戻さない。履歴統計更新はrevisionに触れない。確認記録でのrevision条件は#283が既存統計Updateへ組み込む。
+
+推薦は `PK=W#<wardrobeId>#TPL` の全ページ強整合Queryを使い、季節内ACTIVE候補に必要な `PK=W#<wardrobeId>#CLOTH,SK=CLOTH#<clothingId>` を強整合BatchGetする。新GSI/集計itemなし。完了済み更新を反映するが読取中の全体スナップショットは保証しない。

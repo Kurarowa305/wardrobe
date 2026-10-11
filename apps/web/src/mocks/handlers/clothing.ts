@@ -26,6 +26,9 @@ const RECOMMENDATION_LIMIT_PER_GENRE = 2;
 let mockClothingIdSequence = 1;
 let clothingStore = initializeClothingStore();
 
+// Shared mock state keeps template recommendations and history statistics current.
+export function getMockClothingItems() { return clothingStore; }
+
 function initializeClothingStore(): ClothingDetailResponseDto[] {
   return clothingDetailFixtures.map((fixture) => ({ ...fixture }));
 }

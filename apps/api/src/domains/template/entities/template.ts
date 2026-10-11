@@ -28,6 +28,7 @@ export type CreateTemplateEntityInput = TemplateEntityKey & {
 
 export function createTemplateEntity(input: CreateTemplateEntityInput): TemplateEntity {
   return {
+    revision: 1,
     wardrobeId: input.wardrobeId,
     templateId: input.templateId,
     name: input.name,
@@ -44,6 +45,7 @@ export function createTemplateEntity(input: CreateTemplateEntityInput): Template
 export function markTemplateDeleted(entity: TemplateEntity, deletedAt: number): TemplateEntity {
   return {
     ...entity,
+    revision: (entity.revision ?? 0) + 1,
     status: "DELETED",
     deletedAt,
   };
