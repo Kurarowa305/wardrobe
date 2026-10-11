@@ -30,7 +30,9 @@ let templateStore = initializeTemplateStore();
 export function getMockTemplates() { return templateStore; }
 
 function initializeTemplateStore(): TemplateRecord[] {
-  return templateDetailFixtures.map((fixture) => ({
+  return templateDetailFixtures.map((fixture, index) => ({
+    createdAt: index,
+    revision: fixture.revision,
     templateId: fixture.templateId,
     name: fixture.name,
     tagIds: fixture.tagIds,
@@ -42,6 +44,7 @@ function initializeTemplateStore(): TemplateRecord[] {
 }
 
 type TemplateRecord = TemplateDetailResponseDto & {
+  createdAt: number;
   templateId: string;
 };
 
@@ -354,6 +357,7 @@ export const templateHandlers = [
     }
 
     return HttpResponse.json<TemplateDetailResponseDto>({
+      revision: template.revision,
       name: template.name,
       tagIds: template.tagIds,
       status: template.status,
@@ -392,6 +396,8 @@ export const templateHandlers = [
     templateStore = [
       ...templateStore,
       {
+        createdAt: Date.now(),
+        revision: 1,
         templateId: createMockTemplateId(),
         name: payload.name,
         tagIds: payload.tagIds ?? [],
@@ -448,6 +454,10 @@ export const templateHandlers = [
 
       return {
         ...template,
+        revision: template.revision + (
+          (payload.name ?? template.name) !== template.name
+          || JSON.stringify(nextClothingItems.map(item => item.clothingId)) !== JSON.stringify(template.clothingItems.map(item => item.clothingId))
+          || JSON.stringify([...(payload.tagIds ?? template.tagIds)].sort()) !== JSON.stringify([...template.tagIds].sort()) ? 1 : 0),
         name: payload.name ?? template.name,
         tagIds: payload.tagIds ?? template.tagIds,
         clothingItems: nextClothingItems,
@@ -485,6 +495,7 @@ export const templateHandlers = [
 
       return {
         ...template,
+        revision: template.revision + 1,
         status: "DELETED",
       };
     });

@@ -884,3 +884,13 @@ DTOは[契約Q9](タスク設計/地域天気テンプレート推薦_API契約�
 `GET /wardrobes/:wardrobeId/region` と `PUT /wardrobes/:wardrobeId/region` の成功DTOは `{revision,region:{regionId,label,datasetVersion}|null}`。既存未設定は0/null。PUTは `{regionId,datasetVersion,expectedRevision}`、解除は `{regionId:null,expectedRevision}`。JSONのみ、未知属性・不正整数は拒否。未知コードは400 UNKNOWN_REGION、辞書版変更と保存版競合は409 REGION_DATASET_CHANGED/REGION_CHANGED（details.reason）。PUT結果不明の再送も古い版では409。未知wardrobeは404。
 
 経路は既存wardrobe Lambdaとlocal共通handler。既存wardrobe IAMのGetItem/UpdateItemを使い追加権限・環境変数不要。Web共通clientにPUTとAbortSignal対応endpoint、DTO検証とMSWを追加。画面側の明示検索・応答世代管理は#282。
+
+## テンプレート推薦 API (#281)
+
+`GET /wardrobes/:wardrobeId/recommendations/templates?date=YYYY-MM-DD&regionRevision=0&mode=auto`。modeは省略auto、spring/summer/autumn/winter。厳密な実在日と安全整数、未知/重複queryは400。応答前にもJST日・地域版を検査し409 TARGET_DATE_CHANGED/REGION_CHANGEDを返す。
+
+DTOは契約Q9のwardrobeId/regionRevision/targetDate/mode/status/basis/items。region_required、weather_required（reason/retryAfter）、empty、readyを区別。自動は共有天気解決後に候補取得、手動は天気を呼ばない。丸め前15/25度、体感優先・最高実気温fallback、春秋ORと全区分season:all。候補は構成服最終着用日の最大値→createdAt→IDの昇順最大3件。全構成服と確認revisionを返し内部順位/季節を返さない。
+
+入口10秒の共通WeatherBudgetで、META/天気共有状態/全候補のDB読取を合計5秒に収める。SDK maxAttempts=1。ベースQuery全ページ強整合→必要服IDを重複排除し80件/最大4並行BatchGet強整合。候補間の共通服は除去しない。欠落・削除服を含む候補は除外、未処理キー/期限/読取失敗は503。local/Lambdaはtemplate domain、既存IAMのtable Get/Query/BatchGet/Updateを利用する。
+
+テンプレート詳細GETへrevisionを追加。作成1、旧データ0、名前/構成服/タグの内容変更と削除で増加、同内容・統計更新では維持する。同時編集/削除の条件不成立は409 TEMPLATE_CHANGED。

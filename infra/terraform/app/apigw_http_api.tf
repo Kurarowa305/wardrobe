@@ -26,6 +26,7 @@ locals {
       "ANY /wardrobes/{wardrobeId}/clothing/{clothingId}"
     ]
     template = [
+      "GET /wardrobes/{wardrobeId}/recommendations/templates",
       "ANY /wardrobes/{wardrobeId}/templates",
       "ANY /wardrobes/{wardrobeId}/templates/{templateId}"
     ]

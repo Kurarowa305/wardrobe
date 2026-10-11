@@ -86,6 +86,7 @@ function toTemplateClothingItem(clothingId: string): TemplateDetailClothingItemD
 }
 
 export const templateDetailFixtures: TemplateDetailFixture[] = templateDetailFixtureSeeds.map((seed) => ({
+  revision: 0,
   templateId: seed.templateId,
   name: seed.name,
   status: seed.status,

@@ -11,6 +11,7 @@ export const localRoutePatterns = [
   "/wardrobes",
   "/wardrobes/:wardrobeId",
   "/wardrobes/:wardrobeId/weather",
+  "/wardrobes/:wardrobeId/recommendations/templates",
   "/wardrobes/:wardrobeId/recommendations/clothing",
   "/wardrobes/:wardrobeId/clothing",
   "/wardrobes/:wardrobeId/clothing/:clothingId",
@@ -56,6 +57,7 @@ export type LocalRouteHandler = (
   | { statusCode: number; headers: Record<string, string>; body: string };
 
 export const localRoutes: readonly LocalRouteDefinition[] = [
+  { method: "GET", pattern: "/wardrobes/:wardrobeId/recommendations/templates", domain: "template" },
   { method: "GET", pattern: "/wardrobes/:wardrobeId/weather", domain: "wardrobe" },
   { method: "GET", pattern: "/regions", domain: "wardrobe" },
   { method: "GET", pattern: "/wardrobes/:wardrobeId/region", domain: "wardrobe" },
