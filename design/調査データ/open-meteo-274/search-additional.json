@@ -1,0 +1,664 @@
+{
+  "records": [
+    {
+      "kind": "geocoding",
+      "label": "東京都",
+      "requestedAt": "2026-10-10T17:44:17.688319+00:00",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=%E6%9D%B1%E4%BA%AC%E9%83%BD&count=10&language=ja&countryCode=JP&format=json",
+      "status": 200,
+      "elapsedMs": 1056,
+      "response": {
+        "results": [
+          {
+            "id": 1850147,
+            "name": "東京都",
+            "latitude": 35.6895,
+            "longitude": 139.69171,
+            "elevation": 44.0,
+            "feature_code": "PPLC",
+            "country_code": "JP",
+            "admin1_id": 1850144,
+            "timezone": "Asia/Tokyo",
+            "population": 9733276,
+            "country_id": 1861060,
+            "country": "日本",
+            "admin1": "東京都"
+          }
+        ],
+        "generationtime_ms": 0.33962727
+      }
+    },
+    {
+      "kind": "geocoding",
+      "label": "札幌市",
+      "requestedAt": "2026-10-10T17:44:18.744108+00:00",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=%E6%9C%AD%E5%B9%8C%E5%B8%82&count=10&language=ja&countryCode=JP&format=json",
+      "status": 200,
+      "elapsedMs": 1079,
+      "response": {
+        "results": [
+          {
+            "id": 2128295,
+            "name": "札幌市",
+            "latitude": 43.06667,
+            "longitude": 141.35,
+            "elevation": 26.0,
+            "feature_code": "PPLA",
+            "country_code": "JP",
+            "admin1_id": 2130037,
+            "admin2_id": 2128291,
+            "timezone": "Asia/Tokyo",
+            "population": 1973832,
+            "country_id": 1861060,
+            "country": "日本",
+            "admin1": "北海道",
+            "admin2": "札幌市"
+          }
+        ],
+        "generationtime_ms": 0.084757805
+      }
+    },
+    {
+      "kind": "geocoding",
+      "label": "大阪市",
+      "requestedAt": "2026-10-10T17:44:19.823379+00:00",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=%E5%A4%A7%E9%98%AA%E5%B8%82&count=10&language=ja&countryCode=JP&format=json",
+      "status": 200,
+      "elapsedMs": 1137,
+      "response": {
+        "results": [
+          {
+            "id": 1853909,
+            "name": "大阪市",
+            "latitude": 34.69379,
+            "longitude": 135.50107,
+            "elevation": 4.0,
+            "feature_code": "PPLA",
+            "country_code": "JP",
+            "admin1_id": 1853904,
+            "admin2_id": 1853897,
+            "admin3_id": 1859310,
+            "timezone": "Asia/Tokyo",
+            "population": 2753862,
+            "country_id": 1861060,
+            "country": "日本",
+            "admin1": "大阪府",
+            "admin2": "大阪市",
+            "admin3": "北区"
+          }
+        ],
+        "generationtime_ms": 0.74350834
+      }
+    },
+    {
+      "kind": "geocoding",
+      "label": "福岡市",
+      "requestedAt": "2026-10-10T17:44:20.960094+00:00",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=%E7%A6%8F%E5%B2%A1%E5%B8%82&count=10&language=ja&countryCode=JP&format=json",
+      "status": 200,
+      "elapsedMs": 1220,
+      "response": {
+        "results": [
+          {
+            "id": 1863967,
+            "name": "福岡市",
+            "latitude": 33.6,
+            "longitude": 130.41667,
+            "elevation": 3.0,
+            "feature_code": "PPLA",
+            "country_code": "JP",
+            "admin1_id": 1863958,
+            "admin2_id": 1863955,
+            "admin3_id": 7407401,
+            "timezone": "Asia/Tokyo",
+            "population": 1612392,
+            "country_id": 1861060,
+            "country": "日本",
+            "admin1": "福岡県",
+            "admin2": "Fukuoka-shi",
+            "admin3": "博多区"
+          },
+          {
+            "id": 13494452,
+            "name": "福岡市役所西側ふれあい広場",
+            "latitude": 33.59,
+            "longitude": 130.40111,
+            "elevation": 5.0,
+            "feature_code": "PRK",
+            "country_code": "JP",
+            "admin1_id": 1863958,
+            "admin2_id": 1863955,
+            "admin3_id": 7407400,
+            "timezone": "Asia/Tokyo",
+            "postcodes": [
+              "810-8620"
+            ],
+            "country_id": 1861060,
+            "country": "日本",
+            "admin1": "福岡県",
+            "admin2": "Fukuoka-shi",
+            "admin3": "中央区"
+          }
+        ],
+        "generationtime_ms": 0.46920776
+      }
+    },
+    {
+      "kind": "geocoding",
+      "label": "那覇市",
+      "requestedAt": "2026-10-10T17:44:22.180406+00:00",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=%E9%82%A3%E8%A6%87%E5%B8%82&count=10&language=ja&countryCode=JP&format=json",
+      "status": 200,
+      "elapsedMs": 1100,
+      "response": {
+        "results": [
+          {
+            "id": 1856035,
+            "name": "那覇市",
+            "latitude": 26.213,
+            "longitude": 127.67851,
+            "elevation": 1.0,
+            "feature_code": "PPLA",
+            "country_code": "JP",
+            "admin1_id": 1854345,
+            "admin2_id": 1856030,
+            "timezone": "Asia/Tokyo",
+            "population": 317625,
+            "country_id": 1861060,
+            "country": "日本",
+            "admin1": "沖縄県",
+            "admin2": "那覇市"
+          }
+        ],
+        "generationtime_ms": 0.09167194
+      }
+    },
+    {
+      "kind": "geocoding",
+      "label": "しんじゅく",
+      "requestedAt": "2026-10-10T17:44:23.280862+00:00",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=%E3%81%97%E3%82%93%E3%81%98%E3%82%85%E3%81%8F&count=10&language=ja&countryCode=JP&format=json",
+      "status": 200,
+      "elapsedMs": 1071,
+      "response": {
+        "generationtime_ms": 0.082850456
+      }
+    },
+    {
+      "kind": "geocoding",
+      "label": "シンジュク",
+      "requestedAt": "2026-10-10T17:44:24.351996+00:00",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=%E3%82%B7%E3%83%B3%E3%82%B8%E3%83%A5%E3%82%AF&count=10&language=ja&countryCode=JP&format=json",
+      "status": 200,
+      "elapsedMs": 1182,
+      "response": {
+        "generationtime_ms": 0.3246069
+      }
+    },
+    {
+      "kind": "geocoding",
+      "label": "Shinjuku",
+      "requestedAt": "2026-10-10T17:44:25.533992+00:00",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Shinjuku&count=10&language=ja&countryCode=JP&format=json",
+      "status": 200,
+      "elapsedMs": 1079,
+      "response": {
+        "results": [
+          {
+            "id": 11790353,
+            "name": "新宿",
+            "latitude": 35.69115,
+            "longitude": 139.70854,
+            "elevation": 47.0,
+            "feature_code": "PPLX",
+            "country_code": "JP",
+            "admin1_id": 1850144,
+            "admin2_id": 1852083,
+            "timezone": "Asia/Tokyo",
+            "population": 349385,
+            "country_id": 1861060,
+            "country": "日本",
+            "admin1": "東京都",
+            "admin2": "新宿区"
+          },
+          {
+            "id": 1852043,
+            "name": "Shinshuku",
+            "latitude": 35.6,
+            "longitude": 138.78333,
+            "elevation": 1024.0,
+            "feature_code": "PPL",
+            "country_code": "JP",
+            "admin1_id": 1848649,
+            "admin2_id": 1853562,
+            "timezone": "Asia/Tokyo",
+            "country_id": 1861060,
+            "country": "日本",
+            "admin1": "山梨県",
+            "admin2": "大月市"
+          },
+          {
+            "id": 8726153,
+            "name": "新宿",
+            "latitude": 35.2946,
+            "longitude": 139.57059,
+            "elevation": 7.0,
+            "feature_code": "PPL",
+            "country_code": "JP",
+            "admin1_id": 1860291,
+            "admin2_id": 7470888,
+            "timezone": "Asia/Tokyo",
+            "country_id": 1861060,
+            "country": "日本",
+            "admin1": "神奈川県",
+            "admin2": "逗子市"
+          },
+          {
+            "id": 10430609,
+            "name": "新宿",
+            "latitude": 35.47645,
+            "longitude": 139.34203,
+            "elevation": 52.0,
+            "feature_code": "PPL",
+            "country_code": "JP",
+            "admin1_id": 1860291,
+            "admin2_id": 1864928,
+            "timezone": "Asia/Tokyo",
+            "country_id": 1861060,
+            "country": "日本",
+            "admin1": "神奈川県",
+            "admin2": "厚木市"
+          },
+          {
+            "id": 1862460,
+            "name": "Hiratsuka-Shinjuku",
+            "latitude": 35.31667,
+            "longitude": 139.35,
+            "elevation": 11.0,
+            "feature_code": "PPLX",
+            "country_code": "JP",
+            "admin1_id": 1860291,
+            "admin2_id": 1862461,
+            "timezone": "Asia/Tokyo",
+            "country_id": 1861060,
+            "country": "日本",
+            "admin1": "神奈川県",
+            "admin2": "平塚市"
+          },
+          {
+            "id": 10413024,
+            "name": "新宿",
+            "latitude": 35.33055,
+            "longitude": 139.14912,
+            "elevation": 46.0,
+            "feature_code": "PPLL",
+            "country_code": "JP",
+            "admin1_id": 1860291,
+            "admin2_id": 1865011,
+            "admin3_id": 1854509,
+            "timezone": "Asia/Tokyo",
+            "country_id": 1861060,
+            "country": "日本",
+            "admin1": "神奈川県",
+            "admin2": "足柄上郡",
+            "admin3": "大井町"
+          },
+          {
+            "id": 10426273,
+            "name": "新宿",
+            "latitude": 35.40623,
+            "longitude": 139.40256,
+            "elevation": 20.0,
+            "feature_code": "PPLL",
+            "country_code": "JP",
+            "admin1_id": 1860291,
+            "admin2_id": 7470889,
+            "timezone": "Asia/Tokyo",
+            "country_id": 1861060,
+            "country": "日本",
+            "admin1": "神奈川県",
+            "admin2": "海老名市"
+          },
+          {
+            "id": 11838113,
+            "name": "新宿",
+            "latitude": 35.60501,
+            "longitude": 140.1135,
+            "elevation": 7.0,
+            "feature_code": "PPLX",
+            "country_code": "JP",
+            "admin1_id": 2113014,
+            "admin2_id": 2113012,
+            "admin3_id": 8534447,
+            "timezone": "Asia/Tokyo",
+            "country_id": 1861060,
+            "country": "日本",
+            "admin1": "千葉県",
+            "admin2": "千葉市",
+            "admin3": "中央区"
+          },
+          {
+            "id": 10642176,
+            "name": "新宿町",
+            "latitude": 35.10764,
+            "longitude": 138.85982,
+            "elevation": 14.0,
+            "feature_code": "PPL",
+            "country_code": "JP",
+            "admin1_id": 1851715,
+            "admin2_id": 1854900,
+            "timezone": "Asia/Tokyo",
+            "country_id": 1861060,
+            "country": "日本",
+            "admin1": "静岡県",
+            "admin2": "沼津市"
+          },
+          {
+            "id": 11822058,
+            "name": "新宿通",
+            "latitude": 34.06381,
+            "longitude": 131.8003,
+            "elevation": 7.0,
+            "feature_code": "PPLX",
+            "country_code": "JP",
+            "admin1_id": 1848681,
+            "admin2_id": 7393001,
+            "timezone": "Asia/Tokyo",
+            "country_id": 1861060,
+            "country": "日本",
+            "admin1": "山口県",
+            "admin2": "周南市"
+          }
+        ],
+        "generationtime_ms": 0.52011013
+      }
+    },
+    {
+      "kind": "geocoding",
+      "label": "Fuchu",
+      "requestedAt": "2026-10-10T17:44:26.613497+00:00",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Fuchu&count=10&language=ja&countryCode=JP&format=json",
+      "status": 200,
+      "elapsedMs": 1111,
+      "response": {
+        "results": [
+          {
+            "id": 11611632,
+            "name": "府中",
+            "latitude": 35.67452,
+            "longitude": 139.48216,
+            "elevation": 59.0,
+            "feature_code": "PPLA2",
+            "country_code": "JP",
+            "admin1_id": 1850144,
+            "admin2_id": 1864148,
+            "timezone": "Asia/Tokyo",
+            "population": 262790,
+            "country_id": 1861060,
+            "country": "日本",
+            "admin1": "東京都",
+            "admin2": "府中市"
+          },
+          {
+            "id": 1864155,
+            "name": "府中町",
+            "latitude": 34.5735,
+            "longitude": 133.23512,
+            "elevation": 33.0,
+            "feature_code": "PPLA2",
+            "country_code": "JP",
+            "admin1_id": 1862413,
+            "admin2_id": 1864151,
+            "timezone": "Asia/Tokyo",
+            "population": 50746,
+            "country_id": 1861060,
+            "country": "日本",
+            "admin1": "広島県",
+            "admin2": "府中市"
+          },
+          {
+            "id": 13132765,
+            "name": "Fuchū",
+            "latitude": 34.38793,
+            "longitude": 132.51001,
+            "elevation": 68.0,
+            "feature_code": "PPL",
+            "country_code": "JP",
+            "admin1_id": 1862413,
+            "admin2_id": 1865442,
+            "admin3_id": 1864152,
+            "timezone": "Asia/Tokyo",
+            "population": 51155,
+            "country_id": 1861060,
+            "country": "日本",
+            "admin1": "広島県",
+            "admin2": "安芸郡",
+            "admin3": "府中町"
+          },
+          {
+            "id": 1859196,
+            "name": "Kō",
+            "latitude": 34.06667,
+            "longitude": 134.46667,
+            "elevation": 10.0,
+            "feature_code": "PPL",
+            "country_code": "JP",
+            "admin1_id": 1850157,
+            "admin2_id": 1856299,
+            "admin3_id": 1861397,
+            "timezone": "Asia/Tokyo",
+            "country_id": 1861060,
+            "country": "日本",
+            "admin1": "徳島県",
+            "admin2": "名西郡",
+            "admin3": "石井町"
+          },
+          {
+            "id": 11109069,
+            "name": "府中",
+            "latitude": 35.01351,
+            "longitude": 139.89104,
+            "elevation": 14.0,
+            "feature_code": "PPL",
+            "country_code": "JP",
+            "admin1_id": 2113014,
+            "admin2_id": 7465521,
+            "timezone": "Asia/Tokyo",
+            "country_id": 1861060,
+            "country": "日本",
+            "admin1": "千葉県",
+            "admin2": "南房総市"
+          },
+          {
+            "id": 11836085,
+            "name": "府中",
+            "latitude": 36.19166,
+            "longitude": 140.27452,
+            "elevation": 27.0,
+            "feature_code": "PPLX",
+            "country_code": "JP",
+            "admin1_id": 2112669,
+            "admin2_id": 7452800,
+            "timezone": "Asia/Tokyo",
+            "country_id": 1861060,
+            "country": "日本",
+            "admin1": "茨城県",
+            "admin2": "石岡市"
+          },
+          {
+            "id": 9289117,
+            "name": "府中町",
+            "latitude": 34.48609,
+            "longitude": 135.42615,
+            "elevation": 20.0,
+            "feature_code": "PPL",
+            "country_code": "JP",
+            "admin1_id": 1853904,
+            "admin2_id": 1861089,
+            "timezone": "Asia/Tokyo",
+            "country_id": 1861060,
+            "country": "日本",
+            "admin1": "大阪府",
+            "admin2": "和泉市"
+          },
+          {
+            "id": 8663715,
+            "name": "婦中町大瀬谷",
+            "latitude": 36.60965,
+            "longitude": 137.06976,
+            "elevation": 125.0,
+            "feature_code": "PPL",
+            "country_code": "JP",
+            "admin1_id": 1849872,
+            "admin2_id": 1849870,
+            "timezone": "Asia/Tokyo",
+            "country_id": 1861060,
+            "country": "日本",
+            "admin1": "富山県",
+            "admin2": "富山市"
+          },
+          {
+            "id": 8667710,
+            "name": "婦中町平等",
+            "latitude": 36.6489,
+            "longitude": 137.0699,
+            "elevation": 72.0,
+            "feature_code": "PPL",
+            "country_code": "JP",
+            "admin1_id": 1849872,
+            "admin2_id": 1849870,
+            "timezone": "Asia/Tokyo",
+            "country_id": 1861060,
+            "country": "日本",
+            "admin1": "富山県",
+            "admin2": "富山市"
+          },
+          {
+            "id": 8664239,
+            "name": "婦中町成子",
+            "latitude": 36.61296,
+            "longitude": 137.1798,
+            "elevation": 47.0,
+            "feature_code": "PPL",
+            "country_code": "JP",
+            "admin1_id": 1849872,
+            "admin2_id": 1849870,
+            "timezone": "Asia/Tokyo",
+            "country_id": 1861060,
+            "country": "日本",
+            "admin1": "富山県",
+            "admin2": "富山市"
+          }
+        ],
+        "generationtime_ms": 0.41353703
+      }
+    },
+    {
+      "kind": "geocoding",
+      "label": "Fuchu, Hiroshima",
+      "requestedAt": "2026-10-10T17:44:27.724274+00:00",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Fuchu%2C+Hiroshima&count=10&language=ja&countryCode=JP&format=json",
+      "status": 200,
+      "elapsedMs": 1193,
+      "response": {
+        "results": [
+          {
+            "id": 1864155,
+            "name": "府中町",
+            "latitude": 34.5735,
+            "longitude": 133.23512,
+            "elevation": 33.0,
+            "feature_code": "PPLA2",
+            "country_code": "JP",
+            "admin1_id": 1862413,
+            "admin2_id": 1864151,
+            "timezone": "Asia/Tokyo",
+            "population": 50746,
+            "country_id": 1861060,
+            "country": "日本",
+            "admin1": "広島県",
+            "admin2": "府中市"
+          },
+          {
+            "id": 13132765,
+            "name": "Fuchū",
+            "latitude": 34.38793,
+            "longitude": 132.51001,
+            "elevation": 68.0,
+            "feature_code": "PPL",
+            "country_code": "JP",
+            "admin1_id": 1862413,
+            "admin2_id": 1865442,
+            "admin3_id": 1864152,
+            "timezone": "Asia/Tokyo",
+            "population": 51155,
+            "country_id": 1861060,
+            "country": "日本",
+            "admin1": "広島県",
+            "admin2": "安芸郡",
+            "admin3": "府中町"
+          }
+        ],
+        "generationtime_ms": 0.45502186
+      }
+    },
+    {
+      "kind": "geocoding",
+      "label": "ふちゅう",
+      "requestedAt": "2026-10-10T17:44:28.917406+00:00",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=%E3%81%B5%E3%81%A1%E3%82%85%E3%81%86&count=10&language=ja&countryCode=JP&format=json",
+      "status": 200,
+      "elapsedMs": 1075,
+      "response": {
+        "generationtime_ms": 0.15079975
+      }
+    },
+    {
+      "kind": "geocoding",
+      "label": "フチュウ",
+      "requestedAt": "2026-10-10T17:44:29.992108+00:00",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=%E3%83%95%E3%83%81%E3%83%A5%E3%82%A6&count=10&language=ja&countryCode=JP&format=json",
+      "status": 200,
+      "elapsedMs": 1108,
+      "response": {
+        "generationtime_ms": 0.43725967
+      }
+    },
+    {
+      "kind": "geocoding",
+      "label": "檜原村, 東京都",
+      "requestedAt": "2026-10-10T17:44:31.100650+00:00",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=%E6%AA%9C%E5%8E%9F%E6%9D%91%2C+%E6%9D%B1%E4%BA%AC%E9%83%BD&count=10&language=ja&countryCode=JP&format=json",
+      "status": 200,
+      "elapsedMs": 1113,
+      "response": {
+        "generationtime_ms": 0.14567375
+      }
+    },
+    {
+      "kind": "geocoding-get",
+      "label": "府中ID再解決",
+      "requestedAt": "2026-10-10T17:45:01.277760+00:00",
+      "url": "https://geocoding-api.open-meteo.com/v1/get?id=11611632&language=ja",
+      "status": 200,
+      "elapsedMs": 1199,
+      "response": {
+        "id": 11611632,
+        "name": "府中",
+        "latitude": 35.67452,
+        "longitude": 139.48216,
+        "elevation": 59.0,
+        "feature_code": "PPLA2",
+        "country_code": "JP",
+        "admin1_id": 1850144,
+        "admin2_id": 1864148,
+        "timezone": "Asia/Tokyo",
+        "population": 262790,
+        "country_id": 1861060,
+        "country": "日本",
+        "admin1": "東京都",
+        "admin2": "府中市"
+      }
+    }
+  ]
+}

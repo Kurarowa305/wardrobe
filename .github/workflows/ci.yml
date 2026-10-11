@@ -25,6 +25,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Open-Meteo connection research evidence
+        run: node scripts/check-open-meteo-274-evidence.mjs
+
+      - name: Japan municipality research evidence
+        run: python3 scripts/check-japan-municipality-274-evidence.py
+
       - name: Lint
         run: pnpm -r --if-present run lint
 
