@@ -1,3 +1,5 @@
+import { homeHandlers } from "./home";
+import { regionHandlers } from "./region";
 import { clothingHandlers } from "./clothing";
 import { healthHandler } from "./health";
 import { historyHandlers } from "./history";
@@ -11,3 +13,6 @@ handlers.push(...clothingHandlers);
 handlers.push(...imagePresignHandlers);
 handlers.push(...templateHandlers);
 handlers.push(...historyHandlers);
+
+handlers.push(...regionHandlers);
+handlers.push(...homeHandlers);
