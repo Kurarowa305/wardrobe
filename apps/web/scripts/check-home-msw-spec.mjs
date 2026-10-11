@@ -5,6 +5,7 @@ process.env.NEXT_PUBLIC_API_BASE_URL = "http://localhost";
 const require = createRequire(import.meta.url);
 const { setupServer } = require("msw/node");
 const { http, HttpResponse } = require("msw");
+const { clothingHandlers } = load("mocks/handlers/clothing");
 const { templateHandlers } = load("mocks/handlers/template");
 const { updateTemplate } = load("api/endpoints/template");
 const { homeHandlers } = load("mocks/handlers/home");
@@ -22,6 +23,7 @@ const context = {
 const server = setupServer(
   ...homeHandlers,
   ...templateHandlers,
+  ...clothingHandlers,
   ...regionHandlers,
   ...wardrobeHandlers,
 );
@@ -45,6 +47,17 @@ try {
     const response = await fetch(`http://localhost/wardrobes/${context.wardrobeId}/recommendations/templates?mode=summer&date=${context.targetDate}&regionRevision=0${suffix}`);
     assert.equal(response.status, 400);
   }
+  const clothingId = updated.items[0].clothingItems[0].clothingId;
+  const patch = await fetch(`http://localhost/wardrobes/${context.wardrobeId}/clothing/${clothingId}`, {
+    method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({ imageKey: "clothing/updated-preview.png" }),
+  });
+  assert.equal(patch.status, 204);
+  const refreshed = await getTemplateRecommendations(context, "summer");
+  assert.equal(refreshed.items.flatMap(item => item.clothingItems).find(item => item.clothingId === clothingId).imageKey, "clothing/updated-preview.png");
+  const removed = await fetch(`http://localhost/wardrobes/${context.wardrobeId}/clothing/${clothingId}`, { method: "DELETE" });
+  assert.equal(removed.status, 204);
+  const afterDelete = await getTemplateRecommendations(context, "summer");
+  assert.ok(afterDelete.items.every(item => item.clothingItems.every(clothing => clothing.clothingId !== clothingId)), "deleted clothing excludes every containing template");
   const result = await searchRegions("新宿");
   await saveWardrobeRegion(context.wardrobeId, {
     regionId: result.items[0].regionId,

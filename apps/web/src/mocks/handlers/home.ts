@@ -3,6 +3,7 @@ import { getMockWardrobeRegion } from "./region";
 import { wardrobeStore } from "./wardrobe";
 import { applyMockScenario } from "./scenario";
 import { getMockTemplates } from "./template";
+import { getMockClothingItems } from "./clothing";
 import { jstDate, nextJstMidnight } from "@/features/home/controller";
 import type {
   HomeContext,
@@ -115,9 +116,16 @@ export const homeHandlers = [
         mode === "auto"
           ? ["season:spring", "season:autumn"]
           : [`season:${mode}`];
+      const clothingById = new Map(getMockClothingItems().map(item => [item.clothingId, item]));
       const items = regionRequired
         ? []
         : getMockTemplates()
+            .flatMap(template => {
+              const clothingItems = template.clothingItems.map(item => clothingById.get(item.clothingId));
+              return clothingItems.every((item): item is NonNullable<typeof item> => item !== undefined && item.status === "ACTIVE")
+                ? [{ ...template, clothingItems }]
+                : [];
+            })
             .filter(
               (item) =>
                 item.status === "ACTIVE" &&
