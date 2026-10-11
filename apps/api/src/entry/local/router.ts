@@ -8,6 +8,7 @@ import { sharedDomainHandlers } from "../lambda/adapter.js";
 export const localRoutePatterns = [
   "/wardrobes",
   "/wardrobes/:wardrobeId",
+  "/wardrobes/:wardrobeId/weather",
   "/wardrobes/:wardrobeId/recommendations/clothing",
   "/wardrobes/:wardrobeId/clothing",
   "/wardrobes/:wardrobeId/clothing/:clothingId",
@@ -35,6 +36,7 @@ export type LocalRouteMatch = LocalRouteDefinition & {
 };
 
 export type LocalRouteRequest = {
+  startedAt?: number;
   requestId: string;
   method: string;
   pathname: string;
@@ -52,6 +54,7 @@ export type LocalRouteHandler = (
   | { statusCode: number; headers: Record<string, string>; body: string };
 
 export const localRoutes: readonly LocalRouteDefinition[] = [
+  { method: "GET", pattern: "/wardrobes/:wardrobeId/weather", domain: "wardrobe" },
   { method: "POST", pattern: "/wardrobes", domain: "wardrobe" },
   { method: "GET", pattern: "/wardrobes/:wardrobeId", domain: "wardrobe" },
   { method: "GET", pattern: "/wardrobes/:wardrobeId/recommendations/clothing", domain: "clothing" },
@@ -182,6 +185,7 @@ export function createLocalRouter(handlers: Partial<Record<LocalDomain, LocalRou
   return {
     routes: localRoutes,
     async dispatch(request: IncomingMessage) {
+      const startedAt = Date.now();
       const requestId = request.headers["x-request-id"]?.toString() || randomUUID();
       const method = request.method?.toUpperCase() ?? "GET";
       const url = new URL(request.url ?? "/", "http://127.0.0.1");
@@ -203,6 +207,7 @@ export function createLocalRouter(handlers: Partial<Record<LocalDomain, LocalRou
       try {
         const body = method === "GET" || method === "DELETE" ? {} : await readJsonBody(request);
         const response = await resolvedHandlers[match.domain]({
+          startedAt,
           requestId,
           method,
           pathname: url.pathname,
