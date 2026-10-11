@@ -383,6 +383,9 @@ jobs:
           bash scripts/run-confirm-record-dynamodb-tests.sh
           pnpm --filter web test:confirm-record
 
+      - name: Real Web API home integration with DynamoDB Local
+        run: pnpm --filter api test:home-integration
+
       - name: Typecheck api
         run: pnpm --filter api exec tsc --noEmit
 
@@ -515,6 +518,8 @@ jobs:
           pnpm --filter web test:home-dialogs
           pnpm --filter web test:home-mutations
           pnpm --filter web test:home-msw
+          pnpm --filter web test:home-record-integration
+          pnpm --filter web test:legacy-web-integration
 
       - name: Home screen spec test
         run: pnpm --filter web test:home-screen

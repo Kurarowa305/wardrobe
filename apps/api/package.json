@@ -121,7 +121,8 @@
     "test:confirm-record": "node --import tsx/esm scripts/check-confirm-record-spec.mjs",
     "test:template-recommendations": "tsx scripts/check-template-recommendations-spec.mjs && tsx scripts/check-template-recommendations-wire-spec.mjs",
     "test:template-revision": "tsx scripts/check-template-revision-spec.mjs",
-    "test:template-revision-web": "NEXT_PUBLIC_API_BASE_URL=http://localhost tsx --tsconfig ../web/tsconfig.json ../web/scripts/check-template-revision-spec.mjs"
+    "test:template-revision-web": "NEXT_PUBLIC_API_BASE_URL=http://localhost tsx --tsconfig ../web/tsconfig.json ../web/scripts/check-template-revision-spec.mjs",
+    "test:home-integration": "bash ../../scripts/run-confirm-record-dynamodb-tests.sh pnpm --filter api exec node --import tsx/esm scripts/check-home-integration-spec.mjs"
   },
   "keywords": [],
   "author": "",
