@@ -6,6 +6,8 @@ import { createErrorResponse, type JsonResponse } from "../../core/response/inde
 import { sharedDomainHandlers } from "../lambda/adapter.js";
 
 export const localRoutePatterns = [
+  "/regions",
+  "/wardrobes/:wardrobeId/region",
   "/wardrobes",
   "/wardrobes/:wardrobeId",
   "/wardrobes/:wardrobeId/recommendations/clothing",
@@ -20,7 +22,7 @@ export const localRoutePatterns = [
 
 export type LocalRoutePattern = (typeof localRoutePatterns)[number];
 export type LocalDomain = "wardrobe" | "clothing" | "template" | "history" | "presign";
-export type LocalRouteMethod = "GET" | "POST" | "PATCH" | "DELETE";
+export type LocalRouteMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 export type LocalRouteParams = Record<string, string>;
 export type LocalRouteQuery = Record<string, string | string[]>;
 
@@ -52,6 +54,9 @@ export type LocalRouteHandler = (
   | { statusCode: number; headers: Record<string, string>; body: string };
 
 export const localRoutes: readonly LocalRouteDefinition[] = [
+  { method: "GET", pattern: "/regions", domain: "wardrobe" },
+  { method: "GET", pattern: "/wardrobes/:wardrobeId/region", domain: "wardrobe" },
+  { method: "PUT", pattern: "/wardrobes/:wardrobeId/region", domain: "wardrobe" },
   { method: "POST", pattern: "/wardrobes", domain: "wardrobe" },
   { method: "GET", pattern: "/wardrobes/:wardrobeId", domain: "wardrobe" },
   { method: "GET", pattern: "/wardrobes/:wardrobeId/recommendations/clothing", domain: "clothing" },

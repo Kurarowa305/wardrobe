@@ -867,3 +867,11 @@ API-14 / API-16 は記録時の全構成服を対象に、履歴・日別件数�
 統計・日別件数の条件付き書き込み失敗とトランザクション競合は `409 CONFLICT`。API-16で対象日の日別件数が欠落・不正な場合も同じ。失敗したトランザクションの履歴や統計は部分反映しない。再読込後に利用者が再操作でき、アプリケーションによる自動再送は行わない。認証・容量等の失敗を一律に競合へ分類しない。
 
 API-06 / API-11 の通常編集は統計を保持する。内部の `statsVersion` は公開リクエスト・レスポンスに追加しない。
+
+## 地域設定 API (#279)
+
+`GET /regions?q=` は固定ABR辞書（1,918件）をNFKC・かな統一で検索し、完全一致→前方一致→部分一致、同点コード順で10件まで返す。空・64コードポイント超・重複query・未知queryは400。DTOは `{datasetVersion,items:[{regionId,label}],hasMore}`。
+
+`GET /wardrobes/:wardrobeId/region` と `PUT /wardrobes/:wardrobeId/region` の成功DTOは `{revision,region:{regionId,label,datasetVersion}|null}`。既存未設定は0/null。PUTは `{regionId,datasetVersion,expectedRevision}`、解除は `{regionId:null,expectedRevision}`。JSONのみ、未知属性・不正整数は拒否。未知コードは400 UNKNOWN_REGION、辞書版変更と保存版競合は409 REGION_DATASET_CHANGED/REGION_CHANGED（details.reason）。PUT結果不明の再送も古い版では409。未知wardrobeは404。
+
+経路は既存wardrobe Lambdaとlocal共通handler。既存wardrobe IAMのGetItem/UpdateItemを使い追加権限・環境変数不要。Web共通clientにPUTとAbortSignal対応endpoint、DTO検証とMSWを追加。画面側の明示検索・応答世代管理は#282。

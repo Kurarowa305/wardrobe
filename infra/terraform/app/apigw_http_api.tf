@@ -13,6 +13,9 @@ locals {
 
   apigw_domain_route_keys = {
     wardrobe = [
+      "GET /regions",
+      "GET /wardrobes/{wardrobeId}/region",
+      "PUT /wardrobes/{wardrobeId}/region",
       "ANY /wardrobes",
       "ANY /wardrobes/{wardrobeId}"
     ]

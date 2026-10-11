@@ -39,7 +39,7 @@ type BodyRequestOptions<TBody> = BaseRequestOptions & {
   body?: TBody;
 };
 
-type RequestMethod = "GET" | "POST" | "PATCH" | "DELETE";
+type RequestMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
 type ApiClientConfig = {
   baseUrl?: string;
@@ -57,6 +57,7 @@ export type ApiClient = {
     path: string,
     options?: BodyRequestOptions<TBody>,
   ): Promise<TResponse>;
+  put<TResponse, TBody = unknown>(path: string, options?: BodyRequestOptions<TBody>): Promise<TResponse>;
   patch<TResponse, TBody = unknown>(
     path: string,
     options?: BodyRequestOptions<TBody>,
@@ -227,6 +228,7 @@ export function createApiClient(config: ApiClientConfig = {}): ApiClient {
   return {
     get: (path, options) => request("GET", path, options, resolved),
     post: (path, options) => request("POST", path, options, resolved),
+    put: (path, options) => request("PUT", path, options, resolved),
     patch: (path, options) => request("PATCH", path, options, resolved),
     delete: (path, options) => request("DELETE", path, options, resolved),
   };
