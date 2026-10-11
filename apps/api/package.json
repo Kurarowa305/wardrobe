@@ -114,7 +114,9 @@
     "test:lambda-detail-routing": "node --import tsx/esm scripts/check-lambda-detail-routing-spec.mjs",
     "test:wear-stats-integrity": "node --import tsx/esm scripts/check-wear-stats-integrity-spec.mjs",
     "test:wear-stats-audit": "node scripts/check-wear-stats-audit-spec.mjs",
-    "audit:wear-stats": "node scripts/audit-wear-stats.mjs"
+    "audit:wear-stats": "node scripts/audit-wear-stats.mjs",
+    "test:region": "tsx scripts/check-region-spec.mjs",
+    "test:region-web": "NEXT_PUBLIC_API_BASE_URL=http://localhost tsx --tsconfig ../web/tsconfig.json ../web/scripts/check-region-spec.mjs"
   },
   "keywords": [],
   "author": "",

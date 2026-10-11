@@ -12,7 +12,7 @@ type WardrobeRecord = {
 };
 
 let sequence = 1;
-const wardrobeStore = new Map<string, WardrobeRecord>();
+export const wardrobeStore = new Map<string, WardrobeRecord>();
 
 wardrobeStore.set(DEMO_IDS.wardrobe, {
   wardrobeId: DEMO_IDS.wardrobe,
